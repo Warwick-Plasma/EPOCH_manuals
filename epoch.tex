@@ -170,7 +170,7 @@ Welcome to EPOCH1D Version 1.3
 
 At which point the end user should simply type in the name of the directory
 where the code ouput should be placed. This directory must also include the
-file Òinput.deckÓ which controls the code setup, specifies how to set the
+file ï¿½input.deckï¿½ which controls the code setup, specifies how to set the
 initial conditions and controls the IO. Writing an input deck for \EPOCH is
 fairly time consuming and so the code is supplied with an example input deck
 which includes all the necessary sections for the code to run. This section of
@@ -191,27 +191,25 @@ conditions to use.
 
 \boxverbatim{control block}
 begin:control
+   nx=2000 #in x
+   npart=200*200*40
 
-	nx=2000 #in x
-	npart=200*200*40
-	
-	nsteps=-1
-	
-	t_end=0.3e-12
+   nsteps=-1
 
-	x_start=-5e-6
-	x_end=5e-6
-	
-	dt_multiplier=0.8
+   t_end=0.3e-12
 
-	dlb=F
-	dlb_threshold=1.0
+   x_start=-5e-6
+   x_end=5e-6
 
-	initial_conditions=external
-	icfile=ic.deck
-	restart_snapshot=98
-	neutral_background=T
+   dt_multiplier=0.8
 
+   dlb=F
+   dlb_threshold=1.0
+
+   initial_conditions=external
+   icfile=ic.deck
+   restart_snapshot=98
+   neutral_background=T
 end:control
 \end{Verbatim}
 
@@ -262,8 +260,8 @@ conditions.\\
 dump to restart the code from.\\
 
 {\emphtext neutral\_background} - Logical flag indicating whether or not to
-solve PoissonÕs equation at t=0 or assume that there is a neutralising
-background field. If T then PoissonÕs equation is solved.\\
+solve Poissonï¿½s equation at t=0 or assume that there is a neutralising
+background field. If T then Poissonï¿½s equation is solved.\\
 
 \pagebreak
 
@@ -275,10 +273,8 @@ stage.
 
 \boxverbatim{boundaries block}
 begin:boundaries
-
-	xbc_left=simple_laser
-	xbc_right=simple_outflow
-
+   xbc_left=simple_laser
+   xbc_right=simple_outflow
 end:boundaries
 \end{Verbatim}
 
@@ -325,27 +321,25 @@ one or more boundaries then the code will no longer necessarily conserve mass.}
 \subsubsection{{\inlineemph species} block}
 
 \boxverbatim{species block}
-
 begin:species
-	n_species=2
+   n_species=2
 
-	#electrons
-	charge1=-1.0
-	mass1=1.0
-	npart1=2000*100
-	frac1=0.5
-	name1=Electron
-	dump1=T
+   #electrons
+   charge1=-1.0
+   mass1=1.0
+   npart1=2000*100
+   frac1=0.5
+   name1=Electron
+   dump1=T
 
-	#carbon4+
-	charge2=4.0
-	mass2=1836.0*12
-	npart2=2000*100
-	frac2=0.5
-	name2=Carbon
-	dump2=T
+   #carbon4+
+   charge2=4.0
+   mass2=1836.0*12
+   npart2=2000*100
+   frac2=0.5
+   name2=Carbon
+   dump2=T
 end:species
-
 \end{Verbatim}
 
 {\emphtext n\_species} - This MUST be the first entry in this block and
@@ -388,13 +382,13 @@ information. \\
 the information about species n. If set to F, then the species information is
 not dumped when writing ANY species specific diagnostics, although it is
 included in global diagnostics (i.e in the example if dump2=F were specified
-then there would be no Òmass\_density\_carbonÓ, but the mass of the carbon
-would be considered when calculating Òmass\_densityÓ) and restart dumps.\\
+then there would be no ï¿½mass\_density\_carbonï¿½, but the mass of the carbon
+would be considered when calculating ï¿½mass\_densityï¿½) and restart dumps.\\
 
 {\emphtext tracer\inlinecode{n}} - Logical flag switching particle species n
 into tracer particles. Tracer particles are enabled with the correct
 precompiler option, and when set for a given species make that species move
-correctly for itÕs charge and mass, but contribute no current. This means that
+correctly for itï¿½s charge and mass, but contribute no current. This means that
 these particles as passive tracers in the plasma.\\
 
 \pagebreak
@@ -405,7 +399,7 @@ Flexible Datatype}) self defining file format which will be covered in more
 detail in a later set of notes and comes with readers for ITT IDL and LLNL
 VisIT, with additional readers for Mathworks Matlab and Yorick under
 development. What the code should output and when it should output it is
-specified in the ÒoutputÓ block of the input deck which will be covered over
+specified in the ï¿½outputï¿½ block of the input deck which will be covered over
 the next few pages, but a quick note should be made on the types of output and
 on how to specify when a given variable should be dumped.\\
 
@@ -462,53 +456,53 @@ dumpmask}.\\
 
 \boxverbatim{output block}
 begin:output
-	#If use_offset_grid is true then the code dumps a
-	#grid which displays positions relative to the
-	#Left hand edge of the window
-	use_offset_grid=F
-	#number of timesteps between output dumps
-	dt_snapshot=1.0e-14
-	#Number of dt_snapshot between full dumps
-      full_dump_every=10
-	restart_dump_every=-1
-	force_final_to_be_restartable=T
+   #If use_offset_grid is true then the code dumps a
+   #grid which displays positions relative to the
+   #Left hand edge of the window
+   use_offset_grid=F
+   #number of timesteps between output dumps
+   dt_snapshot=1.0e-14
+   #Number of dt_snapshot between full dumps
+   full_dump_every=10
+   restart_dump_every=-1
+   force_final_to_be_restartable=T
 
-	use_extended_io=T
-	extended_io_file=io.deck
+   use_extended_io=T
+   extended_io_file=io.deck
 
-	#Properties at particle positions
-	particles=never
-      px=never
-      py=never
-      pz=never
-      vx=never
-      vy=never
-      vz=never
-      charge=never
-      mass=never
-      particle_weight=never
-	species_id=never
+   #Properties at particle positions
+   particles=never
+   px=never
+   py=never
+   pz=never
+   vx=never
+   vy=never
+   vz=never
+   charge=never
+   mass=never
+   particle_weight=never
+   species_id=never
 
-	#Properties on grid
-	grid=always
-	ex=always
-	ey=always
-	ez=always
-	bx=always
-	by=always
-	bz=always
-	jx=always
-	jy=always
-	jz=never
-	ekbar=always + species
-	mass_density=never + species
-	charge_density=always
-	number_density=always + species
-      temperature=always+species
+   #Properties on grid
+   grid=always
+   ex=always
+   ey=always
+   ez=always
+   bx=always
+   by=always
+   bz=always
+   jx=always
+   jy=always
+   jz=never
+   ekbar=always + species
+   mass_density=never + species
+   charge_density=always
+   number_density=always + species
+   temperature=always+species
 
-	#extended io
-	distribution_functions=always
-	particle_probes=never
+   #extended io
+   distribution_functions=always
+   particle_probes=never
 end:output
 \end{Verbatim}
 
@@ -603,7 +597,7 @@ near future.\\
 
 {\emphtext distribution\_function} - Dumpmask for outputting distribution
 functions specified in the extended io deck. Each individual distribution
-function can have itÕs own dumpmask, but this one is more restrictive.\\
+function can have itï¿½s own dumpmask, but this one is more restrictive.\\
 
 \pagebreak
 
@@ -619,19 +613,19 @@ details the blocks that can be set to set up the initial conditions.
 
 \boxverbatim{constant block}
 begin:constant
-	lambda=1.0e-6#1 micron wavelength
-	omega=2.0*pi*c/lambda
-	den_crit=critical(omega)
-	scale=3.5e-6 #microns
-	den_max=5.0*den_crit
-	thick=300e-9
-	pplength=6000e-9
-	widscale=5.0e-6
+   lambda=1.0e-6#1 micron wavelength
+   omega=2.0*pi*c/lambda
+   den_crit=critical(omega)
+   scale=3.5e-6 #microns
+   den_max=5.0*den_crit
+   thick=300e-9
+   pplength=6000e-9
+   widscale=5.0e-6
 
-	t_wid=(10.0e-6)/c
-	amax=1.0
-	wy=1e-6
-	y=0.0
+   t_wid=(10.0e-6)/c
+   amax=1.0
+   wy=1e-6
+   y=0.0
 end:constant
 \end{Verbatim}
 
@@ -696,16 +690,16 @@ Laser blocks attach an EM wave source to a boundary which is set as
 
 \boxverbatim{laser block}
 begin:laser
-	direction=left
-	amp=3.222499e13
-	irradiance=1.0e19
-	id=1
-	freq=omega
-	pol=0.0
-	phase=0.0
-	t_profile=gauss(time,40.0e-15,40.0e-15)
-	t_start=0.0
-	t_end=80.0e-15
+   direction=left
+   amp=3.222499e13
+   irradiance=1.0e19
+   id=1
+   freq=omega
+   pol=0.0
+   phase=0.0
+   t_profile=gauss(time,40.0e-15,40.0e-15)
+   t_start=0.0
+   t_end=80.0e-15
 end:laser
 \end{Verbatim}
 
@@ -720,7 +714,7 @@ multidimensional \EPOCH\\
 {\emphtext direction} - The boundary to which to attach the laser. This is
 slightly misnamed, since it is NOT the direction in which the laser will be
 propagating, but the side of the box to which to attach the laser. The name may
-change in future versions, but ÒdirectionÓ will be kept to maintain
+change in future versions, but ï¿½directionï¿½ will be kept to maintain
 compatibility. In 1D, the directions can be either left or right.\\
 
 {\emphtext amp} - The amplitude of the E field of the laser.\\
@@ -747,12 +741,12 @@ greater than 1 is possible but will cause the maximum laser intensity to grow
 beyond amp.\\
 
 {\emphtext t\_start} - Start time for the laser in seconds, can be set to the
-string ÒstartÓ to start at the beginning of the simulation. When using this
+string ï¿½startï¿½ to start at the beginning of the simulation. When using this
 parameter, the laser start is hard, to get a soft start use the {\inlineemph
 t\_profile} parameter to ramp the laser up to full strength.\\
 
 {\emphtext t\_end} - End time for the laser in seconds, can be set to the
-string ÒendÓ to end at the end of the simulation. When using this parameter,
+string ï¿½endï¿½ to end at the end of the simulation. When using this parameter,
 the laser end is clipped straight to zero at t$>${\inlineemph t\_end}. To get a
 soft end use the {\inlineemph t\_profile} parameter to ramp the laser down to
 zero.\\
@@ -806,24 +800,24 @@ includes a high order field solver to attempt to reduce this.
 \subsubsection{{\inlineemph species\inlinecode{n}} block}
 \boxverbatim{species{\it n} block}
 begin:species2
-	rho=if(abs(x) lt thick,den_max,0.0)
-	rho=if((x gt -thick) and (abs(y) gt 2e-6),0.0,rho(2))
-	 temp_x=0.0
-	 temp_y=temp_x(1)
-	 minrho=0.1 * den_max
+   rho=if(abs(x) lt thick,den_max,0.0)
+   rho=if((x gt -thick) and (abs(y) gt 2e-6),0.0,rho(2))
+   temp_x=0.0
+   temp_y=temp_x(1)
+   minrho=0.1 * den_max
 end:species2
 
 begin:species1
-	rho=4.0*rho(2)
-	temp_x=temp_x(1)
-	temp_y=temp_x(1)
-	minrho=0.1 * den_max
+   rho=4.0*rho(2)
+   temp_x=temp_x(1)
+   temp_y=temp_x(1)
+   minrho=0.1 * den_max
 end:species1
 \end{Verbatim}
 
 The actual initial conditions are specified in one or more blocks called
 species blocks. There should be one of these blocks for each species which is
-to have itÕs initial conditions set from the external initial conditions.\\
+to have itï¿½s initial conditions set from the external initial conditions.\\
 
 Each block is started with a\\
 
@@ -874,9 +868,9 @@ parameter CANNOT vary in space and is just a single constant.
 \subsubsection{{\inlineemph species\_external\inlinecode{n}} block}
 \boxverbatim{species\_external{\it n} block}
 begin:species_external2
-	rho=Data/ic.dat
-	offset=80000
-	temp_x=Data/ic.dat
+   rho=Data/ic.dat
+   offset=80000
+   temp_x=Data/ic.dat
 end:species_external2
 \end{Verbatim}
 
@@ -911,12 +905,12 @@ unformatted files using the offset element, but care must be taken!}\\
 \subsubsection{{\inlineemph fields} block}
 \boxverbatim{fields block}
 begin:fields
-	ex=sin(pi*x/lengthx)
-	ey=cos(pi*x/lengthx)
-	ez=0
-	bx=1.0
-	by=-1.0
-	bz=0
+   ex=sin(pi*x/lengthx)
+   ey=cos(pi*x/lengthx)
+   ez=0
+   bx=1.0
+   by=-1.0
+   bz=0
 end:fields
 \end{Verbatim}
 
@@ -962,17 +956,17 @@ useful. These will the next elements to be covered.\\
 
 \boxverbatim{Changed control block}
 begin:control
-	.
-	.
-	ny=200
-	nz=200
-	.
-	y_start=-10e-6
-	y_end=10e-6
-	z_start=-10e-6
-	z_end=10e-6
-	.
-	.
+   .
+   .
+   ny=200
+   nz=200
+   .
+   y_start=-10e-6
+   y_end=10e-6
+   z_start=-10e-6
+   z_end=10e-6
+   .
+   .
 end:control
 \end{Verbatim}
 
@@ -994,12 +988,12 @@ simulations.\\
 
 \boxverbatim{Changed boundaries block}
 begin:boundaries
-	.
-	.
-	ybc_up=periodic
-	ybc_down=periodic
-	zbc_front=simple_outflow
-	zbc_back=simple_laser
+   .
+   .
+   ybc_up=periodic
+   ybc_down=periodic
+   zbc_front=simple_outflow
+   zbc_back=simple_laser
 end:boundaries
 \end{Verbatim}
 
@@ -1007,10 +1001,10 @@ The modified boundary block includes new boundary conditions for the additional
 boundaries that are introduced in higher dimensions. These available boundaries
 are exactly the same as in 1D, with the additional boundaries being:\\
 
-{\inlineemph ybc\_up}	- top of domain\\
-{\inlineemph ybc\_down}	- bottom of domain\\
-{\inlineemph zbc\_front}	- front of domain\\
-{\inlineemph zbc\_back}	- back of domain\\
+{\inlineemph ybc\_up}    - top of domain\\
+{\inlineemph ybc\_down}  - bottom of domain\\
+{\inlineemph zbc\_front} - front of domain\\
+{\inlineemph zbc\_back}  - back of domain\\
 
 These are equivalent to the existing 1D simulations except that the moving
 window always moves parallel to the x-axis when activated.\\ This concludes all
@@ -1047,15 +1041,15 @@ centre of the domain.}{0.4}
 \begin{minipage}{\textwidth}
 \boxverbatim{species block to set up Gaussian density blob}
 begin:constant
-	width=2.5e-6 #2.5 microns
+   width=2.5e-6 #2.5 microns
 end:constant
 
 begin:deo
-	r=sqrt(x^2+y^2)
+   r=sqrt(x^2+y^2)
 end:deo
 
 begin:species1
-	rho=1.0e19 * gauss(r,0.0,width)
+   rho=1.0e19 * gauss(r,0.0,width)
 end:species1
 \end{Verbatim}
 \end{minipage}
@@ -1066,15 +1060,15 @@ defecit at the centre of the domain.}{0.4}
 \begin{minipage}{\textwidth}
 \boxverbatim{species block to set up Gaussian density blob}
 begin:constant
-	width=2.5e-6 #2.5 microns
+   width=2.5e-6 #2.5 microns
 end:constant
 
 begin:deo
-	r=sqrt(x^2+y^2)
+   r=sqrt(x^2+y^2)
 end:deo
 
 begin:species1
-	rho=1.0e19 * (1.0-gauss(r,0.0,width))
+   rho=1.0e19 * (1.0-gauss(r,0.0,width))
 end:species1
 \end{Verbatim}
 \end{minipage}
@@ -1097,7 +1091,7 @@ by\\
 {\emphtext profile} - The spatial profile for the laser. This is
 essentially an array defined along the edge (or surface) that the laser is
 attached to. It is clear that the spatial profile is only meaningful
-perpendicular to the laserÕs direction of travel and so it simply does not
+perpendicular to the laserï¿½s direction of travel and so it simply does not
 exist in 1D. The laser profile is evaulated while the initial conditions deck
 is evaluated and so cannot include any temporal information which must be
 encoded in {\inlineemph t\_profile}.  The spatial profile is evaluated at the
@@ -1130,30 +1124,30 @@ laser to propagate in from a corner.\\
 
 \boxverbatim{dist\_fn block}
 begin:dist_fn
-	name=x_px
-	ndims=2
-	dumpmask=always
-	
-	direction1=dir_x
-	direction2=dir_px
+   name=x_px
+   ndims=2
+   dumpmask=always
 
-	#range is ignored for spatial coordinates
-	range1=1>1
-	range2=-50.0e-20>50.0e-20
-	
-	#resolution is ignored for spatial coordinates
-	resolution1=1
-	resolution2=5000
+   direction1=dir_x
+   direction2=dir_px
 
-	include_species_1=F
-	include_species_2=T
-	include_species_3=T
+   #range is ignored for spatial coordinates
+   range1=1>1
+   range2=-50.0e-20>50.0e-20
+
+   #resolution is ignored for spatial coordinates
+   resolution1=1
+   resolution2=5000
+
+   include_species_1=F
+   include_species_2=T
+   include_species_3=T
 end:dist_fn
 \end{Verbatim}
 
 One way of considering the PIC methodology is based on the idea of using the
 simulation pseudo-particles as Monte-Carlo sampling points of the phase space
-of VlasovÕs equation. While direct simulation of VlasovÕs equation leads to
+of Vlasovï¿½s equation. While direct simulation of Vlasovï¿½s equation leads to
 much lower noise then using this Monte-Carlo approach it is much more
 computationally expensive and is currently only just possible in 2D and
 completely impossible in 3D. However, sometimes it is useful to be able to
@@ -1168,7 +1162,7 @@ setting up additional diagnostics including phase space reconstructions. It is
 possible to set up as many 2D and 3D distribution functions as required by
 simply specifying multiple {\inlineemph dist\_fn} blocks. The layout of these
 blocks is as follows:\\
-	
+
 {\emphtext name} - The name of the distribution function when it is
 output. This name is appended with the name of each species for which the data
 is output and so in the output this block when applied to a species named
@@ -1256,136 +1250,124 @@ files.\\
 
 \boxverbatim{input.deck}
 begin:control
+   #global number of gridpoints
+   nx=400 #in x
+   npart=3200
 
-	#global number of gridpoints
-	nx=400 #in x
-        npart=3200
+   #maximum number of iterations
+   #set to -1 to run until finished
+   nsteps=-1
 
-	#maximum number of iterations
-	#set to -1 to run until finished
-	nsteps=-1
+   #final time of simulation
+   t_end=1.5e-1
 
-	#final time of simulation
-        t_end=1.5e-1
+   #size of domain
+   x_start=0
+   x_end=5.0e5
 
-	#size of domain
-	x_start=0
-	x_end=5.0e5
-	
-	#Don't know if this should be in the deck or not
-	dt_multiplier=0.9
+   #Don't know if this should be in the deck or not
+   dt_multiplier=0.9
 
-	dlb=F
-	dlb_threshold=1.0
+   dlb=F
+   dlb_threshold=1.0
 
-	initial_conditions=external
-	icfile=ic.deck
-        restart_snapshot=98
+   initial_conditions=external
+   icfile=ic.deck
+   restart_snapshot=98
 
-	#Setting neutral_background to F makes the code solve
-        #Poisson's equation for the initial electric field
-        #Setting it to T makes the initial electric field 0
-        neutral_background=T
-
+   #Setting neutral_background to F makes the code solve
+   #Poisson's equation for the initial electric field
+   #Setting it to T makes the initial electric field 0
+   neutral_background=T
 end:control
 
 begin:boundaries
-
-	xbc_left=periodic
-	xbc_right=periodic
-
+   xbc_left=periodic
+   xbc_right=periodic
 end:boundaries
 
 begin:species
-	n_species=2
+   n_species=2
 
-	#Rightwards travelling electrons
-	charge1=-1
-	mass1=1.0
-	frac1=0.5
-	name1=Right
-	dump1=T
+   #Rightwards travelling electrons
+   charge1=-1
+   mass1=1.0
+   frac1=0.5
+   name1=Right
+   dump1=T
 
-	#Leftwards travelling electrons
-	charge2=-1
-	mass2=1.0
-	frac2=0.5
-	name2=Left
-	dump2=T
-
+   #Leftwards travelling electrons
+   charge2=-1
+   mass2=1.0
+   frac2=0.5
+   name2=Left
+   dump2=T
 end:species
 
-
 begin:output
+   #If use_offset_grid is true then the code dumps a
+   #grid which displays positions relative to the
+   #Left hand edge of the window
+   use_offset_grid=F
+   #number of timesteps between output dumps
+   dt_snapshot=1.5e-3
+   #Number of dt_snapshot between full dumps
+   full_dump_every=1
+   restart_dump_every=-1
+   force_final_to_be_restartable=T
 
-	#If use_offset_grid is true then the code dumps a
-	#grid which displays positions relative to the
-	#Left hand edge of the window
-	use_offset_grid=F
-	#number of timesteps between output dumps
-	dt_snapshot=1.5e-3
-	#Number of dt_snapshot between full dumps
-        full_dump_every=1
-	restart_dump_every=-1
-	force_final_to_be_restartable=T
+   use_extended_io=F
 
-	use_extended_io=F
+   #Properties at particle positions
+   particles=always
+   px=always
+   py=never
+   pz=never
+   vx=never
+   vy=never
+   vz=never
+   charge=never
+   mass=never
+   particle_weight=never
+   species_id=always
 
-	#Properties at particle positions
-	particles=always
-        px=always
-        py=never
-        pz=never
-        vx=never
-        vy=never
-        vz=never
-        charge=never
-        mass=never
-        particle_weight=never
-	species_id=always
-
-	#Properties on grid
-	grid=always
-	ex=always
-	ey=always
-	ez=always
-	bx=always
-	by=always
-	bz=always
-	jx=always
-	jy=never
-	jz=never
-	ekbar=always
-	mass_density=never + species
-	charge_density=never
-	number_density=always + species
-        temperature=never
-
+   #Properties on grid
+   grid=always
+   ex=always
+   ey=always
+   ez=always
+   bx=always
+   by=always
+   bz=always
+   jx=always
+   jy=never
+   jz=never
+   ekbar=always
+   mass_density=never + species
+   charge_density=never
+   number_density=always + species
+   temperature=never
 end:output
-
-
 \end{Verbatim}
 
 \boxverbatim{ic.deck}
-
 begin:constant
-        drift_p=2.5e-24
-        temp=273
-        dens=10
+   drift_p=2.5e-24
+   temp=273
+   dens=10
 end:constant
 
 begin:species1
-        temp_x=temp
-        drift_x=drift_p
-        rho=dens
+   temp_x=temp
+   drift_x=drift_p
+   rho=dens
 end:species1
 
 begin:species2
-        temp_x=temp
-        drift_x=-drift_p
-        rho=dens
+   temp_x=temp
+   drift_x=-drift_p
+   rho=dens
 end:species2
-
 \end{Verbatim}
 
 \captionedimage{./images/late.eps}{tsilate}{The final state of the electron
@@ -1408,21 +1390,19 @@ condition to show that this is still easy to implement in EPOCH. A good example
 initial condition would be\\
 
 \boxverbatim{ic.deck}
-
 begin:constant
-        den_peak=1.0e19
+  den_peak=1.0e19
 end:constant
 
 begin:species2
-        rho=den_peak*(sin(4.0*pi*x/lengthx+pi/4))*(sin(8.0*pi*y/lengthy)+1)
-        minrho=0.1*den_peak
+  rho=den_peak*(sin(4.0*pi*x/lengthx+pi/4))*(sin(8.0*pi*y/lengthy)+1)
+  minrho=0.1*den_peak
 end:species2
 
 begin:species1
-        rho=rho(2)
-        minrho=0.1*den_peak
+  rho=rho(2)
+  minrho=0.1*den_peak
 end:species1
-
 \end{Verbatim}
 
 Although not included here the input deck associated with these initial
@@ -1445,25 +1425,24 @@ is easy to do in both 2D and 3D, but is presented here in 3D form.\\
 
 \boxverbatim{ic.deck}
 begin:constants
-	den_cone=1.0e22
+   den_cone=1.0e22
 end:constants
 
 begin:deo
-	ri=abs(x-5.0e-6)
-	ro=ri+1.0e-6
-	r=sqrt(y^2+z^2)
+   ri=abs(x-5.0e-6)
+   ro=ri+1.0e-6
+   r=sqrt(y^2+z^2)
 end:deo
 
 begin:species2
-	rho=if(r gt ri) and(r lt ro),den_cone,0.0)
-	rho=if((x gt 3.0e-6) and (x lt 4.0e-6) and (r lt ri),den_cone,rho(2))
-	rho=if(x gt 4e-6,0.0,rho(2))
+   rho=if(r gt ri) and(r lt ro),den_cone,0.0)
+   rho=if((x gt 3.0e-6) and (x lt 4.0e-6) and (r lt ri),den_cone,rho(2))
+   rho=if(x gt 4e-6,0.0,rho(2))
 end:species2
 
 begin:species1
-	rho=rho(2) * 22.0
+   rho=rho(2) * 22.0
 end:species1
-
 \end{Verbatim}
 
 To convert this to 2D, simply replace the line \inlinecode{r=sqrt(y\^2+z\^2)}
@@ -1718,43 +1697,40 @@ writer of the extension for assistance. The five built in blocks are
 The control block of a valid input deck for EPOCH2D reads as follows\\
 \simpleboxverbatim
 begin:control
+   #global number of gridpoints
+   nx=512 #in x
+   ny=512 #in y
+   #global number of particles
+   npart=1000000
 
-      #global number of gridpoints
-      nx=512 #in x
-      ny=512 #in y
-      #global number of particles
-      npart=1000000
+   #maximum number of iterations
+   #set to -1 to run until finished
+   nsteps=-1
 
-	#maximum number of iterations
-	#set to -1 to run until finished
-      nsteps=-1
+   #final time of simulation
+   t_end=1.0e-12
 
+   #size of domain
+   x_start=-0.1e-6
+   x_end=400.0e-6
+   y_start=-400.0e-6
+   y_end=400.0e-6
 
-      #final time of simulation
-      t_end=1.0e-12
+   #Don't know if this should be in the deck or not
+   dt_multiplier=0.8
 
-	#size of domain
-	x_start=-0.1e-6
-      x_end=400.0e-6
-      y_start=-400.0e-6
-      y_end=400.0e-6
+   #dynamic load balancing
+   dlb=F
+   dlb_threshold=1.0
 
-      #Don't know if this should be in the deck or not
-      dt_multiplier=0.8
+   initial_conditions=external
+   icfile=ic.deck
+   restart_snapshot=76
 
-      #dynamic load balancing
-      dlb=F
-      dlb_threshold=1.0
-
-      initial_conditions=external
-      icfile=ic.deck
-      restart_snapshot=76
-
-      #Setting neutral_background to F makes the code solve
-      #Poisson's equation for the initial electric field
-      #Setting it to T makes the initial electric field 0
-      neutral_background=T
-
+   #Setting neutral_background to F makes the code solve
+   #Poisson's equation for the initial electric field
+   #Setting it to T makes the initial electric field 0
+   neutral_background=T
 end:control
 \end{Verbatim}
 
@@ -1814,12 +1790,12 @@ The next section of the input deck describes the boundary conditions. The
 boundaries block for EPOCH3D is as follows\\
 \simpleboxverbatim
 begin:boundaries
-	xbc_left=other
-	xbc_right=other
-	ybc_up=periodic
-	ybc_down=periodic
-      zbc_front=other
-      zbc_back=other
+   xbc_left=other
+   xbc_right=other
+   ybc_up=periodic
+   ybc_down=periodic
+   zbc_front=other
+   zbc_back=other
 end:boundaries
 \end{Verbatim}
 
@@ -1849,21 +1825,21 @@ The next section of the input deck describes the particles species used in the
 code. An example species block for any \EPOCH code is given below\\
 \simpleboxverbatim
 begin:species
-	n_species=2
+   n_species=2
 
-      #H+ ions
-      charge1=1.0
-      mass1=1800.0
-      frac1=0.5
-      name1=Proton
-      dump1=T
+   #H+ ions
+   charge1=1.0
+   mass1=1800.0
+   frac1=0.5
+   name1=Proton
+   dump1=T
 
-      #electrons
-      charge2=-1.0
-      mass2=1.0
-      frac2=0.5
-      name2=Electron
-      dump2=T
+   #electrons
+   charge2=-1.0
+   mass2=1.0
+   frac2=0.5
+   name2=Electron
+   dump2=T
 end:species
 \end{Verbatim}
 
@@ -1909,48 +1885,48 @@ data that the user wants dumped from the code and an example block from any
 version of \EPOCH is given below\\
 \simpleboxverbatim
 begin:output
-      #If use_offset_grid is true then the code dumps a
-      #grid which displays positions relative to the
-      #Left hand edge of the window
-      use_offset_grid=T
+   #If use_offset_grid is true then the code dumps a
+   #grid which displays positions relative to the
+   #Left hand edge of the window
+   use_offset_grid=T
 
-      #number of timesteps between output dumps
-      dt_snapshot=1.0e-14
-      #Number of dt_snapshot between full dumps
-      full_dump_every=1
-      restart_dump_every=1
-      force_final_to_be_restartable=T
+   #number of timesteps between output dumps
+   dt_snapshot=1.0e-14
+   #Number of dt_snapshot between full dumps
+   full_dump_every=1
+   restart_dump_every=1
+   force_final_to_be_restartable=T
 
-      use_extended_io=T
-      extended_io_file=io.deck
+   use_extended_io=T
+   extended_io_file=io.deck
 
-      #Properties at particle positions
-      particles=full
-      px=never
-      py=never
-      pz=never
-      vx=full
-      vy=full
-      vz=never
-      charge=full
-      mass=full
-      particle_weight=always
-      species_id=always
+   #Properties at particle positions
+   particles=full
+   px=never
+   py=never
+   pz=never
+   vx=full
+   vy=full
+   vz=never
+   charge=full
+   mass=full
+   particle_weight=always
+   species_id=always
 
-      #Properties on grid
-      grid=always
-      ex=always
-      ey=always
-      ez=always
-      bx=always
-      by=always
-      bz=always
-      jx=always
-      jy=always
-      jz=always
-      temperatures=always
-      mass_density=always
-      charge_density=always
+   #Properties on grid
+   grid=always
+   ex=always
+   ey=always
+   ez=always
+   bx=always
+   by=always
+   bz=always
+   jx=always
+   jy=always
+   jz=always
+   temperatures=always
+   mass_density=always
+   charge_density=always
 end:output
 \end{Verbatim}
 
@@ -2035,11 +2011,11 @@ a pulse to travel into a vacuum region, although this is being developed. The
 block looks like\\
 \simpleboxverbatim
 begin:window
-        move_window=T
-        window_v_x=3.0e8
-        window_start_time=7.0e-13
-        xbc_left_after_move=simple_outflow
-        xbc_right_after_move=simple_outflow
+   move_window=T
+   window_v_x=3.0e8
+   window_start_time=7.0e-13
+   xbc_left_after_move=simple_outflow
+   xbc_right_after_move=simple_outflow
 end:window
 \end{Verbatim}
 
@@ -2328,19 +2304,19 @@ and the grid spacing to always be at least 0.5 Debye lengths, you would set
 that up as follows\\
 \simpleboxverbatim
 begin:constant
-     l_debye=1.0e-6 # Debye length is 1 micrometer
-     n_debye_in_box = 100 # number of debye lengths in simulation
-     n_gridpoints=100 # number of grid points requested
-     l_metres=l_debye * n_debye_in_box # length of simulation box in metres
-     n_gp_per_debye=n_gridpoints/n_debye_in_box # number of gridpoints per debye length
+   l_debye=1.0e-6 # Debye length is 1 micrometer
+   n_debye_in_box = 100 # number of debye lengths in simulation
+   n_gridpoints=100 # number of grid points requested
+   l_metres=l_debye * n_debye_in_box # length of simulation box in metres
+   n_gp_per_debye=n_gridpoints/n_debye_in_box # number of gridpoints per debye length
 end:constant
 
 begin:control
-     #if the number of gridpoints per debye length is greated than 2
-     #use the requested number of gridpoints, otherwise use enough
-     #that there are two gridpoints per debye length
-     nx = if(n_gp_per_debye gt 2, n_gridpoints, n_debye_in_box * 2)
-     length_x = l_metres
+   #if the number of gridpoints per debye length is greated than 2
+   #use the requested number of gridpoints, otherwise use enough
+   #that there are two gridpoints per debye length
+   nx = if(n_gp_per_debye gt 2, n_gridpoints, n_debye_in_box * 2)
+   length_x = l_metres
 end:control
 \end{Verbatim}
 
@@ -2353,21 +2329,21 @@ ones. It is possible to break other blocks to define constants and then
 restart the block, so this is valid\\
 \simpleboxverbatim
 begin:control
-    #some of control block
+   #some of control block
 end:control
 
 begin:constant
-    #set constants
+   #set constants
 end:constant
 
 begin:control
-    #rest of control block
+   #rest of control block
 end:control
 \end{Verbatim}
 
 \subsection{MPI in \EPOCH}
-\EPOCH is a parallel PIC code using the standard MPI 2.0 library. However, the code
-has been written in such a way that it is possible to use most of the code
+\EPOCH is a parallel PIC code using the standard MPI 2.0 library. However, the
+code has been written in such a way that it is possible to use most of the code
 with no knowledge of MPI at all. However, this does mean that there are some
 quantities which MUST be read from specific variables in the code rather than
 hard coding quantities in. These variables are listed below
@@ -2547,24 +2523,24 @@ constants and functions which only make sense when specifiying initial
 conditions. The layout of an inital conditions file is
 \simpleboxverbatim
 begin:constant
-	partdens=1.0e25
-	wpe=sqrt(partdens * qe^2/(me * epsilonnought))
+   partdens=1.0e25
+   wpe=sqrt(partdens * qe^2/(me * epsilonnought))
 end:constant
 
 begin:species1
-	rho=interpolate(x,-(6.0e-6),0.2,(10.0e-6),0.2,(11.0e-6),
+   rho=interpolate(x,-(6.0e-6),0.2,(10.0e-6),0.2,(11.0e-6),
             1.0,(150.0e-6),1.0,(150.5e-6),0.2,(420.0e-6),0.2,6)
-	rho=rho(1)*partdens
-	temp_x=300.0
-	temp_y=temp_x(1)
-	minrho=0.3*partdens
+   rho=rho(1)*partdens
+   temp_x=300.0
+   temp_y=temp_x(1)
+   minrho=0.3*partdens
 end:species1
 
 begin:species2
-	rho=rho(1)
-	temp_x=temp_x(1)
-	temp_y=temp_x(1)
-	minrho=0.3*partdens
+   rho=rho(1)
+   temp_x=temp_x(1)
+   temp_y=temp_x(1)
+   minrho=0.3*partdens
 end:species2
 \end{Verbatim}
 
@@ -2624,33 +2600,33 @@ All that is required now is to give an example. A good example is to reproduce
 the previous example of an isolated plasma block in 2D. This would look like
 \simpleboxverbatim
 begin:species1
-      #first set density in the range 0->1
-      #cut down density in x direction
-      rho=if ((x gt -1) and (x lt 1),1.0,0.2)
-      #cut down density in y direction
-      rho=if ((y gt -1) and (y lt 1),rho(1),0.2)
+   #first set density in the range 0->1
+   #cut down density in x direction
+   rho=if ((x gt -1) and (x lt 1),1.0,0.2)
+   #cut down density in y direction
+   rho=if ((y gt -1) and (y lt 1),rho(1),0.2)
 
-      #multiply density by real particle density
-      rho=rho(1)*100.0
+   #multiply density by real particle density
+   rho=rho(1)*100.0
 
-      #Set the temperature to be zero
-      temp_x=0.0
-      temp_y=temp_x(1)
+   #Set the temperature to be zero
+   temp_x=0.0
+   temp_y=temp_x(1)
 
-      #Set the minimum density for this species
-      minrho=0.3*100.0
+   #Set the minimum density for this species
+   minrho=0.3*100.0
 end:species1
 
 begin:species2
-      #Just copy the density for species 1
-      rho=rho(1)
+   #Just copy the density for species 1
+   rho=rho(1)
 
-      #Just copy the temperature from species 1
-      temp_x=temp_x(1)
-      temp_y=temp_y(1)
+   #Just copy the temperature from species 1
+   temp_x=temp_x(1)
+   temp_y=temp_y(1)
 
-      #Set the minimum density for this species
-      minrho=0.3*100.0
+   #Set the minimum density for this species
+   minrho=0.3*100.0
 end:species2
 \end{Verbatim}
 
@@ -2669,10 +2645,10 @@ It is possible to load external data files into variables used by the
 autoloader. In the input deck this is done as follows
 \simpleboxverbatim
 begin:species_external1
-      rho=Data/data.file
-      offset=80000
-      temp_x=Data/data.file
-      temp_y=Data/data.file
+   rho=Data/data.file
+   offset=80000
+   temp_x=Data/data.file
+   temp_y=Data/data.file
 end:species_external1
 \end{Verbatim}
 
@@ -2689,14 +2665,14 @@ and {\bf temp\_y} are set to the same. The data is immediatly loaded into the
 requested variable, so it is valid to do the following.
 \simpleboxverbatim
 begin:species_external1
-      rho=Data/data.file
-      offset=80000
-      temp_x=Data/data.file
+   rho=Data/data.file
+   offset=80000
+   temp_x=Data/data.file
 end:species_external1
 
 begin:species1
-      rho=rho(1)*partdens
-      temp_y=temp_x(1)
+   rho=rho(1)*partdens
+   temp_y=temp_x(1)
 end:species1
 \end{Verbatim}
 It is also possible to load data from external files from the internal
@@ -2735,24 +2711,23 @@ information. DEOs are relativly memory intensive, so should only be used when
 required. An example would be
 \simpleboxverbatim
 begin:deo
-      r=sqrt(x^2+y^2)
+   r=sqrt(x^2+y^2)
 end:deo
 
 begin:species1
-      #first set density in the range 0->1
-      #cut down density in x direction
-      rho=if ((r lt 1),1.0,0.2)
+   #first set density in the range 0->1
+   #cut down density in x direction
+   rho=if ((r lt 1),1.0,0.2)
 
+   #multiply density by real particle density
+   rho=rho(1)*partdens
 
-      #multiply density by real particle density
-      rho=rho(1)*partdens
+   #Set the temperature to be zero
+   temp_x=0.0
+   temp_y=temp_x(1)
 
-      #Set the temperature to be zero
-      temp_x=0.0
-      temp_y=temp_x(1)
-
-      #Set the minimum density for this species
-      minrho=0.3*partdens
+   #Set the minimum density for this species
+   minrho=0.3*partdens
 end:species1
 \end{Verbatim}
 This example produces a circular rather than a square density enhancement.
@@ -2771,16 +2746,16 @@ many lasers as required to a boundary. A laser block looks like
 
 \simpleboxverbatim
 begin:laser
-        direction=left
-        amp=3.88191e13
-        profile=exp(-(y^2))
-        freq=1.78e15
-        pol=0.0
-        phase=0.0
-        t_profile=1.0
-        t_start=0.0
-        t_end=end
-        ID=1
+   direction=left
+   amp=3.88191e13
+   profile=exp(-(y^2))
+   freq=1.78e15
+   pol=0.0
+   phase=0.0
+   t_profile=1.0
+   t_start=0.0
+   t_end=end
+   ID=1
 end:laser
 \end{Verbatim}
 
@@ -2930,25 +2905,25 @@ properties from the code. This will be improved in the next release.
 \subsubsection{Distribution functions in the input deck}
 \simpleboxverbatim
 begin:dist_fn
-        name=x_px
-        ndims=2
-        dumpmask=always
+   name=x_px
+   ndims=2
+   dumpmask=always
 
-        direction1=dir_x
-        direction2=dir_px
+   direction1=dir_x
+   direction2=dir_px
 
-        #range is ignored for spatial coordinates
-        range1=1>1
-        range2=-3.0e-20>3.0e-20
+   #range is ignored for spatial coordinates
+   range1=1>1
+   range2=-3.0e-20>3.0e-20
 
-        restrict_py=-3.0e-20>3.0e-20
+   restrict_py=-3.0e-20>3.0e-20
 
-        #resolution is ignored for spatial coordinates
-        resolution1=1
-        resolution2=100
+   #resolution is ignored for spatial coordinates
+   resolution1=1
+   resolution2=100
 
-        include_species_1=T
-        include_species_2=T
+   include_species_1=T
+   include_species_2=T
 end:dist_fn
 \end{Verbatim}
 \begin{itemize}
@@ -3042,19 +3017,19 @@ probes.
 \subsubsection{Particle probes in the input deck}
 \simpleboxverbatim
 begin:probe
-	name=electron_back_probe
-	
-	x1=50.0e-6
-	y1=-50.0e-6
-	
-	x2=50.0e-6
-	y2=50.0e-6
+   name=electron_back_probe
 
-	probe_species=1
-	ek_min=0.0
-	ek_max=-1.0
+   x1=50.0e-6
+   y1=-50.0e-6
 
-	dump=always
+   x2=50.0e-6
+   y2=50.0e-6
+
+   probe_species=1
+   ek_min=0.0
+   ek_max=-1.0
+
+   dump=always
 end:probe
 \end{Verbatim}
 \begin{itemize}
@@ -3167,15 +3142,15 @@ user\_interaction/initial\_conditions.f90. Manual loading takes place after
 all the autoloader phases, to allow manual tweaking of autoloader specified
 initial conditions. To use the manual loading routines, just set\\
 \simpleboxverbatim
-     initial_conditions=manual
+   initial_conditions=manual
 \end{Verbatim}
 in the control block of the input deck. It can be combined with autoloader
 options in the input deck by addition in the same way as the individual
 autoloader options are used, so
 \simpleboxverbatim
-     initial_conditions=manual+internal_early
-     initial_conditions=manual+external
-     initial_conditions=manual+external+internal_late+internal_early
+   initial_conditions=manual+internal_early
+   initial_conditions=manual+external
+   initial_conditions=manual+external+internal_late+internal_early
 \end{Verbatim}
 are all valid values in the input deck.
 
@@ -3723,33 +3698,33 @@ variation on an earlier example
 
  \simpleboxverbatim
 begin:species1
-      #first set density in the range 0->1
-      #cut down density in x direction
-      rho=if ((x gt -1) and (x lt 1),1.0,0.2)
-      #cut down density in y direction
-      rho=if ((y gt -1) and (y lt 1),rho(1),0.2)
+   #first set density in the range 0->1
+   #cut down density in x direction
+   rho=if ((x gt -1) and (x lt 1),1.0,0.2)
+   #cut down density in y direction
+   rho=if ((y gt -1) and (y lt 1),rho(1),0.2)
 
-      #multiply density by real particle density
-      rho=rho(1)*100.0
+   #multiply density by real particle density
+   rho=rho(1)*100.0
 
-      #Set the temperature to be zero
-      temp_x=0.0
-      temp_y=temp_x(1)
+   #Set the temperature to be zero
+   temp_x=0.0
+   temp_y=temp_x(1)
 
-      #Set the minimum density for this species
-      minrho=0.3*100.0
+   #Set the minimum density for this species
+   minrho=0.3*100.0
 end:species1
 
 begin:species2
-      #Just copy the density for species 1
-      rho=rho(1)
+   #Just copy the density for species 1
+   rho=rho(1)
 
-      #Just copy the temperature from species 1
-      temp_x=temp_x(1)
-      temp_y=temp_y(1)
+   #Just copy the temperature from species 1
+   temp_x=temp_x(1)
+   temp_y=temp_y(1)
 
-      #Set the minimum density for this species
-      minrho=0.3*100.0
+   #Set the minimum density for this species
+   minrho=0.3*100.0
 end:species2
 \end{Verbatim}
 
@@ -3758,37 +3733,37 @@ places. It would be easier if this was given to a new useras
 
 \simpleboxverbatim
 begin:constant
-     particle_density=100.0 #Particle number density
+   particle_density=100.0 #Particle number density
 end:constant
 
 begin:species1
-      #first set density in the range 0->1
-      #cut down density in x direction
-      rho=if ((x gt -1) and (x lt 1),1.0,0.2)
-      #cut down density in y direction
-      rho=if ((y gt -1) and (y lt 1),rho(1),0.2)
+   #first set density in the range 0->1
+   #cut down density in x direction
+   rho=if ((x gt -1) and (x lt 1),1.0,0.2)
+   #cut down density in y direction
+   rho=if ((y gt -1) and (y lt 1),rho(1),0.2)
 
-      #multiply density by real particle density
-      rho=rho(1)*particle_density
+   #multiply density by real particle density
+   rho=rho(1)*particle_density
 
-      #Set the temperature to be zero
-      temp_x=0.0
-      temp_y=temp_x(1)
+   #Set the temperature to be zero
+   temp_x=0.0
+   temp_y=temp_x(1)
 
-      #Set the minimum density for this species
-      minrho=0.3*particle_density
+   #Set the minimum density for this species
+   minrho=0.3*particle_density
 end:species1
 
 begin:species2
-      #Just copy the density for species 1
-      rho=rho(1)
+   #Just copy the density for species 1
+   rho=rho(1)
 
-      #Just copy the temperature from species 1
-      temp_x=temp_x(1)
-      temp_y=temp_y(1)
+   #Just copy the temperature from species 1
+   temp_x=temp_x(1)
+   temp_y=temp_y(1)
 
-      #Set the minimum density for this species
-      minrho=0.3*particle_density
+   #Set the minimum density for this species
+   minrho=0.3*particle_density
 end:species2
 \end{Verbatim}
 
@@ -3804,37 +3779,36 @@ DEO in order to make changing them at a later date easier. For example
 
 \simpleboxverbatim
 begin:constant
-     particle_density=100.0 #Particle number density
+   particle_density=100.0 #Particle number density
 end:constant
 
 begin:deo
-      profile_x=if((x gt -1) and (x lt 1),1.0,0.2)
-      profile_y=if((y gt -1) and (y lt 1),1.0,0.2)
+   profile_x=if((x gt -1) and (x lt 1),1.0,0.2)
+   profile_y=if((y gt -1) and (y lt 1),1.0,0.2)
 end:deo
 
 begin:species1
+   #multiply density by real particle density
+   rho=particle_density * profile_x * profile_y
 
-      #multiply density by real particle density
-      rho=particle_density * profile_x * profile_y
+   #Set the temperature to be zero
+   temp_x=0.0
+   temp_y=temp_x(1)
 
-      #Set the temperature to be zero
-      temp_x=0.0
-      temp_y=temp_x(1)
-
-      #Set the minimum density for this species
-      minrho=0.3*particle_density
+   #Set the minimum density for this species
+   minrho=0.3*particle_density
 end:species1
 
 begin:species2
-      #Just copy the density for species 1
-      rho=rho(1)
+   #Just copy the density for species 1
+   rho=rho(1)
 
-      #Just copy the temperature from species 1
-      temp_x=temp_x(1)
-      temp_y=temp_y(1)
+   #Just copy the temperature from species 1
+   temp_x=temp_x(1)
+   temp_y=temp_y(1)
 
-      #Set the minimum density for this species
-      minrho=0.3*particle_density
+   #Set the minimum density for this species
+   minrho=0.3*particle_density
 end:species2
 \end{Verbatim}
 
@@ -3842,37 +3816,37 @@ Which creates the same output as before. It is now trivial to modify the profile
 
 \simpleboxverbatim
 begin:constant
-     particle_density=100.0 #Particle number density
+   particle_density=100.0 #Particle number density
 end:constant
 
 begin:deo
-      profile_x=gauss(x,0.0,1.0)
-      profile_y=gauss(y,0.0,1.0)
+   profile_x=gauss(x,0.0,1.0)
+   profile_y=gauss(y,0.0,1.0)
 end:deo
 
 begin:species1
 
-      #multiply density by real particle density
-      rho=particle_density * profile_x * profile_y
+   #multiply density by real particle density
+   rho=particle_density * profile_x * profile_y
 
-      #Set the temperature to be zero
-      temp_x=0.0
-      temp_y=temp_x(1)
+   #Set the temperature to be zero
+   temp_x=0.0
+   temp_y=temp_x(1)
 
-      #Set the minimum density for this species
-      minrho=0.3*particle_density
+   #Set the minimum density for this species
+   minrho=0.3*particle_density
 end:species1
 
 begin:species2
-      #Just copy the density for species 1
-      rho=rho(1)
+   #Just copy the density for species 1
+   rho=rho(1)
 
-      #Just copy the temperature from species 1
-      temp_x=temp_x(1)
-      temp_y=temp_y(1)
+   #Just copy the temperature from species 1
+   temp_x=temp_x(1)
+   temp_y=temp_y(1)
 
-      #Set the minimum density for this species
-      minrho=0.3*particle_density
+   #Set the minimum density for this species
+   minrho=0.3*particle_density
 end:species2
 \end{Verbatim}
 
@@ -4078,37 +4052,36 @@ to the previous example ic.deck file, it would be used as follows
 
 \simpleboxverbatim
 begin:constant
-     particle_density=100.0 #Particle number density
+   particle_density=100.0 #Particle number density
 end:constant
 
 begin:deo
-	profile_x=lorentz(x,0.0,1.0)
-	profile_y=lorentz(y,0.0,1.0)
+   profile_x=lorentz(x,0.0,1.0)
+   profile_y=lorentz(y,0.0,1.0)
 end:deo
 
 begin:species1
+   #multiply density by real particle density
+   rho=particle_density * profile_x * profile_y
 
-      #multiply density by real particle density
-      rho=particle_density * profile_x * profile_y
+   #Set the temperature to be zero
+   temp_x=0.0
+   temp_y=temp_x(1)
 
-      #Set the temperature to be zero
-      temp_x=0.0
-      temp_y=temp_x(1)
-
-      #Set the minimum density for this species
-      minrho=0.3*particle_density
+   #Set the minimum density for this species
+   minrho=0.3*particle_density
 end:species1
 
 begin:species2
-      #Just copy the density for species 1
-      rho=rho(1)
+   #Just copy the density for species 1
+   rho=rho(1)
 
-      #Just copy the temperature from species 1
-      temp_x=temp_x(1)
-      temp_y=temp_y(1)
+   #Just copy the temperature from species 1
+   temp_x=temp_x(1)
+   temp_y=temp_y(1)
 
-      #Set the minimum density for this species
-      minrho=0.3*particle_density
+   #Set the minimum density for this species
+   minrho=0.3*particle_density
 end:species2
 \end{Verbatim}
 
@@ -5344,8 +5317,8 @@ that it only changes the timestep if the timestep is MORE restrictive than that
 calculated from the core code. An example would be
 
 \simpleboxverbatim
-    dt=dtx*dty/SQRT(dtx**2+dty**2)
-    dt=MIN(dt,my_new_dt)
+   dt=dtx*dty/SQRT(dtx**2+dty**2)
+   dt=MIN(dt,my_new_dt)
 \end{Verbatim}
 
 In the core \EPOCH code the timestep can be calculated identically on each
