@@ -10,12 +10,15 @@
 \definecolor{warwickred}{cmyk}{0.0,1.0,0.65,0.15}
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 \newcommand{\emphtext}{\color{warwickdark} \fontfamily{phv}\selectfont\Large\bf}
-\newcommand{\inlineemph}{\color{warwicklight} \bf}
 \newcommand{\simpleboxverbatim}{\begin{Verbatim}[obeytabs=true,frame=single,
   framerule=0.5mm,rulecolor=\color{warwickmid}]}
 \newcommand{\boxverbatim}[1]{\begin{Verbatim}[obeytabs=true,frame=single,
   framerule=0.5mm,rulecolor=\color{warwickmid},label=#1]}
 \newcommand{\inlinecode}[1]{{\color{warwickred} \bf\texttt{#1}}}
+\newcommand{\code}[1]{{\texttt{#1}}}
+\newcommand{\qtt}[1]{``{\code{#1}}''}
+\newcommand{\inlineemph}[1]{{\color{warwicklight} \bf{#1}}}
+\newcommand{\cemph}[1]{{\inlineemph{#1}}}
 \newcommand{\EPOCH}{{\color{warwickdark}\fontfamily{phv}\selectfont EPOCH} }
 \newcommand{\image}[1]
   {{\begin{figure} \centering \includegraphics{#1} \end{figure}}}
@@ -66,7 +69,7 @@ solvers at the expense of lower accuracy and higher noise.
   \item MPI parallelised explicit 2nd order relativistic PIC code
   \item Dynamic MPI load balancing option
   \item MPIIO based output, allowing restart on arbitrary number of processors
-  \item Data analysis and visualisation options include ITT IDL, LLNL VisIT
+  \item Data analysis and visualisation options include ITT IDL, LLNL VisIt
     and Mathworks MatLab
 \end{itemize}
 
@@ -82,18 +85,19 @@ Since the idea from the start was that \EPOCH would be used by a large number
 of different users, and that it should be as easy as possible to ``plug in''
 different modules from different people into a given copy of the code, it was
 decided to write \EPOCH in SI units. There are a few places in the code where
-some quantities are given in other units for convenience(for example charges
+some quantities are given in other units for convenience (for example charges
 are specified in multiples of the electron charge), but the entire of the core
 code is written in SI units.
 
-\subsection{What are those \_num things doing everywhere}
-Historically using the compiler autopromotion of REAL to DOUBLE PRECISION was
-unreliable, so \EPOCH uses kind tags to specifiy the precision of the code. The
-\_num suffixes and the associated definition of REALs as REAL(num) are these
-kind tags in operation. The \_num tags force numerical constants to match the
+\subsection{What are those \code{\_num} things doing everywhere}
+Historically using the compiler autopromotion of \code{REAL} to
+\code{DOUBLE PRECISION} was unreliable, so \EPOCH uses kind tags to specifiy
+the precision of the code. The \code{\_num} suffixes and the associated
+definition of \code{REAL}s as \code{REAL(num)} are these kind tags in
+operation. The \code{\_num} tags force numerical constants to match the
 precision of the code preventing errors due to precision conversion. The
-important thing is that all numerical constants should be tagged with an \_num
-tag, and all REALs should be defined as REAL(num).
+important thing is that all numerical constants should be tagged with an
+\code{\_num} tag, and all \code{REAL}s should be defined as \code{REAL(num)}.
 
 \subsection{I just want to use the code as a black box, or I'm just
   starting. How do I do that?}
@@ -132,13 +136,9 @@ purpose of these guides is to quickly get a new user to the point of being able
 to use \EPOCH without getting bogged down in the details of how the code
 works. Some of the material covered in these getting started guides will also
 appear in the body of the manual.
-\pagebreak
 
 \subsection{Running \EPOCH and basic control of EPOCH1D}
 When the code is run, the output is\\
-\\
-\\
-\\
 \boxverbatim{Command line output}
 @@@@@@@@  @@@@@@      @@@@    @@@@@@@@  @@    @@    @@@@@@    @@@@@@
 @@@@@@@@  @@@@@@      @@@@    @@@@@@@@  @@    @@    @@@@@@    @@@@@@
@@ -170,22 +170,21 @@ Welcome to EPOCH1D Version 1.3
 
 At which point the end user should simply type in the name of the directory
 where the code ouput should be placed. This directory must also include the
-file �input.deck� which controls the code setup, specifies how to set the
+file \qtt{input.deck} which controls the code setup, specifies how to set the
 initial conditions and controls the IO. Writing an input deck for \EPOCH is
 fairly time consuming and so the code is supplied with an example input deck
 which includes all the necessary sections for the code to run. This section of
 the manual describes how to set up the basic code and a few simple problems in
 EPOCH1D.
-\pagebreak
 
-\subsection{input.deck}
+\subsection{\code{input.deck}}
 The input deck file resides in the output directory and contains all the basic
 information which is needed to set up the code, including the size and
 subdivision of the domain, the boundary conditions, the species of particles to
 simulate and the output settings for the code.
 
-\subsubsection{{\inlineemph control} block}
-The {\inlineemph control} block sets up the basic code properties for the
+\subsubsection{\cemph{control} block}
+The \cemph{control} block sets up the basic code properties for the
 domain, the end time of the code, the load balancer and the types of initial
 conditions to use.
 
@@ -203,12 +202,9 @@ begin:control
 
    dt_multiplier=0.8
 
-   dlb=F
    dlb_threshold=1.0
 
-   initial_conditions=external
-   icfile=ic.deck
-   restart_snapshot=98
+   #restart_snapshot=98
    neutral_background=T
 end:control
 \end{Verbatim}
@@ -224,7 +220,7 @@ use the number of particles specified for each species\\
 
 {\emphtext nsteps} - The number of iterations of the core solver before the
 code terminates. Negative numbers instructs the code to only terminate at
-{\inlineemph t\_end}.\\
+\inlineemph{t\_end}.\\
 
 {\emphtext t\_end} - The final simulation time in simulation seconds before the
 code terminates.\\
@@ -236,36 +232,24 @@ nsteps or t\_end is satisfied}\\
 metres. Can be negative.\\
 
 {\emphtext x\_end} - The position of the right hand edge of the domain in
-metres. Must be greater than {\inlineemph x\_start}.\\
+metres. Must be greater than \inlineemph{x\_start}.\\
 
 {\emphtext dt\_multiplier} - Factor by which the timestep is multiplied before
 it is applied in the code. Must be less than one.\\
 
-{\emphtext dlb} - Logical flag to activate/deactive the dynamic load
-balancing. Even with dlb=F the code will be statically balanced when first
-run.\\
-
 {\emphtext dlb\_threshold} - Number indicating the minimum ratio between the
 load on the least loaded processor to the most loaded processor. Set to 1 means
-always balance, set to 0 means never balance.\\
-
-{\emphtext initial\_conditions} - Sets the type of initial conditions used in
-this run of the code. The types of available initial conditions is descibed
-later in this document.\\
-
-{\emphtext icfile} - The filename for external (input deck driven) initial
-conditions.\\
+always balance, set to 0 means never balance. If this parameter is not
+specified then the code will only load balanced at initialisation time.\\
 
 {\emphtext restart\_snapshot} - The number of the previously written restart
 dump to restart the code from.\\
 
 {\emphtext neutral\_background} - Logical flag indicating whether or not to
-solve Poisson�s equation at t=0 or assume that there is a neutralising
-background field. If T then Poisson�s equation is solved.\\
+solve Poisson's equation at t=0 or assume that there is a neutralising
+background field. If T then Poisson's equation is solved.\\
 
-\pagebreak
-
-\subsubsection{{\inlineemph boundaries} block}
+\subsubsection{\inlineemph{boundaries} block}
 The {\emphtext boundaries} block sets the boundary conditions of each boundary
 of the domain. Some types of boundaries allow EM wave sources (lasers) to be
 attached to a boundary. The lasers are attached at the initial conditions
@@ -297,7 +281,7 @@ version is perfectly reflecting for both particles and EM waves.\\\\
 one or more EM wave sources can be attached. Since the wave sources require the
 domain to be completely set up before they can be calculated the wave sources
 are attached when the initial conditions are set.  EM waves impinging on a
-{\inlineemph simple\_laser} boundary are transmitted with as little reflection
+\inlineemph{simple\_laser} boundary are transmitted with as little reflection
 as possible. Particles are fully transmitted. The field boundary condition
 works by allowing outflowing characteristics to propagate through the boundary
 while using the attached lasers to specify the inflowing characteristics. The
@@ -316,9 +300,7 @@ removed from the simulation when they reach the boundary.\\\\
 {\emphtext NOTE: If either simple\_laser or simple\_outflow are specified on
 one or more boundaries then the code will no longer necessarily conserve mass.}
 
-\pagebreak
-
-\subsubsection{{\inlineemph species} block}
+\subsubsection{\inlineemph{species} block}
 
 \boxverbatim{species block}
 begin:species
@@ -345,7 +327,7 @@ end:species
 {\emphtext n\_species} - This MUST be the first entry in this block and
 specifies the number of species in the simulation. After this line, the
 properties of any numbered species may be set in any order. The species are
-numbered from 1 to {\inlineemph n\_species}.\\
+numbered from 1 to \inlineemph{n\_species}.\\
 
 {\emphtext charge\inlinecode{n}} - This sets the charge of species n in
 multiples of the electron charge. Negative numbers are used for negatively
@@ -360,7 +342,7 @@ mass\_density diagnostic.\\
 which should be loaded into the simulation domain for species n. This is the
 most convenient way of loading particles for simulations containing multiple
 species with different number densities. If these are specified then
-{\inlineemph npart} (the global number of particles specified in the control
+\inlineemph{npart} (the global number of particles specified in the control
 block) is ignored for this species. It should not be specified at the same time
 as fracn for a given species.\\
 
@@ -382,24 +364,22 @@ information. \\
 the information about species n. If set to F, then the species information is
 not dumped when writing ANY species specific diagnostics, although it is
 included in global diagnostics (i.e in the example if dump2=F were specified
-then there would be no �mass\_density\_carbon�, but the mass of the carbon
-would be considered when calculating �mass\_density�) and restart dumps.\\
+then there would be no ``mass\_density\_carbon'', but the mass of the carbon
+would be considered when calculating ``mass\_density'') and restart dumps.\\
 
 {\emphtext tracer\inlinecode{n}} - Logical flag switching particle species n
 into tracer particles. Tracer particles are enabled with the correct
 precompiler option, and when set for a given species make that species move
-correctly for it�s charge and mass, but contribute no current. This means that
+correctly for its charge and mass, but contribute no current. This means that
 these particles as passive tracers in the plasma.\\
 
-\pagebreak
-
-\subsubsection{{\inlineemph output} block}
-Output in \EPOCH is handled using the custom designed CFD ({\inlineemph Compact
+\subsubsection{\inlineemph{output} block}
+Output in \EPOCH is handled using the custom designed CFD (\inlineemph{Compact
 Flexible Datatype}) self defining file format which will be covered in more
 detail in a later set of notes and comes with readers for ITT IDL and LLNL
-VisIT, with additional readers for Mathworks Matlab and Yorick under
+VisIt, with additional readers for Mathworks Matlab and Yorick under
 development. What the code should output and when it should output it is
-specified in the �output� block of the input deck which will be covered over
+specified in the ``output'' block of the input deck which will be covered over
 the next few pages, but a quick note should be made on the types of output and
 on how to specify when a given variable should be dumped.\\
 
@@ -452,8 +432,6 @@ by addition as in : \inlinecode{px = always + species}.\\
 When applied to a variable, these codes are referred to as a {\inlineemph
 dumpmask}.\\
 
-\pagebreak
-
 \boxverbatim{output block}
 begin:output
    #If use_offset_grid is true then the code dumps a
@@ -466,9 +444,6 @@ begin:output
    full_dump_every=10
    restart_dump_every=-1
    force_final_to_be_restartable=T
-
-   use_extended_io=T
-   extended_io_file=io.deck
 
    #Properties at particle positions
    particles=never
@@ -500,14 +475,13 @@ begin:output
    number_density=always + species
    temperature=always+species
 
-   #extended io
    distribution_functions=always
    particle_probes=never
 end:output
 \end{Verbatim}
 
 {\emphtext use\_offset\_grid} - When using moving windows some visualisation
-programs (notable VisIT) show the motion of the window by moving the
+programs (notable VisIt) show the motion of the window by moving the
 visualisation window rather than by changing the x-axis. Setting this option to
 T causes the code to write another grid which always gives the offset relative
 to the left hand edge of the window rather than the true origin. Performs no
@@ -516,9 +490,9 @@ function when not using the moving window.\\
 {\emphtext dt\_snapshot} - Sets the interval between normal output dumps in
 simulation seconds. Setting zero or negative means that the code will output
 every step of the core solver. The code does NOT guarantee that outputs will be
-exactly {\inlineemph dt\_snapshot} apart, what is guaranteed is that the next
+exactly \inlineemph{dt\_snapshot} apart, what is guaranteed is that the next
 output will be after the first iteration which takes the simulation to a time
-$/ge$ {\inlineemph dt\_snapshot} from the last output.\\
+$/ge$ \inlineemph{dt\_snapshot} from the last output.\\
 
 {\emphtext full\_dump\_every} - The number of normal output dumps between full
 output dumps.\\
@@ -532,16 +506,6 @@ other output settings and make the last output dump it writes be a restart
 dump. Any internal condition which causes the code to terminate will make the
 code write a restart dump, but code crashes or scheduler terminations will not
 cause the code to write a restart dump.\\
-
-{\emphtext use\_extended\_io} - Some types of output can only be specified once
-the code has been completely set up and all the MPI initialization routines
-have been completed. Those routines are classed as extended IO routines and
-need their input files to be in a separate input deck. If this option is set to
-T then these routines are available for use and the file containing their input
-decks must be specified in {\inlineemph extended\_io\_file}.\\
-
-{\emphtext extended\_io\_file} - Input deck file setting up extended diagnostic
-options.\\
 
 {\emphtext particles} - The dumpmask for the particle positions. Restart
 variable. No particle variables can be plotted in VisIt unless this is
@@ -567,7 +531,7 @@ particle species a given particle is. This is the same as the number assigned
 to that particle species in the species block. Restart variable\\
 
 {\emphtext grid} - The dumpmask for the Cartesian grid which defines the
-locations of the grid variables. No grid variables can be plotted in VisIT
+locations of the grid variables. No grid variables can be plotted in VisIt
 unless this variable is output.\\
 
 {\emphtext e\{x,y,z\}} - The electric field vectors pointing in all three
@@ -596,10 +560,8 @@ exact way that temperature is calculated in the code is likely to vary in the
 near future.\\
 
 {\emphtext distribution\_function} - Dumpmask for outputting distribution
-functions specified in the extended io deck. Each individual distribution
-function can have it�s own dumpmask, but this one is more restrictive.\\
-
-\pagebreak
+functions specified in the input deck. Each individual distribution function
+can have its own dumpmask, but this one is more restrictive.\\
 
 \subsection{External initial conditions}
 
@@ -609,7 +571,7 @@ allows any initial condition which can be specified everywhere in space by a
 number density and a drifting Maxwellian distribution function. This sections
 details the blocks that can be set to set up the initial conditions.
 
-\subsubsection{{\inlineemph constants} and {\inlineemph DEO} blocks}
+\subsubsection{\inlineemph{constants} and \inlineemph{DEO} blocks}
 
 \boxverbatim{constant block}
 begin:constant
@@ -642,7 +604,7 @@ then used by the autoloader to actually position the particles.\\
 
 Before moving on to the blocks which actually set up the initial conditions
 there are other helpful blocks which should be explained. These are called
-{\inlineemph constants} and {\inlineemph DEO}s which allow you to define
+\inlineemph{constants} and \inlineemph{DEO}s which allow you to define
 constants and maths parser expressions which can be used by name later in the
 deck.\\
 
@@ -682,11 +644,10 @@ Both constants and DEOs are persistent for the entire runtime of the code,
 allowing them to be used when specifying time profiles for lasers, and also
 allowing developers to use maths parser expressions for other internal parts of
 the code where needed.
-\pagebreak
 
-\subsubsection{{\inlineemph laser} blocks}
+\subsubsection{\inlineemph{laser} blocks}
 Laser blocks attach an EM wave source to a boundary which is set as
-{\inlineemph simple\_laser}.
+\inlineemph{simple\_laser}.
 
 \boxverbatim{laser block}
 begin:laser
@@ -714,7 +675,7 @@ multidimensional \EPOCH\\
 {\emphtext direction} - The boundary to which to attach the laser. This is
 slightly misnamed, since it is NOT the direction in which the laser will be
 propagating, but the side of the box to which to attach the laser. The name may
-change in future versions, but �direction� will be kept to maintain
+change in future versions, but ``direction'' will be kept to maintain
 compatibility. In 1D, the directions can be either left or right.\\
 
 {\emphtext amp} - The amplitude of the E field of the laser.\\
@@ -741,14 +702,14 @@ greater than 1 is possible but will cause the maximum laser intensity to grow
 beyond amp.\\
 
 {\emphtext t\_start} - Start time for the laser in seconds, can be set to the
-string �start� to start at the beginning of the simulation. When using this
+string ``start'' to start at the beginning of the simulation. When using this
 parameter, the laser start is hard, to get a soft start use the {\inlineemph
 t\_profile} parameter to ramp the laser up to full strength.\\
 
 {\emphtext t\_end} - End time for the laser in seconds, can be set to the
-string �end� to end at the end of the simulation. When using this parameter,
-the laser end is clipped straight to zero at t$>${\inlineemph t\_end}. To get a
-soft end use the {\inlineemph t\_profile} parameter to ramp the laser down to
+string ``end'' to end at the end of the simulation. When using this parameter,
+the laser end is clipped straight to zero at t$>$\inlineemph{t\_end}. To get a
+soft end use the \inlineemph{t\_profile} parameter to ramp the laser down to
 zero.\\
 
 {\emphtext NOTE: You should not use amp and irradiance in the same block
@@ -763,7 +724,7 @@ In theory, any laser time profile required is possible, but the core FDTD
 solver for the EM fields in EPOCH produces spurious results if suddent changes
 in the field intensity occur. This is shown in the two figures on this
 page. The pulse shown in figure \ref{badpulse} used a constant {\inlineemph
-t\_profile} and used {\inlineemph t\_end} to stop the laser after 8fs. Since
+t\_profile} and used \inlineemph{t\_end} to stop the laser after 8fs. Since
 the stopping time was not an exact multiple of the period, the result was to
 introduce spurious oscillations behind the pulse. If the laser had a finite
 phase shift so that the amplitude did not start at zero, a similar effect would
@@ -775,7 +736,7 @@ cutoff shows numerical artifacts behind the pulse.}
 temporal profile shows no artifacts.}
 
 Figure /ref{smoothpulse} instead used a Gaussian window function with a
-characteristic width of 8fs as well as using {\inlineemph t\_end} to introduce
+characteristic width of 8fs as well as using \inlineemph{t\_end} to introduce
 a hard cutoff. It can clearly be seen that there are no spurious oscillations
 and the wave packet propagates correctly, showing only some dispersive
 features.
@@ -789,15 +750,14 @@ resolution (with a comparable increase in the number of pseudo-particles), thus
 causing the timestep to drop via the CFL condition.
 
 This is computationally expensive, and so a cheaper option is simply to
-decrease the input.deck option {\inlineemph dt\_multiplier}. This artificially
+decrease the input.deck option \inlineemph{dt\_multiplier}. This artificially
 decreases the timestep below the timestep calculated from the internal
 stability criteria and allows the resolution of sharp temporal gradients. This
 is an inferior solution since the FDTD scheme has increased error as the
 timestep is reduced from that for EM waves. The latest version of EPOCH
 includes a high order field solver to attempt to reduce this.
-\pagebreak
 
-\subsubsection{{\inlineemph species\inlinecode{n}} block}
+\subsubsection{\inlineemph{species\inlinecode{n}} block}
 \boxverbatim{species{\it n} block}
 begin:species2
    rho=if(abs(x) lt thick,den_max,0.0)
@@ -817,7 +777,7 @@ end:species1
 
 The actual initial conditions are specified in one or more blocks called
 species blocks. There should be one of these blocks for each species which is
-to have it�s initial conditions set from the external initial conditions.\\
+to have its initial conditions set from the external initial conditions.\\
 
 Each block is started with a\\
 
@@ -863,9 +823,8 @@ maxrho allowing easy implementation of exponential rises to plataeus.
 {\emphtext drift\_\{x,y,z\}} - Specifies a momentum space offset in kgms-2 to
 the distibution function for this species. At present the drift\_\{x,y,z\}
 parameter CANNOT vary in space and is just a single constant.
-\pagebreak
 
-\subsubsection{{\inlineemph species\_external\inlinecode{n}} block}
+\subsubsection{\inlineemph{species\_external\inlinecode{n}} block}
 \boxverbatim{species\_external{\it n} block}
 begin:species_external2
    rho=Data/ic.dat
@@ -876,13 +835,13 @@ end:species_external2
 
 The penultimate type of block in the initial conditions deck is the
 species\_external\inlinecode{n} block. It is very similar to the ic.deck
-{\inlineemph species\inlinecode{n}} block, but instead of specifying the
+\inlineemph{species\inlinecode{n}} block, but instead of specifying the
 initial conditions mathematically in the input deck, you specify the filename
 of a simple binary file containing the information required. The use of this
 block is very simple and is shown in the example above.\\
 
-All the elements which exist in the simple {\inlineemph species\inlinecode{n}}
-block also exist in the {\inlineemph species\_external\inlinecode{n}} block,
+All the elements which exist in the simple \inlineemph{species\inlinecode{n}}
+block also exist in the \inlineemph{species\_external\inlinecode{n}} block,
 and the value on the right hand side should be the filename which holds the
 data wanted. An additional element is also introduced, the offset element which
 is the offset in bytes from which the start of the file where the data should
@@ -893,7 +852,7 @@ changed between data reading lines the same data will be read into all the
 variables. The data is read in as soon as a line is executed, and so it is
 perfectly possible to load data from a file with the {\inlineemph
 species\_external\inlinecode{n}} block and then modify the data with a
-{\inlineemph species\inlinecode{n}} block.\\
+\inlineemph{species\inlinecode{n}} block.\\
 
 The file should be a simple binary file consisting of floating point numbers of
 the same precision as \inlinecode{\_num} in the core \EPOCH code.\\
@@ -902,7 +861,7 @@ the same precision as \inlinecode{\_num} in the core \EPOCH code.\\
 files, NOT Fortran unformatted files. It is possible to read Fortran
 unformatted files using the offset element, but care must be taken!}\\
 
-\subsubsection{{\inlineemph fields} block}
+\subsubsection{\inlineemph{fields} block}
 \boxverbatim{fields block}
 begin:fields
    ex=sin(pi*x/lengthx)
@@ -923,8 +882,6 @@ using the appropriate commands from the maths parser. \\
 Any valid maths parser expression can be used to set up the fields, and no
 check is made to ensure that the solenoidal condition is satisfied (as can be
 seen in the above example)\\
-
-\pagebreak
 
 \subsection{Moving to EPOCH2D and EPOCH3D}
 EPOCH1D is the simplest version of \EPOCH and, although feature complete, lacks
@@ -952,7 +909,7 @@ the data files generated by higher dimensionality versions of EPOCH will be
 much larger, which makes the more advanced IO routines available in \EPOCH more
 useful. These will the next elements to be covered.\\
 
-\subsubsection{Changes to the {\inlineemph control} block}
+\subsubsection{Changes to the \inlineemph{control} block}
 
 \boxverbatim{Changed control block}
 begin:control
@@ -972,9 +929,9 @@ end:control
 
 The modified control block in EPOCH2D and 3D is very similar to the control
 block already introduced for EPOCH1D. All that is added are new elements
-describing the number of gridpoints in y and z ({\inlineemph ny \& nz}), and
+describing the number of gridpoints in y and z (\inlineemph{ny \& nz}), and
 new start and end lines for the length of the domain in the new directions
-({\inlineemph y\_start -> y\_end} \& {\inlineemph z\_start -> z\_end}). These
+(\inlineemph{y\_start -> y\_end} \& \inlineemph{z\_start -> z\_end}). These
 operate in exactly the same way as those already introduced with EPOCH1D,
 although care must be taken to increase the number of particles to ensure that
 the number of particles per cell remains high enough to accuratly resolve the
@@ -984,7 +941,7 @@ Also note that the amount of memory required for multidimensional simulations
 will generally be hundreds of times larger than that required for 1D
 simulations.\\
 
-\subsubsection{Changes to the {\inlineemph boundaries} block}
+\subsubsection{Changes to the \inlineemph{boundaries} block}
 
 \boxverbatim{Changed boundaries block}
 begin:boundaries
@@ -1001,10 +958,10 @@ The modified boundary block includes new boundary conditions for the additional
 boundaries that are introduced in higher dimensions. These available boundaries
 are exactly the same as in 1D, with the additional boundaries being:\\
 
-{\inlineemph ybc\_up}    - top of domain\\
-{\inlineemph ybc\_down}  - bottom of domain\\
-{\inlineemph zbc\_front} - front of domain\\
-{\inlineemph zbc\_back}  - back of domain\\
+\inlineemph{ybc\_up}    - top of domain\\
+\inlineemph{ybc\_down}  - bottom of domain\\
+\inlineemph{zbc\_front} - front of domain\\
+\inlineemph{zbc\_back}  - back of domain\\
 
 These are equivalent to the existing 1D simulations except that the moving
 window always moves parallel to the x-axis when activated.\\ This concludes all
@@ -1025,7 +982,7 @@ introduction here.
 
 A very simple problem to set up using EPOCH 2D is a Gaussian blob which is
 shown in Figure \ref{gaussblob}, in the form both of the ic.deck needed to
-create it and the output from VisIT that is produced from running this deck.
+create it and the output from VisIt that is produced from running this deck.
 
 In Figure \ref{gaussblobinverse}, a very small modification to this initial
 conditions deck is shown which creates the a case with a Gaussian density
@@ -1073,9 +1030,7 @@ end:species1
 \end{Verbatim}
 \end{minipage}
 
-\pagebreak
-
-\subsubsection{{\inlineemph laser} blocks in multiple dimensions.}
+\subsubsection{\inlineemph{laser} blocks in multiple dimensions.}
 
 \scaledcapimage{./images/profile_flat.eps}{flatlaser}{Constant laser
 profile}{0.4} \scaledcapimage{./images/profile_gauss.eps}{gausslaser}{Gaussian
@@ -1085,22 +1040,22 @@ Gaussian laser profile}{0.4}
 
 The laser block already introduced in the EPOCH1D handouts are still present in
 2D and 3D, but have one additional feature and a modification to one existing
-feature. The new feature is {\inlineemph profile} which is defined
+feature. The new feature is \inlineemph{profile} which is defined
 by\\
 
 {\emphtext profile} - The spatial profile for the laser. This is
 essentially an array defined along the edge (or surface) that the laser is
 attached to. It is clear that the spatial profile is only meaningful
-perpendicular to the laser�s direction of travel and so it simply does not
+perpendicular to the laser's direction of travel and so it simply does not
 exist in 1D. The laser profile is evaulated while the initial conditions deck
 is evaluated and so cannot include any temporal information which must be
-encoded in {\inlineemph t\_profile}.  The spatial profile is evaluated at the
+encoded in \inlineemph{t\_profile}.  The spatial profile is evaluated at the
 boundary where the laser is attached and so only spatial information in the
 plane of the boundary is significant. This is most clearly explained through a
 few examples. In these examples the spatial profile of the laser is set to vary
-between a flat uniform profile ({\inlineemph profile=1}), a Gaussian profile in
-y ({\inlineemph profile=gauss(y,0,2.5e-6)}) and a differentiated Gaussian
-profile in y ({\inlineemph profile=(y/2.5e-6) * gauss(y,0,2.5e-6)}). The
+between a flat uniform profile (\inlineemph{profile=1}), a Gaussian profile in
+y (\inlineemph{profile=gauss(y,0,2.5e-6)}) and a differentiated Gaussian
+profile in y (\inlineemph{profile=(y/2.5e-6) * gauss(y,0,2.5e-6)}). The
 difference between these profiles is obvious but the important point is that a
 laser travelling parallel to the x-direction has a profile in the y
 direction. Similarly a laser progagating in the y-direction has a profile in
@@ -1118,9 +1073,7 @@ angle to a boundary although no examples of this will be given. It is not
 currently possible to automatically link lasers on two boundaries to allow a
 laser to propagate in from a corner.\\
 
-\pagebreak
-
-\subsubsection{Extended IO}
+\subsubsection{Distribution functions}
 
 \boxverbatim{dist\_fn block}
 begin:dist_fn
@@ -1147,28 +1100,27 @@ end:dist_fn
 
 One way of considering the PIC methodology is based on the idea of using the
 simulation pseudo-particles as Monte-Carlo sampling points of the phase space
-of Vlasov�s equation. While direct simulation of Vlasov�s equation leads to
+of Vlasov's equation. While direct simulation of Vlasov's equation leads to
 much lower noise then using this Monte-Carlo approach it is much more
 computationally expensive and is currently only just possible in 2D and
 completely impossible in 3D. However, sometimes it is useful to be able to
 reconstruct at least some of the phase space for one or more particle species,
-and this option is provided through an extended IO option.  The distribution
-function is integrated over all dimensions which are not axes of the
-distribution function.\\
+and this option is provided through a \inlineemph{dist\_fn} block. The
+distribution function is integrated over all dimensions which are not axes of
+the distribution function.\\
 
-When extended IO is turned on in the output block of input.deck it allows a
-user to specify an additional input deck file which contains information about
+This block allows the user to specify information about
 setting up additional diagnostics including phase space reconstructions. It is
 possible to set up as many 2D and 3D distribution functions as required by
-simply specifying multiple {\inlineemph dist\_fn} blocks. The layout of these
+simply specifying multiple \inlineemph{dist\_fn} blocks. The layout of these
 blocks is as follows:\\
 
 {\emphtext name} - The name of the distribution function when it is
 output. This name is appended with the name of each species for which the data
 is output and so in the output this block when applied to a species named
-carbon is called for example {\inlineemph x\_px\_carbon}. The Cartesian grid
+carbon is called for example \inlineemph{x\_px\_carbon}. The Cartesian grid
 which describes the axes of the distribution function would then be called
-{\inlineemph grid\_x\_px\_carbon}.\\
+\inlineemph{grid\_x\_px\_carbon}.\\
 
 {\emphtext ndims} - The number of dimensions in this phase space
 reconstruction. Due to difficulties in visualising data in more than three
@@ -1235,9 +1187,6 @@ restrictions in any momentum dimension in any dimensionality of the code.
 {\emphtext NOTE: It is possible to restrict in dimensions which are included in
 the distribution function and these restrictions are honoured. This means that
 there will be empty sections of the distribution function plot.}
-
-
-\pagebreak
 
 \subsection{Basic examples of using \EPOCH}
 
@@ -1316,8 +1265,6 @@ begin:output
    restart_dump_every=-1
    force_final_to_be_restartable=T
 
-   use_extended_io=F
-
    #Properties at particle positions
    particles=always
    px=always
@@ -1373,10 +1320,10 @@ end:species2
 \captionedimage{./images/late.eps}{tsilate}{The final state of the electron
 phase space for the two stream instability example.}
 
-While the {\inlineemph input.deck} file is rather long, most of it is the basic
+While the \inlineemph{input.deck} file is rather long, most of it is the basic
 standard input deck that is supplied with \EPOCH, with only the length of the
 domain, the final time and the time between snapshots specific to this
-problem. {\inlineemph ic.deck} the initial conditions file is very simple
+problem. \inlineemph{ic.deck} the initial conditions file is very simple
 indeed. The first block sets up constants for the momentum space drift, the
 temperature and the electron number density. The second and third blocks set up
 the two drifting Maxwellian distributions and the constant density profile. The
@@ -1406,13 +1353,13 @@ end:species1
 \end{Verbatim}
 
 Although not included here the input deck associated with these initial
-conditions sets {\inlineemph species1} to be electrons and {\inlineemph
-species2} to be protons. There species block for {\inlineemph species2} is set
+conditions sets \inlineemph{species1} to be electrons and {\inlineemph
+species2} to be protons. There species block for \inlineemph{species2} is set
 first to set up the ion density to be a highly structured 2D sinusoidal
-profile. The species block for {\inlineemph species1} is then set up to simply
-match the density of {\inlineemph species2} to produce charge neutrality. On
+profile. The species block for \inlineemph{species1} is then set up to simply
+match the density of \inlineemph{species2} to produce charge neutrality. On
 it's own this initial condition does nothing and so only needs to run for 0
-timesteps({\inlineemph nsteps=0} in input.deck). The resulting electron number
+timesteps(\inlineemph{nsteps=0} in input.deck). The resulting electron number
 density should look like Figure \ref{complexdensity}
 
 
@@ -1488,7 +1435,7 @@ epoch{n}d directory, there are 4 subdirectories
 \item src - The \EPOCH source code
 \item IDL - The IDL routines needed to open the Compact Flexible Datatype
   (CFD) files which the code outputs
-\item VisIT - The files for creating a plugin for the LLNL VisIT parallel
+\item VisIt - The files for creating a plugin for the LLNL VisIt parallel
   visualisation tool for reading CFD files
 \item Data - A sample data directory containing example input deck files
 \end{itemize}
@@ -1897,9 +1844,6 @@ begin:output
    restart_dump_every=1
    force_final_to_be_restartable=T
 
-   use_extended_io=T
-   extended_io_file=io.deck
-
    #Properties at particle positions
    particles=full
    px=never
@@ -1935,7 +1879,7 @@ are used as follows\\
 \begin{itemize}
 \item use\_offset\_grid - Causes the code to output a special grid which moves
   with a moving window if one is specified. This is needed to allow
-  visualisation packages like LLNL VisIT which cannot cope with moving axes to
+  visualisation packages like LLNL VisIt which cannot cope with moving axes to
   work properly. If you are not using a moving window then setting this option
   to true merely wastes space as both the normal and the special grid are the
   same.
@@ -1948,12 +1892,6 @@ are used as follows\\
 \item force\_final\_to\_be\_restartable - Whether or not the code should force
   the last output dump to be a restart dump. This ensures that it is possible
   to restart the code from the last output dump.
-\item use\_extended\_io - Some forms of more advanced IO require that the
-  entire of the input deck MUST have been parsed before they can be set
-  up. These are termed ``extended io features'' and are specified in another
-  file
-\item extended\_io\_file - The file which contains the information about the
-  extended io.
 \end{itemize}
 
 The remaining items control what data should be dumped at which type of
@@ -2336,7 +2274,7 @@ of the code from the previous figure to this one\\
 %Example image from visit for the second set of initial conditions
 \image{./images/example2.eps}
 Both figures are from runs with the same number of particles and the same
-fraction of particles displayed in VisIT. This shows why the use of the minrho
+fraction of particles displayed in VisIt. This shows why the use of the minrho
 field is so useful, because the second figure obviously has a higher particles
 density than the first, since the particles are concentrated into a smaller
 region.
@@ -2705,12 +2643,11 @@ The function returns just the time profile part of the laser, and the
 amplitude specified when the laser is set up is still applied, so normally you
 would want Custom\_Laser\_Time\_Profile to run between 0 and 1.
 
-\subsection{Extended IO - Distribution functions}
+\subsection{Distribution functions}
 PIC codes effectively represent a Lagrangian Monte-Carlo sampling of the phase
 space of Vlasov's equation. Sometimes it is useful to reconstruct part of the
-full phase space, this is controlled by the distribution function extended io
-option. The block must be put in the extended io deck file specified in the
-output section of the main input deck. Distribution function output can also
+full phase space, this is controlled by the distribution function
+option.  Distribution function output can
 be specified in any of the initial conditions sections of the main code.
 
 \subsubsection{Distribution function units}
@@ -2810,7 +2747,7 @@ conditions subroutines, the sequence looks like
 This code would create exactly the same distribution function as the
 preceeding input deck section.
 
-\subsection{Extended IO - Particle Probes}
+\subsection{Particle Probes}
 Sometimes it is useful to consider all the properties of particle which pass
 through a point/line/plane (depending on dimension) in the simulation. To
 allow this, it is possible to specify one or more {\it Particle Probe} blocks
@@ -2942,16 +2879,16 @@ which prints the name and type of data held in the file, but loads no data. To
 load a specific variable, just add a /\{variable\_name\} to the load command\\
 \inlinecode{data=getdata(\{dumpnum\},wkdir='Data',/vx)}\\
 
-\subsubsection{LLNL VisIT}
-LLNL's VisIT software is a parallel data visualisation
+\subsubsection{LLNL VisIt}
+LLNL's VisIt software is a parallel data visualisation
 package(\inlinecode{https://wci.llnl.gov/codes/visit/}). \EPOCH comes with
-source code for the plugin needed to allow VisIT to load the output CFD files
-which are generated. There are full manuals for VisIT which can be downloaded
+source code for the plugin needed to allow VisIt to load the output CFD files
+which are generated. There are full manuals for VisIt which can be downloaded
 from the above link so no further details will be given here. To build the
-plugin when the VisIT bin directory is in the user's path, just type ``make
+plugin when the VisIt bin directory is in the user's path, just type ``make
 visit'' at the root of the \EPOCH directory. For more experienced users of
-VisIT, the xml file which is used to generate the plugin is supplied in the
-VisIT subdirectory, called cfd.xml.
+VisIt, the xml file which is used to generate the plugin is supplied in the
+VisIt subdirectory, called cfd.xml.
 
 \subsubsection{Mathworks MatLab}
 There are also routines to allow the loading of CFD files from Mathworks
@@ -4148,7 +4085,7 @@ is explained here
 \item \inlinecode{src/deck} - Files in this directory are responsible for
   dealing with the permanent input deck parser, and include the core parts of
   the deck handler and also the routines which deal with the blocks in the
-  input, initial conditions and extended IO deck files.
+  input deck files.
 \item \inlinecode{src/housekeeping} - Files in this directory deal with those
   parts of the operation of the code which are not physics, including the load
   balancer, the MPI setup routines and the moving window.
@@ -4198,9 +4135,9 @@ is explained here
 \item deck\_deo\_block.f90 - Reader routine for "deo" blocks in the input
   deck.
 \item deck\_eio\_dist\_fn\_block.f90 - Reader routine for "dist\_fn" blocks in
-  the extended io deck.
+  the input deck.
 \item deck\_eio\_particle\_probe\_block.f90 - Reader routine for
-  "particle\_probe" blocks in the extended io deck.
+  "particle\_probe" blocks in the input deck.
 \item deck\_ic\_external\_block.f90 - Reader routines for "species\_external"
   and "field\_external" blocks in the initial conditions deck.
 \item deck\_ic\_fields\_block.f90 - Reader routine for "fields" blocks in the
@@ -4465,7 +4402,6 @@ These variables are used internally in the load balancer, where it is updated,
 but is also used when calculating distribution functions, where it is used to
 define the extents of the MPI type which is used to write the distribution
 function to disk.
-\pagebreak
 
 \subsubsection{Input deck variables}
 \begin{itemize}
@@ -4484,7 +4420,6 @@ function to disk.
   input deck and written into the output files to allow the project to be
   recognised by a reader.
 \end{itemize}
-\pagebreak
 
 \subsubsection{Initial conditions (autoloader) variables}
 Initial conditions for the autoloader for a given species are described in
@@ -4521,7 +4456,6 @@ The initial conditions themselves are in the variable
   TYPE(Initial_Condition_Block),DIMENSION(:),ALLOCATABLE :: InitialConditions
 \end{Verbatim}
 which is allocated \inlinecode{1:nSpecies}
-\pagebreak
 
 \subsubsection{Particles and particle species}
 Particles are represented as linked lists of Fortran TYPES. The definition of
@@ -4569,7 +4503,6 @@ sufficient to extend the particle type, since the communications when the
 particle crosses a processor boundary do not know about the new parameter and
 it will not be transmitted with the particle. How to add new properties to the
 particle communication layer is described later.\\
-\pagebreak
 
 The entire linked list of particles is encapsulated in another Fortran TYPE,
 called \inlinecode{ParticleList}, which is defined as
@@ -4608,7 +4541,6 @@ And the descriptions are
   aware of these pointers and will automatically use them if they are ever
   set. They are reserved for future use.
 \end{itemize}
-\pagebreak
 
 The \inlinecode{ParticleList} objects are used to abstract all the functions
 of the linked list, including adding and removing particles and transporting
@@ -4741,8 +4673,6 @@ below
   the head of an attached linked list of particle probe diagnostics.
 \end{itemize}
 
-\pagebreak
-
 \subsubsection{EM Fields}
 There are nine variables which are used in updating the EM field solver. These
 are
@@ -4822,8 +4752,6 @@ the final derivatives in the code appear one sided. However, this is not the
 case, and all spatial derivates are second order accurate. Higher order spatial
 derivatives schemes for \EPOCH are being developed to improve the dispersion
 properties of the code when resolving small timescales.
-
-\pagebreak
 
 \subsection{The particle pusher}
 EPOCH's particle pusher is based on the one from the PSC by Hartmut Ruhl, and
@@ -5126,7 +5054,6 @@ Villasenor and Buneman paper already quoted.\\
 Currents in ignorable directions are simply calculated using $J=n\rho\vec{v}$
 with the correct shape functions to ensure that the current is placed in the
 correct places.
-\pagebreak
 
 \subsection{The timestep}
 
@@ -5165,8 +5092,6 @@ all processors. \EPOCH is not written in a way that permits operation with
 different timesteps on different processors, and the behaviour of the code is
 undefined (and likely wrong) if the code runs with different timesteps on
 different processors.
-
-\pagebreak
 
 \subsection{Boundary conditions}
 Boundary conditions in \EPOCH are split into three types
@@ -6719,7 +6644,7 @@ respectively.  If it can't split the string successfully then it sets the
 \inlinecode{ERR\_BAD\_VALUE} bitfield of the ERR parameter.
 \\[0.5cm]
 {\Large Notes\\}
-This is used when specifying ranges in the extended IO decks at present. Any
+This is used when specifying ranges in the input decks at present. Any
 ranges which should be specified in a single parameter should be specified in
 this form and this routine used to split the string. {\bf IMPORTANT NOTE. This
 routine has proved somewhat unsatisfactory and may be replaced by another
@@ -6853,15 +6778,14 @@ the deck. These are
 
 There is one final variable which is important for modifying the input deck,
 \inlinecode{Deck\_State}. The input deck parser routine used to read the main
-input deck, the initial conditions file and the extended IO file is all the
-same routine, and it just uses the variable \inlinecode{Deck\_State} to
-determine which type of file is being read. The possible values of
+input deck uses the variable \inlinecode{Deck\_State} to
+determine which stage of parsing the deck is required. The possible values of
 \inlinecode{Deck\_State} are
 
 \begin{itemize}
 \item DS\_DECK - The main input deck
-\item DS\_IC - The initial conditions file
-\item DS\_EIO - The extended IO file
+\item DS\_IC - The initial conditions
+\item DS\_EIO - The extended IO
 \end{itemize}
 These constants are defined in \inlinecode{shared\_data.F90} and if new files
 need to be read, then new variables should be created in the same place with
@@ -6951,10 +6875,8 @@ The existing blocks in the code are read in the following files
 \item \inlinecode{deck\_control\_block.f90} - Input deck control block
 \item \inlinecode{deck\_deo\_block.f90} - Deferred Evaluation Objects in all
   deck files
-\item \inlinecode{deck\_eio\_dist\_fn\_block.f90} - Extended IO deck dist\_fn
-  blocks
-\item \inlinecode{deck\_eio\_particle\_probe\_block.F90} - Extended IO deck
-  probe blocks
+\item \inlinecode{deck\_eio\_dist\_fn\_block.f90} - dist\_fn blocks
+\item \inlinecode{deck\_eio\_particle\_probe\_block.F90} - probe blocks
 \item \inlinecode{deck\_ic\_external\_block.f90} - Initial conditions deck for
   reading species\_external and field\_external blocks.
 \item \inlinecode{deck\_ic\_fields\_block.f90} - Initial conditions deck field
