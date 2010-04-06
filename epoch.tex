@@ -1087,8 +1087,8 @@ begin:dist_fn
    direction2=dir_px
 
    #range is ignored for spatial coordinates
-   range1=1>1
-   range2=-50.0e-20>50.0e-20
+   range1=(1,1)
+   range2=(-50.0e-20,50.0e-20)
 
    #resolution is ignored for spatial coordinates
    resolution1=1
@@ -1140,8 +1140,7 @@ being available in dimensionalities of the code which have that
 direction. Therefore dir\_z does not exist in EPOCH1D or EPOCH2D.\\
 
 {\emphtext range\inlinecode{n}} - The range between which this axis should
-run. This is in the form of minimum$>$maximum at present although this is a
-slightly inelegant notation which may change. The rangen parameter is ignored
+run. This is in the form of (minimum,maximum). The rangen parameter is ignored
 when a direction is a spatial direction since all spatial directions run over
 the whole domain. For momentum directions this parameter is specified in
 $kgms^{-2}$. If the range of a momentum direction is set so that the maximum
@@ -1175,7 +1174,7 @@ particles should be included in the integration over directions which are not
 axes of the distribution function. It allows the user to specify maximum and
 minimum values for each spatial and momentum direction and use particles which
 fall within this range when calculating the distribution function. The
-restrictions are specified in the same minimum$>$maximum form as ranges. These
+restrictions are specified in the same (minimum,maximum) form as ranges. These
 commands are:\\
 
 {\emphtext restrict\_\{x,y,z\}} - Restricts over spatial dimensions. Only
@@ -2679,10 +2678,10 @@ begin:dist_fn
    direction2=dir_px
 
    #range is ignored for spatial coordinates
-   range1=1>1
-   range2=-3.0e-20>3.0e-20
+   range1=(1,1)
+   range2=(-3.0e-20,3.0e-20)
 
-   restrict_py=-3.0e-20>3.0e-20
+   restrict_py=(-3.0e-20,3.0e-20)
 
    #resolution is ignored for spatial coordinates
    resolution1=1
@@ -2702,8 +2701,8 @@ end:dist_fn
   to the axis. Valid directions are : dir\_x, \{dir\_y\}, \{dir\_z\}, dir\_px,
   dir\_py, dir\_pz. Spatial directions are only valid in high enough dimension
   codes, i.e. EPOCH1D only has a valid dir\_x.
-\item range\{n\} - The range of this dimension, specified as {\it lower}>{\it
-    upper}. This is ignored for spatial dimensions. Any particle which exceeds
+\item range\{n\} - The range of this dimension, specified as ({\it lower},{\it
+    upper}). This is ignored for spatial dimensions. Any particle which exceeds
   the range is ignored.
 \item resolution\{n\} - The number of gridpoints in each dimension. This
   number is ignored for any specified spatial dimension, due to the
@@ -6640,7 +6639,7 @@ INTEGER,INTENT(INOUT) ::ERR}}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{SplitRange} is a routine which splits a string of the format
-{\bf{\it n} > {\it m}} into two reals {\it n} and {\it m} which are returned
+{(\bf{\it n} , {\it m})} into two reals {\it n} and {\it m} which are returned
 separately in the \inlinecode{Real1} and \inlinecode{Real2} parameters
 respectively.  If it can't split the string successfully then it sets the
 \inlinecode{ERR\_BAD\_VALUE} bitfield of the ERR parameter.
