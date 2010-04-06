@@ -19,7 +19,8 @@
 \newcommand{\qtt}[1]{``{\code{#1}}''}
 \newcommand{\inlineemph}[1]{{\color{warwicklight} \bf{#1}}}
 \newcommand{\cemph}[1]{{\inlineemph{#1}}}
-\newcommand{\EPOCH}{{\color{warwickdark}\fontfamily{phv}\selectfont EPOCH} }
+\newcommand{\nEPOCH}{{\color{warwickdark}\fontfamily{phv}\selectfont EPOCH}}
+\newcommand{\EPOCH}{{\nEPOCH} }
 \newcommand{\image}[1]
   {{\begin{figure} \centering \includegraphics{#1} \end{figure}}}
 \newcommand{\taggedimage}[2]
@@ -115,7 +116,7 @@ See the section titled {\bf \EPOCH for advanced end users}
   experienced users can use it. How do I do that?}
 See the section titled {\bf Customising \EPOCH}
 
-\subsection{I want to develop an addition to \EPOCH. How do I do that?}
+\subsection{I want to develop an addition to \nEPOCH. How do I do that?}
 Basically read the entire of this manual. The second part of the manual details
 the internals of the code but it expects you to already be familiar with all
 the material in the first part of the manual.
@@ -288,14 +289,14 @@ while using the attached lasers to specify the inflowing characteristics. The
 particles are simply removed from the simulation when they reach the
 boundary.\\\\
 
-{\emphtext simple\_outflow} - A simplified version of {\inlineemph
-simple\_laser} which has the same properties of transmitting incident waves and
+{\emphtext simple\_outflow} - A simplified version of \inlineemph{simple\_laser}
+which has the same properties of transmitting incident waves and
 particles, but which cannot have EM wave sources attached to it. These
-boundaries are about 5\% more computationally efficient than {\inlineemph
-simple\_laser boundaries} with no attached sources. This boundary condition
-again allows outflowing characteristics to flow unchanged, but this time the
-inflowing characteristics are set to zero. The particles are again simply
-removed from the simulation when they reach the boundary.\\\\
+boundaries are about 5\% more computationally efficient than
+\inlineemph{simple\_laser boundaries} with no attached sources. This boundary
+condition again allows outflowing characteristics to flow unchanged, but this
+time the inflowing characteristics are set to zero. The particles are again
+simply removed from the simulation when they reach the boundary.\\\\
 
 {\emphtext NOTE: If either simple\_laser or simple\_outflow are specified on
 one or more boundaries then the code will no longer necessarily conserve mass.}
@@ -429,8 +430,8 @@ species by species basis. This only applies to certain kinds of derived field
 variable, such as mass\_density. It is combined with a restart frequency code
 by addition as in : \inlinecode{px = always + species}.\\
 
-When applied to a variable, these codes are referred to as a {\inlineemph
-dumpmask}.\\
+When applied to a variable, these codes are referred to as a
+\inlineemph{dumpmask}.\\
 
 \boxverbatim{output block}
 begin:output
@@ -469,10 +470,10 @@ begin:output
    jx=always
    jy=always
    jz=never
-   ekbar=always + species
-   mass_density=never + species
+   ekbar=always+species
+   mass_density=never+species
    charge_density=always
-   number_density=always + species
+   number_density=always+species
    temperature=always+species
 
    distribution_functions=always
@@ -481,7 +482,7 @@ end:output
 \end{Verbatim}
 
 {\emphtext use\_offset\_grid} - When using moving windows some visualisation
-programs (notable VisIt) show the motion of the window by moving the
+programs (notably VisIt) show the motion of the window by moving the
 visualisation window rather than by changing the x-axis. Setting this option to
 T causes the code to write another grid which always gives the offset relative
 to the left hand edge of the window rather than the true origin. Performs no
@@ -492,7 +493,7 @@ simulation seconds. Setting zero or negative means that the code will output
 every step of the core solver. The code does NOT guarantee that outputs will be
 exactly \inlineemph{dt\_snapshot} apart, what is guaranteed is that the next
 output will be after the first iteration which takes the simulation to a time
-$/ge$ \inlineemph{dt\_snapshot} from the last output.\\
+$\ge$ \inlineemph{dt\_snapshot} from the last output.\\
 
 {\emphtext full\_dump\_every} - The number of normal output dumps between full
 output dumps.\\
@@ -703,8 +704,8 @@ beyond amp.\\
 
 {\emphtext t\_start} - Start time for the laser in seconds, can be set to the
 string ``start'' to start at the beginning of the simulation. When using this
-parameter, the laser start is hard, to get a soft start use the {\inlineemph
-t\_profile} parameter to ramp the laser up to full strength.\\
+parameter, the laser start is hard, to get a soft start use the
+\inlineemph{t\_profile} parameter to ramp the laser up to full strength.\\
 
 {\emphtext t\_end} - End time for the laser in seconds, can be set to the
 string ``end'' to end at the end of the simulation. When using this parameter,
@@ -721,10 +722,11 @@ temporal envelope for the wave. The wave itself is introduced as a sinusoidal
 variation using the frequency specified in the laser block.
 
 In theory, any laser time profile required is possible, but the core FDTD
-solver for the EM fields in EPOCH produces spurious results if suddent changes
+solver for the EM fields in \EPOCH produces spurious results if suddent changes
 in the field intensity occur. This is shown in the two figures on this
-page. The pulse shown in figure \ref{badpulse} used a constant {\inlineemph
-t\_profile} and used \inlineemph{t\_end} to stop the laser after 8fs. Since
+page. The pulse shown in figure \ref{badpulse} used a constant
+\inlineemph{t\_profile} and used \inlineemph{t\_end} to stop the laser after
+8fs. Since
 the stopping time was not an exact multiple of the period, the result was to
 introduce spurious oscillations behind the pulse. If the laser had a finite
 phase shift so that the amplitude did not start at zero, a similar effect would
@@ -735,7 +737,7 @@ cutoff shows numerical artifacts behind the pulse.}
 \captionedimage{./images/pulse1.eps}{smoothpulse}{A laser pulse with a smooth
 temporal profile shows no artifacts.}
 
-Figure /ref{smoothpulse} instead used a Gaussian window function with a
+Figure \ref{smoothpulse} instead used a Gaussian window function with a
 characteristic width of 8fs as well as using \inlineemph{t\_end} to introduce
 a hard cutoff. It can clearly be seen that there are no spurious oscillations
 and the wave packet propagates correctly, showing only some dispersive
@@ -850,9 +852,9 @@ file handle is moved to the point specified by the offset parameter, the data
 is read and the file is then closed. Therefore, unless the offset value is
 changed between data reading lines the same data will be read into all the
 variables. The data is read in as soon as a line is executed, and so it is
-perfectly possible to load data from a file with the {\inlineemph
-species\_external\inlinecode{n}} block and then modify the data with a
-\inlineemph{species\inlinecode{n}} block.\\
+perfectly possible to load data from a file with the
+\inlineemph{species\_external\inlinecode{n}} block and then modify the data
+with a \inlineemph{species\inlinecode{n}} block.\\
 
 The file should be a simple binary file consisting of floating point numbers of
 the same precision as \inlinecode{\_num} in the core \EPOCH code.\\
@@ -873,7 +875,7 @@ begin:fields
 end:fields
 \end{Verbatim}
 
-The final type of block in the EPOCH input deck is the fields block. This
+The final type of block in the \EPOCH input deck is the fields block. This
 allows you to specify the electric and magnetic fields at any point in the
 domain. Once again, this is a very simple block needing only limited
 explanation. All field variables are accessible by name and can be read back
@@ -905,7 +907,7 @@ The data loading routines are identical to those for EPOCH1D, although
 obviously new routines are required to actually visualise 2D and 3D data. 2D
 and 3D data is much larger than 1D, and a much larger number of particles are
 required to adequately resolve the physics in multidimensional simulation so
-the data files generated by higher dimensionality versions of EPOCH will be
+the data files generated by higher dimensionality versions of \EPOCH will be
 much larger, which makes the more advanced IO routines available in \EPOCH more
 useful. These will the next elements to be covered.\\
 
@@ -931,7 +933,7 @@ The modified control block in EPOCH2D and 3D is very similar to the control
 block already introduced for EPOCH1D. All that is added are new elements
 describing the number of gridpoints in y and z (\inlineemph{ny \& nz}), and
 new start and end lines for the length of the domain in the new directions
-(\inlineemph{y\_start -> y\_end} \& \inlineemph{z\_start -> z\_end}). These
+(\inlineemph{y\_start $\rightarrow$ y\_end} \& \inlineemph{z\_start $\rightarrow$ z\_end}). These
 operate in exactly the same way as those already introduced with EPOCH1D,
 although care must be taken to increase the number of particles to ensure that
 the number of particles per cell remains high enough to accuratly resolve the
@@ -958,10 +960,12 @@ The modified boundary block includes new boundary conditions for the additional
 boundaries that are introduced in higher dimensions. These available boundaries
 are exactly the same as in 1D, with the additional boundaries being:\\
 
-\inlineemph{ybc\_up}    - top of domain\\
-\inlineemph{ybc\_down}  - bottom of domain\\
-\inlineemph{zbc\_front} - front of domain\\
-\inlineemph{zbc\_back}  - back of domain\\
+\begin{tabular}{rcl}
+\inlineemph{ybc\_up}    &-& top of domain\\
+\inlineemph{ybc\_down}  &-& bottom of domain\\
+\inlineemph{zbc\_front} &-& front of domain\\
+\inlineemph{zbc\_back}  &-& back of domain\\
+\end{tabular} \\
 
 These are equivalent to the existing 1D simulations except that the moving
 window always moves parallel to the x-axis when activated.\\ This concludes all
@@ -969,13 +973,13 @@ the modifications to input.deck that are required to use \EPOCH in multiple
 dimensions. There are some modifications that are required to allow
 multidimensional initial conditions, but a surprising number of initial
 conditions are in fact 1D even when running in multi-dimensional versions of
-\EPOCH. The next few pages cover the modifications to the initial conditions
+\nEPOCH. The next few pages cover the modifications to the initial conditions
 file which are needed for true multidimensional initial conditions with
 examples.
 
 \subsubsection{Multidimensional initial conditions}
 
-The basic modification to the EPOCH initial conditions deck is the addition of
+The basic modification to the \EPOCH initial conditions deck is the addition of
 the new variables describing positions and length in the new directions. The
 names of these variables are given in the full manual and will be used without
 introduction here.
@@ -984,18 +988,17 @@ A very simple problem to set up using EPOCH 2D is a Gaussian blob which is
 shown in Figure \ref{gaussblob}, in the form both of the ic.deck needed to
 create it and the output from VisIt that is produced from running this deck.
 
-In Figure \ref{gaussblobinverse}, a very small modification to this initial
+In Figure \ref{inversegaussblob}, a very small modification to this initial
 conditions deck is shown which creates the a case with a Gaussian density
 minimum at the centre. This makes it clear that multidimensional initial
 conditions are only a little more complex than 1D initial conditions, but at
 present these are not very interesting initial conditions.
 
-The next page extends this example to a more useful initial condition.
+The next page extends this example to a more useful initial condition. \\
 
 \scaledcapimage{./images/gaussic.eps}{gaussblob}{A Gaussian density blob at the
 centre of the domain.}{0.4}
 
-\begin{minipage}{\textwidth}
 \boxverbatim{species block to set up Gaussian density blob}
 begin:constant
    width=2.5e-6 #2.5 microns
@@ -1009,7 +1012,6 @@ begin:species1
    rho=1.0e19 * gauss(r,0.0,width)
 end:species1
 \end{Verbatim}
-\end{minipage}
 
 \scaledcapimage{./images/invgaussic.eps}{inversegaussblob}{A Gaussian density
 defecit at the centre of the domain.}{0.4}
@@ -1290,9 +1292,9 @@ begin:output
    jy=never
    jz=never
    ekbar=always
-   mass_density=never + species
+   mass_density=never+species
    charge_density=never
-   number_density=always + species
+   number_density=always+species
    temperature=never
 end:output
 \end{Verbatim}
@@ -1333,7 +1335,7 @@ should produce a figure that looks like Figure\ref{tsilate}.
 
 \subsubsection{Structured density profile in EPOCH2D}
 A simple but useful example for EPOCH2D is to have a highly structured initial
-condition to show that this is still easy to implement in EPOCH. A good example
+condition to show that this is still easy to implement in \nEPOCH. A good example
 initial condition would be\\
 
 \boxverbatim{ic.deck}
@@ -1353,8 +1355,8 @@ end:species1
 \end{Verbatim}
 
 Although not included here the input deck associated with these initial
-conditions sets \inlineemph{species1} to be electrons and {\inlineemph
-species2} to be protons. There species block for \inlineemph{species2} is set
+conditions sets \inlineemph{species1} to be electrons and \inlineemph{species2}
+to be protons. There species block for \inlineemph{species2} is set
 first to set up the ion density to be a highly structured 2D sinusoidal
 profile. The species block for \inlineemph{species1} is then set up to simply
 match the density of \inlineemph{species2} to produce charge neutrality. On
@@ -1394,9 +1396,9 @@ end:species1
 
 To convert this to 2D, simply replace the line \inlinecode{r=sqrt(y\^2+z\^2)}
 with the line \inlinecode{r=abs(y)}. The actual work in these initial
-conditions is done by the three lines inside the block for {\inlineemph
-species2}. Each of these lines performs a very specific function, with those
-functions being
+conditions is done by the three lines inside the block for
+\inlineemph{species2}. Each of these lines performs a very specific function,
+with those functions being
 
 \begin{enumerate}
 \item Creates the outer cone. Simply tests whether \inlinecode{r} is within
@@ -1449,7 +1451,7 @@ there are also 8 files
   directory to another without copying any of the output files
 \item deck.file - An example file showing how to run the code without user
   interaction. It will be explained in more depth later
-\item \EPOCH.pbs - An example PBS batch submission script showing how to use
+\item EPOCH.pbs - An example PBS batch submission script showing how to use
   the code in a parallel environment. In general, it probably will not be
   suitable for your particular machine, please consult the documentation for
   the facility that you are working on.
@@ -1516,7 +1518,7 @@ specified directory and start running. To run the code in parallel, just use
 the normal mpirun or mpiexec scripts supplied by your MPI implementation. If
 you want the code to run unattended, then you will need to specify the output
 directory by piping the directory name in from a file. An example of such a
-file is supplied as ``deck.file'' with the standard distribution of \EPOCH. To
+file is supplied as ``deck.file'' with the standard distribution of \nEPOCH. To
 use it, just run the code as\\
 \inlinecode{mpirun -np 2 ./bin/epoch2d < deck.file}\\
 and the code will run without user input. Some cluster queuing systems do not
@@ -1575,7 +1577,7 @@ options currently controlled by the preprocessors are\\
   parser and calls internal routines to set the same variables. NB - It is NOT
   ACCEPTABLE to develop an extension to the code which requires the code to be
   run in this mode. An input deck parser MUST be written for any released
-  extension to \EPOCH.
+  extension to \nEPOCH.
 \item SPLINE\_FOUR - Swap the code from a 2nd order cloud in cell PIC code to
   using 4th order spline particle shape functions.
 \end{itemize}
@@ -2148,7 +2150,7 @@ manual particle loader.
 The \EPOCH autoloader is a feature which means that if your initial condition
 can be specified as a number density and temperature profile on the underlying
 grid then you don't have to deal with the details of the internal
-representation of particles in \EPOCH. There are three phases of the
+representation of particles in \nEPOCH. There are three phases of the
 autoloader in EPOCH
 
 \begin{itemize}
@@ -2360,7 +2362,7 @@ will normally just be a coordinate axis. The next 2n entries are the
 position,value pairs, and the final parameter is the number of position,value
 pairs. The slightly clunky syntax of this command is unfortunatly necessary to
 allow it to work with some fairly fundamental features of the maths parser
-used in \EPOCH.\\
+used in \nEPOCH.\\
 All that is required now is to give an example. A good example is to reproduce
 the previous example of an isolated plasma block in 2D. This would look like
 \simpleboxverbatim
@@ -2705,7 +2707,7 @@ end:dist_fn
   the range is ignored.
 \item resolution\{n\} - The number of gridpoints in each dimension. This
   number is ignored for any specified spatial dimension, due to the
-  requirements of the paralellism scheme of \EPOCH.
+  requirements of the paralellism scheme of \nEPOCH.
 \item restrict\_\{x,y,z,p\_x,p\_y,p\_z\} - Restrictions are specified in the
   same way as ranges, but have a subtly different behaviour. Ranges specifiy
   the range of a visible axis on the resulting distribution function, whereas
@@ -3046,7 +3048,7 @@ the chain only knows about the previous link in the chain and the next link in
 the chain. Although there are schemes for doing this in languages which don't
 have pointers, the normal method of implementing linked lists is to use
 pointers to point to previous and next elements in the list, and this is how
-they are implemented in \EPOCH. Since both linked lists and Fortran pointers
+they are implemented in \nEPOCH. Since both linked lists and Fortran pointers
 are slightly esoteric concepts, while being key to the operation of \EPOCH a
 brief overview of them is presented here.\\
 
@@ -3186,7 +3188,7 @@ ASSOCIATED to check whether a pointer points to a particular object or not, in
 which case the syntax is \inlinecode{RESULT=ASSOCIATED(b,TARGET=a)}, which
 returns true if b points to a, or false if it doesn't, even if b is a valid
 pointer pointing to something else. It also introduces the way in which you
-must use linked lists in \EPOCH. The execution flow is as follows
+must use linked lists in \nEPOCH. The execution flow is as follows
 \begin{itemize}
 \item Point Current to the current element to the start of the linked list
   (head)
@@ -4363,7 +4365,7 @@ Any new constants required should be specified in the same place in
 
 \subsection{Important variables, arrays and array length}
 As well as the physical constants, there are some important variables which
-you will have to use to do any development with \EPOCH. As a general note,
+you will have to use to do any development with \nEPOCH. As a general note,
 since \EPOCH is written with separate 1D, 2D and 3D versions, definitions will
 be given for the 3D version of the code and irrelevant dimensions should just
 be cut out.
@@ -4388,7 +4390,7 @@ be cut out.
 \item INTEGER :: data\_dir\_max\_length - The maximum number of characters in
   the name of the output directory.
 \item INTEGER :: nZeros - The number of leading zeros in the output filenames
-  from \EPOCH.
+  from \nEPOCH.
 \end{itemize}
 The variables \inlinecode{cell\_{\it direction}\_start} and
 \inlinecode{cell\_{\it direction}\_end} represent the part of a global array
@@ -5216,7 +5218,7 @@ then it also introduces an EM wave propagating from the left boundary.\\
 
 This boundary condition is found in the file \inlinecode{laser.F90} which also
 includes the routines for handling the \inlinecode{Laser\_Block} objects which
-represent how lasers are represented in \EPOCH.
+represent how lasers are represented in \nEPOCH.
 
 \subsubsection{Particle boundaries}
 Due to the time that is required to loop over all the particles the particle
@@ -5276,7 +5278,7 @@ described in the next section.
 
 \subsubsection{MPI Boundaries}
 There are three routines which deal with MPI exchange for field variables in
-\EPOCH. Two are closely related and will be considered together. The third
+\nEPOCH. Two are closely related and will be considered together. The third
 deals with using MPI to sum variables at processor boundaries rather than
 synchronize ghost cells.\\\\
 
@@ -5327,11 +5329,11 @@ particles to the ghost cells and then call this routine.
 \pagebreak
 
 These routines can be used for most MPI which is needed for all but the most
-extreme modifications to \EPOCH. More details on the internals of the parallel
+extreme modifications to \nEPOCH. More details on the internals of the parallel
 implementation of \EPOCH is given in the section {\it MPI in \EPOCH}, which
 includes information on more extreme changes to EPOCH, but realistically one
 should already be a proficient MPI programmer before attempting to perform
-extensive modification to \EPOCH.
+extensive modification to \nEPOCH.
 
 \subsection{Particle List control functions}
 Collections of particles in \EPOCH are represented by Particle List
@@ -6124,9 +6126,9 @@ recommended that a developer examine this code when developing new routines.
 with codes developed by CFSA at the University of Warwick. The internal
 structure of CFD files is documented in the CFD documentation available from
 CFSA, but it is not necessary to have a full understanding of the file format
-to add the output of new variables to \EPOCH. To add a new variable to EPOCH's
+to add the output of new variables to \nEPOCH. To add a new variable to EPOCH's
 output, you simple have to use the supplied subroutines of the CFD library
-which is part of \EPOCH. The file output from \EPOCH takes place in the file
+which is part of \nEPOCH. The file output from \EPOCH takes place in the file
 {\it diagnostics.F90}, so to add new variables to the output you must add
 additional code there. Looking through the listings, you will see two lines
 
@@ -6455,7 +6457,7 @@ compilers do not allow strings to exceed 512 characters in length.
 
 Listed here are all the string handling routines (other than the core maths
 parser routine which are documented elsewhere) which are still currently used
-in \EPOCH. Simply looking at the code reveals some other routines which are
+in \nEPOCH. Simply looking at the code reveals some other routines which are
 historical remnants, left in place to make testing current versions of \EPOCH
 against earlier versions easier, and they will probably not remain in
 place. Any routines in \inlinecode{src/deck/strings.F90} and
@@ -6473,13 +6475,13 @@ LOGICAL :: StrCmp}}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{StrCmp} is the routine which does all the string comparisons in
-\EPOCH. It deals with leading and trailing whitespace automatically and
+\nEPOCH. It deals with leading and trailing whitespace automatically and
 automatically tests for length differences. It does not test for strings being
 valid substrings of each other, only for full equality.
 \\[0.5cm]
 {\Large Notes\\}
 A developer should always use \inlinecode{StrCmp} rather than doing their own
-string testing to ensure consistent behaviour across the entire of \EPOCH.
+string testing to ensure consistent behaviour across the entire of \nEPOCH.
 \pagebreak
 
 \pagebreak
@@ -7018,7 +7020,7 @@ Exactly how to extend \EPOCH depends heavily upon what you intend to add. The
 simplest thing is to add a new diagnostic to the code, and this is detailed in
 the section on \EPOCH IO. Other than simply adding new diagnostics to the code,
 there are a few main places where changes to the code will probably be needed
-to develop and extension to \EPOCH. These are
+to develop and extension to \nEPOCH. These are
 \begin{itemize}
 \item The field solver - Changing the field solver to add new laser like
   boundaries, add spatial smoothing to remove noise, add high order field
