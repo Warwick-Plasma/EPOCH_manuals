@@ -1574,13 +1574,6 @@ options currently controlled by the preprocessors are\\
   copies of particles until the next output dump, it is a heavyweight
   diagnostic. Therefore, this diagnostic is only enabled when the code is
   compiled with this directive.
-\item NO\_DECK - When developing the code, it is sometimes more convenient to
-  deactivate the input deck support and run the code with all variables
-  specified internally to the code. This input deck option turns off the deck
-  parser and calls internal routines to set the same variables. NB - It is NOT
-  ACCEPTABLE to develop an extension to the code which requires the code to be
-  run in this mode. An input deck parser MUST be written for any released
-  extension to \EPOCH.
 \item SPLINE\_FOUR - Swap the code from a 2nd order cloud in cell PIC code to
   using 4th order spline particle shape functions.
 \end{itemize}
@@ -2212,23 +2205,23 @@ elements of this structure have the following definitions (againin 2D)\\
 So an example of setting up a cold plasma block for all species in 2D would
 look like
 \simpleboxverbatim
-  SUBROUTINE ic_early
-    INTEGER :: ispecies
-    REAL(num) :: slab
+SUBROUTINE ic_early
+  INTEGER :: ispecies
+  REAL(num) :: slab
 
-    DO ispecies = 1, nspecies
-      initial_conditions(ispecies)%temp = 0.0_num
-      initial_conditions(ispecies)%minrho = 1.4_num
-      DO iy = -1, ny+2
-        DO ix = -1, nx+2
-          slab = 0.0_num
-          IF (x(ix) .LT. 1.0_num .AND. x(ix) .GT. -1.0_num) slab = 100.0
-          initial_conditions(ispecies)%rho(ix,iy) = 1.0_num + slab
-        ENDDO
+  DO ispecies = 1, nspecies
+    initial_conditions(ispecies)%temp = 0.0_num
+    initial_conditions(ispecies)%minrho = 1.4_num
+    DO iy = -1, ny+2
+      DO ix = -1, nx+2
+        slab = 0.0_num
+        IF (x(ix) .LT. 1.0_num .AND. x(ix) .GT. -1.0_num) slab = 100.0
+        initial_conditions(ispecies)%rho(ix,iy) = 1.0_num + slab
       ENDDO
     ENDDO
+  ENDDO
 
-  END SUBROUTINE ic_early
+END SUBROUTINE ic_early
 \end{Verbatim}
 
 This sets up a plasma slab with a density of 100 particles per square metre
@@ -2448,23 +2441,23 @@ It is also possible to load data from external files from the internal
 autoloader routines. This is done as follows
 
 \simpleboxverbatim
-  SUBROUTINE ic_early
-    INTEGER :: ispecies
-    INTEGER :: error
-    INTEGER(KIND=MPI_OFFSET_KIND) :: offset
+SUBROUTINE ic_early
+  INTEGER :: ispecies
+  INTEGER :: error
+  INTEGER(KIND=MPI_OFFSET_KIND) :: offset
 
-    DO ispecies = 1, nspecies
-      offset = 0
-      CALL load_single_array_from_data_file("Data/data.file", &
-          initial_conditions(species_id)%rho, offset, error)
-      offset = 80000
-      CALL load_single_array_from_data_file("Data/data.file", &
-          initial_conditions(species_id)%temp(:,:,1), offset, error)
-      CALL load_single_array_from_data_file("Data/data.file", &
-          initial_conditions(species_id)%temp(:,:,2), offset, error)
-    ENDDO
+  DO ispecies = 1, nspecies
+    offset = 0
+    CALL load_single_array_from_data_file("Data/data.file", &
+        initial_conditions(species_id)%rho, offset, error)
+    offset = 80000
+    CALL load_single_array_from_data_file("Data/data.file", &
+        initial_conditions(species_id)%temp(:,:,1), offset, error)
+    CALL load_single_array_from_data_file("Data/data.file", &
+        initial_conditions(species_id)%temp(:,:,2), offset, error)
+  ENDDO
 
-  END SUBROUTINE ic_early
+END SUBROUTINE ic_early
 \end{Verbatim}
 
 \subsection{Deferred Evaluation Objects (DEOs)}
@@ -2561,22 +2554,22 @@ You can add lasers at any point in the internal initial conditions routines,
 using the internal representation of a laser in the code, which is a Fortran
 TYPE called \inlinecode{laser\_block}
 \simpleboxverbatim
-  TYPE :: laser_block
-    ! Boundary to which laser is attached
-    INTEGER :: direction
-    ! A unique id number for the laser (not used directly by EPOCH)
-    ! Only used if hard coding time profiles
-    INTEGER :: id
-    REAL(num), DIMENSION(:), ALLOCATABLE :: profile
-    REAL(num), DIMENSION(:), ALLOCATABLE :: phase
+TYPE :: laser_block
+  ! Boundary to which laser is attached
+  INTEGER :: direction
+  ! A unique id number for the laser (not used directly by EPOCH)
+  ! Only used if hard coding time profiles
+  INTEGER :: id
+  REAL(num), DIMENSION(:), ALLOCATABLE :: profile
+  REAL(num), DIMENSION(:), ALLOCATABLE :: phase
 
-    LOGICAL :: use_time_function
-    TYPE(PrimitiveStack) :: time_function
+  LOGICAL :: use_time_function
+  TYPE(primitive_stack) :: time_function
 
-    REAL(num) :: amp = 0.0_num, freq = 1.0_num
-    REAL(num) :: pol = 0.0_num, angle = 0.0_num
-    REAL(num) :: t_start = 0.0_num, t_end = 0.0_num
-  END TYPE laser_block
+  REAL(num) :: amp = 0.0_num, freq = 1.0_num
+  REAL(num) :: pol = 0.0_num, angle = 0.0_num
+  REAL(num) :: t_start = 0.0_num, t_end = 0.0_num
+END TYPE laser_block
 \end{Verbatim}
 Most of these items are the same as their equivalents in the input deck and
 are set in the same way. The detailed description is
@@ -2585,7 +2578,7 @@ are set in the same way. The detailed description is
   automatically set when the laser is attached to a boundary.
 \item id - Exactly the same as the id property from the input deck.
 \item profile - The spatial profile for the laser. The array is allocated by
-  the initial call to \inlinecode{Init\_Laser} and must be populated between
+  the initial call to \inlinecode{init\_laser} and must be populated between
   (1:nx) for a boundary on the top or bottom, or (1:ny) for a boundary on the
   left or right.
 \item phase - The phase of the wavefront for the laser. See profile.
@@ -2601,21 +2594,21 @@ are set in the same way. The detailed description is
 To actually set up a laser is fairly simple, as shown below. The following
 code creates a laser and attaches it to the left hand boundary.
 \simpleboxverbatim
-TYPE(laser_block), POINTER :: NewLaser
+TYPE(laser_block), POINTER :: new_laser
 
-ALLOCATE(NewLaser)
-CALL Init_Laser(NewLaser, BD_LEFT)
-NewLaser%amp=3.88191e13_num
-NewLaser%freq=1.78e15_num
-NewLaser%id=1
-NewLaser%phase=0.0_num
-DO iy=1, ny
-   NewLaser%profile(iy)=exp(-y(iy)**2)
+ALLOCATE(new_laser)
+CALL init_laser(new_laser, c_bd_left)
+new_laser%amp = 3.88191e13_num
+new_laser%freq = 1.78e15_num
+new_laser%id = 1
+new_laser%phase = 0.0_num
+DO iy = 1, ny
+  new_laser%profile(iy) = exp(-y(iy)**2)
 ENDDO
-CALL Attach_Laser(NewLaser)
+CALL attach_laser(new_laser)
 \end{Verbatim}
-After the call to \inlinecode{Attach\_Laser} the laser is attached to the
-correct boundary. Since NewLaser is a pointer, it is valid to then reallocate
+After the call to \inlinecode{attach\_laser} the laser is attached to the
+correct boundary. Since new\_laser is a pointer, it is valid to then reallocate
 the same variable again to create and attach further lasers. It is valid to
 delete a laser without attaching it, although obviously the laser is lost. It
 is not valid to call \inlinecode{laser\_init} on an already initialised laser.
@@ -2627,18 +2620,18 @@ have more control, you can specify the laser time profile internally. In this
 case, the relevant function is in
 \inlinecode{user\_interaction/custom\_laser.f90}
 \simpleboxverbatim
-  FUNCTION custom_laser_time_profile(laser)
+FUNCTION custom_laser_time_profile(laser)
 
-    TYPE(laser_block), INTENT(IN) :: laser
-    REAL(num) :: custom_laser_time_profile
+  TYPE(laser_block), INTENT(IN) :: laser
+  REAL(num) :: custom_laser_time_profile
 
-    IF (laser%id .EQ. 1) THEN
-      custom_laser_time_profile = 1.0
-    ELSE
-      custom_laser_time_profile = EXP(-((time-1.0e-12_num)/1.0-e13_num)**2)
-    ENDIF
+  IF (laser%id .EQ. 1) THEN
+    custom_laser_time_profile = 1.0
+  ELSE
+    custom_laser_time_profile = EXP(-((time-1.0e-12_num)/1.0-e13_num)**2)
+  ENDIF
 
-  END FUNCTION custom_laser_time_profile
+END FUNCTION custom_laser_time_profile
 \end{Verbatim}
 The function returns just the time profile part of the laser, and the
 amplitude specified when the laser is set up is still applied, so normally you
@@ -2742,7 +2735,7 @@ conditions subroutines, the sequence looks like
   ! DIR_X, DIR_Y, DIR_Z, DIR_PX, DIR_PY, DIR_PZ
   Work%Restrictions(4,:)=(/-3.0e-20, 3.0e-20/)
   Work%Use_Species(1:2)=.TRUE.
-  CALL Attach_Dist_Fn(Work)
+  CALL attach_dist_fn(work)
 
 \end{Verbatim}
 This code would create exactly the same distribution function as the
@@ -2924,7 +2917,7 @@ PARTICLE. The current definition of this type (in 2D) is
 
 \simpleboxverbatim
 ! Object representing a particle
-  TYPE :: Particle
+  TYPE :: particle
      REAL(num), DIMENSION(3) :: Part_P
      REAL(num), DIMENSION(2) :: Part_pos
 #ifdef PER_PARTICLE_WEIGHT
@@ -2934,12 +2927,12 @@ PARTICLE. The current definition of this type (in 2D) is
      REAL(num) :: charge
      REAL(num) :: mass
 #endif
-     TYPE(Particle), POINTER :: Next, Prev
+     TYPE(particle), POINTER :: Next, Prev
 #ifdef PART_DEBUG
      INTEGER :: Processor
      INTEGER :: Processor_at_t0
 #endif
-  END TYPE Particle
+  END TYPE particle
 \end{Verbatim}
 Note the presence of the preprocessor directives, meaning that charge and mass
 only exist if the \inlinecode{-DPER\_PARTICLE\_CHARGEMASS} define was put in
@@ -2948,9 +2941,9 @@ present, check the preprocessor defines.
 
 These parameters can be explained as follows
 \begin{itemize}
-\item Part\_P - The momentum in 3 dimensions for the particle. This is always
+\item part\_p - The momentum in 3 dimensions for the particle. This is always
   of size 3.
-\item Part\_Pos - The position of the particle in space. This is of the same
+\item part\_pos - The position of the particle in space. This is of the same
   size as the dimensionality of the code.
 \item weight - The weight of this particle. The number of real particles
   represented by this pseudoparticle.
@@ -2963,7 +2956,7 @@ These parameters can be explained as follows
   later.
 \item Processor - The rank of the processor which currently holds the
   particle.
-\item Processor\_at\_t0 - The rank of the processor on which the particle
+\item processor\_at\_t0 - The rank of the processor on which the particle
   started.
 \end{itemize}
 
@@ -2974,8 +2967,8 @@ interprocessor communication of particles. The definition of the type is
 
 \simpleboxverbatim
   TYPE :: particle_list
-     TYPE(Particle), POINTER :: Head
-     TYPE(Particle), POINTER :: Tail
+     TYPE(particle), POINTER :: head
+     TYPE(particle), POINTER :: tail
      INTEGER(KIND=8) :: Count
      ! Pointer is safe if the particles in it are all unambiguously linked
      LOGICAL :: Safe
@@ -2984,8 +2977,8 @@ interprocessor communication of particles. The definition of the type is
   END TYPE particle_list
 \end{Verbatim}
 \begin{itemize}
-\item Head - The first particle in the linked list.
-\item Tail - The last particle in the linked list.
+\item head - The first particle in the linked list.
+\item tail - The last particle in the linked list.
 \item Count - The number of particles in the list. Note that this is NOT MPI
   aware, so reading count only gives you the number of particles on the local
   processor.
@@ -3005,7 +2998,7 @@ which are common to all particles in a species. The definition is
   TYPE :: ParticleFamily
      CHARACTER(EntryLength) :: Name
 
-     TYPE(particle\_list) :: AttachedList
+     TYPE(particle_list) :: attached_list
      TYPE(ParticleFamily), POINTER :: Next, Prev
      INTEGER :: id
      LOGICAL :: Dump
@@ -3020,7 +3013,7 @@ which are common to all particles in a species. The definition is
 
 \begin{itemize}
 \item Name - The name of the particle species, used in the output dumps etc.
-\item Next, Prev - Particle Species are also linked together in a linked
+\item Next, Prev - Particle species are also linked together in a linked
   list. This is used internally by the output dump routines, but should not be
   used by end users.
 \item id - The species number for this species. This is the same number as is
@@ -3066,16 +3059,16 @@ adding a new elements to the list, you normally also keep a pointer to the
 last element of the list. Therefore you would also have variables which look
 like
 \simpleboxverbatim
-TYPE(linked_list) :: Head, Tail
+TYPE(linked_list) :: head, tail
 \end{Verbatim}
 
 Since Fortran pointers are not initialised in any particular state, you have
-to remember to set the Head and Tail pointers to explictly point nowhere
+to remember to set the head and tail pointers to explictly point nowhere
 (normally called a null pointer by analogy with the older C style
 pointers). This is done using the nullify command
 \simpleboxverbatim
-NULLIFY(Head)
-NULLIFY(Tail)
+NULLIFY(head)
+NULLIFY(tail)
 \end{Verbatim}
 
 The same thing is important when creating a new linked list element, so you
@@ -3087,8 +3080,8 @@ SUBROUTINE create_element(element)
   TYPE(linked_list), POINTER, INTENT(INOUT) :: element
 
   ALLOCATE(element)
-  NULLIFY(element%Next)
-  NULLIFY(element%Prev)
+  NULLIFY(element%next)
+  NULLIFY(element%prev)
 
 END SUBROUTINE create_element
 \end{Verbatim}
@@ -3111,21 +3104,21 @@ on each cycle, the entire memory can very quickly be used up.
 So, to add a new element to the list you would have a subroutine which looks
 like
 \simpleboxverbatim
-SUBROUTINE add_element(Element)
+SUBROUTINE add_element(element)
 
-   TYPE(linked_list), POINTER, INTENT(IN) :: element
+  TYPE(linked_list), POINTER, INTENT(IN) :: element
 
-   IF (.NOT. ASSOCIATED(Head)) THEN
-      ! Adding first element to list, so just set
-      ! both head and tail to the element
-      Head=>Element
-      Tail=>element
-      RETURN
-   ENDIF
+  IF (.NOT. ASSOCIATED(head)) THEN
+    ! Adding first element to list, so just set
+    ! both head and tail to the element
+    head=>element
+    tail=>element
+    RETURN
+  ENDIF
 
-   Tail%Next=>element
-   element%Prev=>Tail
-   Tail=>element
+  tail%next=>element
+  element%prev=>tail
+  tail=>element
 
 END SUBROUTINE add_element
 \end{Verbatim}
@@ -3162,8 +3155,8 @@ TYPE(linked_list), POINTER :: New
 NULLIFY(New)
 
 DO i=1,n
-   CALL create_element(new)
-   CALL add_element(New)
+  CALL create_element(new)
+  CALL add_element(New)
 ENDDO
 \end{Verbatim}
 
@@ -3172,10 +3165,10 @@ use code like
 \simpleboxverbatim
 TYPE(linked_list), POINTER :: Current
 
-Current=>Head
+Current=>head
 DO WHILE(ASSOCIATED(Current))
-   ! Do stuff
-   Current=>Current%Next
+  ! Do stuff
+  Current=>Current%next
 ENDDO
 \end{Verbatim}
 
@@ -3203,30 +3196,30 @@ to delete elements. A subroutine to remove a single element from a linked list
 would look like
 
 \simpleboxverbatim
-SUBROUTINE Remove_Element(Element)
-TYPE(linked_list), POINTER, INTENT(INOUT) :: Element
+SUBROUTINE remove_element(element)
+  TYPE(linked_list), POINTER, INTENT(INOUT) :: element
 
-IF (ASSOCIATED(Element%Prev)) THEN
-   ! Previous element exists
-   Element%Prev%Next=>Element%Next
-ELSE
-   ! Previous element does not exist therefore
-   ! Element is the head. When Element is removed
-   ! The head is the element after the element being removed
-   Head=>Element%Next
-ENDIF
+  IF (ASSOCIATED(element%prev)) THEN
+    ! Previous element exists
+    element%prev%next=>element%next
+  ELSE
+    ! Previous element does not exist therefore
+    ! element is the head. When element is removed
+    ! The head is the element after the element being removed
+    head=>element%next
+  ENDIF
 
-IF (ASSOCIATED(Element%Next)) THEN
-   ! Next element exists
-   Element%Next%Prev=>Element%Prev
-ELSE
-   ! Next element does not exists therefore
-   ! Element is the tail. When element is removed
-   ! The head is the element before the element being removed
-   Tail=>Element%Prev
-ENDIF
+  IF (ASSOCIATED(element%next)) THEN
+    ! Next element exists
+    element%next%prev=>element%prev
+  ELSE
+    ! Next element does not exists therefore
+    ! element is the tail. When element is removed
+    ! The head is the element before the element being removed
+    tail=>element%prev
+  ENDIF
 
-END SUBROUTINE Remove_Element
+END SUBROUTINE remove_element
 \end{Verbatim}
 
 Once again, this code looks slightly counter-intuitive, but if you go through
@@ -3239,35 +3232,35 @@ called ``N''
   \inlinecode{P} exists
 \item If \inlinecode{P} exists then the element to be removed isn't at the
   start of the chain. When \inlinecode{C} is removed, we need
-  \inlinecode{P}\%Next to point to \inlinecode{C}\%Next. This leads to the odd
-  looking Element\%Prev\%Next=>Element\%Next syntax
+  \inlinecode{P}\%next to point to \inlinecode{C}\%next. This leads to the odd
+  looking element\%prev\%next=>element\%next syntax
 \item If \inlinecode{P} does not exist then \inlinecode{C} is at the the start
   of the chain. In order to not leave the chain orphaned when \inlinecode{C}
-  is removed, we need Head to point to \inlinecode{C}\%Next
+  is removed, we need head to point to \inlinecode{C}\%next
 \item Exactly the same logic applies for updating the element after
   \inlinecode{C}
 \item Check whether \inlinecode{C}'s Next element exists, this means that
   \inlinecode{N} exists
 \item If \inlinecode{N} exists then the element to be removed isn't at the end
-  of the chain. When \inlinecode{C} is removed, we need \inlinecode{N}\%Prev
-  to point to \inlinecode{C}\%Prev.
+  of the chain. When \inlinecode{C} is removed, we need \inlinecode{N}\%prev
+  to point to \inlinecode{C}\%prev.
 \item If \inlinecode{P} does not exist then \inlinecode{C} is at the the start
   of the chain. In order to not leave the chain orphaned when \inlinecode{C}
-  is removed, we need Head to point to \inlinecode{C}\%Next
+  is removed, we need head to point to \inlinecode{C}\%next
 \end{itemize}
 
 Therefore, code to remove some elements from a linked list would look like
 \simpleboxverbatim
 TYPE(linked_list), POINTER :: Current, Next
 
-Current=>Head
+Current=>head
 DO WHILE(ASSOCIATED(Current))
-   Next=>Current%Next
-   IF (Dealloc) THEN
-      CALL Remove_Element(Current)
-      DEALLOCATE(Current)
-   ENDIF
-   Current=>Next
+  Next=>Current%next
+  IF (Dealloc) THEN
+    CALL remove_element(current)
+    DEALLOCATE(Current)
+  ENDIF
+  Current=>Next
 ENDDO
 \end{Verbatim}
 Note that current must be deallocated explicitly even after it has been
@@ -3282,36 +3275,34 @@ the particles is fairly simple. The following is an example which positions
 the particles correctly in 2D space, but doesn't set any momentum
 
 \simpleboxverbatim
+SUBROUTINE manual_load
 
-SUBROUTINE Manual_Load
+  TYPE(particle), POINTER :: Current
+  INTEGER :: ispecies
+  INTEGER :: idum, clock
+  REAL(num) :: rpos
 
-TYPE(Particle), POINTER :: Current
-INTEGER :: ispecies
-INTEGER :: idum, clock
-REAL(num) :: rpos
+  ! Seed the random number generator off the system clock
+  CALL SYSTEM_CLOCK(clock)
+  ! Correct using the rank to ENSURE that different
+  ! processors have different random numbers
+  idum=-(clock+rank+1)
 
-! Seed the random number generator off the system clock
-CALL SYSTEM_CLOCK(clock)
-! Correct using the rank to ENSURE that different
-! processors have different random numbers
-idum=-(clock+rank+1)
-
-DO ispecies=1,nspecies
-   Current=>ParticleSpecies(ispecies)%AttachedList%Head
-   DO WHILE(ASSOCIATED(Current))
+  DO ispecies=1,nspecies
+    Current=>ParticleSpecies(ispecies)%attached_list%head
+    DO WHILE(ASSOCIATED(Current))
       rpos=(random(idum) - 0.5_num)*2.0_num
       Current%Part_Pos(1)=rpos
       rpos=random(idum)*length_x + x_start
 
       Current%Weight=1.0_num
-      Current=>Current%Next
-   ENDDO
-ENDDO
+      Current=>Current%next
+    ENDDO
+  ENDDO
 
-
-END SUBROUTINE Manual_Load
-
+END SUBROUTINE manual_load
 \end{Verbatim}
+
 This once again produces the now familiar example output. Note that now there
 are no stripes since I made no attempt to use a quiet start algorithm when
 positioning particles. Note also that I completely ignored the question of
@@ -3343,26 +3334,25 @@ distribution. An example of using {\bf momentum\_from\_temperature} is given
 below.
 
 \simpleboxverbatim
+SUBROUTINE manual_load
 
-SUBROUTINE Manual_Load
+  TYPE(particle), POINTER :: Current
+  INTEGER :: ispecies
+  INTEGER :: idum, clock
+  REAL(num) :: rpos, temp
 
-TYPE(Particle), POINTER :: Current
-INTEGER :: ispecies
-INTEGER :: idum, clock
-REAL(num) :: rpos, temp
+  ! Seed the random number generator off the system clock
+  CALL SYSTEM_CLOCK(clock)
+  ! Correct using the rank to ENSURE that different
+  ! processors have different random numbers
+  idum=-(clock+rank+1)
 
-! Seed the random number generator off the system clock
-CALL SYSTEM_CLOCK(clock)
-! Correct using the rank to ENSURE that different
-! processors have different random numbers
-idum=-(clock+rank+1)
+  ! Simple uniform temperature
+  temp=1.0e6_num
 
-! Simple uniform temperature
-temp=1.0e6_num
-
-DO ispecies=1, nspecies
-   Current=>ParticleSpecies(ispecies)%AttachedList%Head
-   DO WHILE(ASSOCIATED(Current))
+  DO ispecies=1, nspecies
+    Current=>ParticleSpecies(ispecies)%attached_list%head
+    DO WHILE(ASSOCIATED(Current))
       rpos=(random(idum) - 0.5_num)*2.0_num
       Current%Part_Pos(1)=rpos
       rpos=random(idum)*length_x + x_start
@@ -3374,13 +3364,11 @@ DO ispecies=1, nspecies
       Current%Part_P(2) = &
         momentum_from_temperature(ParticleSpecies(ispecies)%Mass, temp, idum)
 
-      Current=>Current%Next
-   ENDDO
-ENDDO
+      Current=>Current%next
+    ENDDO
+  ENDDO
 
-
-END SUBROUTINE Manual_Load
-
+END SUBROUTINE manual_load
 \end{Verbatim}
 
 While the autoloader is capable of dealing with most required initial thermal
@@ -3390,56 +3378,55 @@ function which can be used to deal with most non-thermal distributions. To use
 the helper function, you need two to define two 1D arrays which are the x and
 y axes for the distribution function. An example of using the helper function
 is given below
+
 \simpleboxverbatim
+SUBROUTINE manual_load
 
-SUBROUTINE Manual_Load
+  TYPE(particle), POINTER :: Current
+  INTEGER, PARAMETER :: nx_local=100
+  INTEGER :: ispecies
+  INTEGER :: idum, clock, ix
+  REAL(num) :: rpos, dx_local
+  REAL(num) :: min_p, max_p, var, temperature
+  REAL(num), DIMENSION(nx_local) :: x_axis, y_axis
 
-TYPE(Particle), POINTER :: Current
-INTEGER, PARAMETER :: nx_local=100
-INTEGER :: ispecies
-INTEGER :: idum, clock, ix
-REAL(num) :: rpos, dx_local
-REAL(num) :: min_p, max_p, var, temperature
-REAL(num), DIMENSION(nx_local) :: x_axis, y_axis
+  ! Seed the random number generator off the system clock
+  CALL SYSTEM_CLOCK(clock)
+  ! Correct using the rank to ENSURE that different
+  ! processors have different random numbers
+  idum=-(clock+rank+1)
 
-! Seed the random number generator off the system clock
-CALL SYSTEM_CLOCK(clock)
-! Correct using the rank to ENSURE that different
-! processors have different random numbers
-idum=-(clock+rank+1)
+  min_p=-3.0e-20
+  max_p=3.0e-20
 
-min_p=-3.0e-20
-max_p=3.0e-20
+  dx_local=(max_p-min_p)/REAL(nx_local, num) + min_p
+  x_axis(1)=min_p
+  DO ix=2, nx_local
+    x_axis(ix)=x_axis(ix-1)+dx_local
+  ENDDO
 
-dx_local=(max_p-min_p)/REAL(nx_local, num) + min_p
-x_axis(1)=min_p
-DO ix=2, nx_local
-   x_axis(ix)=x_axis(ix-1)+dx_local
-ENDDO
-
-temperature=10000.0_num
-DO ispecies=1, nspecies
-   var=temperature*kb*ParticleSpecies(ispecies)%Mass
-   DO ix=1, nx_local
+  temperature=10000.0_num
+  DO ispecies=1, nspecies
+    var=temperature*kb*ParticleSpecies(ispecies)%Mass
+    DO ix=1, nx_local
       y_axis(ix)=EXP(-x_axis(ix)**2/var)
-   ENDDO
-   Current=>ParticleSpecies(ispecies)%AttachedList%Head
-   DO WHILE(ASSOCIATED(Current))
+    ENDDO
+    Current=>ParticleSpecies(ispecies)%attached_list%head
+    DO WHILE(ASSOCIATED(Current))
       Current%Part_P(1)=Sample_Dist_Function(x_axis, y_axis, idum)
-      Current=>Current%Next
-   ENDDO
-ENDDO
+      Current=>Current%next
+    ENDDO
+  ENDDO
 
-
-END SUBROUTINE Manual_Load
-
+END SUBROUTINE manual_load
 \end{Verbatim}
+
 This is a very simple example where the distribution function is a Maxwellian
 which could have been set up using the {\bf momentum\_from\_temperature}
 function more easily, but it does demonstrate how the
-{\bf Sample\_Dist\_Function} function works. It is not necessary to normalise
+{\bf sample\_dist\_function} function works. It is not necessary to normalise
 the distribution function, as this is done automatically by the
-{\bf Sample\_Dist\_Function} function.
+{\bf sample\_dist\_function} function.
 
 \section{Customising {\EPOCH}}
 This section details how to setup {\EPOCH} with additional parameters so that it
@@ -3658,10 +3645,10 @@ this manual). Actually registering the objects is done in the
 lines to register functions and constants, which should look like
 
 \simpleboxverbatim
-  SUBROUTINE RegisterObjects
-       FUNC_LORENTZ=RegisterFunction("lorentz")
-       CONST_PHI=RegisterConstant("phi")
-  END SUBROUTINE RegisterObjects
+SUBROUTINE RegisterObjects
+  FUNC_LORENTZ=RegisterFunction("lorentz")
+  CONST_PHI=RegisterConstant("phi")
+END SUBROUTINE RegisterObjects
 \end{Verbatim}
 
 Note that the input deck parser is case sensitive, so the strings which are
@@ -3677,17 +3664,17 @@ Once a new constant has been registered it must be described using the
 \inlinecode{CustomConstant} function. In 2D this function looks like
 
 \simpleboxverbatim
-  FUNCTION CustomConstant(opcode, ix, iy, errcode)
-    INTEGER, INTENT(IN) :: opcode, ix, iy
-    INTEGER, INTENT(INOUT) :: errcode
-    REAL(num) :: CustomConstant
+FUNCTION CustomConstant(opcode, ix, iy, errcode)
+  INTEGER, INTENT(IN) :: opcode, ix, iy
+  INTEGER, INTENT(INOUT) :: errcode
+  REAL(num) :: CustomConstant
 
-    ! Leave these lines in place. They cause the code to throw an error if
-    ! The opcode is unknown
-    CustomConstant=0.0_num
-    errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
+  ! Leave these lines in place. They cause the code to throw an error if
+  ! The opcode is unknown
+  CustomConstant=0.0_num
+  errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
 
-  END FUNCTION CustomConstant
+END FUNCTION CustomConstant
 \end{Verbatim}
 
 The parameters are
@@ -3713,22 +3700,22 @@ The function should just return the evaluated value of the constant requested
 by \inlinecode{opcode}. This might look like
 
 \simpleboxverbatim
-  FUNCTION CustomConstant(opcode, ix, iy, errcode)
-    INTEGER, INTENT(IN) :: opcode, ix, iy
-    INTEGER, INTENT(INOUT) :: errcode
-    REAL(num) :: CustomConstant
+FUNCTION CustomConstant(opcode, ix, iy, errcode)
+  INTEGER, INTENT(IN) :: opcode, ix, iy
+  INTEGER, INTENT(INOUT) :: errcode
+  REAL(num) :: CustomConstant
 
-    IF (opcode == CONST_PHI) THEN
-    	CustomConstant=pi
-	RETURN
-    ENDIF
+  IF (opcode == CONST_PHI) THEN
+    CustomConstant=pi
+    RETURN
+  ENDIF
 
-    ! Leave these lines in place. They cause the code to throw an error if
-    ! The opcode is unknown
-    CustomConstant=0.0_num
-    errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
+  ! Leave these lines in place. They cause the code to throw an error if
+  ! The opcode is unknown
+  CustomConstant=0.0_num
+  errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
 
-  END FUNCTION CustomConstant
+END FUNCTION CustomConstant
 \end{Verbatim}
 
 Note that when \inlinecode{opcode} is successfully recognized, the code sets
@@ -3749,18 +3736,18 @@ the new constant. The relevant function is \inlinecode{CustomFunction} and
 when empty looks like
 
 \simpleboxverbatim
-  FUNCTION CustomFunction(opcode, ix, iy, errcode)
-    INTEGER, INTENT(IN) :: opcode, ix, iy
-    INTEGER, INTENT(INOUT) :: errcode
-    REAL(num) :: CustomFunction
-    REAL(num) :: Values(5)
+FUNCTION CustomFunction(opcode, ix, iy, errcode)
+  INTEGER, INTENT(IN) :: opcode, ix, iy
+  INTEGER, INTENT(INOUT) :: errcode
+  REAL(num) :: CustomFunction
+  REAL(num) :: Values(5)
 
-    ! Leave these lines in place. They cause the code to throw an error if
-    ! The opcode is unknown
-    CustomFunction=0.0_num
-    errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
+  ! Leave these lines in place. They cause the code to throw an error if
+  ! The opcode is unknown
+  CustomFunction=0.0_num
+  errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
 
-  END FUNCTION CustomFunction
+END FUNCTION CustomFunction
 \end{Verbatim}
 
 The parameters are
@@ -3790,27 +3777,27 @@ dependent variable, the location parameter and the scale parameter. The code
 to implement the function therefore looks like
 
 \simpleboxverbatim
-  FUNCTION CustomFunction(opcode, ix, iy, errcode)
-    INTEGER, INTENT(IN) :: opcode, ix, iy
-    INTEGER, INTENT(INOUT) :: errcode
-    REAL(num) :: CustomFunction
-    REAL(num) :: Values(5)
+FUNCTION CustomFunction(opcode, ix, iy, errcode)
+  INTEGER, INTENT(IN) :: opcode, ix, iy
+  INTEGER, INTENT(INOUT) :: errcode
+  REAL(num) :: CustomFunction
+  REAL(num) :: Values(5)
 
-    IF (opcode == FUNC_LORENTZ) THEN
-    	CALL GetValues(3, Values(1:3))
-	! Values(1) - Dependent variable
-	! Values(2) - location parameter
-	! Values(3) - scale parameter
-	CustomFunction=Values(3)**2/((Values(1)-Values(2))**2+Values(3)**2)
-	RETURN
-    ENDIF
+  IF (opcode == FUNC_LORENTZ) THEN
+    CALL GetValues(3, Values(1:3))
+    ! Values(1) - Dependent variable
+    ! Values(2) - location parameter
+    ! Values(3) - scale parameter
+    CustomFunction=Values(3)**2/((Values(1)-Values(2))**2+Values(3)**2)
+    RETURN
+  ENDIF
 
-    ! Leave these lines in place. They cause the code to throw an error if
-    ! The opcode is unknown
-    CustomFunction=0.0_num
-    errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
+  ! Leave these lines in place. They cause the code to throw an error if
+  ! The opcode is unknown
+  CustomFunction=0.0_num
+  errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
 
-  END FUNCTION CustomFunction
+END FUNCTION CustomFunction
 \end{Verbatim}
 
 This function is then available at any point in the input deck and if I return
@@ -3888,7 +3875,7 @@ There are three parameters passed to \inlinecode{HandleCustomBlock}, which are
 \begin{itemize}
 \item blockname - The name of the block specified in the
   \inlinecode{begin:blockname} part of the input deck.
-\item Element - The name of the element in an input deck
+\item element - The name of the element in an input deck
   \inlinecode{element=value} pair.
 \item Value - The string representation of the value in an input deck
   \inlinecode{element=value} pair.
@@ -3898,9 +3885,9 @@ There are three parameters passed to \inlinecode{HandleCustomBlock}, which are
 \inlinecode{begin:blockname} which cannot be recognized by the core input deck
 parser. The first thing that it does is test whether or not it is a valid
 custom block. The code does this by passing in the blockname with
-\inlinecode{Element} and \inlinecode{Value} set to the special constant called
+\inlinecode{element} and \inlinecode{Value} set to the special constant called
 "Blank". When extending the input deck, an end user should check for either
-\inlinecode{Element} or \inlinecode{Value} begin the special constant Blank
+\inlinecode{element} or \inlinecode{Value} begin the special constant Blank
 and if they are then test to see whether the blockname is known or not. If the
 blockname is known then the code should return the error code
 \inlinecode{ERR\_NONE} (No error), if the blockname is not known then the code
@@ -3908,24 +3895,24 @@ should return \inlinecode{ERR\_UNKNOWN\_BLOCK} and the deck parser will just
 skip the block. In operation, this looks like
 
 \simpleboxverbatim
-  FUNCTION HandleCustomBlock(blockname, Element, Value)
+FUNCTION HandleCustomBlock(blockname, element, Value)
 
-    CHARACTER(len=entrylength), INTENT(IN)::blockname, Element, Value
-    INTEGER :: HandleCustomBlock
-    TYPE(primitivestack) :: output
-    INTEGER :: ix, iy
-    IF (StrCmp(blockname, "custom")) THEN
-    	IF (Element == Blank .OR. Value == Blank) THEN
-              ! If element or value are blank, then just testing block so return ERR_NONE
-              HandleCustomBlock=ERR_NONE
-              RETURN
-         ENDIF
+  CHARACTER(len=entrylength), INTENT(IN)::blockname, element, Value
+  INTEGER :: HandleCustomBlock
+  TYPE(primitivestack) :: output
+  INTEGER :: ix, iy
+  IF (StrCmp(blockname, "custom")) THEN
+    IF (element == Blank .OR. Value == Blank) THEN
+      ! If element or value are blank, then just testing block so return ERR_NONE
+       HandleCustomBlock=ERR_NONE
+       RETURN
      ENDIF
+   ENDIF
 
-    ! The following line must always be present
-    HandleCustomBlock=ERR_UNKNOWN_BLOCK
+  ! The following line must always be present
+  HandleCustomBlock=ERR_UNKNOWN_BLOCK
 
-  END FUNCTION HandleCustomBlock
+END FUNCTION HandleCustomBlock
 \end{Verbatim}
 
 In order to simply Fortran's rather annoying string handling behaviour several
@@ -3933,45 +3920,46 @@ helper functions have been defined, and the most used one is
 \inlinecode{StrCmp(String1, String2)} which is a simple routine which returns
 true if String1==String2 and false otherwise. It is case sensitive but can
 deal with differing string lengths etc. The next stage is to deal with the
-actual \inlinecode{Element=Value} pairs in the deck. Each time that a new pair
+actual \inlinecode{element=Value} pairs in the deck. Each time that a new pair
 is read from the deck \inlinecode{HandleCustomBlock} is called with
-\inlinecode{Element} and \inlinecode{Value} having the values read from the
+\inlinecode{element} and \inlinecode{Value} having the values read from the
 deck. To test for known elements they should just be checked against a known
 list of names using \inlinecode{StrCmp} and return the error code
 \inlinecode{ERR\_UNKNOWN\_ELEMENT} if the element isn't a known element. This
 looks like
 
 \simpleboxverbatim
-  FUNCTION HandleCustomBlock(blockname, Element, Value)
+FUNCTION HandleCustomBlock(blockname, element, Value)
 
-    CHARACTER(len=entrylength), INTENT(IN)::blockname, Element, Value
-    INTEGER :: HandleCustomBlock
-    TYPE(primitivestack) :: output
-    INTEGER :: ix, iy
-    IF (StrCmp(blockname, "custom")) THEN
-    	IF (Element == Blank .OR. Value == Blank) THEN
-              ! If element or value are blank, then just testing block so return ERR_NONE
-              HandleCustomBlock=ERR_NONE
-              RETURN
-         ENDIF
-         HandleCustomBlock=ERR_UNKNOWN_ELEMENT
-         ! Now test for the real elements
-         IF (StrCmp(Element, "int_element")) THEN
-             HandleCustomBlock=ERR_NONE
-         ENDIF
-         IF (StrCmp(Element, "real_element")) THEN
-             HandleCustomBlock=ERR_NONE
-         ENDIF
-         IF (StrCmp(Element, "logical_element")) THEN
-             HandleCustomBlock=ERR_NONE
-         ENDIF
-         RETURN
-     ENDIF
+  CHARACTER(len=entrylength), INTENT(IN)::blockname, element, Value
+  INTEGER :: HandleCustomBlock
+  TYPE(primitivestack) :: output
+  INTEGER :: ix, iy
 
-     ! The following line must always be present
-     HandleCustomBlock=ERR_UNKNOWN_BLOCK
+  IF (StrCmp(blockname, "custom")) THEN
+    IF (element == Blank .OR. Value == Blank) THEN
+      ! If element or value are blank, then just testing block so return ERR_NONE
+      HandleCustomBlock=ERR_NONE
+      RETURN
+    ENDIF
+    HandleCustomBlock=ERR_UNKNOWN_ELEMENT
+    ! Now test for the real elements
+    IF (StrCmp(element, "int_element")) THEN
+      HandleCustomBlock=ERR_NONE
+    ENDIF
+    IF (StrCmp(element, "real_element")) THEN
+      HandleCustomBlock=ERR_NONE
+    ENDIF
+    IF (StrCmp(element, "logical_element")) THEN
+      HandleCustomBlock=ERR_NONE
+    ENDIF
+    RETURN
+  ENDIF
 
-  END FUNCTION HandleCustomBlock
+  ! The following line must always be present
+  HandleCustomBlock=ERR_UNKNOWN_BLOCK
+
+END FUNCTION HandleCustomBlock
 \end{Verbatim}
 
 This version of the code will allow you to add a new block called "custom"
@@ -4001,39 +3989,39 @@ to the functions so that they can report errors while trying to parse the
 string. An example would then be
 
 \simpleboxverbatim
-  FUNCTION HandleCustomBlock(blockname, Element, Value)
+FUNCTION HandleCustomBlock(blockname, element, Value)
 
-    CHARACTER(len=entrylength), INTENT(IN)::blockname, Element, Value
-    INTEGER :: HandleCustomBlock
-    TYPE(primitivestack) :: output
-    INTEGER :: ix, iy
-    IF (StrCmp(blockname, "custom")) THEN
-    	IF (Element == Blank .OR. Value == Blank) THEN
-	     ! If element or value are blank, then just testing block so return ERR_NONE
-	     HandleCustomBlock=ERR_NONE
-	     RETURN
-	 ENDIF
-	 HandleCustomBlock=ERR_UNKNOWN_ELEMENT
-	 ! Now test for the real elements
-	 IF (StrCmp(Element, "int_element")) THEN
-	     HandleCustomBlock=ERR_NONE
-	     int_element=AsInteger(Value, HandleCustomBlock)
-	 ENDIF
-	 IF (StrCmp(Element, "real_element")) THEN
-	     HandleCustomBlock=ERR_NONE
-	     real_element=AsReal(Value, HandleCustomBlock)
-	ENDIF
-	IF (StrCmp(Element, "logical_element")) THEN
-	    HandleCustomBlock=ERR_NONE
-	    logical_element=AsLogical(Value, HandleCustomBlock)
-	    ENDIF
-	RETURN
+  CHARACTER(len=entrylength), INTENT(IN)::blockname, element, Value
+  INTEGER :: HandleCustomBlock
+  TYPE(primitivestack) :: output
+  INTEGER :: ix, iy
+  IF (StrCmp(blockname, "custom")) THEN
+    IF (element == Blank .OR. Value == Blank) THEN
+      ! If element or value are blank, then just testing block so return ERR_NONE
+      HandleCustomBlock=ERR_NONE
+      RETURN
     ENDIF
+    HandleCustomBlock=ERR_UNKNOWN_ELEMENT
+    ! Now test for the real elements
+    IF (StrCmp(element, "int_element")) THEN
+      HandleCustomBlock=ERR_NONE
+      int_element=AsInteger(Value, HandleCustomBlock)
+    ENDIF
+    IF (StrCmp(element, "real_element")) THEN
+      HandleCustomBlock=ERR_NONE
+      real_element=AsReal(Value, HandleCustomBlock)
+    ENDIF
+    IF (StrCmp(element, "logical_element")) THEN
+      HandleCustomBlock=ERR_NONE
+      logical_element=AsLogical(Value, HandleCustomBlock)
+      ENDIF
+    RETURN
+  ENDIF
 
-    ! The following line must always be present
-    HandleCustomBlock=ERR_UNKNOWN_BLOCK
+  ! The following line must always be present
+  HandleCustomBlock=ERR_UNKNOWN_BLOCK
 
-  END FUNCTION HandleCustomBlock
+END FUNCTION HandleCustomBlock
 \end{Verbatim}
 
 It is possible to perform more advanced types of evaluation of maths
@@ -4407,37 +4395,37 @@ function to disk.
 
 \subsubsection{Input deck variables}
 \begin{itemize}
-\item CHARACTER(LEN=Entry\_Length) :: Blank - A special string which the input
+\item CHARACTER(len=entry\_length) :: Blank - A special string which the input
   deck parser uses to indicate that it's passing a blank string rather than a
   string read from the deck which just happens to be blank.
-\item INTEGER :: Deck\_State - An integer determining which type of input deck
+\item INTEGER :: deck\_state - An integer determining which type of input deck
   is being read by the deck parse
 \item INTEGER, PARAMETER :: num\_vars\_to\_dump - A variable describing the
   number of variable which should be selectable in the input deck as possible
   variables to dump.
-\item CHARACTER(LEN=Entry\_Length) :: extended\_error\_string - String used by
+\item CHARACTER(len=entry\_length) :: extended\_error\_string - String used by
   some error codes in the deck parser to give more user friendly error
   messages.
-\item CHARACTER(LEN=Entry\_Length) :: Project\_Name - String read from the
+\item CHARACTER(len=entry\_length) :: project\_name - String read from the
   input deck and written into the output files to allow the project to be
   recognised by a reader.
 \end{itemize}
 
 \subsubsection{Initial conditions (autoloader) variables}
 Initial conditions for the autoloader for a given species are described in
-{\EPOCH} by the Fortran TYPE \inlinecode{Initial\_Conditions\_Block}. The
+{\EPOCH} by the Fortran TYPE \inlinecode{initial\_conditions\_block}. The
 definition (in 3D) is
 
 \simpleboxverbatim
-  TYPE :: initial_condition_block
+TYPE :: initial_condition_block
 
-     REAL(num), DIMENSION(:,:,:), POINTER :: rho
-     REAL(num), DIMENSION(:,:,:,:), POINTER :: temp
+  REAL(num), DIMENSION(:,:,:), POINTER :: rho
+  REAL(num), DIMENSION(:,:,:,:), POINTER :: temp
 
-     REAL(num) :: minrho
-     REAL(num) :: maxrho
+  REAL(num) :: minrho
+  REAL(num) :: maxrho
 
-  END TYPE initial_condition_block
+END TYPE initial_condition_block
 \end{Verbatim}
 
 In 1D, the arrays have one fewer index, and in 3D they have one more.
@@ -4455,7 +4443,7 @@ In 1D, the arrays have one fewer index, and in 3D they have one more.
 
 The initial conditions themselves are in the variable
 \simpleboxverbatim
-  TYPE(initial_condition_block), DIMENSION(:), ALLOCATABLE :: initial_conditions
+TYPE(initial_condition_block), DIMENSION(:), ALLOCATABLE :: initial_conditions
 \end{Verbatim}
 which is allocated \inlinecode{1:nspecies}
 
@@ -4464,28 +4452,28 @@ Particles are represented as linked lists of Fortran TYPES. The definition of
 the particle type is
 \simpleboxverbatim
   ! Object representing a particle
-  TYPE :: Particle
-     REAL(num), DIMENSION(3) :: Part_P
-     REAL(num), DIMENSION(2) :: Part_pos
+  TYPE :: particle
+    REAL(num), DIMENSION(3) :: Part_P
+    REAL(num), DIMENSION(2) :: Part_pos
 #ifdef PER_PARTICLE_WEIGHT
-     REAL(num) :: weight
+    REAL(num) :: weight
 #endif
 #ifdef PER_PARTICLE_CHARGEMASS
-     REAL(num) :: charge
-     REAL(num) :: mass
+    REAL(num) :: charge
+    REAL(num) :: mass
 #endif
-     TYPE(Particle), POINTER :: Next, Prev
+    TYPE(particle), POINTER :: Next, Prev
 #ifdef PART_DEBUG
-     INTEGER :: Processor
-     INTEGER :: Processor_at_t0
+    INTEGER :: Processor
+    INTEGER :: Processor_at_t0
 #endif
-  END TYPE Particle
+  END TYPE particle
 \end{Verbatim}
 And the descriptions are
 \begin{itemize}
-\item REAL(num) :: Part\_P(3) - The particle momentum. Always dimension 3 even
+\item REAL(num) :: part\_p(3) - The particle momentum. Always dimension 3 even
   in 1D and 2D codes.
-\item REAL(num) :: Part\_pos({\it ndims}) - The particle position. Has
+\item REAL(num) :: part\_pos({\it ndims}) - The particle position. Has
   dimensions of dimensonality of the code.
 \item REAL(num) :: weight - The particle weight if the code is running with
   per particle weighting.
@@ -4493,11 +4481,11 @@ And the descriptions are
   running with per particle charge.
 \item REAL(nun) :: Mass - The particle mass in kilograms if the code is
   running with per particle mass.
-\item TYPE(Particle), POINTER :: Next, Prev - The pointers to the next and
+\item TYPE(particle), POINTER :: Next, Prev - The pointers to the next and
   previous elements of the linked list.
 \item INTEGER :: Processor - The rank of the processor that the particle
   thinks it is on. Used for debugging.
-\item INTEGER :: Processor \_at\_t0 - The rank of the processor that the
+\item INTEGER :: processor\_at\_t0 - The rank of the processor that the
   particle started on. Used for debugging.
 \end{itemize}
 Simply adding a new parameter to the definition of the particle type is NOT
@@ -4509,22 +4497,22 @@ particle communication layer is described later.\\
 The entire linked list of particles is encapsulated in another Fortran TYPE,
 called \inlinecode{particle\_list}, which is defined as
 \simpleboxverbatim
-  ! Object representing a collection of particles
-  ! Used internally by the MPI particle transfer code
-  TYPE :: particle\_list
-     TYPE(Particle), POINTER :: Head
-     TYPE(Particle), POINTER :: Tail
-     INTEGER(KIND=8) :: Count
-     ! Pointer is safe if the particles in it are all unambiguously linked
-     LOGICAL :: Safe
+! Object representing a collection of particles
+! Used internally by the MPI particle transfer code
+TYPE :: particle\_list
+  TYPE(particle), POINTER :: head
+  TYPE(particle), POINTER :: tail
+  INTEGER(KIND=8) :: Count
+  ! Pointer is safe if the particles in it are all unambiguously linked
+  LOGICAL :: Safe
 
-     TYPE(particle\_list), POINTER :: Next, Prev
-  END TYPE particle\_list
+  TYPE(particle\_list), POINTER :: Next, Prev
+END TYPE particle\_list
 \end{Verbatim}
 And the descriptions are
 \begin{itemize}
-\item TYPE(Particle), POINTER :: Head - The first particle in the linked list.
-\item TYPE(Particle), POINTER :: Tail - The last particle in the linked
+\item TYPE(particle), POINTER :: head - The first particle in the linked list.
+\item TYPE(particle), POINTER :: tail - The last particle in the linked
   list. New particles added to the end of the list are added onto the end of
   the tail element, and the new last particle becomes the new tail element.
 \item INTEGER(KIND=8) :: Count - The number of particles in this particle
@@ -4553,46 +4541,46 @@ called \inlinecode{ParticleFamily}, which is defined as
 \simpleboxverbatim
   ! Object representing a particle species
   TYPE :: ParticleFamily
-     ! Core properties
-     CHARACTER(EntryLength) :: Name
-     TYPE(ParticleFamily), POINTER :: Next, Prev
-     INTEGER :: id
-     LOGICAL :: Dump
+    ! Core properties
+    CHARACTER(EntryLength) :: Name
+    TYPE(ParticleFamily), POINTER :: Next, Prev
+    INTEGER :: id
+    LOGICAL :: Dump
 
-     REAL(num) :: Charge
-     REAL(num) :: Mass
-     INTEGER(KIND=8) :: Count
-     TYPE(ParticleList) :: AttachedList
+    REAL(num) :: Charge
+    REAL(num) :: Mass
+    INTEGER(KIND=8) :: Count
+    TYPE(particle_list) :: attached_list
 
 #ifdef TRACER_PARTICLES
-     LOGICAL :: Tracer
+    LOGICAL :: Tracer
 #endif
 
-     ! Particle cell division
+    ! Particle cell division
 #ifdef PARTICLE_CELL_DIVISION
-     LOGICAL :: Split
-     INTEGER(KIND=8) :: npart_max
+    LOGICAL :: Split
+    INTEGER(KIND=8) :: npart_max
 #endif
-     ! Secondary list
+    ! Secondary list
 #ifdef USE_SECONDARY_LIST
-     TYPE(ParticleList), DIMENSION(:,:,:), POINTER :: SecondaryList
+    TYPE(particle_list), DIMENSION(:,:,:), POINTER :: SecondaryList
 #endif
 
-     ! Injection of particles
-     INTEGER(KIND=8) :: npart_per_cell
-     REAL(num), DIMENSION(:,:), POINTER :: Density
-     REAL(num), DIMENSION(:,:,:), POINTER :: temperature
+    ! Injection of particles
+    INTEGER(KIND=8) :: npart_per_cell
+    REAL(num), DIMENSION(:,:), POINTER :: Density
+    REAL(num), DIMENSION(:,:,:), POINTER :: temperature
 
-     ! Species_ionisation
+    ! Species_ionisation
 #ifdef PART_IONISE
-     LOGICAL :: ionise
-     INTEGER :: ionise_to_species
-     INTEGER :: release_species
-     REAL(num) :: ionisation_energy
+    LOGICAL :: ionise
+    INTEGER :: ionise_to_species
+    INTEGER :: release_species
+    REAL(num) :: ionisation_energy
 #endif
-     ! Attached Probes for this species
+    ! Attached Probes for this species
 #ifdef PARTICLE_PROBES
-     TYPE(Particle_Probe), POINTER :: AttachedProbes
+    TYPE(Particle_Probe), POINTER :: AttachedProbes
 #endif
   END TYPE ParticleFamily
 \end{Verbatim}
@@ -4621,15 +4609,15 @@ below
   this will be accurate at the start of the code runtime, but will not be if
   any particles enter or leave the domain. This is mainly a debugging
   parameter.
-\item TYPE(ParticleList) :: AttachedList - This is the
-  \inlinecode{ParticleList} object which holds the particles assigned to this
+\item TYPE(particle\_list) :: attached\_list - This is the
+  \inlinecode{particle\_list} object which holds the particles assigned to this
   species on this processor. Particles are attached to this list at all times
   EXCEPT when they are explicitly split when the code is compiled with the
   \inlinecode{PARTICLE\_CELL\_DIVISION}. When the code is compiled with
   \inlinecode{PARTICLE\_CELL\_DIVISION} then the particles are attached to
-  \inlinecode{AttachedList} except between the calls to
-  \inlinecode{Reorder\_Particles\_To\_Grid} and
-  \inlinecode{Reattach\_Particles\_To\_mainlist} in \inlinecode{epoch{\it
+  \inlinecode{attached\_list} except between the calls to
+  \inlinecode{reorder\_particles\_to\_grid} and
+  \inlinecode{reattach\_particles\_to\_mainlist} in \inlinecode{epoch{\it
       n}d.F90} where the particles are instead attached to
   \inlinecode{SecondaryList} which is explained later.
 \item LOGICAL :: Tracer - Whether or not this species is a tracer particle. If
@@ -4642,11 +4630,11 @@ below
 \item INTEGER(KIND=8) :: npart\_max - Used with the particle splitting
   operator. When the total number of particles equals this number further
   particle splitting is supressed.
-\item TYPE(ParticleList), DIMENSION(:,:,:), POINTER :: SecondaryList - When the
+\item TYPE(particle\_list), DIMENSION(:,:,:), POINTER :: SecondaryList - When the
   code is compiled with the \inlinecode{-DPARTICLE\_CELL\_DIVISION} the code
   allocates \inlinecode{SecondaryList(0:nx+1,0:ny+1,0:nz+1)} and then loops
   over all particles. It calculates the cell in which each particle is and
-  moves the particle from \inlinecode{AttachedList} to the correct element of
+  moves the particle from \inlinecode{attached\_list} to the correct element of
   \inlinecode{SecondaryList} for that cell. This means the particles which are
   nearby in space are now linked together in an array of linked lists. This
   allows things such as collision operators which require direct interaction
@@ -4671,7 +4659,7 @@ below
   particle should be release (i.e. which species is the electron)
 \item REAL(num) :: ionisation\_energy - The ionisation energy for the next
   ionisation of this species.
-\item TYPE(Particle\_Probe), POINTER :: AttachedProbes - A pointer pointing to
+\item TYPE(particle\_probe), POINTER :: AttachedProbes - A pointer pointing to
   the head of an attached linked list of particle probe diagnostics.
 \end{itemize}
 
@@ -4839,32 +4827,31 @@ cells. The form of this function is
 
 In the code calculating the strength of a cell centered field on the particle
 is done as follows.
+
 \simpleboxverbatim
+  REAL(num) :: cell_x_r, cell_frac_x
+  INTEGER :: cell_x
+  REAL(num) :: gx(-2:2)
+  TYPE(particle), POINTER :: Current
 
-	REAL(num) :: cell_x_r, cell_frac_x
-	INTEGER :: cell_x
-	REAL(num) :: gx(-2:2)
-	TYPE(Particle), POINTER :: Current
-	
-          ! Work out number of grid cells in the particle is
-          ! Not in general an integer
-          cell_x_r = (Current%Particle_Pos(1)-x_start_local)/dx
-          ! Round cell position to nearest cell
-          cell_x=NINT(cell_x_r)
-          ! Calculate fraction of cell between nearest cell boundary and particle
-          cell_frac_x = REAL(cell_x, num) - cell_x_r
-          cell_x=cell_x+1
+  ! Work out number of grid cells in the particle is
+  ! Not in general an integer
+  cell_x_r = (Current%Particle_Pos(1)-x_start_local)/dx
+  ! Round cell position to nearest cell
+  cell_x=NINT(cell_x_r)
+  ! Calculate fraction of cell between nearest cell boundary and particle
+  cell_frac_x = REAL(cell_x, num) - cell_x_r
+  cell_x=cell_x+1
 
-    	 CALL GridToParticle(cell_frac_x, gx)
-	
-	 F_Part=0.0_num
-	 DO ix = -sf_order, sf_order
-	          F_Part = F_Part + F(cell_x+ix) * gx(ix)
-	  ENDDO
+  CALL GridToParticle(cell_frac_x, gx)
 
+  F_Part=0.0_num
+  DO ix = -sf_order, sf_order
+    F_Part = F_Part + F(cell_x+ix) * gx(ix)
+  ENDDO
 \end{Verbatim}
 
-where \inlinecode{F\_Part} is the field at the particle location. The variable
+where \inlinecode{f\_part} is the field at the particle location. The variable
 \inlinecode{sf\_order} contains the shape function order parameter which
 indicates the number of cells each side of the cell containing the particle
 which are overlapped by the particle shape function. It is defined in
@@ -4874,79 +4861,77 @@ in the same manner as gx and calculate the weight over all the cells affected
 by the individual 1D shape functions. In 2D this looks like
 {\small
 \simpleboxverbatim
-          CALL GridToParticle(cell_frac_x, gx)
-          CALL GridToParticle(cell_frac_y, gy)
-          F_Part=0.0_num
-	 DO iy = -sf_order, sf_order
-		 DO ix = -sf_order, sf_order
-		          F_Part = F_Part + F(cell_x+ix, cell_y+iy) * gx(ix) *gy(iy)
-		  ENDDO
- 	 ENDDO
+  CALL GridToParticle(cell_frac_x, gx)
+  CALL GridToParticle(cell_frac_y, gy)
+  F_Part=0.0_num
+  DO iy = -sf_order, sf_order
+    DO ix = -sf_order, sf_order
+      F_Part = F_Part + F(cell_x+ix, cell_y+iy) * gx(ix) *gy(iy)
+    ENDDO
+  ENDDO
 \end{Verbatim}
 }
 Inside the particle pusher the E and B fields are not cell centered fields, but
 Yee staggered. This means that there is a small change to the above mentioned
 example. In 1D this change looks like
+
 \simpleboxverbatim
+  REAL(num) :: cell_x_r, cell_frac_x
+  INTEGER :: cell_x1, cell_x2
+  REAL(num) :: gx(-2:2), hx(-2:2)
+  TYPE(particle), POINTER :: Current
 
-	REAL(num) :: cell_x_r, cell_frac_x
-	INTEGER :: cell_x1, cell_x2
-	REAL(num) :: gx(-2:2), hx(-2:2)
-	TYPE(Particle), POINTER :: Current
-	
-          ! Work out number of grid cells in the particle is
-          ! Not in general an integer
-          cell_x_r = (Current%Particle_Pos(1)-x_start_local)/dx
-          ! Round cell position to nearest cell
-          cell_x=NINT(cell_x_r)
-          ! Calculate fraction of cell between nearest cell boundary and particle
-          cell_frac_x = REAL(cell_x, num) - cell_x_r
-          cell_x=cell_x+1
+  ! Work out number of grid cells in the particle is
+  ! Not in general an integer
+  cell_x_r = (Current%Particle_Pos(1)-x_start_local)/dx
+  ! Round cell position to nearest cell
+  cell_x=NINT(cell_x_r)
+  ! Calculate fraction of cell between nearest cell boundary and particle
+  cell_frac_x = REAL(cell_x, num) - cell_x_r
+  cell_x=cell_x+1
 
-          CALL GridToParticle(cell_frac_x, gx)
+  CALL GridToParticle(cell_frac_x, gx)
 
-          cell_x_r = (Current%Particle_Pos(1)-x_start_local)/dx - 0.5_num
-          cell_x2  = NINT(cell_x_r)
-          cell_frac_x = REAL(cell_x2, num) - cell_x_r
-          cell_x2=cell_x2+1
+  cell_x_r = (Current%Particle_Pos(1)-x_start_local)/dx - 0.5_num
+  cell_x2  = NINT(cell_x_r)
+  cell_frac_x = REAL(cell_x2, num) - cell_x_r
+  cell_x2=cell_x2+1
 
-          CALL GridToParticle(cell_frac_x, hx)
+  CALL GridToParticle(cell_frac_x, hx)
 
-          ! Bx is cell centred
-          Bx_Part=0.0_num
-	 DO ix = -sf_order, sf_order
-	          Bx_Part = Bx_Part + Bx(cell_x1+ix) * gx(ix)
-	  ENDDO
+  ! Bx is cell centred
+  Bx_Part=0.0_num
+  DO ix = -sf_order, sf_order
+    Bx_Part = Bx_Part + Bx(cell_x1+ix) * gx(ix)
+  ENDDO
 
-          ! Ex is staggered 1/2 a cell to the right
-          Ex_Part=0.0_num
-	 DO ix = -sf_order, sf_order
-	          Ex_Part = Ex_Part + Ex(cell_x2+ix) * hx(ix)
-	  ENDDO
-
+  ! Ex is staggered 1/2 a cell to the right
+  Ex_Part=0.0_num
+  DO ix = -sf_order, sf_order
+    Ex_Part = Ex_Part + Ex(cell_x2+ix) * hx(ix)
+  ENDDO
 \end{Verbatim}
 
 In 2D and 3D, you just combine the shifted and unshifted shape functions and associated cell positions depending on the position of the variable in the cell. Therefore, in 3D  and using the loop notation for clarity you would get
 
 \simpleboxverbatim
-    DO iz=-sf_order, sf_order
-        DO iy=-sf_order, sf_order
-            DO ix=-sf_order, sf_order
-                 Ex_Part = Ex_Part + hx(ix)*gy(iy)*gz(iz) * &
-                     Ex(cell_x2+ix, cell_y1+iy, cell_z1+iz)
-            ENDDO
-        ENDDO
+  DO iz=-sf_order, sf_order
+    DO iy=-sf_order, sf_order
+      DO ix=-sf_order, sf_order
+        Ex_Part = Ex_Part + hx(ix)*gy(iy)*gz(iz) * &
+        Ex(cell_x2+ix, cell_y1+iy, cell_z1+iz)
+      ENDDO
     ENDDO
+  ENDDO
 
-    DO iz=-sf_order, sf_order
-        DO iy=-sf_order, sf_order
-            DO ix=-sf_order, sf_order
-                 Bx_Part = Bx_Part + gx(ix)*hy(iy)*hz(iz) * &
-                     Bx(cell_x2+ix,cell_y1+iy,cell_z1+iz)
-            ENDDO
-        ENDDO
+  DO iz=-sf_order, sf_order
+    DO iy=-sf_order, sf_order
+      DO ix=-sf_order, sf_order
+        Bx_Part = Bx_Part + gx(ix)*hy(iy)*hz(iz) * &
+        Bx(cell_x2+ix,cell_y1+iy,cell_z1+iz)
+      ENDDO
     ENDDO
-
+  ENDDO
 \end{Verbatim}
 
 Since Ex is staggered half a grid cell in the x direction, whereas Bx is
@@ -4987,28 +4972,27 @@ properties onto the grid for output. The form from calc\_df is rather clearer
 and easier to see in operation. In 1D it looks like
 
 \simpleboxverbatim
-          cell_x_r = part_x / dx
-          cell_x  = NINT(cell_x_r)
-          cell_frac_x = REAL(cell_x, num) - cell_x_r
-          cell_x=cell_x+1
+  cell_x_r = part_x / dx
+  cell_x  = NINT(cell_x_r)
+  cell_frac_x = REAL(cell_x, num) - cell_x_r
+  cell_x=cell_x+1
 
-	CALL ParticleToGrid(cell_frac_x, gx)
+  CALL ParticleToGrid(cell_frac_x, gx)
 
-          DO ix=-sf_order, sf_order
-              DataArray(cell_x+ix) = DataArray(cell_x+ix) + &
-                 gx(ix)  * Data
-          ENDDO
+  DO ix=-sf_order, sf_order
+    DataArray(cell_x+ix) = DataArray(cell_x+ix) + gx(ix)  * Data
+  ENDDO
 \end{Verbatim}
 
 Once again multi-dimensional codes just have the weighting functions multiplied
 together
 \simpleboxverbatim
-	DO iy=-sf_order, sf_order
-	          DO ix=-sf_order, sf_order
-         		     DataArray(cell_x+ix,cell_y+iy) = DataArray(cell_x+ix,cell_y+iy) + &
-	                 gx(ix) *gy(iy) * Data
-         		 ENDDO
-	ENDDO
+  DO iy=-sf_order, sf_order
+    DO ix=-sf_order, sf_order
+      DataArray(cell_x+ix,cell_y+iy) = DataArray(cell_x+ix,cell_y+iy) + &
+          gx(ix) *gy(iy) * Data
+    ENDDO
+  ENDDO
 \end{Verbatim}
 
 \subsubsection{Current calculation}
@@ -5081,12 +5065,12 @@ each processor then some additional lines must be added to the
 should read
 
 \simpleboxverbatim
-	REAL(num) :: dt_global
-		.
-		.
-		.
-	CALL MPI_ALLREDUCE(dt_global, dt, 1, mpireal, MPI_MIN, comm, errcode)
-	dt=dt_global
+  REAL(num) :: dt_global
+          .
+          .
+          .
+  CALL MPI_ALLREDUCE(dt_global, dt, 1, mpireal, MPI_MIN, comm, errcode)
+  dt=dt_global
 \end{Verbatim}
 
 This uses another MPI command to determine the most restrictive timestep across
@@ -5129,7 +5113,7 @@ The boundary conditions are applied in too many places in the code to give a
 full description of them, but the laser boundaries are only applied in
 \inlinecode{src/fields.f90}. The boundaries requested by the user are converted
 into the conditions on the fields and particles in the routine
-\inlinecode{Setup\_Particle\_Boundaries} in
+\inlinecode{setup\_particle\_boundaries} in
 \inlinecode{src/boundaries.F90}. For each of the six possible boundaries
 (right, left, up, down, front, back) there is a variable which will be named
 something like \inlinecode{xbc\_right\_particle} or
@@ -5138,7 +5122,7 @@ be applied to either the field or the particles.
 
 \subsubsection{Simple field boundaries}
 There are two subroutines which apply the standard boundary conditions :
-\inlinecode{Field\_Zero\_Gradient} and \inlinecode{Field\_Clamp\_Zero}. The
+\inlinecode{field\_zero\_gradient} and \inlinecode{field\_clamp\_zero}. The
 type of boundary condition that the two apply is obvious from the name, but
 unfortunately the two functions have different calling conventions.
 
@@ -5159,14 +5143,14 @@ LOGICAL, INTENT(IN) :: Force
 boundary conditions to a field variable passed in the parameter
 \inlinecode{Field}. It can be used as a global field boundary condition by
 setting one of the field boundary conditions to BC\_ZERO\_GRADIENT in
-\inlinecode{Setup\_Particle\_Boundaries}, but it is mostly used to give
+\inlinecode{setup\_particle\_boundaries}, but it is mostly used to give
 boundary conditions for the autoloader, where the \inlinecode{Force} parameter
 is set to \inlinecode{.TRUE.} to override the boundary condition values.
 \\[0.5cm]
 {\Large Notes\\ \\}
 
 \pagebreak
-{\Large \inlinecode{SUBROUTINE Field\_Clamp\_Zero\\
+{\Large \inlinecode{SUBROUTINE field\_clamp\_zero\\
 \HRule \\[0.5cm]
     REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: Field\\
     INTEGER, DIMENSION(nDims), INTENT(IN) :: Stagger}}\\
@@ -5175,7 +5159,7 @@ is set to \inlinecode{.TRUE.} to override the boundary condition values.
 \inlinecode{src/boundary.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Field\_Clamp\_Zero} is the routine which clamps the field given by
+\inlinecode{field\_clamp\_zero} is the routine which clamps the field given by
 the \inlinecode{Field} variable to zero on the boundary. Since this routine
 explicitly sets the field to zero {\it on} the boundary it needs to know about
 the grid stagger which is provided in the parameter \inlinecode{Stagger}. At
@@ -5227,7 +5211,7 @@ represent how lasers are represented in \EPOCH.
 Due to the time that is required to loop over all the particles the particle
 boundary conditions {\EPOCH} combines the interprocessor boundary conditions with
 the real boundary conditions. The boundary conditions for particles are in the
-routine \inlinecode{Particle\_bcs} in the file \inlinecode{boundary.f90} \\
+routine \inlinecode{particle\_bcs} in the file \inlinecode{boundary.f90} \\
 Currently {\EPOCH} includes only three particle boundary conditions
 \begin{itemize}
 \item BC\_PERIODIC - Particles which leave one side of the box reappear on the
@@ -5242,7 +5226,7 @@ Although the routine looks rather messy, it is fairly easy to understand. The
 sequence goes
 \begin{itemize}
 \item Loop over all species
-\item Createparticle list objects for particles to be sent to and received from
+\item Create particle list objects for particles to be sent to and received from
   other processors.
 \item Loop over all particles
 \item If particle has crossed the domain boundary and that boundary has
@@ -5285,7 +5269,7 @@ There are three routines which deal with MPI exchange for field variables in
 deals with using MPI to sum variables at processor boundaries rather than
 synchronize ghost cells.\\\\
 
-{\Large \inlinecode{SUBROUTINE Field\_BC\\
+{\Large \inlinecode{SUBROUTINE field\_bc\\
 \HRule \\[0.5cm]
     REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: Field\\}}
 \\[0.5cm]
@@ -5293,7 +5277,7 @@ synchronize ghost cells.\\\\
 \inlinecode{src/boundary.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Field\_BC} exchanges the information in the ghost cells between
+\inlinecode{field\_bc} exchanges the information in the ghost cells between
 adjacent processors. Any field variable which is used in a calculation which
 requires operations which involve information from points other than the
 current point should call this routine each time the variable is updated to
@@ -5302,8 +5286,8 @@ you only need to access field(ix,iy,iz) there is no need to update ghost cells,
 if you use field(ix-1,iy,iz) you do)
 \\[0.5cm]
 {\Large Notes\\}
-The \inlinecode{Field\_BC} routine just calls the
-\inlinecode{Do\_Field\_MPI\_With\_Lengths} routine which is a more general
+The \inlinecode{field\_bc} routine just calls the
+\inlinecode{do\_field\_mpi\_with\_lengths} routine which is a more general
 routine which allows ghost cell information to be exchanged for fields with
 arbitrary number of cells, rather than fields which are
 (-2:nx+3,-2:ny+2,-2:nz+3). This routine is used internally in the load
@@ -5311,7 +5295,7 @@ balancing routine when fields with both the old and new sizes must be handled
 at the same time.
 \pagebreak
 
-{\Large \inlinecode{SUBROUTINE Processor\_Summation\_BCS\\
+{\Large \inlinecode{SUBROUTINE processor\_summation\_bcs\\
 \HRule \\[0.5cm]
     REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: Field\\}}
 \\[0.5cm]
@@ -5319,7 +5303,7 @@ at the same time.
 \inlinecode{src/boundary.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Processor\_Summation\_BCS} is a routine which is used to deal with
+\inlinecode{processor\_summation\_bcs} is a routine which is used to deal with
 variables, like $\vec{j}$ or number density which should be added at boundaries
 to include contributions from particles on both sides of a processor
 boundary. The routine is used for current inside the particle pusher and inside
@@ -5347,7 +5331,7 @@ processors. The functions are as follows:
 
 {\Large \inlinecode{FUNCTION create\_empty\_partlist(partlist)\\
 \HRule \\[0.5cm]
-TYPE(ParticleList), INTENT(INOUT) :: PartList}}\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5355,10 +5339,10 @@ TYPE(ParticleList), INTENT(INOUT) :: PartList}}\\
 {\Large Description\\}
 \inlinecode{create\_empty\_partlist} is a function which takes a particle\_list
 object and sets it up so that it points to no particles at all. It should be
-used on newly allocated ParticleList objects and when a ParticleList has served
+used on newly allocated particle\_list objects and when a particle\_list has served
 it's purpose. It DOES NOT destroy the particles linked in the list at the point
 that it is called. If the user wishes to delete all the particles in a
-ParticleList then the routine \inlinecode{Destroy\_PartList} should be used
+particle\_list then the routine \inlinecode{destroy\_partlist} should be used
 instead.
 \\[0.5cm]
 {\Large Notes\\}
@@ -5369,17 +5353,17 @@ instead.
 \inlinecode{%
 FUNCTION create\_unsafe\_partlist(partlist, a\_particle, n\_elements)\\
 \HRule \\[0.5cm]
-TYPE(ParticleList), INTENT(INOUT) :: PartList\\
-TYPE(Particle), POINTER :: aParticle\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist\\
+TYPE(particle), POINTER :: a\_particle\\
 INTEGER(KIND=8), INTENT(IN) :: n\_elements}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Create\_Unsafe\_PartList} is a routine which allows the creation of
+\inlinecode{create\_unsafe\_partlist} is a routine which allows the creation of
 a particle\_list which represents a subset of another particle list. This subset
-is defined as starting at the particle pointed to by \inlinecode{aParticle} and
+is defined as starting at the particle pointed to by \inlinecode{a\_particle} and
 extending for \inlinecode{n\_elements} elements. The new particle\_list is then
 flagged as "unsafe" because if it is destroyed for any reason then it will
 affect other particle lists. Many particle\_list functions can only work on safe
@@ -5390,17 +5374,17 @@ particle lists.
 \pagebreak
 
 {\Large
-\inlinecode{FUNCTION Create\_Unsafe\_PartList\_By\_Tail(PartList, Head, Tail)\\
+\inlinecode{FUNCTION create\_unsafe\_partlist\_by\_tail(partlist, head, tail)\\
 \HRule \\[0.5cm]
 TYPE(particle\_list), INTENT(INOUT) :: PartList\\
-TYPE(Particle), POINTER :: Head, Tail}}\\
+TYPE(particle), POINTER :: head, tail}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Create\_Unsafe\_PartList\_By\_Tail} is almost identical to
-\inlinecode{Create\_Unsafe\_PartList}, but instead of specifying a the first
+\inlinecode{create\_unsafe\_partlist\_by\_tail} is almost identical to
+\inlinecode{create\_unsafe\_partlist}, but instead of specifying a the first
 particle and a number of elements, the user specifies the first and last
 elements of the subset of the particle list. If the particle objects specified
 for head and tail are not in the same partlist or tail actually comes before
@@ -5411,7 +5395,7 @@ head then the routine will fail in an undefined manner.
 \pagebreak
 
 {\Large
-\inlinecode{FUNCTION Create\_Allocated\_PartList(PartList, n\_elements)\\
+\inlinecode{FUNCTION create\_allocated\_partlist(partlist, n\_elements)\\
 \HRule \\[0.5cm]
 TYPE(particle\_list), INTENT(INOUT) :: PartList\\
 INTEGER(KIND=8), INTENT(IN) :: n\_elements}}\\
@@ -5420,8 +5404,8 @@ INTEGER(KIND=8), INTENT(IN) :: n\_elements}}\\
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Create\_Allocated\_PartList} is a helper routine to setup a new
-particle\_list and create \inlinecode{n\_elements} new Particle objects already
+\inlinecode{create\_allocated\_partlist} is a helper routine to setup a new
+particle\_list and create \inlinecode{n\_elements} new particle objects already
 in place in the list.
 \\[0.5cm]
 {\Large Notes\\}
@@ -5432,22 +5416,22 @@ be modified to reflect any changes in the underlying code.
 \pagebreak
 
 {\Large
-\inlinecode{FUNCTION Create\_Filled\_PartList(PartList, DataIn, n\_elements)\\
+\inlinecode{FUNCTION create\_filled\_partlist(partlist, data\_in, n\_elements)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(INOUT) :: PartList\\
-REAL(num), DIMENSION(:), INTENT(IN) :: DataIn\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist\\
+REAL(num), DIMENSION(:), INTENT(IN) :: data\_in\\
 INTEGER(KIND=8), INTENT(IN) :: n\_elements}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Create\_Filled\_PartList} is a helper routine to setup a new
-particle\_list and create \inlinecode{n\_elements} new Particle objects already
+\inlinecode{create\_filled\_partlist} is a helper routine to setup a new
+particle\_list and create \inlinecode{n\_elements} new particle objects already
 in place in the list. These new particle objects are then assigned properties
-from the array \inlinecode{DataIn} where the particle properties are contained
+from the array \inlinecode{data\_in} where the particle properties are contained
 in packed form. The particle data is unpacked from the array using the
-\inlinecode{UnPack\_Particle} routine.
+\inlinecode{unpack\_particle} routine.
 \\[0.5cm]
 {\Large Notes\\}
 You should always use this routine if possible when copying particles out of
@@ -5456,15 +5440,15 @@ particle\_list objects will not change in the future. This routine will however
 be modified to reflect any changes in the underlying code.
 \pagebreak
 
-{\Large \inlinecode{FUNCTION Test\_PartList(PartList)\\
+{\Large \inlinecode{FUNCTION test\_partlist(partlist)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(INOUT) :: PartList}}\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Test\_PartList} is a routine which tests for various possible types
+\inlinecode{test\_partlist} is a routine which tests for various possible types
 of error within a particle\_list object. It has various possible return codes
 for different errors, with the different possible error codes either signified
 by a specific negative value for errors so severe that the main tests cannot be
@@ -5496,60 +5480,60 @@ written in such a way that it is impossible for a particle\_list object to
 become corrupted.
 \pagebreak
 
-{\Large \inlinecode{FUNCTION Destroy\_PartList(PartList)\\
+{\Large \inlinecode{FUNCTION destroy\_partlist(partlist)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(INOUT) :: PartList}}\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Destroy\_PartList} is a helper routine to delete all the particles
+\inlinecode{destroy\_partlist} is a helper routine to delete all the particles
 attached to a particle\_list and free up the memory that they use. It also
 guarantees to leave the particle\_list object itself in a blank state where new
 particles can be added to it. It DOES NOT delete the particle\_list object
 itself, since it does not know whether or not the particle\_list is dynamically
 allocated. If using dynamically allocated particle\_list objects then it is up
 to the user to deallocate them AFTER the attached particles are destroyed using
-\inlinecode{Destroy\_PartList}
+\inlinecode{destroy\_partlist}
 \\[0.5cm]
 {\Large Notes\\}
-If a particle\_list is deleted without deleting the attached Particle objects
+If a particle\_list is deleted without deleting the attached particle objects
 either using this routine or explicitly by the user then the particles will
 become orphaned and sit around using memory until the code ends. If this
 happens regularly then the code will quickly crash, usually with a SIG\_SEGV
 error.
 \pagebreak
 
-{\Large \inlinecode{FUNCTION Copy\_PartList(PartList1, PartList2)\\
+{\Large \inlinecode{FUNCTION copy\_partlist(partlist1, partlist2)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(INOUT) :: PartList1, PartList2}}\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist1, partlist2}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Copy\_PartList} is a routine which sets \inlinecode{PartList2} to
-point to the same linked list of particles as \inlinecode{PartList1}. It does
+\inlinecode{copy\_partlist} is a routine which sets \inlinecode{partlist2} to
+point to the same linked list of particles as \inlinecode{partlist1}. It does
 not copy the particles, just sets the head and tail pointers of
-\inlinecode{PartList1} to point to the same Particle objects as
-\inlinecode{PartList1}
+\inlinecode{partlist1} to point to the same particle objects as
+\inlinecode{partlist1}
 \\[0.5cm]
 {\Large Notes\\}
 \pagebreak
 
-{\Large \inlinecode{FUNCTION Append\_PartList(Head, Tail)\\
+{\Large \inlinecode{FUNCTION append\_partlist(head, tail)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(INOUT) :: Head, Tail}}\\
+TYPE(particle\_list), INTENT(INOUT) :: head, tail}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Append\_PartList} is a routine which attaches the particles
-attached to the particle\_list object \inlinecode{Tail} and adds them to the end
-of the linked list for particle\_list \inlinecode{Head}. The particle\_list
-\inlinecode{Tail} is then set to be an empty particle\_list.
+\inlinecode{append\_partlist} is a routine which attaches the particles
+attached to the particle\_list object \inlinecode{tail} and adds them to the end
+of the linked list for particle\_list \inlinecode{head}. The particle\_list
+\inlinecode{tail} is then set to be an empty particle\_list.
 \\[0.5cm]
 {\Large Notes\\}
 This routine can only append one safe particle\_list to another safe
@@ -5557,18 +5541,18 @@ particle\_list.
 \pagebreak
 
 {\Large
-\inlinecode{FUNCTION Add\_Particle\_To\_PartList(PartList, NewParticle)\\
+\inlinecode{FUNCTION add\_particle\_to\_partList(partlist, NewParticle)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(INOUT) :: PartList\\
-TYPE(Particle), POINTER :: NewParticle}}\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist\\
+TYPE(particle), POINTER :: NewParticle}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Add\_Particle\_To\_PartList} is the routine which adds a new particle(\inlinecode{NewParticle})
+\inlinecode{add\_particle\_to\_partList} is the routine which adds a new particle(\inlinecode{NewParticle})
 to the end of the linked list of particles in the particle\_list object
-\inlinecode{PartList}. It deals with cases of empty particle\_list objects
+\inlinecode{partlist}. It deals with cases of empty particle\_list objects
 automatically.
 \\[0.5cm]
 {\Large Notes\\}
@@ -5577,22 +5561,22 @@ always use this routine.
 \pagebreak
 
 {\Large
-\inlinecode{FUNCTION Remove\_Particle\_From\_PartList(PartList, aParticle)\\
+\inlinecode{FUNCTION remove\_particle\_from\_partlist(partlist, a\_particle)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(INOUT) :: PartList\\
-TYPE(Particle), POINTER :: aParticle}}\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist\\
+TYPE(particle), POINTER :: a\_particle}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Remove\_Particle\_From\_PartList} removes the Particle object
-specified by \inlinecode{aParticle} from the particle\_list object given by
-\inlinecode{PartList}. Be very careful that \inlinecode{aParticle} is indeed in
-the linked list pointed to by \inlinecode{PartList}, otherwise it is possible
+\inlinecode{remove\_particle\_from\_partlist} removes the particle object
+specified by \inlinecode{a\_particle} from the particle\_list object given by
+\inlinecode{partlist}. Be very careful that \inlinecode{a\_particle} is indeed in
+the linked list pointed to by \inlinecode{partlist}, otherwise it is possible
 for the particle\_list object which really does contain \inlinecode{a\_particle}
 to be left with an invalid pointer as it's head or tail element if
-\inlinecode{aParticle} is either the head or tail element.
+\inlinecode{a\_particle} is either the head or tail element.
 \\[0.5cm]
 {\Large Notes\\}
 Although this routine does work with unsafe particle\_list objects, you should be
@@ -5603,23 +5587,23 @@ simple particle\_list which is a singly referenced primary, safe particle\_list.
 \pagebreak
 
 
-{\Large \inlinecode{SUBROUTINE Setup\_PartLists()\\
+{\Large \inlinecode{SUBROUTINE setup\_partlists()\\
 \HRule \\[0.5cm]}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Setup\_PartLists} is a routine which is called once when {\EPOCH}
+\inlinecode{setup\_partlists} is a routine which is called once when {\EPOCH}
 first starts. It sets the variable \inlinecode{nvars} which is the number of
 REAL(num) values which are required to contain all the information about a
-single Particle object which is needed when a particle is transfered to another
-processor. How the information is packed and unpacked from the Particle object
+single particle object which is needed when a particle is transfered to another
+processor. How the information is packed and unpacked from the particle object
 into an array of REAL(num) values is controlled in the functions
-\inlinecode{Pack\_Particle} and \inlinecode{UnPack\_Particle}.
+\inlinecode{pack\_particle} and \inlinecode{unpack\_particle}.
 \\[0.5cm]
 {\Large Notes\\}
-If the Particle type gains additional properties as the result of preprocessor
+If the particle type gains additional properties as the result of preprocessor
 directives then there should be a line which increments \inlinecode{nvars} by
 the correct number when that preprocessor directive is active. For example
 \simpleboxverbatim
@@ -5629,18 +5613,18 @@ the correct number when that preprocessor directive is active. For example
 \end{Verbatim}
 \pagebreak
 
-{\Large \inlinecode{SUBROUTINE Pack\_Particle(Data, aParticle)\\
-\inlinecode{SUBROUTINE UnPack\_Particle(Data, aParticle)}\\
+{\Large \inlinecode{SUBROUTINE pack\_particle(data, a\_particle)\\
+\inlinecode{SUBROUTINE unpack\_particle(data, a\_particle)}\\
 \HRule \\[0.5cm]
 REAL(num), DIMENSION(:), INTENT(INOUT) :: Data\\
-TYPE(Particle), POINTER :: aParticle\\
+TYPE(particle), POINTER :: a\_particle\\
 }}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Pack\_Particle} and \inlinecode{UnPack\_Particle} are subroutines
+\inlinecode{pack\_particle} and \inlinecode{unpack\_particle} are subroutines
 which are used to transfer all the information about a particle which is
 necessary for the particle to be transfered to another processor into a
 temporary array before sending to another processor. If a new particle property
@@ -5648,11 +5632,11 @@ has been added to the particle then these routines must be modified to allow
 the copying of the new data into the array. The parameter \inlinecode{Data} is
 a REAL(num) array of length \inlinecode{nvars} and is the array into which the
 data either must be packed or from which it must be
-unpacked. \inlinecode{aParticle} is the Particle object which must either have
+unpacked. \inlinecode{a\_particle} is the particle object which must either have
 it's data copied into the array or the blank particle object which must be
 populated with the data from the array. No restriction is placed on how the
 data should be packed into the Data array, but obviously
-\inlinecode{Pack\_Particle} and \inlinecode{UnPack\_Particle} must be inverse
+\inlinecode{pack\_particle} and \inlinecode{unpack\_particle} must be inverse
 operations so that particles packed by one processor can be unpacked correctly
 by another processor.
 \\[0.5cm]
@@ -5660,46 +5644,46 @@ by another processor.
 Since it is very unlikely that {\EPOCH} will be run on anything other than a
 homogenous cluster, it is acceptable to use the Fortran \inlinecode{TRANSFER}
 function to pack incompatible data types into the \inlinecode{Data} array. Just
-make sure that \inlinecode{nvars} is defined in \inlinecode{Setup\_PartLists}
+make sure that \inlinecode{nvars} is defined in \inlinecode{setup\_partlists}
 to be long enough to contain all the information. More documentation on the
 \inlinecode{TRANSFER} function (which is rarely used and dangerous!) can be
 found at
 http://www.macresearch.org/advanced\_fortran\_90\_callbacks\_with\_the\_transfer\_function.
 \pagebreak
 
-{\Large \inlinecode{SUBROUTINE Display\_Particle(aParticle)\\
+{\Large \inlinecode{SUBROUTINE display\_particle(a\_particle)\\
 \HRule \\[0.5cm]
-TYPE(Particle), POINTER :: aParticle}}\\
+TYPE(particle), POINTER :: a\_particle}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
 Displays the key information about a particle given by the parameter
-\inlinecode{aParticle}. Used by \inlinecode{Compare\_Particles}.
+\inlinecode{a\_particle}. Used by \inlinecode{compare\_particles}.
 \\[0.5cm]
 
-{\Large \inlinecode{FUNCTION Compare\_Particles(Particle1, Particle2)\\
+{\Large \inlinecode{FUNCTION compare\_particles(particle1, particle2)\\
 \HRule \\[0.5cm]
-TYPE(Particle), POINTER :: Particle1, Particle2\\
-LOGICAL :: Compare\_Particles
+TYPE(particle), POINTER :: Particle1, Particle2\\
+LOGICAL :: compare\_particles
 }}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-Compares all the properties of two Particle objects and displays the
+Compares all the properties of two particle objects and displays the
 information if they don't match. Used internally by
-\inlinecode{Test\_Packed\_Particles}. If the Particle object is extended then
+\inlinecode{test\_packed\_particles}. If the particle object is extended then
 this routine should also be modified to test for equivalence of the new
 properties.
 \\[0.5cm]
 
 {\Large
-\inlinecode{SUBROUTINE Test\_Packed\_Particles(Partlist, Data, npart\_in\_data)\\
+\inlinecode{SUBROUTINE test\_packed\_particles(partlist, data, npart\_in\_data)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(IN) :: PartList\\
+TYPE(particle\_list), INTENT(IN) :: partlist\\
 REAL(num), DIMENSION(:), INTENT(IN) :: Data\\
 INTEGER(KIND=8), INTENT(IN) :: npart\_in\_data
 }}\\
@@ -5708,11 +5692,11 @@ INTEGER(KIND=8), INTENT(IN) :: npart\_in\_data
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Test\_Packed\_Particles} is a routine which checks that a packed
-array of particles can be successfully unpacked back into Particle Objects. The
+\inlinecode{test\_packed\_particles} is a routine which checks that a packed
+array of particles can be successfully unpacked back into particle Objects. The
 parameters are
 \begin{itemize}
-\item \inlinecode{PartList} - The particle\_list corresponding to the original
+\item \inlinecode{partlist} - The particle\_list corresponding to the original
   unpacked particles.
 \item \inlinecode{Data} - The REAL(num) array containing the packed data.
 \item \inlinecode{npart\_in\_data} - The number of particles which were packed
@@ -5721,7 +5705,7 @@ parameters are
 The routine tests that the number of particles in the particle\_list match the
 number believed to be in the Data array, that the length of the Data array is
 correct and the unpacks each particle in turn from the Data array and uses the
-\inlinecode{Compare\_Particles} function to compare the particles with the
+\inlinecode{compare\_particles} function to compare the particles with the
 original versions in the particle\_list. If any particles fail the comparison
 then the error is output to stdout. The error message includes the processor
 rank on which the problem occurs but the routine does not specifically include
@@ -5730,92 +5714,92 @@ processors.
 \\[0.5cm]
 \pagebreak
 
-{\Large \inlinecode{FUNCTION PartList\_Send(PartList, Dest)\\
+{\Large \inlinecode{FUNCTION partlist\_send(partlist, dest)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(INOUT) :: PartList\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist\\
 INTEGER, INTENT(IN) :: Dest}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{PartList\_Send} is a routine for sending all the particles in the
-particle\_list object \inlinecode{PartList} to another processor. The destination
+\inlinecode{partlist\_send} is a routine for sending all the particles in the
+particle\_list object \inlinecode{partlist} to another processor. The destination
 processor is identified by it's rank which is given by the \inlinecode{Dest}
 parameter. The routine does not destroy the particle\_list object which is given
 to it.
 \\[0.5cm]
 {\Large Notes\\}
-\inlinecode{PartList\_Send} uses MPI blocking sends, so unless a matching
-\inlinecode{PartList\_Recv} has been posted on \inlinecode{Dest} then the
+\inlinecode{partlist\_send} uses MPI blocking sends, so unless a matching
+\inlinecode{partlist\_recv} has been posted on \inlinecode{Dest} then the
 routine will deadlock. It would be fairly simple to write a non-blocking
-version of \inlinecode{PartList\_Send}, but at present no need for such a
+version of \inlinecode{partlist\_send}, but at present no need for such a
 routine has been found.
 \pagebreak
 
-{\Large \inlinecode{FUNCTION PartList\_Recv(PartList, Src)\\
+{\Large \inlinecode{FUNCTION partlist\_recv(partlist, src)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(INOUT) :: PartList\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist\\
 INTEGER, INTENT(IN) :: Src}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{PartList\_Recv} is a routine for receiving Particles sent by a call
-to \inlinecode{PartList\_Send} and loading them into the particle\_list object
-\inlinecode{PartList}. The source processor is identified by it's rank which is
+\inlinecode{partlist\_recv} is a routine for receiving particles sent by a call
+to \inlinecode{partlist\_send} and loading them into the particle\_list object
+\inlinecode{partlist}. The source processor is identified by it's rank which is
 given by the \inlinecode{Src} parameter. The routine destroys the particle\_list
 which it is given and indeed will leave orphaned particles if it is not given
 an empty particle\_list to receive the data.
 \\[0.5cm]
 {\Large Notes\\}
 \begin{itemize}
-\item \inlinecode{PartList\_Recv} uses MPI blocking receives, so unless a
-  matching \inlinecode{PartList\_Send} has been posted on \inlinecode{Src} then
+\item \inlinecode{partlist\_recv} uses MPI blocking receives, so unless a
+  matching \inlinecode{partlist\_send} has been posted on \inlinecode{Src} then
   the routine will deadlock. It would be fairly simple to write a non-blocking
-  version of \inlinecode{PartList\_Recv}, but at present no need for such a
+  version of \inlinecode{partlist\_recv}, but at present no need for such a
   routine has been found.
 
-\item Although it is not possible to directly use \inlinecode{PartList\_Recv}
+\item Although it is not possible to directly use \inlinecode{partlist\_recv}
   to add new particles onto an existing particle\_list, it is only two lines to
-  do this. First call \inlinecode{PartList\_Recv} with a temporary particle\_list
-  to receive the data and then use \inlinecode{Append\_PartList} to attach the
+  do this. First call \inlinecode{partlist\_recv} with a temporary particle\_list
+  to receive the data and then use \inlinecode{append\_partlist} to attach the
   particles to the end of the already populated list.
 \end{itemize}
 \pagebreak
 
 {\Large
-\inlinecode{FUNCTION PartList\_Send\_Recv(PartList\_Send, PartList\_Recv, Dest, Src)\\
+\inlinecode{FUNCTION partlist\_send\_recv(partlist\_send, partList\_recv, dest, src)\\
 \HRule \\[0.5cm]
-TYPE(particle\_list), INTENT(INOUT) :: PartList\_Send, PartList\_Recv\\
+TYPE(particle\_list), INTENT(INOUT) :: partlist\_send, partlist\_recv\\
 INTEGER, INTENT(IN) :: Dest, Src}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{PartList\_SendRecv} is a routine equivalent to
+\inlinecode{partlist\_sendrecv} is a routine equivalent to
 \inlinecode{MPI\_SENDRECV} in that it allows overlapping sends and receives to
 be written in a single line rather than the end user having to split processors
 into red/black ordered pairs for communication. It sends the particle data in
-\inlinecode{PartList\_Send} to the processor with rank \inlinecode{Dest} and
+\inlinecode{partlist\_send} to the processor with rank \inlinecode{Dest} and
 receives particle data sent by processor \inlinecode{Src} and stores it in the
-particle\_list \inlinecode{PartList\_Recv}. The routine is destructive to both
+particle\_list \inlinecode{partlist\_recv}. the routine is destructive to both
 sending and receiving particle\_lists, and can lead to orphaned particles if a
-filled particle\_list is passed as \inlinecode{PartList\_Recv}. This is the
+filled particle\_list is passed as \inlinecode{partlist\_recv}. this is the
 routine which is used in the particle boundary conditions.
 \\[0.5cm]
 {\Large Notes\\}
 \begin{itemize}
-\item \inlinecode{PartList\_SendRecv} uses MPI blocking sendrecv commands, so
+\item \inlinecode{partlist\_sendrecv} uses MPI blocking sendrecv commands, so
   should be used in matching pairs the routine will deadlock.
 
 \item Although it is not possible to directly use
-  \inlinecode{PartList\_SendRecv} to add new particles onto an existing
+  \inlinecode{partlist\_sendrecv} to add new particles onto an existing
   particle\_list, it is only two lines to do this. First call
-  \inlinecode{PartList\_SendRecv} with a temporary particle\_list to receive the
-  data and then use \inlinecode{Append\_PartList} to attach the particles to
+  \inlinecode{partlist\_sendrecv} with a temporary particle\_list to receive the
+  data and then use \inlinecode{append\_partlist} to attach the particles to
   the end of the already populated list.
 \end{itemize}
 \pagebreak
@@ -5896,15 +5880,15 @@ code. It contains the following routines
 \item mpi\_minimal\_init - Routine contains enough code to start MPI enough to
   allow the input deck reader to work. The default {\EPOCH} code setup means that
   it needs to initialise MPI, obtain the rank and the number of processors.
-\item Setup\_Communicator - Routine which creates the Cartesian communicator
+\item setup\_communicator - Routine which creates the Cartesian communicator
   used by the code after the input deck has been parsed. It also populates
   \inlinecode{left, right} etc. It is in it's own subroutine so that it can be
   recalled after the start of the window move when the code is using a moving
   window. This is needed since it is valid to have a non-periodic boundary
   before the window starts to move and a periodic boundary afterwards.
-\item mpi\_initialise - This routine calls \inlinecode{Setup\_Communicator} and
+\item mpi\_initialise - This routine calls \inlinecode{setup\_communicator} and
   then allocates all the arrays to do with fields etc. It also sets up the
-  Particle List objects for each species. If the code is running with only
+  particle list objects for each species. If the code is running with only
   manual initial conditions then this routine loads the requested number of
   particles on each processor, otherwise either the restart or the autoloader
   code load the particles.
@@ -5927,18 +5911,18 @@ the general purpose subroutines are described here, since most of the other
 routines are fairly clear and use these routines internally.
 \pagebreak
 
-{\Large \inlinecode{FUNCTION Create\_Particle\_Subtype(nPart\_Local)\\
+{\Large \inlinecode{FUNCTION create\_particle\_subtype(npart\_local)\\
 \HRule \\[0.5cm]
-INTEGER(KIND=8), INTENT(IN) :: nPart\_Local}}\\
+INTEGER(KIND=8), INTENT(IN) :: npart\_local}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/mpi\_subtype\_control.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Create\_Particle\_Subtype} is a routine which creates an MPI type
+\inlinecode{create\_particle\_subtype} is a routine which creates an MPI type
 representing particles which are spread across different processors with
-\inlinecode{nPart\_Local} particles on each
-processor. \inlinecode{nPart\_Local} does not have to be the same number on all
+\inlinecode{npart\_local} particles on each
+processor. \inlinecode{npart\_local} does not have to be the same number on all
 processors.
 \\[0.5cm]
 {\Large Notes\\}
@@ -5946,34 +5930,34 @@ If you use this routine to write data from multiple species of particle then
 the data will be written out in a way which is unhelpful for data analysis,
 since the layout will be "All particles on processor 1, All Particles on
 processor 2 etc." rather than "All of species 1, All of species 2". To create
-this type of layout use \inlinecode{Create\_Ordered\_Particle\_Subtype}
+this type of layout use \inlinecode{create\_ordered\_particle\_subtype}
 \pagebreak
 
 {\Large
-\inlinecode{FUNCTION Create\_Ordered\_Particle\_Subtype(n\_species\_dump,\\ nPart\_Local)\\
+\inlinecode{FUNCTION create\_ordered\_particle\_subtype(n\_species\_dump,\\ npart\_local)\\
 \HRule \\[0.5cm]
 INTEGER, INTENT(IN) :: n\_species\_dump\\
-INTEGER(KIND=8), DIMENSION(n\_species\_dump), INTENT(IN) \\:: nPart\_Local}}\\
+INTEGER(KIND=8), DIMENSION(n\_species\_dump), INTENT(IN) \\:: npart\_local}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/mpi\_subtype\_control.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Create\_Ordered\_Particle\_Subtype} is a routine which creates an
+\inlinecode{create\_ordered\_particle\_subtype} is a routine which creates an
 MPI type representing particles from \inlinecode{n\_species\_dump} which are
-spread across different processors with \inlinecode{nPart\_Local(ispecies)}
-particles of each species on each processor. \inlinecode{nPart\_Local} does not
+spread across different processors with \inlinecode{npart\_local(ispecies)}
+particles of each species on each processor. \inlinecode{npart\_local} does not
 have to be the same number on all processors and does not have to be the same
 number for each species.
 \\[0.5cm]
 {\Large Notes\\}
 This routine causes the data to be written to disk as "All of species 1, All of
-Species 2 etc." as opposed to \inlinecode{Create\_Particle\_Subtype}. It does
+Species 2 etc." as opposed to \inlinecode{create\_particle\_subtype}. It does
 however need rather more memory and is rather slower.
 \pagebreak
 
 {\Large
-\inlinecode{FUNCTION Create\_Field\_Subtype(n\{x,y,z\}\_local, \\cell\_start\_\{x,y,z\}\_local)\\
+\inlinecode{FUNCTION create\_field\_subtype(n\{x,y,z\}\_local, \\cell\_start\_\{x,y,z\}\_local)\\
 \HRule \\[0.5cm]
 INTEGER, INTENT(IN) :: n\_x\_local, n\_y\_local, n\_z\_local
 INTEGER, INTENT(IN) :: cell\_start\_x\_local, cell\_start\_y\_local, cell\_start\_z\_local
@@ -5983,7 +5967,7 @@ INTEGER, INTENT(IN) :: cell\_start\_x\_local, cell\_start\_y\_local, cell\_start
 \inlinecode{src/housekeeping/mpi\_subtype\_control.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{Create\_Field\_Subtype} is a routine which creates an MPI type
+\inlinecode{create\_field\_subtype} is a routine which creates an MPI type
 representing a field which is defined across some or all of the processors. The
 \inlinecode{n\_\{x,y,z\}\_local} parameters are the number of points in the x,
 y, z directions (if they exist in the version of the code that you are working
@@ -5995,8 +5979,8 @@ position and so it begins at \{0,0,0\} NOT \{1,1,1\}.
 \\[0.5cm]
 {\Large Notes\\}
 In EPOCH3D there is also a routine called
-\inlinecode{Create\_Field\_Subtype\_2D} which is exactly equivalent to
-\inlinecode{Create\_Field\_Subtype} in EPOCH2D and is used for writing the 2D
+\inlinecode{create\_field\_subtype\_2d} which is exactly equivalent to
+\inlinecode{create\_field\_subtype} in EPOCH2D and is used for writing the 2D
 distribution functions. At present, there are not equivalent 1D functions
 except in EPOCH1D, but these could easily by added if required.
 
@@ -6024,7 +6008,7 @@ simply connected at every point, so it must have one processor to the left, one
 to the front etc. which introduces a further restriction on the load
 balancer. Otherwise, the load balancer is fully general. The load balancer is
 implemented in the file \inlinecode{src/housekeeping/balance.F90} and is called
-by the routine \inlinecode{Balance\_Workload(Override)}. The parameter
+by the routine \inlinecode{balance\_workload(override)}. The parameter
 \inlinecode{Override} is used to force the code to perform a load balancing
 sweep even when it would normally determine that the imbalance is not large
 enough to force a load balancing sweep. Although the load balancer is hard
@@ -6053,10 +6037,10 @@ the general layout of the routine is as follows.
   and \inlinecode{ends\_\{x,y,z\}}. These arrays contain the starting and
   ending cell numbers of the hypothetical global array in each direction for
   each processor.
-\item The routine \inlinecode{Redistribute\_Fields} is then called to move the
+\item The routine \inlinecode{redistribute\_fields} is then called to move the
   information about field variables which cannot be recalculated. If new field
   variables are created that cannot be recalculated after the load balancing is
-  completed then \inlinecode{Redistribute\_Fields} has to be modified for these
+  completed then \inlinecode{redistribute\_fields} has to be modified for these
   new variables.
 \item The next section of the routine deals with those variables which can be
   recalculated after the load balance sweep is complete, such as the coordinate
@@ -6064,7 +6048,7 @@ the general layout of the routine is as follows.
 \item The penultimate section of the routine then changes the variables which
   tell the code where the edges of it's domain lie in real space to reflect the
   changed shape of the domains.
-\item The final part is the call to \inlinecode{Distribute\_Particles} which
+\item The final part is the call to \inlinecode{distribute\_particles} which
   finally moves the particles to the correct new processor. Once this is
   finished, the code should have as near as possible the same number of
   particles on each processor.
@@ -6073,12 +6057,12 @@ the general layout of the routine is as follows.
 Most of the load balancer is purely mechanical and should only be changed if
 the way in which the code is to perform load balancing is fundamentally to be
 changed. The redistribution of particles that takes place in
-\inlinecode{Distribute\_Particles} uses the standard particle\_list objects, so
+\inlinecode{distribute\_particles} uses the standard particle\_list objects, so
 that if the necessary changes have been made to the routines in
 \inlinecode{src/housekeeping/partlist.F90} have been made to allow correct
 boundary swaps of particles then the load balancer should work with no further
 modification. The only part of the load balancer which should need modifying is
-\inlinecode{Redistribute\_Fields} which requires explicit modification if new
+\inlinecode{redistribute\_fields} which requires explicit modification if new
 field variables are required. For fields which are the same shape as the main
 array there is significant assistance provided within the code to make the
 rebalancing simpler. There are also routines which can help with rebalancing
@@ -6088,40 +6072,40 @@ coordinate axes move have to have full load balancing routines implemented by
 the developer. This is beyond the scope of this manual and any developer who
 need assistance with developing such a modification should contact the original
 developer. The field balancer is fair simple and mostly calls one of three
-routines: \inlinecode{Redistribute\_Field} and either
-\inlinecode{Redistribute\_Field\_2D} or \inlinecode{Redistribute\_Field\_1D}
+routines: \inlinecode{redistribute\_field} and either
+\inlinecode{redistribute\_field\_2d} or \inlinecode{redistribute\_field\_1d}
 depending on the dimensionality of your code. To redistribute full field
-variables the routine to use is \inlinecode{Redistribute\_Field}, and an
+variables the routine to use is \inlinecode{redistribute\_field}, and an
 example of using the code looks like
 
 \simpleboxverbatim
-    temp=0.0_num
-    CALL Redistribute_Field(new_domain, Bz,temp)
-    DEALLOCATE(Bz)
-    ALLOCATE(Bz(-2:nx_new+3,-2:ny_new+3))
-    Bz=temp
+  temp=0.0_num
+  CALL Redistribute_Field(new_domain, Bz,temp)
+  DEALLOCATE(Bz)
+  ALLOCATE(Bz(-2:nx_new+3,-2:ny_new+3))
+  Bz=temp
 \end{Verbatim}
 
 This is a very obvious calling sequence where the
-\inlinecode{Redistribute\_Field} subroutine is used to redistribute the field
+\inlinecode{redistribute\_field} subroutine is used to redistribute the field
 given (in this case \inlinecode{Bz}) with the newly redistributed field copied
 into \inlinecode{temp} which is an array which is already allocated to the
 correct size. The \inlinecode{new\_domain} parameter is an array indicating the
 location of the start and end points of the new domain of the current processor
 in gridpoints offset from the start of the global array. It is passed into the
-\inlinecode{Redistribute\_Fields} subroutine as a parameter from the
-\inlinecode{Balance\_Workload} subroutine and should not be changed. The
+\inlinecode{redistribute\_fields} subroutine as a parameter from the
+\inlinecode{balance\_workload} subroutine and should not be changed. The
 \inlinecode{temp} variable is needed since Fortran standards before Fortran2000
 do not allow the deallocation and reallocation of parameters passed to a
 subroutine, and the partial implementation of Fortran2000 in many modern
 compilers means that the more elegant solution where \inlinecode{temp} is
-hidden inside the \inlinecode{Redistribute\_Field} subroutine will work with
+hidden inside the \inlinecode{redistribute\_field} subroutine will work with
 some compilers, fail to compile with others and generate hard to diagnose
 compiler errors with other compilers. It was decided to use the less elegant
 but more compatible form here.\\
 
 The routine for rebalancing variables which lie along an edge of the domain are
-very similar and are demonstrated in the \inlinecode{Redistribute\_Fields}
+very similar and are demonstrated in the \inlinecode{redistribute\_fields}
 subroutine for the lasers which are attached to different boundaries. It is
 recommended that a developer examine this code when developing new routines.
 
@@ -6138,9 +6122,9 @@ which is part of \EPOCH. The file output from {\EPOCH} takes place in the file
 additional code there. Looking through the listings, you will see two lines
 
 \simpleboxverbatim
-       CALL cfd_Open(filename, rank, comm, MPI_MODE_CREATE + MPI_MODE_WRONLY)
+  CALL cfd_Open(filename, rank, comm, MPI_MODE_CREATE + MPI_MODE_WRONLY)
 
-       CALL cfd_Close()
+  CALL cfd_Close()
 \end{Verbatim}
 
 These, as may be expected, are the commands which open and close the CFD
@@ -6161,7 +6145,7 @@ Looking through {\it diagnostics.F90} there are many lines with commands which
 begin \inlinecode{cfd\_}, but they are all prepended with a command which looks
 like
 \simpleboxverbatim
-     IF (IAND(DumpMask(28), code) .NE. 0) THEN
+  IF (IAND(DumpMask(28), code) .NE. 0) THEN
 \end{Verbatim}
 This is the way in which {\EPOCH} allows the end user to specify whether a
 variable should be dumped, and whether it should only be dumped at
@@ -6185,7 +6169,7 @@ When adding a new variable to be written to disk the value of
 written variables. Then open the file \inlinecode{src/deck/deck\_io\_block.F90}
 and find the line
 \simpleboxverbatim
-  CHARACTER(len=EntryLength), DIMENSION(IOBlockElements) ::   IOBlockName =  ...
+  CHARACTER(len=EntryLength), DIMENSION(io\_block\_elements) :: io\_block\_name =  ...
 \end{Verbatim}
 
 and simply add new strings for your new variables to the end of the
@@ -6267,7 +6251,7 @@ IF (IAND(dumpmask(30), code)) THEN
       Dims, Stagger, GridName, GridGroup, Data(1:nx,1:ny), subtype_field)
 ENDIF
 \end{Verbatim}
-where \inlinecode{Calc\_My\_Variable} is a function which calculates the
+where \inlinecode{calc\_my\_variable} is a function which calculates the
 variable which you wish to write. The form of this function depends on the type
 of variable to be calculated and is given in the next section.
 
@@ -6280,45 +6264,45 @@ particles. The iterators are stored in the file {\it iterators.F90}. An example
 iterator is
 
 \simpleboxverbatim
-  ! Iterator for particle processor
-  SUBROUTINE iterate_species(data, n_points, start)
+! Iterator for particle processor
+SUBROUTINE iterate_species(data, n_points, start)
 
-    REAL(num), DIMENSION(:), INTENT(INOUT) :: data
-    INTEGER(8), INTENT(INOUT) :: n_points
-    LOGICAL, INTENT(IN) :: start
-    TYPE(Particle), POINTER, SAVE :: Cur
-    INTEGER(8) :: partcount
-    REAL(num) :: root
+  REAL(num), DIMENSION(:), INTENT(INOUT) :: data
+  INTEGER(8), INTENT(INOUT) :: n_points
+  LOGICAL, INTENT(IN) :: start
+  TYPE(particle), POINTER, SAVE :: Cur
+  INTEGER(8) :: partcount
+  REAL(num) :: root
 
-    TYPE(particle_list), POINTER, SAVE :: CurrentList
-    TYPE(ParticleFamily), POINTER, SAVE :: CurrentFamily
+  TYPE(particle_list), POINTER, SAVE :: CurrentList
+  TYPE(ParticleFamily), POINTER, SAVE :: CurrentFamily
 
-    IF (start)  THEN
-       CALL Start_ParticleFamily(CurrentFamily, CurrentList, Cur)
-    ENDIF
-    partcount=0
-    DO WHILE (ASSOCIATED(CurrentFamily) .AND. (partcount .LT. n_points))
-       DO WHILE (ASSOCIATED(CurrentList) .AND. (partcount .LT. n_points))
-          DO WHILE (ASSOCIATED(Cur) .AND. (partcount .LT. n_points))
-             partcount=partcount+1
-             data(partcount)=REAL(CurrentFamily%id, num) ! This is
-                ! the line which writes the data
-             Cur=>Cur%Next
-          ENDDO
-          ! If the current partlist is exhausted, switch to the next one
-          IF (.NOT. ASSOCIATED(Cur)) CALL Advance_ParticleList(CurrentList, Cur)
-       ENDDO
-       ! If the current particlefamily is exhausted, then switch to the next one
-       DO WHILE (.NOT. ASSOCIATED(Cur))
-          CALL Advance_ParticleFamily(CurrentFamily, CurrentList, Cur)
-          IF (.NOT. ASSOCIATED(CurrentFamily)) EXIT
-          IF ((.NOT. CurrentFamily%Dump) .AND. (.NOT. Iterator_Settings%Restart))&
-             NULLIFY(Cur)
-       ENDDO
+  IF (start)  THEN
+    CALL Start_ParticleFamily(CurrentFamily, CurrentList, Cur)
+  ENDIF
+  partcount=0
+  DO WHILE (ASSOCIATED(CurrentFamily) .AND. (partcount .LT. n_points))
+    DO WHILE (ASSOCIATED(CurrentList) .AND. (partcount .LT. n_points))
+      DO WHILE (ASSOCIATED(Cur) .AND. (partcount .LT. n_points))
+        partcount=partcount+1
+        data(partcount)=REAL(CurrentFamily%id, num) ! This is
+           ! the line which writes the data
+        Cur=>Cur%next
+      ENDDO
+      ! If the current partlist is exhausted, switch to the next one
+      IF (.NOT. ASSOCIATED(Cur)) CALL Advance_particle_list(CurrentList, Cur)
     ENDDO
-    n_points=partcount
+    ! If the current particlefamily is exhausted, then switch to the next one
+    DO WHILE (.NOT. ASSOCIATED(Cur))
+      CALL Advance_ParticleFamily(CurrentFamily, CurrentList, Cur)
+      IF (.NOT. ASSOCIATED(CurrentFamily)) EXIT
+      IF ((.NOT. CurrentFamily%Dump) .AND. (.NOT. Iterator_Settings%Restart))&
+         NULLIFY(Cur)
+    ENDDO
+  ENDDO
+  n_points=partcount
 
-  END SUBROUTINE iterate_species
+END SUBROUTINE iterate_species
 \end{Verbatim}
 
 This is a fairly complicated routine, and includes routines to deal with the
@@ -6359,7 +6343,7 @@ The parameters this time are
 \item gridname - The name of the grid (particle positions) that the variable
   corresponds to. In EPOCH, this is ``Particles''.
 \item gridgroup - The group of the grid (particle positions) that the variable
-  corresponds to. In EPOCH, this is ``Part\_Grid''.
+  corresponds to. In EPOCH, this is ``part\_grid''.
 \item subtype\_particle\_var - An MPI type representing the layout of particles
   across processors species by species. For a default particle variable, this
   is the named variable ``subtype\_particle\_var''.
@@ -6387,9 +6371,9 @@ if more sophisticated changes are needed.
 off. The precompiler directives all begin with \# and look like
 \simpleboxverbatim
 #ifdef MY_PRECOMPILER_DIRECTIVE
-	SOME_FORTRAN_OF_SOME_KIND
+  SOME_FORTRAN_OF_SOME_KIND
 #else
-	SOME_OTHER_FORTRAN
+  SOME_OTHER_FORTRAN
 #endif
 \end{Verbatim}
 and they behave in a very simple manner. The precompiler runs BEFORE the
@@ -6407,7 +6391,7 @@ entire source file as written by the human programmer.
 
 \subsubsection{When to use precompiler directives}
 \begin{itemize}
-\item When adding properties to the \inlinecode{Particle} structure
+\item When adding properties to the \inlinecode{particle} structure
 \item When adding time consuming calculations to the particle pusher
 \end{itemize}
 It is perfectly acceptable to use precompiler directives in other cases as
@@ -6424,14 +6408,14 @@ directives which read
 
 \simpleboxverbatim
 #ifdef TRACER_PARTICLES
-    WRITE(*,*) "Tracer particle support -DTRACER_PARTICLES"
+  WRITE(*,*) "Tracer particle support -DTRACER_PARTICLES"
 #endif
 \end{Verbatim}
 
 Simply add a new element to the end of the list
 \simpleboxverbatim
 #ifdef MY_PRECOMPILER_DIRECTIVE
-    WRITE(*,*) "My new physics -DMY_PRECOMPILER_DIRECTIVE"
+  WRITE(*,*) "My new physics -DMY_PRECOMPILER_DIRECTIVE"
 #endif
 \end{Verbatim}
 
@@ -6572,12 +6556,12 @@ INTEGER :: as\_direction}}\\
 \inlinecode{as\_direction} is used when assigning a laser to a boundary and
 recognizes the strings
 \begin{itemize}
-\item left - BD\_LEFT
-\item right - BD\_RIGHT
-\item up - BD\_UP
-\item down - BD\_DOWN
-\item front -BD\_FRONT
-\item back - BD\_BACK
+\item left - c\_bd\_left
+\item right - c\_bd\_right
+\item up - c\_bd\_up
+\item down - c\_bd\_down
+\item front -c\_bd\_front
+\item back - c\_bd\_back
 \end{itemize}
 and returns the associated direction code (given after the dash in the
 definition).
@@ -6765,7 +6749,7 @@ which are described in the section on the maths parser.
 
 \subsection{Permanently adding blocks to the input deck}
 
-While using the \inlinecode{Custom\_Deck} subroutine is a good way of passing
+While using the \inlinecode{custom\_deck} subroutine is a good way of passing
 parameters into the code or for developing the code, it is not suitable for
 permanent additions to the code. Adding new blocks to the code permanently is
 very similar to doing it temporarily, but requires changes to some of the
@@ -6786,10 +6770,10 @@ the deck. These are
 \end{itemize}
 
 There is one final variable which is important for modifying the input deck,
-\inlinecode{Deck\_State}. The input deck parser routine used to read the main
-input deck uses the variable \inlinecode{Deck\_State} to
+\inlinecode{deck\_state}. The input deck parser routine used to read the main
+input deck uses the variable \inlinecode{deck\_state} to
 determine which stage of parsing the deck is required. The possible values of
-\inlinecode{Deck\_State} are
+\inlinecode{deck\_state} are
 
 \begin{itemize}
 \item DS\_DECK - The main input deck
@@ -6810,7 +6794,7 @@ The main routine which needs to be explained is \inlinecode{HandleBlock}, which
 is the function which determines which subroutine to call to parse the elements
 of a given block. The function is very simple and has the same basic sequence
 as the \inlinecode{StartBlock} and \inlinecode{EndBlock} functions. First check
-what file is being parsed by checking \inlinecode{Deck\_State}, then use
+what file is being parsed by checking \inlinecode{deck\_state}, then use
 \inlinecode{StrCmp} to compare the \inlinecode{BlockName} parameter with the
 list of known block names. What happens next is dependent on exactly what a
 developer wants their block to do, but at the simplest level, the routine
@@ -6821,13 +6805,13 @@ entries in \inlinecode{HandleDeck} such as the \inlinecode{Species} block in
 the initial conditions file reader which strips the species number off the end
 of the block name and passes it to the handler routine. The routines that deal
 with constants and DEOs are implemented before any tests to
-\inlinecode{Deck\_State} since it is valid to set constants and DEOs in any
+\inlinecode{deck\_state} since it is valid to set constants and DEOs in any
 type of file.
 
 The final routine is \inlinecode{CheckCompulsoryBlocks} which is used to check
 that all the needed elements of the input deck have been set. A single
 parameter \inlinecode{errcode\_deck} is passed in. Once again, the routine
-checks \inlinecode{Deck\_State} to make sure that it is testing the correct
+checks \inlinecode{deck\_state} to make sure that it is testing the correct
 type of input deck file. It then goes through and calls functions to check that
 all the necessary parts of a block have been set. The subroutines are contained
 in the same file as the routine which is called in \inlinecode{HandleBlock} to
@@ -6854,7 +6838,7 @@ the input deck corresponds to a new laser being attached to a boundary. This is
 allowed by implementing the lasers as a linked list on each boundary, with a
 new laser object being created when a laser block is started, the laser
 information being set during the main reader routine, and then the laser being
-attached to the linked list by a call to \inlinecode{Attach\_Laser} in
+attached to the linked list by a call to \inlinecode{attach\_laser} in
 \inlinecode{src/laser.f90} when the block is ended. When a new laser block is
 started the process simply repeats allowing the end user to have as many lasers
 as desired.
@@ -6966,11 +6950,11 @@ look at the existing code. These functions are just long lists of
 functions/constants. To add the new code, just add an additional line looking
 like
 \simpleboxverbatim
-    IF (StrCmp(name, "my_const")) AsConstant=CONST_MY_CONST
-    .
-    .
-    .
-    IF (StrCmp(name, "my_func"))    AsFunction=FUNC_MY_FUNC
+  IF (StrCmp(name, "my_const")) AsConstant=CONST_MY_CONST
+  .
+  .
+  .
+  IF (StrCmp(name, "my_func"))    AsFunction=FUNC_MY_FUNC
 \end{Verbatim}
 Note that neither routine returns immediately after recognising the name of the
 function/constant. This allows users to override built in constants or
@@ -7007,11 +6991,11 @@ which is also used in custom function. The calling sequence in
 \inlinecode{DoFunction} looks like
 
 \simpleboxverbatim
-    IF (opcode .EQ. FUNC_GAUSS) THEN
-       CALL GetValues(3, Values)
-       CALL PushOnEval(EXP(-((Values(1)-Values(2))/Values(3))**2))
-       RETURN
-    ENDIF
+  IF (opcode .EQ. FUNC_GAUSS) THEN
+    CALL GetValues(3, Values)
+    CALL PushOnEval(EXP(-((Values(1)-Values(2))/Values(3))**2))
+    RETURN
+  ENDIF
 \end{Verbatim}
 Simple call the \inlinecode{GetValues} subroutine passing the number of
 required parameters and an array of type \inlinecode{REAL(num)} which is at
@@ -7066,7 +7050,7 @@ you should find out at which point of this routine sufficient parts of the
 initial conditions are setup. The setup of the code is fairly complicated, but
 there are a few key points at which the code significantly changes state.
 \begin{itemize}
-\item After the call to \inlinecode{Read\_Deck} the code has read the basic
+\item After the call to \inlinecode{read\_deck} the code has read the basic
   information from the input deck files and any tests or changes which have to
   be made to input deck values should be made immediately after this line. Note
   that although the variables from the deck have been set and have been stored
@@ -7091,14 +7075,14 @@ there are a few key points at which the code significantly changes state.
   \subitem \inlinecode{update\_eb\_fields\_half} - Time centre the E and B
     fields
   \subitem \inlinecode{push\_particles} - The particle pusher
-  \subitem \inlinecode{Reorder\_Particles\_to\_grid} - Groups particles into
+  \subitem \inlinecode{reorder\_particles\_to\_grid} - Groups particles into
     linked lists at each grid point. Used for the particle splitting routine,
     and would be the right place to add a collision operator. Any routine
     which needs to have nearby particles grouped together should take place
     after the call to this routine.
-  \subitem \inlinecode{Split\_Particles} - The very early beta particle
+  \subitem \inlinecode{split\_particles} - The very early beta particle
     splitting operator. Doesn't really work yet, do not use!
-  \subitem \inlinecode{Reattach\_Particles\_to\_mainlist} - Undoes the
+  \subitem \inlinecode{reattach\_particles\_to\_mainlist} - Undoes the
     particle grouping and rebuilds the main list of particles used by the
     particle pusher. Any routine which needs to have nearby particles grouped
     together should take place before the call to this routine.
@@ -7114,18 +7098,18 @@ there are a few key points at which the code significantly changes state.
 If the code is compiled with the right flags during the main loop then the
 particles are grouped into a linked list for each cell in the domain, with all
 the particles which are in that cell linked into the list. The main list
-\inlinecode{Species(ispecies)\%AttachedList} is empty and cannot be used during
+\inlinecode{Species(ispecies)\%attached\_list} is empty and cannot be used during
 this period. The particles should now be accessed using the variable
 \inlinecode{Species(ispecies)\%SecondaryList(ix,iy,iz)} which is the array of
 linked lists. This array is allocated on the call to
-\inlinecode{Reorder\_Particles\_to\_grid} and deallocated on the call to
-\inlinecode{Reattach\_Particles\_to\_mainlist}, and should not be used outside
+\inlinecode{reorder\_particles\_to\_grid} and deallocated on the call to
+\inlinecode{reattach\_particles\_to\_mainlist}, and should not be used outside
 the section of code between these two calls. The particles themselves remain
 unchanged. No attempt is made to check that particles do not cross processor
 boundaries in this section, so if a particle's position is changed, it is up to
 the user to ensure that the particle is transferred to another processor if
 required. However, if a particle is transferred to another processor, it is
-acceptable to relink it to \inlinecode{Species(ispecies)\%AttachedList} since
+acceptable to relink it to \inlinecode{species(ispecies)\%attached\_list} since
 the other lists are simply appended to that list when the particles are
 reattached to the main list.\\
 
