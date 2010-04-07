@@ -2717,24 +2717,24 @@ Using distribution functions within {\EPOCH} is similar to using them from an
 input deck. To add a distribution function output in any of the initial
 conditions subroutines, the sequence looks like
 \simpleboxverbatim
-  TYPE(Distribution_Function_Block), POINTER :: Work
+  TYPE(distribution_function_block), POINTER :: work
 
-  ALLOCATE(Work)
-  CALL Setup_Dist_Fn(Work)
-  Work%Name="x_px"
-  Work%nDims=2
-  Work%DumpMask=IO_ALWAYS
-  Work%directions(1)=DIR_X
-  Work%directions(2)=DIR_PX
-  ! Range is ignored for spatial directions, so don't bother setting
-  Work%Range(2,:)=(/-3.0e-20, 3.0e-20/)
-  Work%Resolution(2)=100
+  ALLOCATE(work)
+  CALL setup_dist_fn(work)
+  work%name = "x_px"
+  work%ndims = 2
+  work%dumpmask = c_io_always
+  work%directions(1) = c_dir_x
+  work%directions(2) = c_dir_px
+  ! range is ignored for spatial directions, so don't bother setting
+  work%range(2,:) = (/-3.0e-20, 3.0e-20/)
+  work%resolution(2) = 100
   ! The get the first index for a restriction, just count
   ! Through this list, ignoring directions which do not apply to your
-  ! Dimensionality (i.e. DIR_Z only in EPOCH3D)
-  ! DIR_X, DIR_Y, DIR_Z, DIR_PX, DIR_PY, DIR_PZ
-  Work%Restrictions(4,:)=(/-3.0e-20, 3.0e-20/)
-  Work%Use_Species(1:2)=.TRUE.
+  ! Dimensionality (i.e. c_dir_z only in EPOCH3D)
+  ! c_dir_x, c_dir_y, c_dir_z, c_dir_px, c_dir_py, c_dir_pz
+  work%restrictions(4,:) = (/-3.0e-20, 3.0e-20/)
+  work%use_species(1:2) = .TRUE.
   CALL attach_dist_fn(work)
 
 \end{Verbatim}
@@ -2918,8 +2918,8 @@ PARTICLE. The current definition of this type (in 2D) is
 \simpleboxverbatim
 ! Object representing a particle
   TYPE :: particle
-     REAL(num), DIMENSION(3) :: Part_P
-     REAL(num), DIMENSION(2) :: Part_pos
+     REAL(num), DIMENSION(3) :: part_p
+     REAL(num), DIMENSION(2) :: part_pos
 #ifdef PER_PARTICLE_WEIGHT
      REAL(num) :: weight
 #endif
@@ -2927,10 +2927,10 @@ PARTICLE. The current definition of this type (in 2D) is
      REAL(num) :: charge
      REAL(num) :: mass
 #endif
-     TYPE(particle), POINTER :: Next, Prev
+     TYPE(particle), POINTER :: next, prev
 #ifdef PART_DEBUG
-     INTEGER :: Processor
-     INTEGER :: Processor_at_t0
+     INTEGER :: processor
+     INTEGER :: processor_at_t0
 #endif
   END TYPE particle
 \end{Verbatim}
@@ -2948,13 +2948,13 @@ These parameters can be explained as follows
 \item weight - The weight of this particle. The number of real particles
   represented by this pseudoparticle.
 \item charge - The particle charge. If the code was compiled without per
-  particle charge, then use the charge property of the TYPE(ParticleFamily).
+  particle charge, then use the charge property of the TYPE(particle\_family).
 \item mass - The particle rest mass. If the code was compiled without per
-  particle mass, then use the mass property of the TYPE(ParticleFamily).
-\item Next, Prev - The next and previous particle in the linked list which
+  particle mass, then use the mass property of the TYPE(particle\_family).
+\item next, prev - The next and previous particle in the linked list which
   represents the particles in the current species. This will be explained more
   later.
-\item Processor - The rank of the processor which currently holds the
+\item processor - The rank of the processor which currently holds the
   particle.
 \item processor\_at\_t0 - The rank of the processor on which the particle
   started.
@@ -2969,60 +2969,58 @@ interprocessor communication of particles. The definition of the type is
   TYPE :: particle_list
      TYPE(particle), POINTER :: head
      TYPE(particle), POINTER :: tail
-     INTEGER(KIND=8) :: Count
+     INTEGER(KIND=8) :: count
      ! Pointer is safe if the particles in it are all unambiguously linked
-     LOGICAL :: Safe
+     LOGICAL :: safe
 
-     TYPE(particle_list), POINTER :: Next, Prev
+     TYPE(particle_list), POINTER :: next, prev
   END TYPE particle_list
 \end{Verbatim}
 \begin{itemize}
 \item head - The first particle in the linked list.
 \item tail - The last particle in the linked list.
-\item Count - The number of particles in the list. Note that this is NOT MPI
+\item count - The number of particles in the list. Note that this is NOT MPI
   aware, so reading count only gives you the number of particles on the local
   processor.
-\item Safe - Any particle\_list which a user should come across will be a Safe
+\item safe - Any particle\_list which a user should come across will be a safe
   particle\_list. Don't change this property
-\item Next, Prev - For future expansion it is possible to attach particle\_lists
+\item next, prev - For future expansion it is possible to attach particle\_lists
   together in another linked list. This is not currently used anywhere in the
   code.
 \end{itemize}
 
 An entire species of particles is represented by another Fortran TYPE, this
-time called \inlinecode{ParticleFamily}. This represents all the properties
+time called \inlinecode{particle\_family}. This represents all the properties
 which are common to all particles in a species. The definition is
 
 \simpleboxverbatim
-
-  TYPE :: ParticleFamily
-     CHARACTER(EntryLength) :: Name
+  TYPE :: particle_family
+     CHARACTER(entry_length) :: name
 
      TYPE(particle_list) :: attached_list
-     TYPE(ParticleFamily), POINTER :: Next, Prev
+     TYPE(particle_family), POINTER :: next, prev
      INTEGER :: id
-     LOGICAL :: Dump
+     LOGICAL :: dump
 
-     REAL(num) :: Charge
-     REAL(num) :: Mass
-     INTEGER(KIND=8) :: Count
+     REAL(num) :: charge
+     REAL(num) :: mass
+     INTEGER(KIND=8) :: count
 
-  END TYPE ParticleFamily
-
+  END TYPE particle_family
 \end{Verbatim}
 
 \begin{itemize}
-\item Name - The name of the particle species, used in the output dumps etc.
-\item Next, Prev - Particle species are also linked together in a linked
+\item name - The name of the particle species, used in the output dumps etc.
+\item next, prev - Particle species are also linked together in a linked
   list. This is used internally by the output dump routines, but should not be
   used by end users.
 \item id - The species number for this species. This is the same number as is
   used in the input deck to designate the species.
-\item Charge - The charge in Coulombs. Even if PER\_PARTICLE\_CHARGEMASS is
+\item charge - The charge in Coulombs. Even if PER\_PARTICLE\_CHARGEMASS is
   specified, this is still populated from the input deck, and now refers to
   the reference charge for the species.
-\item Mass - The mass in kg.
-\item Count - The number of particles of this species globally (NOTE may not
+\item mass - The mass in kg.
+\item count - The number of particles of this species globally (NOTE may not
   be accurate). This will only ever be the number of particles on this
   processor when running on a single processor. While this property will be
   accurate when setting up initial conditions, it is only guaranteed to be
@@ -3049,8 +3047,8 @@ looks like
 
 \simpleboxverbatim
 TYPE :: linked_list
-    TYPE(linked_list), POINTER :: Next
-    TYPE(linked_list), POINTER :: Prev
+    TYPE(linked_list), POINTER :: next
+    TYPE(linked_list), POINTER :: prev
 END TYPE linked_list
 \end{Verbatim}
 
@@ -3129,10 +3127,10 @@ transparent to the end user, so the following code would fail
 \simpleboxverbatim
 PROGRAM test
 
-      REAL, TARGET :: a=10.0
-      REAL, POINTER :: b
+  REAL, TARGET :: a = 10.0
+  REAL, POINTER :: b
 
-      b=a
+  b = a
 
 END PROGRAM test
 \end{Verbatim}
@@ -3151,24 +3149,24 @@ is set to point to a and can then be used everywhere in place of a.
 So, to set up a linked list of n elements, you would use the following code
 
 \simpleboxverbatim
-TYPE(linked_list), POINTER :: New
-NULLIFY(New)
+TYPE(linked_list), POINTER :: new
+NULLIFY(new)
 
-DO i=1,n
+DO i = 1,n
   CALL create_element(new)
-  CALL add_element(New)
+  CALL add_element(new)
 ENDDO
 \end{Verbatim}
 
 To then run through the elements of your newly created linked list, you would
 use code like
 \simpleboxverbatim
-TYPE(linked_list), POINTER :: Current
+TYPE(linked_list), POINTER :: current
 
-Current=>head
-DO WHILE(ASSOCIATED(Current))
+current=>head
+DO WHILE(ASSOCIATED(current))
   ! Do stuff
-  Current=>Current%next
+  current=>current%next
 ENDDO
 \end{Verbatim}
 
@@ -3177,19 +3175,19 @@ whether a pointer is a null pointer or not (this is why it is so important to
 nullify new pointers, because ASSOCIATED on it's own doesn't check whether a
 pointer is valid, just whether or not it is a null pointer). You can also use
 ASSOCIATED to check whether a pointer points to a particular object or not, in
-which case the syntax is \inlinecode{RESULT=ASSOCIATED(b, TARGET=a)}, which
+which case the syntax is \inlinecode{RESULT = ASSOCIATED(b, TARGET=a)}, which
 returns true if b points to a, or false if it doesn't, even if b is a valid
 pointer pointing to something else. It also introduces the way in which you
 must use linked lists in \EPOCH. The execution flow is as follows
 \begin{itemize}
-\item Point Current to the current element to the start of the linked list
+\item Point current to the current element to the start of the linked list
   (head)
-\item Iterate while Current points to a valid element
+\item Iterate while current points to a valid element
 \item Perform whatever actions you want on current
-\item Point Current to the next element in the chain
+\item Point current to the next element in the chain
 \end{itemize}
 This leads to the slightly counter intuitive behaviour where even though the
-loop only acts on the variable named ``Current'', all of the elements in the
+loop only acts on the variable named ``current'', all of the elements in the
 list are operated on. Although there are many tricks which can be performed
 with linked lists, the only other element which needs to be explained is how
 to delete elements. A subroutine to remove a single element from a linked list
@@ -3210,10 +3208,10 @@ SUBROUTINE remove_element(element)
   ENDIF
 
   IF (ASSOCIATED(element%next)) THEN
-    ! Next element exists
+    ! next element exists
     element%next%prev=>element%prev
   ELSE
-    ! Next element does not exists therefore
+    ! next element does not exists therefore
     ! element is the tail. When element is removed
     ! The head is the element before the element being removed
     tail=>element%prev
@@ -3228,7 +3226,7 @@ being removed is called ``C'', the element before ``C'' (if it exists) is
 called ``P''and the element after the element being removed (if it exists) is
 called ``N''
 \begin{itemize}
-\item Check whether \inlinecode{C}'s Prev element exists, this means that
+\item Check whether \inlinecode{C}'s prev element exists, this means that
   \inlinecode{P} exists
 \item If \inlinecode{P} exists then the element to be removed isn't at the
   start of the chain. When \inlinecode{C} is removed, we need
@@ -3239,7 +3237,7 @@ called ``N''
   is removed, we need head to point to \inlinecode{C}\%next
 \item Exactly the same logic applies for updating the element after
   \inlinecode{C}
-\item Check whether \inlinecode{C}'s Next element exists, this means that
+\item Check whether \inlinecode{C}'s next element exists, this means that
   \inlinecode{N} exists
 \item If \inlinecode{N} exists then the element to be removed isn't at the end
   of the chain. When \inlinecode{C} is removed, we need \inlinecode{N}\%prev
@@ -3251,16 +3249,16 @@ called ``N''
 
 Therefore, code to remove some elements from a linked list would look like
 \simpleboxverbatim
-TYPE(linked_list), POINTER :: Current, Next
+TYPE(linked_list), POINTER :: current, next
 
-Current=>head
-DO WHILE(ASSOCIATED(Current))
-  Next=>Current%next
-  IF (Dealloc) THEN
+current=>head
+DO WHILE(ASSOCIATED(current))
+  next=>current%next
+  IF (dealloc) THEN
     CALL remove_element(current)
-    DEALLOCATE(Current)
+    DEALLOCATE(current)
   ENDIF
-  Current=>Next
+  current=>next
 ENDDO
 \end{Verbatim}
 Note that current must be deallocated explicitly even after it has been
@@ -3277,7 +3275,7 @@ the particles correctly in 2D space, but doesn't set any momentum
 \simpleboxverbatim
 SUBROUTINE manual_load
 
-  TYPE(particle), POINTER :: Current
+  TYPE(particle), POINTER :: current
   INTEGER :: ispecies
   INTEGER :: idum, clock
   REAL(num) :: rpos
@@ -3286,17 +3284,17 @@ SUBROUTINE manual_load
   CALL SYSTEM_CLOCK(clock)
   ! Correct using the rank to ENSURE that different
   ! processors have different random numbers
-  idum=-(clock+rank+1)
+  idum = -(clock+rank+1)
 
-  DO ispecies=1,nspecies
-    Current=>ParticleSpecies(ispecies)%attached_list%head
-    DO WHILE(ASSOCIATED(Current))
-      rpos=(random(idum) - 0.5_num)*2.0_num
-      Current%Part_Pos(1)=rpos
-      rpos=random(idum)*length_x + x_start
+  DO ispecies = 1,nspecies
+    current=>particle_species(ispecies)%attached_list%head
+    DO WHILE(ASSOCIATED(current))
+      rpos = (random(idum) - 0.5_num)*2.0_num
+      current%part_pos(1) = rpos
+      rpos = random(idum)*length_x + x_start
 
-      Current%Weight=1.0_num
-      Current=>Current%next
+      current%weight = 1.0_num
+      current=>current%next
     ENDDO
   ENDDO
 
@@ -3336,7 +3334,7 @@ below.
 \simpleboxverbatim
 SUBROUTINE manual_load
 
-  TYPE(particle), POINTER :: Current
+  TYPE(particle), POINTER :: current
   INTEGER :: ispecies
   INTEGER :: idum, clock
   REAL(num) :: rpos, temp
@@ -3345,26 +3343,26 @@ SUBROUTINE manual_load
   CALL SYSTEM_CLOCK(clock)
   ! Correct using the rank to ENSURE that different
   ! processors have different random numbers
-  idum=-(clock+rank+1)
+  idum = -(clock+rank+1)
 
   ! Simple uniform temperature
-  temp=1.0e6_num
+  temp = 1.0e6_num
 
-  DO ispecies=1, nspecies
-    Current=>ParticleSpecies(ispecies)%attached_list%head
-    DO WHILE(ASSOCIATED(Current))
-      rpos=(random(idum) - 0.5_num)*2.0_num
-      Current%Part_Pos(1)=rpos
-      rpos=random(idum)*length_x + x_start
+  DO ispecies = 1, nspecies
+    current=>particle_species(ispecies)%attached_list%head
+    DO WHILE(ASSOCIATED(current))
+      rpos = (random(idum) - 0.5_num)*2.0_num
+      current%part_pos(1) = rpos
+      rpos = random(idum)*length_x + x_start
 
-      Current%Weight=1.0_num
+      current%weight = 1.0_num
 
-      Current%Part_P(1) = &
-        momentum_from_temperature(ParticleSpecies(ispecies)%Mass, temp, idum)
-      Current%Part_P(2) = &
-        momentum_from_temperature(ParticleSpecies(ispecies)%Mass, temp, idum)
+      current%part_p(1) = &
+          momentum_from_temperature(particle_species(ispecies)%mass, temp, idum)
+      current%part_p(2) = &
+          momentum_from_temperature(particle_species(ispecies)%mass, temp, idum)
 
-      Current=>Current%next
+      current=>current%next
     ENDDO
   ENDDO
 
@@ -3382,8 +3380,8 @@ is given below
 \simpleboxverbatim
 SUBROUTINE manual_load
 
-  TYPE(particle), POINTER :: Current
-  INTEGER, PARAMETER :: nx_local=100
+  TYPE(particle), POINTER :: current
+  INTEGER, PARAMETER :: nx_local = 100
   INTEGER :: ispecies
   INTEGER :: idum, clock, ix
   REAL(num) :: rpos, dx_local
@@ -3394,27 +3392,27 @@ SUBROUTINE manual_load
   CALL SYSTEM_CLOCK(clock)
   ! Correct using the rank to ENSURE that different
   ! processors have different random numbers
-  idum=-(clock+rank+1)
+  idum = -(clock+rank+1)
 
-  min_p=-3.0e-20
-  max_p=3.0e-20
+  min_p = -3.0e-20
+  max_p = 3.0e-20
 
-  dx_local=(max_p-min_p)/REAL(nx_local, num) + min_p
-  x_axis(1)=min_p
-  DO ix=2, nx_local
-    x_axis(ix)=x_axis(ix-1)+dx_local
+  dx_local = (max_p-min_p)/REAL(nx_local, num) + min_p
+  x_axis(1) = min_p
+  DO ix = 2, nx_local
+    x_axis(ix) = x_axis(ix-1)+dx_local
   ENDDO
 
-  temperature=10000.0_num
-  DO ispecies=1, nspecies
-    var=temperature*kb*ParticleSpecies(ispecies)%Mass
-    DO ix=1, nx_local
-      y_axis(ix)=EXP(-x_axis(ix)**2/var)
+  temperature = 10000.0_num
+  DO ispecies = 1, nspecies
+    var = temperature*kb*particle_species(ispecies)%mass
+    DO ix = 1, nx_local
+      y_axis(ix) = EXP(-x_axis(ix)**2/var)
     ENDDO
-    Current=>ParticleSpecies(ispecies)%attached_list%head
-    DO WHILE(ASSOCIATED(Current))
-      Current%Part_P(1)=Sample_Dist_Function(x_axis, y_axis, idum)
-      Current=>Current%next
+    current=>particle_species(ispecies)%attached_list%head
+    DO WHILE(ASSOCIATED(current))
+      current%part_p(1) = sample_dist_function(x_axis, y_axis, idum)
+      current=>current%next
     ENDDO
   ENDDO
 
@@ -3634,25 +3632,25 @@ module can access it, so they should be placed after the \inlinecode{IMPLICIT
 NONE} statement at the top of the file and defined as
 
 \simpleboxverbatim
-INTEGER :: FUNC_LORENTZ
-INTEGER :: CONST_PHI
+INTEGER :: c_func_lorentz
+INTEGER :: c_const_phi
 \end{Verbatim}
 
 Note that the names given to the constants is obviously at the developers
 discretion, but these names comply with the {\EPOCH} style guide (the end of
 this manual). Actually registering the objects is done in the
-\inlinecode{RegisterObjects} subroutine. In this subroutine, should be put the
+\inlinecode{register\_objects} subroutine. In this subroutine, should be put the
 lines to register functions and constants, which should look like
 
 \simpleboxverbatim
-SUBROUTINE RegisterObjects
-  FUNC_LORENTZ=RegisterFunction("lorentz")
-  CONST_PHI=RegisterConstant("phi")
-END SUBROUTINE RegisterObjects
+SUBROUTINE register_objects
+  c_func_lorentz = register_function("lorentz")
+  c_const_phi = register_constant("phi")
+END SUBROUTINE register_objects
 \end{Verbatim}
 
 Note that the input deck parser is case sensitive, so the strings which are
-given to \inlinecode{RegisterFunction} and \inlinecode{RegisterConstant}
+given to \inlinecode{register\_function} and \inlinecode{register\_constant}
 should be in the case that they will appear in the input deck. To follow the
 {\EPOCH} style guide this should be all lowercase. At this point, the maths
 parser would start to recognize the new function/constant, but would still
@@ -3661,27 +3659,27 @@ give error messages since they haven't been implemented yet.
 \subsubsection{Setting up new constants}
 
 Once a new constant has been registered it must be described using the
-\inlinecode{CustomConstant} function. In 2D this function looks like
+\inlinecode{custom\_constant} function. In 2D this function looks like
 
 \simpleboxverbatim
-FUNCTION CustomConstant(opcode, ix, iy, errcode)
+FUNCTION custom_constant(opcode, ix, iy, errcode)
   INTEGER, INTENT(IN) :: opcode, ix, iy
   INTEGER, INTENT(INOUT) :: errcode
-  REAL(num) :: CustomConstant
+  REAL(num) :: custom_constant
 
   ! Leave these lines in place. They cause the code to throw an error if
   ! The opcode is unknown
-  CustomConstant=0.0_num
-  errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
+  custom_constant = 0.0_num
+  errcode = IOR(errcode, c_err_unknown_element)
 
-END FUNCTION CustomConstant
+END FUNCTION custom_constant
 \end{Verbatim}
 
 The parameters are
 
 \begin{itemize}
 \item opcode - The operator code of the constant requested. This will be the
-  integer handle returned from \inlinecode{RegisterConstant}
+  integer handle returned from \inlinecode{register\_constant}
 \item ix, iy, iz - Some constants are actually evaluated at specific points in
   space, and ix, iy, iz are the gridpoint number of the location currently being
   evaluated. If you are just specifying a simple constant then just ignore
@@ -3700,22 +3698,22 @@ The function should just return the evaluated value of the constant requested
 by \inlinecode{opcode}. This might look like
 
 \simpleboxverbatim
-FUNCTION CustomConstant(opcode, ix, iy, errcode)
+FUNCTION custom_constant(opcode, ix, iy, errcode)
   INTEGER, INTENT(IN) :: opcode, ix, iy
   INTEGER, INTENT(INOUT) :: errcode
-  REAL(num) :: CustomConstant
+  REAL(num) :: custom_constant
 
-  IF (opcode == CONST_PHI) THEN
-    CustomConstant=pi
+  IF (opcode .EQ. c_const_phi) THEN
+    custom_constant = pi
     RETURN
   ENDIF
 
   ! Leave these lines in place. They cause the code to throw an error if
   ! The opcode is unknown
-  CustomConstant=0.0_num
-  errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
+  custom_constant = 0.0_num
+  errcode = IOR(errcode, c_err_unknown_element)
 
-END FUNCTION CustomConstant
+END FUNCTION custom_constant
 \end{Verbatim}
 
 Note that when \inlinecode{opcode} is successfully recognized, the code sets
@@ -3732,29 +3730,29 @@ and will return a value of $\pi$.
 \subsubsection{Setting up new functions}
 
 Setting up the new function \inlinecode{lorentz} is very similar to setting up
-the new constant. The relevant function is \inlinecode{CustomFunction} and
+the new constant. The relevant function is \inlinecode{custom\_function} and
 when empty looks like
 
 \simpleboxverbatim
-FUNCTION CustomFunction(opcode, ix, iy, errcode)
+FUNCTION custom_function(opcode, ix, iy, errcode)
   INTEGER, INTENT(IN) :: opcode, ix, iy
   INTEGER, INTENT(INOUT) :: errcode
-  REAL(num) :: CustomFunction
-  REAL(num) :: Values(5)
+  REAL(num) :: custom_function
+  REAL(num) :: values(5)
 
   ! Leave these lines in place. They cause the code to throw an error if
   ! The opcode is unknown
-  CustomFunction=0.0_num
-  errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
+  custom_function = 0.0_num
+  errcode = IOR(errcode, c_err_unknown_element)
 
-END FUNCTION CustomFunction
+END FUNCTION custom_function
 \end{Verbatim}
 
 The parameters are
 
 \begin{itemize}
 \item opcode - The operator code of the constant requested. This will be the
-  integer handle returned from \inlinecode {RegisterFunction}
+  integer handle returned from \inlinecode {register\_function}
 \item ix, iy, iz - Some functions are evaluated differently at specific points
   in space, and ix, iy, iz are the gridpoint number of the location currently
   being evaluated. If you are just specifying a simple function then just
@@ -3769,7 +3767,7 @@ The parameters are
 
 The function should return the value of your evaluated constant. The
 parameters which are passed to the function can be retrieved by the function
-\inlinecode {GetValues(n, values)}, where \inlinecode {n} is the number of
+\inlinecode {get\_values(n, values)}, where \inlinecode {n} is the number of
 parameters to be returned and \inlinecode{values} is a \inlinecode{REAL(num)}
 array of length \inlinecode{n} which will hold the returned values .  In this
 implementation of the Lorentizian function there are three parameters : The
@@ -3777,27 +3775,27 @@ dependent variable, the location parameter and the scale parameter. The code
 to implement the function therefore looks like
 
 \simpleboxverbatim
-FUNCTION CustomFunction(opcode, ix, iy, errcode)
+FUNCTION custom_function(opcode, ix, iy, errcode)
   INTEGER, INTENT(IN) :: opcode, ix, iy
   INTEGER, INTENT(INOUT) :: errcode
-  REAL(num) :: CustomFunction
-  REAL(num) :: Values(5)
+  REAL(num) :: custom_function
+  REAL(num) :: values(5)
 
-  IF (opcode == FUNC_LORENTZ) THEN
-    CALL GetValues(3, Values(1:3))
-    ! Values(1) - Dependent variable
-    ! Values(2) - location parameter
-    ! Values(3) - scale parameter
-    CustomFunction=Values(3)**2/((Values(1)-Values(2))**2+Values(3)**2)
+  IF (opcode .EQ. c_func_lorentz) THEN
+    CALL get_values(3, values(1:3))
+    ! values(1) - Dependent variable
+    ! values(2) - location parameter
+    ! values(3) - scale parameter
+    custom_function = values(3)**2/((values(1)-values(2))**2+values(3)**2)
     RETURN
   ENDIF
 
   ! Leave these lines in place. They cause the code to throw an error if
   ! The opcode is unknown
-  CustomFunction=0.0_num
-  errcode=IOR(errcode, ERR_UNKNOWN_ELEMENT)
+  custom_function = 0.0_num
+  errcode = IOR(errcode, c_err_unknown_element)
 
-END FUNCTION CustomFunction
+END FUNCTION custom_function
 \end{Verbatim}
 
 This function is then available at any point in the input deck and if I return
@@ -3842,13 +3840,13 @@ It is therefore clear that the new lorentz function is essentially the same as
 the built in gauss function. Note that due to the way that the parser works,
 the end user is not required to deal with parameters which are themselves
 maths expressions, they have been fully evaluated by the time they are
-returned by \inlinecode{GetValues}. Note that the parser is not guaranteed to
-be bulletproof. If a user calls \inlinecode{GetValues} requesting more
+returned by \inlinecode{get\_values}. Note that the parser is not guaranteed to
+be bulletproof. If a user calls \inlinecode{get\_values} requesting more
 parameters than have been passed to the function then it will scramble the
 stack which is used by the parser and cause the code to fail. Note that
-calling \inlinecode{GetValues(2, Values)} is not the same as calling
-\inlinecode{GetValues(1, Values)} twice, in fact calling
-\inlinecode{GetValues(1, Values)} multiple times will return the parameters in
+calling \inlinecode{get\_values(2, values)} is not the same as calling
+\inlinecode{get\_values(1, values)} twice, in fact calling
+\inlinecode{get\_values(1, values)} multiple times will return the parameters in
 {\it reverse} order. This is normal and is a feature of how the maths parser
 operates. It is possible to use this property to write functions which have a
 variable number of parameters, but this is not recommended.
@@ -3864,102 +3862,102 @@ internal and manual initial conditions.
 
 Custom input deck elements are setup in the file
 \inlinecode{src/user\_interaction/custom\_deck.f90}. The function
-\inlinecode{HandleCustomBlock} is called when a new block is started which the
+\inlinecode{handle\_custom\_block} is called when a new block is started which the
 core parser is not familiar with, and once for each element of a block. The
-function \inlinecode{CheckCustomBlocks} is called once then entire deck has
+function \inlinecode{check\_custom\_blocks} is called once then entire deck has
 been parsed and is used to check that all the elements which are required for
 the code to run.
 
-\subsubsection{HandleCustomBlock}
-There are three parameters passed to \inlinecode{HandleCustomBlock}, which are
+\subsubsection{handle\_custom\_block}
+There are three parameters passed to \inlinecode{handle\_custom\_block}, which are
 \begin{itemize}
 \item blockname - The name of the block specified in the
   \inlinecode{begin:blockname} part of the input deck.
 \item element - The name of the element in an input deck
   \inlinecode{element=value} pair.
-\item Value - The string representation of the value in an input deck
+\item value - The string representation of the value in an input deck
   \inlinecode{element=value} pair.
 \end{itemize}
 
-\inlinecode{HandleCustomBlock} is first called when a new block is begun
+\inlinecode{handle\_custom\_block} is first called when a new block is begun
 \inlinecode{begin:blockname} which cannot be recognized by the core input deck
 parser. The first thing that it does is test whether or not it is a valid
 custom block. The code does this by passing in the blockname with
-\inlinecode{element} and \inlinecode{Value} set to the special constant called
+\inlinecode{element} and \inlinecode{value} set to the special constant called
 "Blank". When extending the input deck, an end user should check for either
-\inlinecode{element} or \inlinecode{Value} begin the special constant Blank
+\inlinecode{element} or \inlinecode{value} begin the special constant Blank
 and if they are then test to see whether the blockname is known or not. If the
 blockname is known then the code should return the error code
-\inlinecode{ERR\_NONE} (No error), if the blockname is not known then the code
-should return \inlinecode{ERR\_UNKNOWN\_BLOCK} and the deck parser will just
+\inlinecode{c\_err\_none} (No error), if the blockname is not known then the code
+should return \inlinecode{c\_err\_unknown\_block} and the deck parser will just
 skip the block. In operation, this looks like
 
 \simpleboxverbatim
-FUNCTION HandleCustomBlock(blockname, element, Value)
+FUNCTION handle_custom_block(blockname, element, value)
 
-  CHARACTER(len=entrylength), INTENT(IN)::blockname, element, Value
-  INTEGER :: HandleCustomBlock
+  CHARACTER(LEN=entrylength), INTENT(IN) :: blockname, element, value
+  INTEGER :: handle_custom_block
   TYPE(primitivestack) :: output
   INTEGER :: ix, iy
-  IF (StrCmp(blockname, "custom")) THEN
-    IF (element == Blank .OR. Value == Blank) THEN
-      ! If element or value are blank, then just testing block so return ERR_NONE
-       HandleCustomBlock=ERR_NONE
+  IF (str_cmp(blockname, "custom")) THEN
+    IF (element .EQ. Blank .OR. value .EQ. Blank) THEN
+      ! If element or value are blank, then just testing block so return c_err_none
+       handle_custom_block = c_err_none
        RETURN
      ENDIF
    ENDIF
 
   ! The following line must always be present
-  HandleCustomBlock=ERR_UNKNOWN_BLOCK
+  handle_custom_block = c_err_unknown_block
 
-END FUNCTION HandleCustomBlock
+END FUNCTION handle_custom_block
 \end{Verbatim}
 
 In order to simply Fortran's rather annoying string handling behaviour several
 helper functions have been defined, and the most used one is
-\inlinecode{StrCmp(String1, String2)} which is a simple routine which returns
-true if String1==String2 and false otherwise. It is case sensitive but can
+\inlinecode{str\_cmp(string1, string2)} which is a simple routine which returns
+true if string1==string2 and false otherwise. It is case sensitive but can
 deal with differing string lengths etc. The next stage is to deal with the
-actual \inlinecode{element=Value} pairs in the deck. Each time that a new pair
-is read from the deck \inlinecode{HandleCustomBlock} is called with
-\inlinecode{element} and \inlinecode{Value} having the values read from the
+actual \inlinecode{element=value} pairs in the deck. Each time that a new pair
+is read from the deck \inlinecode{handle\_custom\_block} is called with
+\inlinecode{element} and \inlinecode{value} having the values read from the
 deck. To test for known elements they should just be checked against a known
-list of names using \inlinecode{StrCmp} and return the error code
-\inlinecode{ERR\_UNKNOWN\_ELEMENT} if the element isn't a known element. This
+list of names using \inlinecode{str\_cmp} and return the error code
+\inlinecode{c\_err\_unknown\_element} if the element isn't a known element. This
 looks like
 
 \simpleboxverbatim
-FUNCTION HandleCustomBlock(blockname, element, Value)
+FUNCTION handle_custom_block(blockname, element, value)
 
-  CHARACTER(len=entrylength), INTENT(IN)::blockname, element, Value
-  INTEGER :: HandleCustomBlock
+  CHARACTER(LEN=entrylength), INTENT(IN) :: blockname, element, value
+  INTEGER :: handle_custom_block
   TYPE(primitivestack) :: output
   INTEGER :: ix, iy
 
-  IF (StrCmp(blockname, "custom")) THEN
-    IF (element == Blank .OR. Value == Blank) THEN
-      ! If element or value are blank, then just testing block so return ERR_NONE
-      HandleCustomBlock=ERR_NONE
+  IF (str_cmp(blockname, "custom")) THEN
+    IF (element .EQ. Blank .OR. value .EQ. Blank) THEN
+      ! If element or value are blank, then just testing block so return c_err_none
+      handle_custom_block = c_err_none
       RETURN
     ENDIF
-    HandleCustomBlock=ERR_UNKNOWN_ELEMENT
+    handle_custom_block = c_err_unknown_element
     ! Now test for the real elements
-    IF (StrCmp(element, "int_element")) THEN
-      HandleCustomBlock=ERR_NONE
+    IF (str_cmp(element, "int_element")) THEN
+      handle_custom_block = c_err_none
     ENDIF
-    IF (StrCmp(element, "real_element")) THEN
-      HandleCustomBlock=ERR_NONE
+    IF (str_cmp(element, "real_element")) THEN
+      handle_custom_block = c_err_none
     ENDIF
-    IF (StrCmp(element, "logical_element")) THEN
-      HandleCustomBlock=ERR_NONE
+    IF (str_cmp(element, "logical_element")) THEN
+      handle_custom_block = c_err_none
     ENDIF
     RETURN
   ENDIF
 
   ! The following line must always be present
-  HandleCustomBlock=ERR_UNKNOWN_BLOCK
+  handle_custom_block = c_err_unknown_block
 
-END FUNCTION HandleCustomBlock
+END FUNCTION handle_custom_block
 \end{Verbatim}
 
 This version of the code will allow you to add a new block called "custom"
@@ -3976,11 +3974,11 @@ again helper functions to make converting the text from the deck into a normal
 Fortran90 variable. These helper functions are
 
 \begin{itemize}
-\item AsInteger - Attempts to convert a string to an integer. Invokes the
+\item as\_integer - Attempts to convert a string to an integer. Invokes the
   maths parser.
-\item AsReal - Attempts to convert a string to a REAL(num). Invokes the maths
+\item as\_real - Attempts to convert a string to a REAL(num). Invokes the maths
   parser.
-\item AsLogical - Attempts to convert a string to a logical. Does not invoke
+\item as\_logical - Attempts to convert a string to a logical. Does not invoke
   the maths parser (must be either T or F).
 \end{itemize}
 
@@ -3989,39 +3987,39 @@ to the functions so that they can report errors while trying to parse the
 string. An example would then be
 
 \simpleboxverbatim
-FUNCTION HandleCustomBlock(blockname, element, Value)
+FUNCTION handle_custom_block(blockname, element, value)
 
-  CHARACTER(len=entrylength), INTENT(IN)::blockname, element, Value
-  INTEGER :: HandleCustomBlock
+  CHARACTER(LEN=entrylength), INTENT(IN) :: blockname, element, value
+  INTEGER :: handle_custom_block
   TYPE(primitivestack) :: output
   INTEGER :: ix, iy
-  IF (StrCmp(blockname, "custom")) THEN
-    IF (element == Blank .OR. Value == Blank) THEN
-      ! If element or value are blank, then just testing block so return ERR_NONE
-      HandleCustomBlock=ERR_NONE
+  IF (str_cmp(blockname, "custom")) THEN
+    IF (element .EQ. Blank .OR. value .EQ. Blank) THEN
+      ! If element or value are blank, then just testing block so return c_err_none
+      handle_custom_block = c_err_none
       RETURN
     ENDIF
-    HandleCustomBlock=ERR_UNKNOWN_ELEMENT
+    handle_custom_block = c_err_unknown_element
     ! Now test for the real elements
-    IF (StrCmp(element, "int_element")) THEN
-      HandleCustomBlock=ERR_NONE
-      int_element=AsInteger(Value, HandleCustomBlock)
+    IF (str_cmp(element, "int_element")) THEN
+      handle_custom_block = c_err_none
+      int_element = as_integer(value, handle_custom_block)
     ENDIF
-    IF (StrCmp(element, "real_element")) THEN
-      HandleCustomBlock=ERR_NONE
-      real_element=AsReal(Value, HandleCustomBlock)
+    IF (str_cmp(element, "real_element")) THEN
+      handle_custom_block = c_err_none
+      real_element = as_real(value, handle_custom_block)
     ENDIF
-    IF (StrCmp(element, "logical_element")) THEN
-      HandleCustomBlock=ERR_NONE
-      logical_element=AsLogical(Value, HandleCustomBlock)
+    IF (str_cmp(element, "logical_element")) THEN
+      handle_custom_block = c_err_none
+      logical_element = as_logical(value, handle_custom_block)
       ENDIF
     RETURN
   ENDIF
 
   ! The following line must always be present
-  HandleCustomBlock=ERR_UNKNOWN_BLOCK
+  handle_custom_block = c_err_unknown_block
 
-END FUNCTION HandleCustomBlock
+END FUNCTION handle_custom_block
 \end{Verbatim}
 
 It is possible to perform more advanced types of evaluation of maths
@@ -4029,15 +4027,15 @@ expressions such as reading arrays etc. but this is beyond the scope of this
 manual at present. Hopefully future releases of the manual will explain how
 this would be implemented.
 
-\subsubsection{CheckCustomBlocks}
+\subsubsection{check\_custom\_blocks}
 This function is called when all the blocks in the input deck have been
 evaluated and is used to check that all required parameters have been set. If
 all required elements have been set then you should just return
-\inlinecode{ERR\_NONE}, otherwise, return
-\inlinecode{ERR\_MISSING\_ELEMENTS}. How you test that required elements have
+\inlinecode{c\_err\_none}, otherwise, return
+\inlinecode{c\_err\_missing\_elements}. How you test that required elements have
 been set is up to the developer, and for testing and personal use (which is
 all that the custom deck parts of the code should be used for) it is
-acceptable to just not check and always return \inlinecode{ERR\_NONE}. If
+acceptable to just not check and always return \inlinecode{c\_err\_none}. If
 permanently expanding the deck error trapping should always be written.
 
 \input{./devtitle.tex}
@@ -4142,7 +4140,7 @@ is explained here
   input deck.
 \item deck\_window\_block.f90 - Reader routine for the "window" block in the
   input deck.
-\item strings.F90 - Basic string handling routines such as "StrCmp" and
+\item strings.F90 - Basic string handling routines such as "str\_cmp" and
   routines for converting strings to numbers WITHOUT using the maths parser
   are covered in this routine.
 \item strings\_advanced.F90 - The routines which pass maths along to the maths
@@ -4234,7 +4232,7 @@ is explained here
 \item stack.f90 - Deals with routines for poping and pushing off and onto
   stacks.
 \item tokenizer\_blocks.f90 - Deal with converting strings found in a string
-  being tokenized into tokens. Essentially a large collection of "StrCmp"
+  being tokenized into tokens. Essentially a large collection of "str\_cmp"
   commands testing a string against a known name.
 \end{itemize}
 
@@ -4370,14 +4368,14 @@ be cut out.
   specified in the input deck. This is not updated as particles leave the
   domain through boundaries etc. so it is not guaranteed to be accurate.
 \item INTEGER :: nspecies - The number of species of particles specified.
-\item INTEGER :: nSteps - The maximum number of steps that the core solver
+\item INTEGER :: nsteps - The maximum number of steps that the core solver
   should take.
 \item INTEGER, DIMENSION(1:nproc\_{\it direction}), ALLOCATABLE :: cell\_{\it
     direction}\_start, cell\_{\it direction}\_end - Replace direction with one
   of x, y, z and see note at end
 \item INTEGER :: data\_dir\_max\_length - The maximum number of characters in
   the name of the output directory.
-\item INTEGER :: nZeros - The number of leading zeros in the output filenames
+\item INTEGER :: n\_zeros - The number of leading zeros in the output filenames
   from \EPOCH.
 \end{itemize}
 The variables \inlinecode{cell\_{\it direction}\_start} and
@@ -4395,7 +4393,7 @@ function to disk.
 
 \subsubsection{Input deck variables}
 \begin{itemize}
-\item CHARACTER(len=entry\_length) :: Blank - A special string which the input
+\item CHARACTER(LEN=entry\_length) :: Blank - A special string which the input
   deck parser uses to indicate that it's passing a blank string rather than a
   string read from the deck which just happens to be blank.
 \item INTEGER :: deck\_state - An integer determining which type of input deck
@@ -4403,10 +4401,10 @@ function to disk.
 \item INTEGER, PARAMETER :: num\_vars\_to\_dump - A variable describing the
   number of variable which should be selectable in the input deck as possible
   variables to dump.
-\item CHARACTER(len=entry\_length) :: extended\_error\_string - String used by
+\item CHARACTER(LEN=entry\_length) :: extended\_error\_string - String used by
   some error codes in the deck parser to give more user friendly error
   messages.
-\item CHARACTER(len=entry\_length) :: project\_name - String read from the
+\item CHARACTER(LEN=entry\_length) :: project\_name - String read from the
   input deck and written into the output files to allow the project to be
   recognised by a reader.
 \end{itemize}
@@ -4453,8 +4451,8 @@ the particle type is
 \simpleboxverbatim
   ! Object representing a particle
   TYPE :: particle
-    REAL(num), DIMENSION(3) :: Part_P
-    REAL(num), DIMENSION(2) :: Part_pos
+    REAL(num), DIMENSION(3) :: part_p
+    REAL(num), DIMENSION(2) :: part_pos
 #ifdef PER_PARTICLE_WEIGHT
     REAL(num) :: weight
 #endif
@@ -4462,10 +4460,10 @@ the particle type is
     REAL(num) :: charge
     REAL(num) :: mass
 #endif
-    TYPE(particle), POINTER :: Next, Prev
+    TYPE(particle), POINTER :: next, prev
 #ifdef PART_DEBUG
-    INTEGER :: Processor
-    INTEGER :: Processor_at_t0
+    INTEGER :: processor
+    INTEGER :: processor_at_t0
 #endif
   END TYPE particle
 \end{Verbatim}
@@ -4479,11 +4477,11 @@ And the descriptions are
   per particle weighting.
 \item REAL(num) :: charge - The particle charge in Coulombs if the code is
   running with per particle charge.
-\item REAL(nun) :: Mass - The particle mass in kilograms if the code is
+\item REAL(nun) :: mass - The particle mass in kilograms if the code is
   running with per particle mass.
-\item TYPE(particle), POINTER :: Next, Prev - The pointers to the next and
+\item TYPE(particle), POINTER :: next, prev - The pointers to the next and
   previous elements of the linked list.
-\item INTEGER :: Processor - The rank of the processor that the particle
+\item INTEGER :: processor - The rank of the processor that the particle
   thinks it is on. Used for debugging.
 \item INTEGER :: processor\_at\_t0 - The rank of the processor that the
   particle started on. Used for debugging.
@@ -4502,11 +4500,11 @@ called \inlinecode{particle\_list}, which is defined as
 TYPE :: particle\_list
   TYPE(particle), POINTER :: head
   TYPE(particle), POINTER :: tail
-  INTEGER(KIND=8) :: Count
+  INTEGER(KIND=8) :: count
   ! Pointer is safe if the particles in it are all unambiguously linked
-  LOGICAL :: Safe
+  LOGICAL :: safe
 
-  TYPE(particle\_list), POINTER :: Next, Prev
+  TYPE(particle\_list), POINTER :: next, prev
 END TYPE particle\_list
 \end{Verbatim}
 And the descriptions are
@@ -4515,17 +4513,17 @@ And the descriptions are
 \item TYPE(particle), POINTER :: tail - The last particle in the linked
   list. New particles added to the end of the list are added onto the end of
   the tail element, and the new last particle becomes the new tail element.
-\item INTEGER(KIND=8) :: Count - The number of particles in this particle
+\item INTEGER(KIND=8) :: count - The number of particles in this particle
   list. Note that the \inlinecode{particlelist} type is not directly MPI
   aware, so this is literally the number of particles in {\it this} particle
   list, not the number of particles of this species on all processors.
-\item LOGICAL :: Safe - A particle list is {\it safe} if the particles in it
-  are unambiguously linked. That is that the \inlinecode{Count}th particle is
-  guaranteed to have it's \inlinecode{Next} property be null. Most particle
+\item LOGICAL :: safe - A particle list is {\it safe} if the particles in it
+  are unambiguously linked. That is that the \inlinecode{count}th particle is
+  guaranteed to have it's \inlinecode{next} property be null. Most particle
   lists within {\EPOCH} are safe, but sometimes it is useful to be able to have
   particle lists which are subsets of longer particles lists, and these
   particle lists are not {\it safe}.
-\item TYPE(particle\_list), POINTER :: Next, Prev - At present, {\EPOCH} does not
+\item TYPE(particle\_list), POINTER :: next, prev - At present, {\EPOCH} does not
   use these pointers, which are intended to allow multiple particle lists to
   be attached together. Certain parts of EPOCH, such as the IO system are
   aware of these pointers and will automatically use them if they are ever
@@ -4537,19 +4535,19 @@ of the linked list, including adding and removing particles and transporting
 particles between processors.\\
 \\
 The particle species are represented by yet another Fortran TYPE, this time
-called \inlinecode{ParticleFamily}, which is defined as
+called \inlinecode{particle\_family}, which is defined as
 \simpleboxverbatim
   ! Object representing a particle species
-  TYPE :: ParticleFamily
+  TYPE :: particle_family
     ! Core properties
-    CHARACTER(EntryLength) :: Name
-    TYPE(ParticleFamily), POINTER :: Next, Prev
+    CHARACTER(entry_length) :: name
+    TYPE(particle_family), POINTER :: next, prev
     INTEGER :: id
-    LOGICAL :: Dump
+    LOGICAL :: dump
 
-    REAL(num) :: Charge
-    REAL(num) :: Mass
-    INTEGER(KIND=8) :: Count
+    REAL(num) :: charge
+    REAL(num) :: mass
+    INTEGER(KIND=8) :: count
     TYPE(particle_list) :: attached_list
 
 #ifdef TRACER_PARTICLES
@@ -4563,7 +4561,7 @@ called \inlinecode{ParticleFamily}, which is defined as
 #endif
     ! Secondary list
 #ifdef USE_SECONDARY_LIST
-    TYPE(particle_list), DIMENSION(:,:,:), POINTER :: SecondaryList
+    TYPE(particle_list), DIMENSION(:,:,:), POINTER :: secondary_list
 #endif
 
     ! Injection of particles
@@ -4571,7 +4569,7 @@ called \inlinecode{ParticleFamily}, which is defined as
     REAL(num), DIMENSION(:,:), POINTER :: Density
     REAL(num), DIMENSION(:,:,:), POINTER :: temperature
 
-    ! Species_ionisation
+    ! species_ionisation
 #ifdef PART_IONISE
     LOGICAL :: ionise
     INTEGER :: ionise_to_species
@@ -4580,30 +4578,30 @@ called \inlinecode{ParticleFamily}, which is defined as
 #endif
     ! Attached Probes for this species
 #ifdef PARTICLE_PROBES
-    TYPE(Particle_Probe), POINTER :: AttachedProbes
+    TYPE(particle_probe), POINTER :: AttachedProbes
 #endif
-  END TYPE ParticleFamily
+  END TYPE particle_family
 \end{Verbatim}
 Again, most of these properties are self explanatory, but they are detailed
 below
 \begin{itemize}
-\item CHARACTER(LEN=EntryLength) :: Name - The name of the particle
+\item CHARACTER(LEN=entry\_length) :: name - The name of the particle
   species. Used when constructing things like "ekbar\_electron" and similar
   names.
-\item TYPE(ParticleFamily), POINTER :: Next, Prev - Particle species are
+\item TYPE(particle\_family), POINTER :: next, prev - Particle species are
   connected to each other as a linked list using pointers as well as being
   available through a simple array. These pointers are used behind the scenes
   in the IO.
 \item INTEGER :: id - The number of the species, so for the species
-  \inlinecode{ParticleSpecies(1)}, the id field would be 1. For
-  \inlinecode{ParticleSpecies(2)}, the id field would be 2 etc.
-\item LOGICAL :: Dump - Whether or not this species should be dumped in
+  \inlinecode{particle\_species(1)}, the id field would be 1. For
+  \inlinecode{particle\_species(2)}, the id field would be 2 etc.
+\item LOGICAL :: dump - Whether or not this species should be dumped in
   diagnostic output.
-\item REAL(num) :: Charge - The charge on a single particle of the species in
+\item REAL(num) :: charge - The charge on a single particle of the species in
   Coulombs
-\item REAL(num) :: Mass - The mass of a single particle of the species in
+\item REAL(num) :: mass - The mass of a single particle of the species in
   kilograms.
-\item INTEGER(KIND=8) :: Count - The number of particles of this species on
+\item INTEGER(KIND=8) :: count - The number of particles of this species on
   all processors. NOTE that this is only accurate if the code is compiled with
   the correct preprocessor options. Without the correct preprocessor options,
   this will be accurate at the start of the code runtime, but will not be if
@@ -4619,7 +4617,7 @@ below
   \inlinecode{reorder\_particles\_to\_grid} and
   \inlinecode{reattach\_particles\_to\_mainlist} in \inlinecode{epoch{\it
       n}d.F90} where the particles are instead attached to
-  \inlinecode{SecondaryList} which is explained later.
+  \inlinecode{secondary\_list} which is explained later.
 \item LOGICAL :: Tracer - Whether or not this species is a tracer particle. If
   a species is a tracer species then it moves under the fields as normal for a
   particle with it's mass and charge but contributes no current.
@@ -4630,12 +4628,12 @@ below
 \item INTEGER(KIND=8) :: npart\_max - Used with the particle splitting
   operator. When the total number of particles equals this number further
   particle splitting is supressed.
-\item TYPE(particle\_list), DIMENSION(:,:,:), POINTER :: SecondaryList - When the
+\item TYPE(particle\_list), DIMENSION(:,:,:), POINTER :: secondary\_list - When the
   code is compiled with the \inlinecode{-DPARTICLE\_CELL\_DIVISION} the code
-  allocates \inlinecode{SecondaryList(0:nx+1,0:ny+1,0:nz+1)} and then loops
+  allocates \inlinecode{secondary\_list(0:nx+1,0:ny+1,0:nz+1)} and then loops
   over all particles. It calculates the cell in which each particle is and
   moves the particle from \inlinecode{attached\_list} to the correct element of
-  \inlinecode{SecondaryList} for that cell. This means the particles which are
+  \inlinecode{secondary\_list} for that cell. This means the particles which are
   nearby in space are now linked together in an array of linked lists. This
   allows things such as collision operators which require direct interaction
   between nearby particles.
@@ -4832,22 +4830,22 @@ is done as follows.
   REAL(num) :: cell_x_r, cell_frac_x
   INTEGER :: cell_x
   REAL(num) :: gx(-2:2)
-  TYPE(particle), POINTER :: Current
+  TYPE(particle), POINTER :: current
 
   ! Work out number of grid cells in the particle is
   ! Not in general an integer
-  cell_x_r = (Current%Particle_Pos(1)-x_start_local)/dx
+  cell_x_r = (current%particle_pos(1)-x_start_local)/dx
   ! Round cell position to nearest cell
-  cell_x=NINT(cell_x_r)
+  cell_x = NINT(cell_x_r)
   ! Calculate fraction of cell between nearest cell boundary and particle
   cell_frac_x = REAL(cell_x, num) - cell_x_r
-  cell_x=cell_x+1
+  cell_x = cell_x+1
 
-  CALL GridToParticle(cell_frac_x, gx)
+  CALL grid_to_particle(cell_frac_x, gx)
 
-  F_Part=0.0_num
+  f_part = 0.0_num
   DO ix = -sf_order, sf_order
-    F_Part = F_Part + F(cell_x+ix) * gx(ix)
+    f_part = f_part + F(cell_x+ix) * gx(ix)
   ENDDO
 \end{Verbatim}
 
@@ -4861,12 +4859,12 @@ in the same manner as gx and calculate the weight over all the cells affected
 by the individual 1D shape functions. In 2D this looks like
 {\small
 \simpleboxverbatim
-  CALL GridToParticle(cell_frac_x, gx)
-  CALL GridToParticle(cell_frac_y, gy)
-  F_Part=0.0_num
+  CALL grid_to_particle(cell_frac_x, gx)
+  CALL grid_to_particle(cell_frac_y, gy)
+  f_part = 0.0_num
   DO iy = -sf_order, sf_order
     DO ix = -sf_order, sf_order
-      F_Part = F_Part + F(cell_x+ix, cell_y+iy) * gx(ix) *gy(iy)
+      f_part = f_part + f(cell_x+ix, cell_y+iy) * gx(ix) *gy(iy)
     ENDDO
   ENDDO
 \end{Verbatim}
@@ -4879,55 +4877,55 @@ example. In 1D this change looks like
   REAL(num) :: cell_x_r, cell_frac_x
   INTEGER :: cell_x1, cell_x2
   REAL(num) :: gx(-2:2), hx(-2:2)
-  TYPE(particle), POINTER :: Current
+  TYPE(particle), POINTER :: current
 
   ! Work out number of grid cells in the particle is
   ! Not in general an integer
-  cell_x_r = (Current%Particle_Pos(1)-x_start_local)/dx
+  cell_x_r = (current%particle_pos(1)-x_start_local)/dx
   ! Round cell position to nearest cell
-  cell_x=NINT(cell_x_r)
+  cell_x = NINT(cell_x_r)
   ! Calculate fraction of cell between nearest cell boundary and particle
   cell_frac_x = REAL(cell_x, num) - cell_x_r
-  cell_x=cell_x+1
+  cell_x = cell_x+1
 
-  CALL GridToParticle(cell_frac_x, gx)
+  CALL grid_to_particle(cell_frac_x, gx)
 
-  cell_x_r = (Current%Particle_Pos(1)-x_start_local)/dx - 0.5_num
+  cell_x_r = (current%particle_pos(1)-x_start_local)/dx - 0.5_num
   cell_x2  = NINT(cell_x_r)
   cell_frac_x = REAL(cell_x2, num) - cell_x_r
-  cell_x2=cell_x2+1
+  cell_x2 = cell_x2+1
 
-  CALL GridToParticle(cell_frac_x, hx)
+  CALL grid_to_particle(cell_frac_x, hx)
 
   ! Bx is cell centred
-  Bx_Part=0.0_num
+  bx_part = 0.0_num
   DO ix = -sf_order, sf_order
-    Bx_Part = Bx_Part + Bx(cell_x1+ix) * gx(ix)
+    bx_part = bx_part + bx(cell_x1+ix) * gx(ix)
   ENDDO
 
   ! Ex is staggered 1/2 a cell to the right
-  Ex_Part=0.0_num
+  ex_part = 0.0_num
   DO ix = -sf_order, sf_order
-    Ex_Part = Ex_Part + Ex(cell_x2+ix) * hx(ix)
+    ex_part = ex_part + ex(cell_x2+ix) * hx(ix)
   ENDDO
 \end{Verbatim}
 
 In 2D and 3D, you just combine the shifted and unshifted shape functions and associated cell positions depending on the position of the variable in the cell. Therefore, in 3D  and using the loop notation for clarity you would get
 
 \simpleboxverbatim
-  DO iz=-sf_order, sf_order
-    DO iy=-sf_order, sf_order
-      DO ix=-sf_order, sf_order
-        Ex_Part = Ex_Part + hx(ix)*gy(iy)*gz(iz) * &
+  DO iz = -sf_order, sf_order
+    DO iy = -sf_order, sf_order
+      DO ix = -sf_order, sf_order
+        ex_part = ex_part + hx(ix)*gy(iy)*gz(iz) * &
         Ex(cell_x2+ix, cell_y1+iy, cell_z1+iz)
       ENDDO
     ENDDO
   ENDDO
 
-  DO iz=-sf_order, sf_order
-    DO iy=-sf_order, sf_order
-      DO ix=-sf_order, sf_order
-        Bx_Part = Bx_Part + gx(ix)*hy(iy)*hz(iz) * &
+  DO iz = -sf_order, sf_order
+    DO iy = -sf_order, sf_order
+      DO ix = -sf_order, sf_order
+        bx_part = bx_part + gx(ix)*hy(iy)*hz(iz) * &
         Bx(cell_x2+ix,cell_y1+iy,cell_z1+iz)
       ENDDO
     ENDDO
@@ -4975,22 +4973,22 @@ and easier to see in operation. In 1D it looks like
   cell_x_r = part_x / dx
   cell_x  = NINT(cell_x_r)
   cell_frac_x = REAL(cell_x, num) - cell_x_r
-  cell_x=cell_x+1
+  cell_x = cell_x+1
 
-  CALL ParticleToGrid(cell_frac_x, gx)
+  CALL particle_to_grid(cell_frac_x, gx)
 
-  DO ix=-sf_order, sf_order
-    DataArray(cell_x+ix) = DataArray(cell_x+ix) + gx(ix)  * Data
+  DO ix = -sf_order, sf_order
+    data_array(cell_x+ix) = data_array(cell_x+ix) + gx(ix)  * data
   ENDDO
 \end{Verbatim}
 
 Once again multi-dimensional codes just have the weighting functions multiplied
 together
 \simpleboxverbatim
-  DO iy=-sf_order, sf_order
-    DO ix=-sf_order, sf_order
-      DataArray(cell_x+ix,cell_y+iy) = DataArray(cell_x+ix,cell_y+iy) + &
-          gx(ix) *gy(iy) * Data
+  DO iy = -sf_order, sf_order
+    DO ix = -sf_order, sf_order
+      data_array(cell_x+ix,cell_y+iy) = data_array(cell_x+ix,cell_y+iy) + &
+          gx(ix) *gy(iy) * data
     ENDDO
   ENDDO
 \end{Verbatim}
@@ -5053,8 +5051,8 @@ that it only changes the timestep if the timestep is MORE restrictive than that
 calculated from the core code. An example would be
 
 \simpleboxverbatim
-   dt=dtx*dty/SQRT(dtx**2+dty**2)
-   dt=MIN(dt, my_new_dt)
+   dt = dtx*dty/SQRT(dtx**2+dty**2)
+   dt = MIN(dt, my_new_dt)
 \end{Verbatim}
 
 In the core {\EPOCH} code the timestep can be calculated identically on each
@@ -5070,7 +5068,7 @@ should read
           .
           .
   CALL MPI_ALLREDUCE(dt_global, dt, 1, mpireal, MPI_MIN, comm, errcode)
-  dt=dt_global
+  dt = dt_global
 \end{Verbatim}
 
 This uses another MPI command to determine the most restrictive timestep across
@@ -5128,7 +5126,7 @@ unfortunately the two functions have different calling conventions.
 
 \pagebreak
 \codedef
-SUBROUTINE Field_Zero_Gradient
+SUBROUTINE field_zero_gradient
 \end{Verbatim}
 \coderule
 REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: Field
@@ -5139,10 +5137,10 @@ LOGICAL, INTENT(IN) :: Force
 \inlinecode{src/boundary.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-#Field_Zero_Gradient# is the routine which applies zero gradient
+#field_zero_gradient# is the routine which applies zero gradient
 boundary conditions to a field variable passed in the parameter
 \inlinecode{Field}. It can be used as a global field boundary condition by
-setting one of the field boundary conditions to BC\_ZERO\_GRADIENT in
+setting one of the field boundary conditions to c\_bc\_zero\_gradient in
 \inlinecode{setup\_particle\_boundaries}, but it is mostly used to give
 boundary conditions for the autoloader, where the \inlinecode{Force} parameter
 is set to \inlinecode{.TRUE.} to override the boundary condition values.
@@ -5153,7 +5151,7 @@ is set to \inlinecode{.TRUE.} to override the boundary condition values.
 {\Large \inlinecode{SUBROUTINE field\_clamp\_zero\\
 \HRule \\[0.5cm]
     REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: Field\\
-    INTEGER, DIMENSION(nDims), INTENT(IN) :: Stagger}}\\
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: stagger}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/boundary.F90}\\
@@ -5162,7 +5160,7 @@ is set to \inlinecode{.TRUE.} to override the boundary condition values.
 \inlinecode{field\_clamp\_zero} is the routine which clamps the field given by
 the \inlinecode{Field} variable to zero on the boundary. Since this routine
 explicitly sets the field to zero {\it on} the boundary it needs to know about
-the grid stagger which is provided in the parameter \inlinecode{Stagger}. At
+the grid stagger which is provided in the parameter \inlinecode{stagger}. At
 present stagger is simply an array of 1/0 values which indicates whether a
 given field is staggered in that direction, so a cell centered field has
 stagger \inlinecode{(/0, 0, 0/)} while Ex has stagger \inlinecode{(/1, 0, 0/)} and
@@ -5173,7 +5171,7 @@ Bx has stagger \inlinecode{(/0, 1, 1/)}.
 
 Additional boundary conditions should follow the same basic principle as these
 routines. Note that all of the routines test for things like \inlinecode{left
-== MPI\_PROC\_NULL} etc. these tests confirm that a given processor is at the
+.EQ. MPI\_PROC\_NULL} etc. these tests confirm that a given processor is at the
 edge of the real domain, and so should have a real boundary condition applied
 to it. This also explains why there are no explicit periodic boundary condition
 routines, since by connecting the processors cyclically in a periodic direction
@@ -5214,11 +5212,11 @@ the real boundary conditions. The boundary conditions for particles are in the
 routine \inlinecode{particle\_bcs} in the file \inlinecode{boundary.f90} \\
 Currently {\EPOCH} includes only three particle boundary conditions
 \begin{itemize}
-\item BC\_PERIODIC - Particles which leave one side of the box reappear on the
+\item c\_bc\_periodic - Particles which leave one side of the box reappear on the
   other side.
-\item BC\_REFLECT - Particles reflect off the boundary as if it was a hard
+\item c\_bc\_reflect - Particles reflect off the boundary as if it was a hard
   boundary
-\item BC\_OPEN - Particles pass through the boundary and are destroyed. Total
+\item c\_bc\_open - Particles pass through the boundary and are destroyed. total
   pseudoparticle number is not conserved in this mode.
 \end{itemize}
 
@@ -5252,7 +5250,7 @@ sequence goes
 \item Although particles which have crossed a periodic boundary are now on the
   correct processor, they have the wrong position in space, so subtract the
   length of the domain from the particles position.
-\item End Species Loop
+\item End species loop
 \end{itemize}
 
 Note that unlike for fields there is explicit periodic boundary code. This is
@@ -5468,7 +5466,7 @@ The other error codes are returned as a bitmask and means the following
   a succeeding particle object.
 \item 4 - The count property of a particle\_list does not correspond to the
   actual number of objects linked between the head and tail objects. This error
-  code on it's own usually means that the Count property has been modified
+  code on it's own usually means that the count property has been modified
   improperly.
 \end{itemize}
 A
@@ -5541,16 +5539,16 @@ particle\_list.
 \pagebreak
 
 {\Large
-\inlinecode{FUNCTION add\_particle\_to\_partList(partlist, NewParticle)\\
+\inlinecode{FUNCTION add\_particle\_to\_partList(partlist, new\_particle)\\
 \HRule \\[0.5cm]
 TYPE(particle\_list), INTENT(INOUT) :: partlist\\
-TYPE(particle), POINTER :: NewParticle}}\\
+TYPE(particle), POINTER :: new\_particle}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{add\_particle\_to\_partList} is the routine which adds a new particle(\inlinecode{NewParticle})
+\inlinecode{add\_particle\_to\_partList} is the routine which adds a new particle(\inlinecode{new\_particle})
 to the end of the linked list of particles in the particle\_list object
 \inlinecode{partlist}. It deals with cases of empty particle\_list objects
 automatically.
@@ -5608,7 +5606,7 @@ directives then there should be a line which increments \inlinecode{nvars} by
 the correct number when that preprocessor directive is active. For example
 \simpleboxverbatim
 #ifdef PER_PARTICLE_CHARGEMASS
-    nvar=nvar+2
+    nvar = nvar+2
 #endif
 \end{Verbatim}
 \pagebreak
@@ -5616,7 +5614,7 @@ the correct number when that preprocessor directive is active. For example
 {\Large \inlinecode{SUBROUTINE pack\_particle(data, a\_particle)\\
 \inlinecode{SUBROUTINE unpack\_particle(data, a\_particle)}\\
 \HRule \\[0.5cm]
-REAL(num), DIMENSION(:), INTENT(INOUT) :: Data\\
+REAL(num), DIMENSION(:), INTENT(INOUT) :: data\\
 TYPE(particle), POINTER :: a\_particle\\
 }}\\
 \\[0.5cm]
@@ -5629,13 +5627,13 @@ which are used to transfer all the information about a particle which is
 necessary for the particle to be transfered to another processor into a
 temporary array before sending to another processor. If a new particle property
 has been added to the particle then these routines must be modified to allow
-the copying of the new data into the array. The parameter \inlinecode{Data} is
+the copying of the new data into the array. The parameter \inlinecode{data} is
 a REAL(num) array of length \inlinecode{nvars} and is the array into which the
 data either must be packed or from which it must be
 unpacked. \inlinecode{a\_particle} is the particle object which must either have
 it's data copied into the array or the blank particle object which must be
 populated with the data from the array. No restriction is placed on how the
-data should be packed into the Data array, but obviously
+data should be packed into the data array, but obviously
 \inlinecode{pack\_particle} and \inlinecode{unpack\_particle} must be inverse
 operations so that particles packed by one processor can be unpacked correctly
 by another processor.
@@ -5643,7 +5641,7 @@ by another processor.
 {\Large Notes\\}
 Since it is very unlikely that {\EPOCH} will be run on anything other than a
 homogenous cluster, it is acceptable to use the Fortran \inlinecode{TRANSFER}
-function to pack incompatible data types into the \inlinecode{Data} array. Just
+function to pack incompatible data types into the \inlinecode{data} array. Just
 make sure that \inlinecode{nvars} is defined in \inlinecode{setup\_partlists}
 to be long enough to contain all the information. More documentation on the
 \inlinecode{TRANSFER} function (which is rarely used and dangerous!) can be
@@ -5665,7 +5663,7 @@ Displays the key information about a particle given by the parameter
 
 {\Large \inlinecode{FUNCTION compare\_particles(particle1, particle2)\\
 \HRule \\[0.5cm]
-TYPE(particle), POINTER :: Particle1, Particle2\\
+TYPE(particle), POINTER :: particle1, particle2\\
 LOGICAL :: compare\_particles
 }}\\
 \\[0.5cm]
@@ -5684,7 +5682,7 @@ properties.
 \inlinecode{SUBROUTINE test\_packed\_particles(partlist, data, npart\_in\_data)\\
 \HRule \\[0.5cm]
 TYPE(particle\_list), INTENT(IN) :: partlist\\
-REAL(num), DIMENSION(:), INTENT(IN) :: Data\\
+REAL(num), DIMENSION(:), INTENT(IN) :: data\\
 INTEGER(KIND=8), INTENT(IN) :: npart\_in\_data
 }}\\
 \\[0.5cm]
@@ -5698,13 +5696,13 @@ parameters are
 \begin{itemize}
 \item \inlinecode{partlist} - The particle\_list corresponding to the original
   unpacked particles.
-\item \inlinecode{Data} - The REAL(num) array containing the packed data.
+\item \inlinecode{data} - The REAL(num) array containing the packed data.
 \item \inlinecode{npart\_in\_data} - The number of particles which were packed
-  into the \inlinecode{Data} array.
+  into the \inlinecode{data} array.
 \end{itemize}
 The routine tests that the number of particles in the particle\_list match the
-number believed to be in the Data array, that the length of the Data array is
-correct and the unpacks each particle in turn from the Data array and uses the
+number believed to be in the data array, that the length of the data array is
+correct and the unpacks each particle in turn from the data array and uses the
 \inlinecode{compare\_particles} function to compare the particles with the
 original versions in the particle\_list. If any particles fail the comparison
 then the error is output to stdout. The error message includes the processor
@@ -5937,7 +5935,7 @@ this type of layout use \inlinecode{create\_ordered\_particle\_subtype}
 \inlinecode{FUNCTION create\_ordered\_particle\_subtype(n\_species\_dump,\\ npart\_local)\\
 \HRule \\[0.5cm]
 INTEGER, INTENT(IN) :: n\_species\_dump\\
-INTEGER(KIND=8), DIMENSION(n\_species\_dump), INTENT(IN) \\:: npart\_local}}\\
+INTEGER(KIND=8), DIMENSION(n\_species\_dump), INTENT(IN) :: npart\_local}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/housekeeping/mpi\_subtype\_control.F90}\\
@@ -5952,7 +5950,7 @@ number for each species.
 \\[0.5cm]
 {\Large Notes\\}
 This routine causes the data to be written to disk as "All of species 1, All of
-Species 2 etc." as opposed to \inlinecode{create\_particle\_subtype}. It does
+species 2 etc." as opposed to \inlinecode{create\_particle\_subtype}. It does
 however need rather more memory and is rather slower.
 \pagebreak
 
@@ -6079,11 +6077,11 @@ variables the routine to use is \inlinecode{redistribute\_field}, and an
 example of using the code looks like
 
 \simpleboxverbatim
-  temp=0.0_num
-  CALL Redistribute_Field(new_domain, Bz,temp)
-  DEALLOCATE(Bz)
-  ALLOCATE(Bz(-2:nx_new+3,-2:ny_new+3))
-  Bz=temp
+  temp = 0.0_num
+  CALL redistribute_field(new_domain, bz, temp)
+  DEALLOCATE(bz)
+  ALLOCATE(bz(-2:nx_new+3,-2:ny_new+3))
+  bz = temp
 \end{Verbatim}
 
 This is a very obvious calling sequence where the
@@ -6122,9 +6120,9 @@ which is part of \EPOCH. The file output from {\EPOCH} takes place in the file
 additional code there. Looking through the listings, you will see two lines
 
 \simpleboxverbatim
-  CALL cfd_Open(filename, rank, comm, MPI_MODE_CREATE + MPI_MODE_WRONLY)
+  CALL cfd_open(filename, rank, comm, MPI_MODE_CREATE + MPI_MODE_WRONLY)
 
-  CALL cfd_Close()
+  CALL cfd_close()
 \end{Verbatim}
 
 These, as may be expected, are the commands which open and close the CFD
@@ -6140,27 +6138,27 @@ since this will cause problems with internal parts of the CFD format and
 generate a non-sensical file. There are routines in CFD which allow the writing
 of arbitrary data INTO a CFD file which are described later.
 
-\subsubsection{DumpMask}
+\subsubsection{dumpmask}
 Looking through {\it diagnostics.F90} there are many lines with commands which
 begin \inlinecode{cfd\_}, but they are all prepended with a command which looks
 like
 \simpleboxverbatim
-  IF (IAND(DumpMask(28), code) .NE. 0) THEN
+  IF (IAND(dumpmask(28), code) .NE. 0) THEN
 \end{Verbatim}
 This is the way in which {\EPOCH} allows the end user to specify whether a
 variable should be dumped, and whether it should only be dumped at
-full/partial/restart dumps. DumpMask is an integer array the length of which is
+full/partial/restart dumps. dumpmask is an integer array the length of which is
 defined by the variable \inlinecode{num\_vars\_to\_dump} in
 \inlinecode{shared\_data.f90} and contains the bitmask representing all the
 types of output which should be written for the associated variable. The
 possible values in the bitmask are
 
 \begin{itemize}
-\item \inlinecode{IO\_NEVER} - Never dump this variable
-\item \inlinecode{IO\_ALWAYS} - Dump this variable at every output dump
-\item \inlinecode{IO\_FULL} - Dump this variable at full dumps
-\item \inlinecode{IO\_RESTARTABLE} - Dump this variable for restart dumps
-\item \inlinecode{IO\_SPECIES} - If meaningful for this variable write
+\item \inlinecode{c\_io\_never} - Never dump this variable
+\item \inlinecode{c\_io\_always} - Dump this variable at every output dump
+\item \inlinecode{c\_io\_full} - Dump this variable at full dumps
+\item \inlinecode{c\_io\_restartable} - Dump this variable for restart dumps
+\item \inlinecode{c\_io\_species} - If meaningful for this variable write
   information for each species rather than integrated for all species
 \end{itemize}
 
@@ -6169,7 +6167,7 @@ When adding a new variable to be written to disk the value of
 written variables. Then open the file \inlinecode{src/deck/deck\_io\_block.F90}
 and find the line
 \simpleboxverbatim
-  CHARACTER(len=EntryLength), DIMENSION(io\_block\_elements) :: io\_block\_name =  ...
+  CHARACTER(LEN=entry_length), DIMENSION(io_block_elements) :: io_block_name =  ...
 \end{Verbatim}
 
 and simply add new strings for your new variables to the end of the
@@ -6194,32 +6192,32 @@ A derived variable is defined on the same grid as the main simulation variables
 and must be written to disk in such a way as to stitch the parts of the grid
 from each processor together. This is acheived using one of the routines
 \simpleboxverbatim
-CALL cfd_Write_1D_Cartesian_Variable_Parallel(Name, GroupName, Dims, &
-    Stagger, GridName, GridGroup, Variable(1:nx), subtype_field)
+CALL cfd_write_1d_cartesian_variable_parallel(name, group_name, dims, &
+    stagger, grid_name, grid_group, Variable(1:nx), subtype_field)
 
-CALL cfd_Write_2D_Cartesian_Variable_Parallel(Name, GroupName, Dims, &
-    Stagger, GridName, GridGroup, Variable(1:nx,1:ny), subtype_field)
+CALL cfd_write_2d_cartesian_variable_parallel(name, group_name, dims, &
+    stagger, grid_name, grid_group, Variable(1:nx,1:ny), subtype_field)
 
-CALL cfd_Write_3D_Cartesian_Variable_Parallel(Name, GroupName, Dims, &
-    Stagger, GridName, GridGroup, Variable(1:nx,1:ny,1:nz), subtype_field)
+CALL cfd_write_3d_cartesian_variable_parallel(name, group_name, dims, &
+    stagger, grid_name, grid_group, Variable(1:nx,1:ny,1:nz), subtype_field)
 \end{Verbatim}
 The parameters have the following types and meanings
 
 \begin{itemize}
-\item Name - The name of the variable
-\item GroupName - The group of the variable. In IDL and Matlab a variable can
-  be loaded either by GroupName or Name, and in VisIt, the variable name
+\item name - The name of the variable
+\item group\_name - The group of the variable. In IDL and Matlab a variable can
+  be loaded either by group\_name or name, and in VisIt, the variable name
   appears under a submenu of the variable groupname.
-\item Dims - An nD integer array containing the GLOBAL length of the variable
-  across all processors. In {\EPOCH} a variable actually called ``Dims'' exists
+\item dims - An nD integer array containing the GLOBAL length of the variable
+  across all processors. In {\EPOCH} a variable actually called ``dims'' exists
   for variables which are the same size as the default field variables.
-\item Stagger - An nD REAL(num) array containing the stagger of a variable from
+\item stagger - An nD REAL(num) array containing the stagger of a variable from
   the cell centre in fractions of a cell. This property is not used in EPOCH,
-  so the default variable ``Stagger'' can be used safely.
-\item GridName - The name of the grid to which the variable is attached. In
+  so the default variable ``stagger'' can be used safely.
+\item grid\_name - The name of the grid to which the variable is attached. In
   EPOCH, the main grid is just called ``Grid''. Note that this property is case
   sensitive.
-\item GridGroup - The groupname of the grid to which the variable is
+\item grid\_group - The groupname of the grid to which the variable is
   attached. in EPOCH, the main gridgroup is just called ``Grid''. Note that
   this property is case sensitive.
 \item Variable - The actual variable to be written to disk. The variable passed
@@ -6239,16 +6237,16 @@ to be done. The IDL, Matlab and VisIt routines will all read the existence of
 the variable from the metadata in the CFD file, and it will now be available to
 view in all CFD reading packages.
 
-There is a working variable called \inlinecode{Data} which is large enough to
+There is a working variable called \inlinecode{data} which is large enough to
 contain the data which is large enough to store a derived variable. It is
 therefore recommended that to calculate derived variables a new subroutine
-should be created which populates \inlinecode{Data} with the required variable
+should be created which populates \inlinecode{data} with the required variable
 and then write it to disk. An example would look like
 \simpleboxverbatim
 IF (IAND(dumpmask(30), code)) THEN
-  CALL Calc_My_Variable(Data)
-  CALL cfd_Write_2D_Cartesian_Variable_Parallel("my_variable", "derived", &
-      Dims, Stagger, GridName, GridGroup, Data(1:nx,1:ny), subtype_field)
+  CALL calc_my_variable(data)
+  CALL cfd_write_2d_cartesian_variable_parallel("my_variable", "derived", &
+      dims, stagger, grid_name, grid_group, data(1:nx,1:ny), subtype_field)
 ENDIF
 \end{Verbatim}
 where \inlinecode{calc\_my\_variable} is a function which calculates the
@@ -6270,37 +6268,37 @@ SUBROUTINE iterate_species(data, n_points, start)
   REAL(num), DIMENSION(:), INTENT(INOUT) :: data
   INTEGER(8), INTENT(INOUT) :: n_points
   LOGICAL, INTENT(IN) :: start
-  TYPE(particle), POINTER, SAVE :: Cur
+  TYPE(particle), POINTER, SAVE :: cur
   INTEGER(8) :: partcount
   REAL(num) :: root
 
-  TYPE(particle_list), POINTER, SAVE :: CurrentList
-  TYPE(ParticleFamily), POINTER, SAVE :: CurrentFamily
+  TYPE(particle_list), POINTER, SAVE :: current_list
+  TYPE(particle_family), POINTER, SAVE :: current_family
 
   IF (start)  THEN
-    CALL Start_ParticleFamily(CurrentFamily, CurrentList, Cur)
+    CALL start_particle_family(current_family, current_list, cur)
   ENDIF
-  partcount=0
-  DO WHILE (ASSOCIATED(CurrentFamily) .AND. (partcount .LT. n_points))
-    DO WHILE (ASSOCIATED(CurrentList) .AND. (partcount .LT. n_points))
-      DO WHILE (ASSOCIATED(Cur) .AND. (partcount .LT. n_points))
-        partcount=partcount+1
-        data(partcount)=REAL(CurrentFamily%id, num) ! This is
+  partcount = 0
+  DO WHILE (ASSOCIATED(current_family) .AND. (partcount .LT. n_points))
+    DO WHILE (ASSOCIATED(current_list) .AND. (partcount .LT. n_points))
+      DO WHILE (ASSOCIATED(cur) .AND. (partcount .LT. n_points))
+        partcount = partcount+1
+        data(partcount) = REAL(current_family%id, num) ! This is
            ! the line which writes the data
-        Cur=>Cur%next
+        cur=>cur%next
       ENDDO
       ! If the current partlist is exhausted, switch to the next one
-      IF (.NOT. ASSOCIATED(Cur)) CALL Advance_particle_list(CurrentList, Cur)
+      IF (.NOT. ASSOCIATED(cur)) CALL Advance_particle_list(current_list, cur)
     ENDDO
     ! If the current particlefamily is exhausted, then switch to the next one
-    DO WHILE (.NOT. ASSOCIATED(Cur))
-      CALL Advance_ParticleFamily(CurrentFamily, CurrentList, Cur)
-      IF (.NOT. ASSOCIATED(CurrentFamily)) EXIT
-      IF ((.NOT. CurrentFamily%Dump) .AND. (.NOT. Iterator_Settings%Restart))&
-         NULLIFY(Cur)
+    DO WHILE (.NOT. ASSOCIATED(cur))
+      CALL advance_particle_family(current_family, current_list, cur)
+      IF (.NOT. ASSOCIATED(current_family)) EXIT
+      IF ((.NOT. current_family%dump) .AND. (.NOT. iterator_settings%restart))&
+         NULLIFY(cur)
     ENDDO
   ENDDO
-  n_points=partcount
+  n_points = partcount
 
 END SUBROUTINE iterate_species
 \end{Verbatim}
@@ -6310,7 +6308,7 @@ possibility of particle species not being dumped, and other similar
 effects. Luckily, there is only one line in the routine which needs to change
 to output a new routine. The is the line
 \simpleboxverbatim
-             data(partcount)=REAL(CurrentFamily%id, num)
+  data(partcount) = REAL(current_family%id, num)
 \end{Verbatim}
 
 To write a new iterator, you just have to copy the skeleton of an existing
@@ -6321,7 +6319,7 @@ the developer guide. Once your new iterator has been written and added into the
 {\it iterators.F90} file, it's time to add the CFD routine to actually write
 the data. The routine is
 \simpleboxverbatim
-CALL cfd_Write_nD_Particle_Variable_With_Iterator_All(name, groupname, &
+CALL cfd_write_nd_particle_variable_with_iterator_all(name, groupname, &
     iterator_name, npart_dump_global, n_part_per_it, gridname, gridgroup, &
     subtype_particle_var)
 \end{Verbatim}
@@ -6422,11 +6420,11 @@ Simply add a new element to the end of the list
 \subsubsection{Precompiler directives and the input deck}
 In theory, it is possible for someone to request a feature of the code in the
 input deck which this version of the code hasn't been compiled with. In this
-case, there is a special error code \inlinecode{ERR\_PP\_OPTIONS\_WRONG} which
+case, there is a special error code \inlinecode{c\_err\_pp\_options\_wrong} which
 causes the input deck parser to give a meaningful error. You should also set
 the string \inlinecode{extended\_error\_string} to be the define command for
 the missing preprocessor directive i.e
-\inlinecode{extended\_error\_string="-DMY\_PRECOMPILER\_DIRECTIVE"}
+\inlinecode{extended\_error\_string = "-DMY\_PRECOMPILER\_DIRECTIVE"}
 
 \section{{\EPOCH} front end programming}
 
@@ -6436,9 +6434,9 @@ to the presence of the input deck {\EPOCH} has fairly extensive string handling
 routines. Strings used are all of the standard Fortran \inlinecode{CHARACTER}
 type and are defined as
 \simpleboxverbatim
-CHARACTER(LEN=EntryLength) :: String
+CHARACTER(LEN=entry_length) :: string
 \end{Verbatim}
-\inlinecode{EntryLength} is a global constant defined in
+\inlinecode{entry\_length} is a global constant defined in
 \inlinecode{src/shared\_data.F90} which can be increased to allow {\EPOCH} to
 handle longer strings. There may be reasons to increase this length if you wish
 to use long complex expressions in the input deck. Note that many Fortran
@@ -6456,42 +6454,42 @@ place. Any routines in \inlinecode{src/deck/strings.F90} and
 documentation are legacy routines and SHOULD NOT BE USED.
 
 \pagebreak
-{\Large \inlinecode{FUNCTION StrCmp(StrIn, StrTest)\\
+{\Large \inlinecode{FUNCTION str\_cmp(str\_in, str\_test)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn, StrTest\\
-LOGICAL :: StrCmp}}\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in, str\_test\\
+LOGICAL :: str\_cmp}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{StrCmp} is the routine which does all the string comparisons in
+\inlinecode{str\_cmp} is the routine which does all the string comparisons in
 \EPOCH. It deals with leading and trailing whitespace automatically and
 automatically tests for length differences. It does not test for strings being
 valid substrings of each other, only for full equality.
 \\[0.5cm]
 {\Large Notes\\}
-A developer should always use \inlinecode{StrCmp} rather than doing their own
+A developer should always use \inlinecode{str\_cmp} rather than doing their own
 string testing to ensure consistent behaviour across the entire of \EPOCH.
 \pagebreak
 
 \pagebreak
-{\Large \inlinecode{FUNCTION AsRealSimple(StrIn, ERR)\\
+{\Large \inlinecode{FUNCTION as\_real\_simple(str\_in, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
-INTEGER, INTENT(INOUT) ::ERR\\
-REAL(num) :: AsRealSimple}}\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
+INTEGER, INTENT(INOUT) :: err\\
+REAL(num) :: as\_real\_simple}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{AsRealSimple} is a routine to convert a string into a real number
+\inlinecode{as\_real\_simple} is a routine to convert a string into a real number
 without invoking the maths parser. It can cope with standard form as well as
 simple decimal reals. It is significantly faster than the maths parser, but
 should only be used when the user explicitly {\it shouldn't} be able to use a
 mathematical expression. If the string cannot be parsed then the routine sets
-the bitmask \inlinecode{ERR\_BAD\_VALUE} on the parameter \inlinecode{ERR}
+the bitmask \inlinecode{c\_err\_bad\_value} on the parameter \inlinecode{err}
 \\[0.5cm]
 {\Large Notes\\}
 If you have a string which has to be converted into a real quickly then this is
@@ -6502,22 +6500,22 @@ simple numbers.
 \pagebreak
 
 \pagebreak
-{\Large \inlinecode{FUNCTION AsIntegerSimple(StrIn, ERR)\\
+{\Large \inlinecode{FUNCTION as\_integer\_simple(str\_in, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
-INTEGER, INTENT(INOUT) ::ERR\\
-INTEGER :: AsIntegerSimple}}\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
+INTEGER, INTENT(INOUT) :: err\\
+INTEGER :: as\_integer\_simple}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{AsIntegerSimple} is a routine to convert a string into an integer
+\inlinecode{as\_integer\_simple} is a routine to convert a string into an integer
 without invoking the maths parser. It can cope with standard form as well as
 simple decimal integers. It is significantly faster than the maths parser, but
 should only be used when the user explicitly {\it shouldn't} be able to use a
 mathematical expression. If the string cannot be parsed then the routine sets
-the bitmask \inlinecode{ERR\_BAD\_VALUE} on the parameter \inlinecode{ERR}
+the bitmask \inlinecode{c\_err\_bad\_value} on the parameter \inlinecode{err}
 \\[0.5cm]
 {\Large Notes\\}
 This routine is used internally in several parts of the code when parsing
@@ -6527,26 +6525,26 @@ input deck parameters, since there is no reason to restrict the user from
 specifying mathematical expressions.
 \pagebreak
 
-{\Large \inlinecode{FUNCTION AsLongIntegerSimple(StrIn, ERR)\\
+{\Large \inlinecode{FUNCTION as\_long\_integer\_simple(str\_in, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
-INTEGER, INTENT(INOUT) ::ERR\\
-INTEGER(KIND=8) :: AsLongIntegerSimple}}\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
+INTEGER, INTENT(INOUT) :: err\\
+INTEGER(KIND=8) :: as\_long\_integer\_simple}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{AsLongIntegerSimple} is equivalent to \inlinecode{AsIntegerSimple}, but returns a the larger \inlinecode{INTEGER(KIND=8)} rather than a normal \inlinecode{INTEGER(KIND=4)}.
+\inlinecode{as\_long\_integer\_simple} is equivalent to \inlinecode{as\_integer\_simple}, but returns a the larger \inlinecode{INTEGER(KIND=8)} rather than a normal \inlinecode{INTEGER(KIND=4)}.
 \\[0.5cm]
 {\Large Notes\\}
 \pagebreak
 
 \pagebreak
-{\Large \inlinecode{FUNCTION as\_direction(StrIn, ERR)\\
+{\Large \inlinecode{FUNCTION as\_direction(str\_in, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
-INTEGER, INTENT(INOUT) ::ERR\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
+INTEGER, INTENT(INOUT) :: err\\
 INTEGER :: as\_direction}}\\
 \\[0.5cm]
 {\Large Location\\}
@@ -6575,18 +6573,18 @@ only recognises the strings for boundaries that it actually has.
 \pagebreak
 
 \pagebreak
-{\Large \inlinecode{FUNCTION AsLogical(StrIn, ERR)\\
+{\Large \inlinecode{FUNCTION as\_logical(str\_in, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
-INTEGER, INTENT(INOUT) ::ERR
-Logical :: AsLogical}}\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
+INTEGER, INTENT(INOUT) :: err
+Logical :: as\_logical}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{AsLogical} simply tests for the strings "T" and "F" to determine a
-boolean value. The default behaviour of \inlinecode{AsLogical} is to treat any
+\inlinecode{as\_logical} simply tests for the strings "T" and "F" to determine a
+boolean value. The default behaviour of \inlinecode{as\_logical} is to treat any
 string that isn't "T" as a false value.
 \\[0.5cm]
 {\Large Notes\\}
@@ -6595,12 +6593,12 @@ consistency.
 \pagebreak
 
 \pagebreak
-{\Large \inlinecode{SUBROUTINE  SplitOffInt(StrIn, StrOut, IntOut, ERR)\\
+{\Large \inlinecode{SUBROUTINE  SplitOffInt(str\_in, str\_out, int\_out, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
-CHARACTER(LEN=EntryLength), INTENT(OUT) :: StrOut\\
-INTEGER, INTENT(OUT) :: IntOut\\
-INTEGER, INTENT(INOUT) ::ERR}}\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
+CHARACTER(LEN=entry\_length), INTENT(OUT) :: str\_out\\
+INTEGER, INTENT(OUT) :: int\_out\\
+INTEGER, INTENT(INOUT) :: err}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
@@ -6608,9 +6606,9 @@ INTEGER, INTENT(INOUT) ::ERR}}\\
 {\Large Description\\}
 \inlinecode{SplitOffInt} is a routine which splits a string of the format {\bf
 string{\it n}} into a string {\bf string} and an integer {\it n} which are
-returned separately in the \inlinecode{StrOut} and \inlinecode{IntOut}
+returned separately in the \inlinecode{str\_out} and \inlinecode{int\_out}
 parameters respectively.  If it can't split the string successfully then it
-sets the \inlinecode{ERR\_BAD\_VALUE} bitfield of the ERR parameter.
+sets the \inlinecode{c\_err\_bad\_value} bitfield of the err parameter.
 \\[0.5cm]
 {\Large Notes\\}
 This is used in the core of the deck parser to deal with blocks like the
@@ -6620,21 +6618,21 @@ like this rather than coding a new routine.
 \pagebreak
 
 \pagebreak
-{\Large \inlinecode{SUBROUTINE  SplitRange(StrIn, Real1, Real2, ERR)\\
+{\Large \inlinecode{SUBROUTINE split\_range(str\_in, Real1, Real2, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
 REAL(num), INTENT(OUT) :: Real1, Real2\\
-INTEGER, INTENT(INOUT) ::ERR}}\\
+INTEGER, INTENT(INOUT) :: err}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{SplitRange} is a routine which splits a string of the format
+\inlinecode{split\_range} is a routine which splits a string of the format
 {(\bf{\it n}, {\it m})} into two reals {\it n} and {\it m} which are returned
 separately in the \inlinecode{Real1} and \inlinecode{Real2} parameters
 respectively.  If it can't split the string successfully then it sets the
-\inlinecode{ERR\_BAD\_VALUE} bitfield of the ERR parameter.
+\inlinecode{c\_err\_bad\_value} bitfield of the err parameter.
 \\[0.5cm]
 {\Large Notes\\}
 This is used when specifying ranges in the input decks at present. Any
@@ -6646,17 +6644,17 @@ and behaviour, but might have subtle differences.}
 \pagebreak
 
 \pagebreak
-{\Large \inlinecode{FUNCTION AsInteger(StrIn, ERR)\\
+{\Large \inlinecode{FUNCTION as\_integer(str\_in, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
-INTEGER, INTENT(INOUT) ::ERR\\
-INTEGER :: AsInteger}}\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
+INTEGER, INTENT(INOUT) :: err\\
+INTEGER :: as\_integer}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{AsInteger} is the routine which returns integers from strings using
+\inlinecode{as\_integer} is the routine which returns integers from strings using
 the maths parser. If a mathematical expression resolves to a non-integer result
 then this routine rounds to the NEAREST integer. There are explicit rounding
 routines in the maths parser to force other behaviour.
@@ -6666,21 +6664,21 @@ This routine should be used when evaluating most strings into integers. Note
 that this routine evaluates spatially dependent quantities at (0,0) on each
 processor, so will give unpredictable results when spatially dependent
 quantities are given to it (like rho, ex etc.). To evaluate a spatially varying
-quantity use \inlinecode{EvaluateStringInSpace}.
+quantity use \inlinecode{evaluate\_string\_in\_space}.
 \pagebreak
 
 \pagebreak
-{\Large \inlinecode{FUNCTION AsLongInteger(StrIn, ERR)\\
+{\Large \inlinecode{FUNCTION as\_long\_integer(str\_in, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
-INTEGER, INTENT(INOUT) ::ERR\\
-INTEGER(KIND=8) :: AsLongInteger}}\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
+INTEGER, INTENT(INOUT) :: err\\
+INTEGER(KIND=8) :: as\_long\_integer}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{AsLongInteger} is the routine which returns long integers from
+\inlinecode{as\_long\_integer} is the routine which returns long integers from
 strings using the maths parser. If a mathematical expression resolves to a
 non-integer result then this routine rounds to the NEAREST integer. There are
 explicit rounding routines in the maths parser to force other behaviour.
@@ -6691,17 +6689,17 @@ large to be stored in an INTEGER(KIND=4).
 \pagebreak
 
 \pagebreak
-{\Large \inlinecode{FUNCTION AsReal(StrIn, ERR)\\
+{\Large \inlinecode{FUNCTION as\_real(str\_in, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
-INTEGER, INTENT(INOUT) ::ERR\\
-REAL(num) :: AsReal}}\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
+INTEGER, INTENT(INOUT) :: err\\
+REAL(num) :: as\_real}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{AsReal} is the routine which returns reals from strings using the
+\inlinecode{as\_real} is the routine which returns reals from strings using the
 maths parser.
 \\[0.5cm]
 {\Large Notes\\}
@@ -6709,32 +6707,32 @@ This routine should be used when evaluating most strings into reals. Note that
 this routine evaluates spatially dependent quantities at (0,0) on each
 processor, so will give unpredictable results when spatially dependent
 quantities are given to it (like rho, ex etc.). To evaluate a spatially varying
-quantity use \inlinecode{EvaluateStringInSpace}.
+quantity use \inlinecode{evaluate\_string\_in\_space}.
 \pagebreak
 
 \pagebreak
-{\Large \inlinecode{SUBROUTINE EvaluateStringInSpace(StrIn, DataOut, xrange, \{yrange\}, \{zrange\}, ERR)\\
+{\Large \inlinecode{SUBROUTINE evaluate\_string\_in\_space(str\_in, data\_out, xrange, \{yrange\}, \{zrange\}, err)\\
 \HRule \\[0.5cm]
-CHARACTER(LEN=EntryLength), INTENT(IN) :: StrIn\\
-REAL(num), DIMENSION(1:,\{1:\},\{1:\}), INTENT(OUT) :: DataOut\\
+CHARACTER(LEN=entry\_length), INTENT(IN) :: str\_in\\
+REAL(num), DIMENSION(1:,\{1:\},\{1:\}), INTENT(OUT) :: data\_out\\
 INTEGER, DIMENSION(2), INTENT(IN) :: xrange, \{yrange\}, \{zrange\}
-INTEGER, INTENT(INOUT) ::ERR}}\\
+INTEGER, INTENT(INOUT) :: err}}\\
 \\[0.5cm]
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{EvaluateStringInSpace} is a routine which is used to evaluate a
+\inlinecode{evaluate\_string\_in\_space} is a routine which is used to evaluate a
 tokenized maths expression over a region of the domain. The dimensionality of
-\inlinecode{DataOut}, and the presence or absence of \inlinecode{yrange} and
+\inlinecode{data\_out}, and the presence or absence of \inlinecode{yrange} and
 \inlinecode{zrange} depend on the dimensionality of the code being used. The
 \inlinecode{{\it $\alpha$}range} parameters represent the indices in that
 direction over which the expression should be evaluated. For example, in 2D to
 evaluate an expression over the entire domain, the code would look like
 \simpleboxverbatim
-REAL(num), DIMENSION(:,:), ALLOCATABLE :: Data
-ALLOCATE(Data(0:nx+1,0:ny+1)
-CALL EvaluateStringInSpace(String, Data, (/0,nx+1/), (/0:ny+1/), ERR)
+REAL(num), DIMENSION(:,:), ALLOCATABLE :: data
+ALLOCATE(data(0:nx+1,0:ny+1)
+CALL evaluate_string_in_space(string, data, (/0,nx+1/), (/0:ny+1/), err)
 \end{Verbatim}
 {\Large Notes\\}
 This routine is suitable to evaluate expressions over the entire or parts of
@@ -6758,13 +6756,13 @@ subroutines in \inlinecode{deck.F90}.\\
 There are four subroutines which may need to be changed to add new blocks to
 the deck. These are
 \begin{itemize}
-\item \inlinecode{StartBlock(BlockName)} - Called when the deck directive
-  \inlinecode{begin:{\it BlockName}} appears in a deck file.
-\item \inlinecode{EndBlock(BlockName)} - Called when the deck directive
-  \inlinecode{end:{\it BlockName}} appears in a deck file.
-\item \inlinecode{HandleBlock(BlockName, BlockElement, BlockValue)} - Called once
+\item \inlinecode{start\_block(block\_name)} - Called when the deck directive
+  \inlinecode{begin:{\it block\_name}} appears in a deck file.
+\item \inlinecode{end\_block(block\_name)} - Called when the deck directive
+  \inlinecode{end:{\it block\_name}} appears in a deck file.
+\item \inlinecode{handle\_block(block\_name, block\_element, block\_value)} - Called once
   for each element in a block.
-\item \inlinecode{CheckCompulsoryBlocks(errcode\_deck)} - Called once when the
+\item \inlinecode{check\_compulsory\_blocks(errcode\_deck)} - Called once when the
   deck file has been read to check that all necessary blocks have been
   populated.
 \end{itemize}
@@ -6776,47 +6774,47 @@ determine which stage of parsing the deck is required. The possible values of
 \inlinecode{deck\_state} are
 
 \begin{itemize}
-\item DS\_DECK - The main input deck
-\item DS\_IC - The initial conditions
-\item DS\_EIO - The extended IO
+\item c\_ds\_deck - The main input deck
+\item c\_ds\_ic - The initial conditions
+\item c\_ds\_eio - The extended IO
 \end{itemize}
 These constants are defined in \inlinecode{shared\_data.F90} and if new files
 need to be read, then new variables should be created in the same place with
-similar names using the \inlinecode{DS\_} prefix.
+similar names using the \inlinecode{c\_ds\_} prefix.
 
-The layout of \inlinecode{StartBlock} and \inlinecode{EndBlock} is very simple,
-and simply tests \inlinecode{Deck\_State} to makes sure that the deck reader is
-reading the right file, then uses \inlinecode{StrCmp} to test the block name,
+The layout of \inlinecode{start\_block} and \inlinecode{end\_block} is very simple,
+and simply tests \inlinecode{deck\_state} to makes sure that the deck reader is
+reading the right file, then uses \inlinecode{str\_cmp} to test the block name,
 and then if necessary calls the correct routine to deal with the start or
 finish of a block.
 
-The main routine which needs to be explained is \inlinecode{HandleBlock}, which
+The main routine which needs to be explained is \inlinecode{handle\_block}, which
 is the function which determines which subroutine to call to parse the elements
 of a given block. The function is very simple and has the same basic sequence
-as the \inlinecode{StartBlock} and \inlinecode{EndBlock} functions. First check
+as the \inlinecode{start\_block} and \inlinecode{end\_block} functions. First check
 what file is being parsed by checking \inlinecode{deck\_state}, then use
-\inlinecode{StrCmp} to compare the \inlinecode{BlockName} parameter with the
+\inlinecode{str\_cmp} to compare the \inlinecode{block\_name} parameter with the
 list of known block names. What happens next is dependent on exactly what a
 developer wants their block to do, but at the simplest level, the routine
-simply calls another function which takes the ElementName and ElementValue as
+simply calls another function which takes the element\_name and element\_value as
 parameters and returns an error code from Appendix A determining the success or
 failure of reading the element. Some blocks have slightly more sophisticated
-entries in \inlinecode{HandleDeck} such as the \inlinecode{Species} block in
+entries in \inlinecode{handle\_deck} such as the \inlinecode{species} block in
 the initial conditions file reader which strips the species number off the end
 of the block name and passes it to the handler routine. The routines that deal
 with constants and DEOs are implemented before any tests to
 \inlinecode{deck\_state} since it is valid to set constants and DEOs in any
 type of file.
 
-The final routine is \inlinecode{CheckCompulsoryBlocks} which is used to check
+The final routine is \inlinecode{check\_compulsory\_blocks} which is used to check
 that all the needed elements of the input deck have been set. A single
 parameter \inlinecode{errcode\_deck} is passed in. Once again, the routine
 checks \inlinecode{deck\_state} to make sure that it is testing the correct
 type of input deck file. It then goes through and calls functions to check that
 all the necessary parts of a block have been set. The subroutines are contained
-in the same file as the routine which is called in \inlinecode{HandleBlock} to
+in the same file as the routine which is called in \inlinecode{handle\_block} to
 handle elements of the block. The error handler functions should return an
-error code from Appendix A, usually \inlinecode{ERR\_MISSING\_ELEMENTS}. The
+error code from Appendix A, usually \inlinecode{c\_err\_missing\_elements}. The
 return code from the error handle function should then be \inlinecode{IOR}ed
 with \inlinecode{errcode\_deck} to allow error codes to be returned from
 several different checks with errors occurring.
@@ -6825,7 +6823,7 @@ several different checks with errors occurring.
 The exact form of the handler routines is up to the end user, the only {\it
 requirements} are that the routine should return an error code detailing
 whether or not there are any problems with reading the block and that the error
-code should be \inlinecode{ERR\_NONE} if either the element name or element
+code should be \inlinecode{c\_err\_none} if either the element name or element
 value are the special constant \inlinecode{blank}. The typical implementation
 of an element handler routine is shown in the routine
 \inlinecode{src/deck/deck\_control\_block.f90}, and this general layout should
@@ -6898,8 +6896,8 @@ not documented here.
 
 \subsubsection{Adding the new tokenizer handle}
 When adding a new function or constant to the maths parser using the temporary
-routines, there are routines, \inlinecode{RegisterFunction} or
-\inlinecode{RegisterConstant} which give a numerical handle which is the token
+routines, there are routines, \inlinecode{register\_function} or
+\inlinecode{register\_constant} which give a numerical handle which is the token
 used to represent that function or constant after the text has been parser
 (remember that EPOCH's maths parser tokenizes before evaluation!). When
 permanently adding objects to the maths parser, the tokenizer handles have to
@@ -6907,32 +6905,34 @@ be set up manually. This takes place in \inlinecode{src/shared\_data.F90} in
 the module \inlinecode{shared\_parser\_data}. There are several lines which
 look like
 \simpleboxverbatim
-  INTEGER, PARAMETER :: CONST_IX=40, CONST_IY=41, CONST_IZ=42
+  INTEGER, PARAMETER :: c_const_ix = 40
+  INTEGER, PARAMETER :: c_const_iy = 41
   .
   .
   .
-  INTEGER, PARAMETER :: FUNC_TEMPZ=21, FUNC_INTERPOLATE=22, FUNC_TANH=23
+  INTEGER, PARAMETER :: c_func_interpolate = 22
+  INTEGER, PARAMETER :: c_func_tanh = 23
 \end{Verbatim}
-Constants beginning with \inlinecode{CONST\_} are tokenizer handles for
-constants, and those beginning with \inlinecode{FUNC\_} are tokenizer handles
+Constants beginning with \inlinecode{c\_const\_} are tokenizer handles for
+constants, and those beginning with \inlinecode{c\_func\_} are tokenizer handles
 for functions. Each number has to be unique and has to be less than a number
 which represents the lower bound of values reserved for temporary or deck
 specified values. This means that any tokenizer handle for a function has to be
-less than the value of the variable \inlinecode{FUNC\_CUSTOM\_LOWBOUND} and any
-handle for a constant must be less than \inlinecode{CONST\_DECK\_LOWBOUND}. It
+less than the value of the variable \inlinecode{c\_func\_custom\_lowbound} and any
+handle for a constant must be less than \inlinecode{c\_const\_deck\_lowbound}. It
 is acceptable to simply increase the value of
-\inlinecode{FUNC\_CUSTOM\_LOWBOUND} and \inlinecode{CONST\_DECK\_LOWBOUND} to
+\inlinecode{c\_func\_custom\_lowbound} and \inlinecode{c\_const\_deck\_lowbound} to
 allow the use of more values for internal constants and functions, although
 care should be taken, since this means that you are at the point of having {\it
 thousands} of constants or functions, and some simplification is probably
 needed, since the maths parser is probably rather slow by this point. If
-\inlinecode{CONST\_DECK\_LOWBOUND} is increased then the constant
-\inlinecode{CONSTANT\_CUSTOM\_LOWBOUND} should be increased by the same amount
-(The values between \inlinecode{CONST\_DECK\_LOWBOUND} and
-\inlinecode{CONSTANT\_CUSTOM\_LOWBOUND-1} are used for constants specified
+\inlinecode{c\_const\_deck\_lowbound} is increased then the constant
+\inlinecode{c\_constant\_custom\_lowbound} should be increased by the same amount
+(The values between \inlinecode{c\_const\_deck\_lowbound} and
+\inlinecode{c\_constant\_custom\_lowbound-1} are used for constants specified
 inside the input deck while values greater than or equal to
-\inlinecode{CONSTANT\_CUSTOM\_LOWBOUND} are used for constants specified by
-\inlinecode{RegisterConstant}.
+\inlinecode{c\_constant\_custom\_lowbound} are used for constants specified by
+\inlinecode{register\_constant}.
 
 Once the tokenizer handle is specified in \inlinecode{shared\_parser\_data}, it
 is now possible to extend the main areas of the maths parser. Note that from
@@ -6944,22 +6944,22 @@ functions and constants from several sources becomes much harder.
 The next stage is to add the string representation of your constant or function
 to the tokenizer routines in
 \inlinecode{src/parser/tokenizer\_blocks.F90}. This is very simple to do, just
-find either the function \inlinecode{AsConstant} or \inlinecode{AsFunction} and
+find either the function \inlinecode{as\_constant} or \inlinecode{as\_function} and
 look at the existing code. These functions are just long lists of
-\inlinecode{StrCmp} commands followed by code to deal with custom
+\inlinecode{str\_cmp} commands followed by code to deal with custom
 functions/constants. To add the new code, just add an additional line looking
 like
 \simpleboxverbatim
-  IF (StrCmp(name, "my_const")) AsConstant=CONST_MY_CONST
+  IF (str_cmp(name, "my_const")) as_constant = c_const_my_const
   .
   .
   .
-  IF (StrCmp(name, "my_func"))    AsFunction=FUNC_MY_FUNC
+  IF (str_cmp(name, "my_func"))  as_function = c_func_my_func
 \end{Verbatim}
 Note that neither routine returns immediately after recognising the name of the
 function/constant. This allows users to override built in constants or
-functions with custom versions using \inlinecode{RegisterConstant} and
-\inlinecode{RegisterFunction}. This is not significant, since tokenizing should
+functions with custom versions using \inlinecode{register\_constant} and
+\inlinecode{register\_function}. This is not significant, since tokenizing should
 never be used in a speed critical part of the code.
 
 \subsubsection{Implementing the function or constant in the evaluator}
@@ -6977,7 +6977,7 @@ both passed up to five parameters, these parameters being
   in space then you should use these parameters to reference the correct point
   of an array.
 \item INTEGER :: errcode - This should be set to an error code from Appendix A,
-  usually \inlinecode{ERR\_BAD\_VALUE} if for some reason it is not possible to
+  usually \inlinecode{c\_err\_bad\_value} if for some reason it is not possible to
   evaluate your constant or function.
 \end{itemize}
 
@@ -6986,18 +6986,18 @@ tokenizer handle already set up in \inlinecode{shared\_parser\_data} and then
 calling the subroutine \inlinecode{PushOnEval} which pushes the final constant
 onto the evaluation stack which is used by the RPN parser. The basic sequence
 for functions is similar except for the addition of the code to read the values
-that the function takes, this is again the subroutine \inlinecode{GetValues}
+that the function takes, this is again the subroutine \inlinecode{get\_values}
 which is also used in custom function. The calling sequence in
 \inlinecode{DoFunction} looks like
 
 \simpleboxverbatim
-  IF (opcode .EQ. FUNC_GAUSS) THEN
-    CALL GetValues(3, Values)
-    CALL PushOnEval(EXP(-((Values(1)-Values(2))/Values(3))**2))
+  IF (opcode .EQ. c_func_gauss) THEN
+    CALL get_values(3, values)
+    CALL PushOnEval(EXP(-((values(1)-values(2))/values(3))**2))
     RETURN
   ENDIF
 \end{Verbatim}
-Simple call the \inlinecode{GetValues} subroutine passing the number of
+Simple call the \inlinecode{get\_values} subroutine passing the number of
 required parameters and an array of type \inlinecode{REAL(num)} which is at
 least as long as the number of required parameters, and the array is populated
 by the values passed into the function, constants and maths expressions are
@@ -7098,9 +7098,9 @@ there are a few key points at which the code significantly changes state.
 If the code is compiled with the right flags during the main loop then the
 particles are grouped into a linked list for each cell in the domain, with all
 the particles which are in that cell linked into the list. The main list
-\inlinecode{Species(ispecies)\%attached\_list} is empty and cannot be used during
+\inlinecode{species(ispecies)\%attached\_list} is empty and cannot be used during
 this period. The particles should now be accessed using the variable
-\inlinecode{Species(ispecies)\%SecondaryList(ix,iy,iz)} which is the array of
+\inlinecode{species(ispecies)\%secondary\_list(ix,iy,iz)} which is the array of
 linked lists. This array is allocated on the call to
 \inlinecode{reorder\_particles\_to\_grid} and deallocated on the call to
 \inlinecode{reattach\_particles\_to\_mainlist}, and should not be used outside
@@ -7129,40 +7129,40 @@ The input deck and maths parser in {\EPOCH} uses various named error codes to
 report on errors which occur during the evaluation of the input deck. These
 codes are
 \begin{itemize}
-\item ERR\_NONE - No error. Set an error code to ERR\_NONE to state that no
+\item c\_err\_none - No error. Set an error code to c\_err\_none to state that no
   error has occurred.
-\item ERR\_UNKNOWN\_BLOCK - In the input deck a block has been found which is
-  not known. This should be returned in \inlinecode{HandleCustomBlock} if it is
+\item c\_err\_unknown\_block - In the input deck a block has been found which is
+  not known. This should be returned in \inlinecode{handle\_custom\_block} if it is
   passed any block but one with which it is familiar.
-\item ERR\_UNKNOWN\_ELEMENT - In the input deck an element of a valid block has
+\item c\_err\_unknown\_element - In the input deck an element of a valid block has
   been found which is not known. This should be returned in
-  \inlinecode{HandleCustomBlock} if an element is requested which is unknown.
-\item ERR\_PRESET\_ELEMENT - An element of the input deck has already been set
+  \inlinecode{handle\_custom\_block} if an element is requested which is unknown.
+\item c\_err\_preset\_element - An element of the input deck has already been set
   and is being set again. Usually this is an indication of a malformed input
-  deck file, so \inlinecode{HandleCustomBlock} should try to identify
+  deck file, so \inlinecode{handle\_custom\_block} should try to identify
   situations where this happens and pass return this error message if the
   subsequent attempts to set the variable are being ignored.
-\item ERR\_PRESET\_ELEMENT\_USE\_LATER - An element of the input deck has
+\item c\_err\_preset\_element\_use\_later - An element of the input deck has
   already been set and is being set again. Usually this is an indication of a
-  malformed input deck file, so \inlinecode{HandleCustomBlock} should try to
+  malformed input deck file, so \inlinecode{handle\_custom\_block} should try to
   identify situations where this happens and pass return this error message if
   the subsequent attempts to set the variable are still successful.
-\item {\bf ERR\_BAD\_VALUE} - An value which is being evaluated for the right
+\item {\bf c\_err\_bad\_value} - A value which is being evaluated for the right
   hand side of an element assignment is in some way invalid. Internally to the
   code this usually means that an string which must be interpreted as an maths
   expression or a numerical constant is in some way malformed. It is also
   acceptable to return this error code when a value has been passed which is
   invalid for some other reason (the value is outside an acceptable range etc.)
-\item {\bf ERR\_MISSING\_ELEMENTS} - This is an error code returned when the
+\item {\bf c\_err\_missing\_elements} - This is an error code returned when the
   code is testing to make sure that all necessary elements of an input deck
   file have been specified. It should be returned when some required parameter
-  is missing in the subroutine \inlinecode{CheckCustomBlocks}
-\item ERR\_TERMINATE - This error code means that the code is in a state where
+  is missing in the subroutine \inlinecode{check\_custom\_blocks}
+\item c\_err\_terminate - This error code means that the code is in a state where
   execution is impossible and the code must terminate once the input deck has
-  been read. Some other error codes automatically set ERR\_TERMINATE, but it
+  been read. Some other error codes automatically set c\_err\_terminate, but it
   can always be IOR'ed with any error code to force the code to exit. Note that
-  just returning ERR\_TERMINATE will just cause the code to silently quit.
-\item {\bf ERR\_REQUIRED\_ELEMENT\_NOT\_SET} - This means that the code cannot
+  just returning c\_err\_terminate will just cause the code to silently quit.
+\item {\bf c\_err\_required\_element\_not\_set} - This means that the code cannot
   parse an input deck element since another element which must be known
   beforehand has not been set. This is intended for things like setting the
   species information where the number of species must be known in
@@ -7173,7 +7173,7 @@ codes are
   should be set up so that it checks for the presence of the required elements
   in order and reports on missing elements so that the end user can fix them
   one by one.
-\item ERR\_PP\_OPTIONS\_WRONG - If you've written a part of the code so that
+\item c\_err\_pp\_options\_wrong - If you've written a part of the code so that
   the part is controlled by preprocessor options then you should return this
   error message if someone attempts to set input deck elements which refer to
   that part when the correct preprocessor options are not used. This means that
@@ -7182,7 +7182,7 @@ codes are
   friendly feedback. If you return this error code, you should set the string
   extended\_error\_string to the define command ("-DPER\_PARTICLE\_WEIGHT")
   that would turn on the requested feature of the code.
-\item {\bf ERR\_OTHER} - This error code is a catch all error which causes the
+\item {\bf c\_err\_other} - This error code is a catch all error which causes the
   code to quit with a sarcastic error message. It's mainly intended for
   debugging and is used before the final error code is implemented.
 \end{itemize}
