@@ -3,33 +3,31 @@ latexfile = epoch
 TEX = latex
 PDFTEX = pdflatex
 
-IMAGES = 2dcone.eps 3dcone.eps EPOCHLogo.eps coreblock.eps example.eps \
-  example3.eps example4.ps gaussic.eps invgaussic.eps late.eps \
-  profile_diff_gauss.eps profile_flat.eps profile_gauss.eps pulse1.eps \
-  pulse2.eps shapetest.eps stagger.eps sweep.eps
+IMAGES = 2dcone.pdf 3dcone.pdf EPOCHLogo.pdf coreblock.pdf example.pdf \
+  example3.pdf example4.pdf gaussic.pdf invgaussic.pdf late.pdf \
+  profile_diff_gauss.pdf profile_flat.pdf profile_gauss.pdf pulse1.pdf \
+  pulse2.pdf shapetest.pdf stagger.pdf sweep.pdf
 
-PDFS := $(IMAGES:.eps=.pdf)
-PDFS := $(PDFS:.ps=.pdf)
+EPS := $(IMAGES:.pdf=.eps)
 
 vpath %.pdf images
 vpath %.ps images
 vpath %.eps images
 
-%.pdf: %.ps
-	epstopdf --outfile=images/$@ $<
+default: pdf
 
-%.pdf: %.eps
-	epstopdf --outfile=images/$@ $<
+%.eps: %.pdf
+	gs -q -dBATCH -dNOPAUSE -dSAFER -dDELAYSAFER -sDEVICE=epswrite -sOutputFile=images/$@ $<
 
 # reruns latex if needed.  to get rid of this capability, delete the
 # three lines after the rule. 
 # idea from http://ctan.unsw.edu.au/help/uk-tex-faq/Makefile
-$(latexfile).dvi : $(latexfile).tex devtitle.tex title.tex
+$(latexfile).dvi : $(latexfile).tex devtitle.tex title.tex $(EPS)
 	while ($(TEX) $(latexfile) ; \
 	grep -q "Rerun to get cross" $(latexfile).log ) do true; \
 	done
 
-$(latexfile).pdf : $(latexfile).tex devtitle.tex title.tex $(PDFS)
+$(latexfile).pdf : $(latexfile).tex devtitle.tex title.tex
 	while ($(PDFTEX) $(latexfile) ; \
 	grep -q "Rerun to get cross" $(latexfile).log ) do true; \
 	done
@@ -41,5 +39,8 @@ pdf: $(latexfile).pdf
 
 ps: $(latexfile).ps 
 
+distclean: clean
+	rm -f images/*.eps epoch.pdf epoch.ps
+
 clean:
-	rm -f *.aux *.dvi *.log *.toc epoch.pdf
+	rm -f *.aux *.dvi *.log *.toc
