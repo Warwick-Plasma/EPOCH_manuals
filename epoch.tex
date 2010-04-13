@@ -200,8 +200,8 @@ begin:control
 
    t_end=0.3e-12
 
-   x_start=-5e-6
-   x_end=5e-6
+   x_min=-5e-6
+   x_max=5e-6
 
    dt_multiplier=0.8
 
@@ -217,7 +217,7 @@ comment character and the code ignores everything on a line following this
 character.\\
 
 {\emphtext nx} - Number of grid points in the x direction. There must be
-sufficient gridpoints so that (x\_end-x\_start)/nx $< \lambda_d$, where
+sufficient gridpoints so that (x\_max-x\_min)/nx $< \lambda_d$, where
 $\lambda_d$ is the Debye length.\\
 
 {\emphtext npart} - The global number of pseudoparticles in the
@@ -235,11 +235,11 @@ code terminates.\\
 {\emphtext NOTE: The code will terminate if EITHER of the above conditions on
 nsteps or t\_end is satisfied.}\\
 
-{\emphtext x\_start} - The position of the left hand edge of the domain in
+{\emphtext x\_min} - The position of the left hand edge of the domain in
 metres. Can be negative.\\
 
-{\emphtext x\_end} - The position of the right hand edge of the domain in
-metres. Must be greater than \inlineemph{x\_start}.\\
+{\emphtext x\_max} - The position of the right hand edge of the domain in
+metres. Must be greater than \inlineemph{x\_min}.\\
 
 {\emphtext dt\_multiplier} - Factor by which the timestep is multiplied before
 it is applied in the code. Must be less than one.\\
@@ -264,14 +264,14 @@ stage.
 
 \boxverbatim{boundaries block}
 begin:boundaries
-   xbc_left=simple_laser
-   xbc_right=simple_outflow
+   bc_x_min=simple_laser
+   bc_x_max=simple_outflow
 end:boundaries
 \end{Verbatim}
 
-{\emphtext xbc\_left} - The condition for the left boundary.\\
+{\emphtext bc\_x\_min} - The condition for the left boundary.\\
 
-{\emphtext xbc\_right} - The condition for the right boundary.\\
+{\emphtext bc\_x\_max} - The condition for the right boundary.\\
 
 There are four boundary types in {\EPOCH} and each boundary of the domain can
 have one and only one of these boundaries attached to it. These boundary types
@@ -658,7 +658,7 @@ Laser blocks attach an EM wave source to a boundary which is set as
 
 \boxverbatim{laser block}
 begin:laser
-   direction=left
+   boundary=x_min
    amp=3.222499e13
    irradiance=1.0e19
    id=1
@@ -679,11 +679,8 @@ only significant difference is that there is also a spatial profile for
 multidimensional lasers. This is covered in detail in the section on
 multidimensional {\EPOCH}.\\
 
-{\emphtext direction} - The boundary on which to attach the laser. This is
-slightly misnamed, since it is NOT the direction in which the laser will be
-propagating, but the side of the box on which to attach the laser. The name may
-change in future versions, but ``direction'' will be kept to maintain
-compatibility. In 1D, the directions can be either left or right.\\
+{\emphtext boundary} - The boundary on which to attach the laser.
+In 1D, the directions can be either x\_min or x\_max.\\
 
 {\emphtext amp} - The amplitude of the E field of the laser.\\
 
@@ -924,10 +921,10 @@ begin:control
    ny=200
    nz=200
    .
-   y_start=-10e-6
-   y_end=10e-6
-   z_start=-10e-6
-   z_end=10e-6
+   y_min=-10e-6
+   y_max=10e-6
+   z_min=-10e-6
+   z_max=10e-6
    .
    .
 end:control
@@ -937,8 +934,8 @@ The modified control block in EPOCH2D and 3D is very similar to the control
 block already introduced for EPOCH1D. All that is added are new elements
 describing the number of gridpoints in y and z (\inlineemph{ny \& nz}), and
 new start and end lines for the length of the domain in the new directions
-(\inlineemph{y\_start $\rightarrow$ y\_end} \&
-\inlineemph{z\_start $\rightarrow$ z\_end}). These operate in exactly the same
+(\inlineemph{y\_min $\rightarrow$ y\_max} \&
+\inlineemph{z\_min $\rightarrow$ z\_max}). These operate in exactly the same
 way as those already introduced with EPOCH1D.  However, care must be taken to
 increase the number of particles, ensuring that the number of particles per
 cell remains high enough to accurately resolve the distribution function.\\
@@ -953,10 +950,10 @@ simulations.\\
 begin:boundaries
    .
    .
-   ybc_down=periodic
-   ybc_up=periodic
-   zbc_back=simple_laser
-   zbc_front=simple_outflow
+   bc_y_min=periodic
+   bc_y_max=periodic
+   bc_z_min=simple_laser
+   bc_z_max=simple_outflow
 end:boundaries
 \end{Verbatim}
 
@@ -965,10 +962,10 @@ boundaries that are introduced in higher dimensions. These available boundaries
 are exactly the same as in 1D, with the additional boundaries being:\\
 
 \begin{tabular}{rcl}
-\inlineemph{ybc\_down}  &-& bottom of domain\\
-\inlineemph{ybc\_up}    &-& top of domain\\
-\inlineemph{zbc\_back}  &-& back of domain\\
-\inlineemph{zbc\_front} &-& front of domain\\
+\inlineemph{bc\_y\_min} &-& bottom of domain\\
+\inlineemph{bc\_y\_max} &-& top of domain\\
+\inlineemph{bc\_z\_min} &-& back of domain\\
+\inlineemph{bc\_z\_max} &-& front of domain\\
 \end{tabular} \\
 
 These are equivalent to the existing 1D simulations except that the moving
@@ -1219,8 +1216,8 @@ begin:control
    t_end=1.5e-1
 
    # size of domain
-   x_start=0
-   x_end=5.0e5
+   x_min=0
+   x_max=5.0e5
 
    # Don't know if this should be in the deck or not
    dt_multiplier=0.9
@@ -1232,8 +1229,8 @@ begin:control
 end:control
 
 begin:boundaries
-   xbc_left=periodic
-   xbc_right=periodic
+   bc_x_min=periodic
+   bc_x_max=periodic
 end:boundaries
 
 begin:species
@@ -1675,10 +1672,10 @@ begin:control
    t_end=1.0e-12
 
    # size of domain
-   x_start=-0.1e-6
-   x_end=400.0e-6
-   y_start=-400.0e-6
-   y_end=400.0e-6
+   x_min=-0.1e-6
+   x_max=400.0e-6
+   y_min=-400.0e-6
+   y_max=400.0e-6
 
    # Don't know if this should be in the deck or not
    dt_multiplier=0.8
@@ -1725,12 +1722,12 @@ The next section of the input deck describes the boundary conditions. The
 boundaries block for EPOCH3D is as follows:\\
 \simpleboxverbatim
 begin:boundaries
-   xbc_left=other
-   xbc_right=other
-   ybc_down=periodic
-   ybc_up=periodic
-   zbc_back=other
-   zbc_front=other
+   bc_x_min=other
+   bc_x_max=other
+   bc_y_min=periodic
+   bc_y_max=periodic
+   bc_z_min=other
+   bc_z_max=other
 end:boundaries
 \end{Verbatim}
 
@@ -1940,8 +1937,8 @@ begin:window
    move_window=T
    window_v_x=3.0e8
    window_start_time=7.0e-13
-   xbc_left_after_move=simple_outflow
-   xbc_right_after_move=simple_outflow
+   bc_x_min_after_move=simple_outflow
+   bc_x_max_after_move=simple_outflow
 end:window
 \end{Verbatim}
 
@@ -1952,13 +1949,13 @@ end:window
 \item window\_v\_x - The speed in m/s of the window.
 \item window\_start\_time - The time in seconds at which the window should
   start moving.
-\item xbc\_left\_after\_move - The boundary condition which should apply to
+\item bc\_x\_min\_after\_move - The boundary condition which should apply to
   the left boundary after the window has started moving. This is to allow the
   swapping of a laser boundary to a simple outflow boundary. Boundary codes
   are the same as when just specifying normal boundaries. If a boundary value
   isn't specified then it is assumed that the boundary isn't changed when the
   window starts moving.
-\item xbc\_right\_after\_move - The boundary condition which should apply to
+\item bc\_x\_max\_after\_move - The boundary condition which should apply to
   the right boundary after the window has started moving.
 \end{itemize}
 
@@ -2518,7 +2515,7 @@ many lasers as required to a boundary. A laser block looks like:
 
 \simpleboxverbatim
 begin:laser
-   direction=left
+   boundary=x_min
    amp=3.88191e13
    profile=exp(-(y^2))
    freq=1.78e15
@@ -2532,8 +2529,9 @@ end:laser
 \end{Verbatim}
 
 \begin{itemize}
-\item direction - The boundary on which to attach the laser. Options are left,
-  right, down, up, back and front. This must be the first element of the block.
+\item boundary - The boundary on which to attach the laser. Options are x\_min,
+  x\_max, y\_min, y\_max, z\_min and z\_max. This must be the first element of
+  the block.
 \item amp - The amplitude of the laser.
 \item profile - The spatial profile of the laser. This should be a spatial
   function not including any values in the direction normal to the boundary
@@ -2609,7 +2607,7 @@ code creates a laser and attaches it to the left hand boundary.
 TYPE(laser_block), POINTER :: new_laser
 
 ALLOCATE(new_laser)
-CALL init_laser(new_laser, c_bd_left)
+CALL init_laser(new_laser, c_bd_x_min)
 new_laser%amp = 3.88191e13_num
 new_laser%freq = 1.78e15_num
 new_laser%id = 1
@@ -3291,7 +3289,7 @@ SUBROUTINE manual_load
     DO WHILE(ASSOCIATED(current))
       rpos = (random(idum) - 0.5_num)*2.0_num
       current%part_pos(1) = rpos
-      rpos = random(idum)*length_x + x_start
+      rpos = random(idum)*length_x + x_min
 
       current%weight = 1.0_num
       current=>current%next
@@ -3350,7 +3348,7 @@ SUBROUTINE manual_load
     DO WHILE(ASSOCIATED(current))
       rpos = (random(idum) - 0.5_num)*2.0_num
       current%part_pos(1) = rpos
-      rpos = random(idum)*length_x + x_start
+      rpos = random(idum)*length_x + x_min
 
       current%weight = 1.0_num
 
@@ -4383,9 +4381,9 @@ The variables \inlinecode{cell\_{\it \{x,y,z\}}\_start} and
 which is held by the current processor. Since {\EPOCH} is an MPI code, there
 doesn't exist a single copy of any of the global arrays anywhere, but if there
 did then each processor would be responsible for the slice which runs\\
-(cell\_x\_start(rank):cell\_x\_end(rank),
-cell\_y\_start(rank):cell\_y\_end(rank),
-cell\_z\_start(rank):cell\_z\_end(rank))\\
+(cell\_x\_min(rank):cell\_x\_max(rank),
+cell\_y\_min(rank):cell\_y\_max(rank),
+cell\_z\_min(rank):cell\_z\_max(rank))\\
 These variables are used internally in the load balancer, where it is updated,
 but is also used when calculating distribution functions. Here it is used to
 define the extents of the MPI type which is used to write the distribution
@@ -4859,7 +4857,7 @@ is done as follows.
 
   ! Work out number of grid cells in the particle is
   ! Not in general an integer
-  cell_x_r = (current%particle_pos(1)-x_start_local)/dx
+  cell_x_r = (current%particle_pos(1)-x_min_local)/dx
   ! Round cell position to nearest cell
   cell_x = NINT(cell_x_r)
   ! Calculate fraction of cell between nearest cell boundary and particle
@@ -4906,7 +4904,7 @@ example. In 1D this change looks like
 
   ! Work out number of grid cells in the particle is
   ! Not in general an integer
-  cell_x_r = (current%particle_pos(1)-x_start_local)/dx
+  cell_x_r = (current%particle_pos(1)-x_min_local)/dx
   ! Round cell position to nearest cell
   cell_x = NINT(cell_x_r)
   ! Calculate fraction of cell between nearest cell boundary and particle
@@ -4915,7 +4913,7 @@ example. In 1D this change looks like
 
   CALL grid_to_particle(cell_frac_x, gx)
 
-  cell_x_r = (current%particle_pos(1)-x_start_local)/dx - 0.5_num
+  cell_x_r = (current%particle_pos(1)-x_min_local)/dx - 0.5_num
   cell_x2  = NINT(cell_x_r)
   cell_frac_x = REAL(cell_x2, num) - cell_x_r
   cell_x2 = cell_x2+1
@@ -5147,9 +5145,9 @@ full description of them, but the laser boundaries are only applied in
 into the conditions on the fields and particles in the routine
 \inlinecode{setup\_particle\_boundaries} in
 \inlinecode{src/boundaries.F90}. For each of the six possible boundaries
-(left, right, down, up, back, front) there is a variable which will be named
-something like \inlinecode{xbc\_right\_particle} or
-\inlinecode{ybc\_down\_field} which controls the boundary condition which will
+(x\_min, x\_max, y\_min, y\_max, z\_min, z\_max) there is a variable which will
+be named something like \inlinecode{bc\_x\_min\_particle} or
+\inlinecode{bc\_y\_max\_field} which controls the boundary condition which will
 be applied to either the field or the particles.
 
 \subsubsection{Simple field boundaries}
@@ -5204,7 +5202,7 @@ and bx has stagger \inlinecode{(/0, 1, 1/)}.
 \pagebreak
 
 Additional boundary conditions should follow the same basic principle as these
-routines. Note that all of the routines test for things like \inlinecode{left
+routines. Note that all of the routines test for things like \inlinecode{x\_min
 .EQ. MPI\_PROC\_NULL} etc. these tests confirm that a given processor is at the
 edge of the real domain, and so should have a real boundary condition applied
 to it. This also explains why there are no explicit periodic boundary condition
@@ -5915,16 +5913,15 @@ which must be made and some variables which must be explained.
   as \{coord\_z, coord\_y, coord\_x\}.
 \item To make this easier, there are some helper variables. The simplest of
   these just gives the processors attached to each face of the domain on the
-  current processor. These variables are named \inlinecode{left, right, down,
-    up, back} and \inlinecode{front} and are in the x, y and z directions
-  respectively.
+  current processor. These variables are named \inlinecode{x\_min, x\_max,
+  y\_min, y\_max, z\_min} and \inlinecode{z\_max}.
 \item Since it is possible for particles to cross boundaries diagonally there
   is another variable \inlinecode{neighbour} which identifies every possible
   neighbouring processor including those meeting at single edges and at
   corners. \inlinecode{neighbour} is an array which runs (-1:1,-1:1,-1:1) and,
   perhaps inconsistently, is ordered in normal order rather than reversed
-  order. This means that \inlinecode{left==neighbour(-1,0,0)} and
-  \inlinecode{front==neighbour(0,0,1)}.
+  order. This means that \inlinecode{x\_min==neighbour(-1,0,0)} and
+  \inlinecode{z\_max==neighbour(0,0,1)}.
 \item The variable \inlinecode{comm} is the handle for the Cartesian
   communicator returned from\linebreak MPI\_CART\_CREATE.
 \item The variable \inlinecode{errcode} is the standard error variable for all
@@ -5964,7 +5961,7 @@ code. It contains the following routines:
   that it needs to initialise MPI, obtain the rank and the number of processors.
 \item setup\_communicator - Routine which creates the Cartesian communicator
   used by the code after the input deck has been parsed. It also populates
-  \inlinecode{left, right} etc. It is in its own subroutine so that it can be
+  \inlinecode{x\_min, x\_max} etc. It is in its own subroutine so that it can be
   recalled after the start of the window move when the code is using a moving
   window. This is needed since it is valid to have a non-periodic boundary
   before the window starts to move and a periodic boundary afterwards.
@@ -6664,12 +6661,12 @@ INTEGER :: as_direction
 \inlinecode{as\_direction} is used when assigning a laser to a boundary and
 recognises the strings
 \begin{itemize}
-\item left - c\_bd\_left.
-\item right - c\_bd\_right.
-\item down - c\_bd\_down.
-\item up - c\_bd\_up.
-\item back - c\_bd\_back.
-\item front -c\_bd\_front.
+\item x\_min - c\_bd\_x\_min.
+\item x\_max - c\_bd\_x\_max.
+\item y\_min - c\_bd\_y\_min.
+\item y\_max - c\_bd\_y\_max.
+\item z\_min - c\_bd\_z\_min.
+\item z\_max - c\_bd\_z\_max.
 \end{itemize}
 and returns the associated direction code (given after the dash in the
 definition).
