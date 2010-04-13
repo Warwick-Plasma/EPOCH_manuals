@@ -1,5 +1,5 @@
 \documentclass[12pt,a4paper]{article}
-\usepackage{url,graphicx,tabularx,array}
+\usepackage{url,graphicx,tabularx,array,titleref}
 \usepackage[margin=.5in,nohead]{geometry}
 \usepackage{color,verbatim,framed}
 \usepackage{moreverb}
@@ -12,6 +12,7 @@
 \newcommand{\HRule}{\rule[0.3cm]{\linewidth}{0.5mm}}
 \newcommand{\emphtext}{\color{warwickdark} \fontfamily{phv}\selectfont\Large\bf}
 \newcommand{\inlinecode}[1]{{\color{warwickred} \bf\texttt{#1}}}
+\newcommand{\sectit}[1]{See the section titled ``{\bf\titleref{sec:#1}}''.}
 \newcommand{\code}[1]{{\texttt{#1}}}
 \newcommand{\qtt}[1]{``{\code{#1}}''}
 \newcommand{\inlineemph}[1]{{\color{warwicklight} \bf{#1}}}
@@ -75,6 +76,7 @@
 \newpage%
 \DefineShortVerb{\#}
 \fvset{formatcom=\color{warwickred}}
+
 \section{FAQs}
 
 \subsection{What is {\EPOCH}?}
@@ -134,19 +136,19 @@ important thing is that all numerical constants should be tagged with an
 
 \subsection{I just want to use the code as a black box, or I'm just
   starting. How do I do that?}
-See the section titled {\bf Getting started guides}.
+\sectit{gettingstarted}
 
 \subsection{I've been through the getting started guides but want more detail
   on using the code. How do I do that?}
-See the section titled {\bf {\EPOCH} for end users}.
+\sectit{endusers}
 
 \subsection{I can set up the code using the autoloaders, but I want more
   control. How do I do that?}
-See the section titled {\bf {\EPOCH} for advanced end users}.
+\sectit{advancedusers}
 
 \subsection{I am an advanced user, but I want to set up the code so that less
   experienced users can use it. How do I do that?}
-See the section titled {\bf Customising {\EPOCH}}.
+\sectit{customising}
 
 \subsection{I want to develop an addition to {\EPOCH}. How do I do that?}
 Basically read the entire of this manual. The second part of the manual details
@@ -161,6 +163,7 @@ this manual and then read through the code. Most of it is commented.
 \pagebreak
 
 \section{Getting Started Guides}
+\label{sec:gettingstarted}
 
 \subsection{History of these guides}
 These guides are based on material which was used as handouts at an {\EPOCH}
@@ -686,6 +689,7 @@ allowing developers to use maths parser expressions for other internal parts of
 the code where needed.
 
 \subsubsection{\inlineemph{laser} blocks}
+\label{sec:lasers}
 Laser blocks attach an EM wave source to a boundary which is set as
 \inlineemph{simple\_laser}.
 
@@ -709,8 +713,8 @@ block, lasers are attached to compatible boundaries here in the initial
 conditions deck. In 1D, laser blocks are slightly simpler than their 2D and 3D
 equivalents, but most of the important features will be mentioned here. The
 only significant difference is that there is also a spatial profile for
-multidimensional lasers. This is covered in detail in the section on
-multidimensional {\EPOCH}.\\
+multidimensional lasers. This is covered in detail in
+Section~\ref{sec:multilaser}.\\
 
 {\emphtext boundary} - The boundary on which to attach the laser.
 In 1D, the directions can be either x\_min or x\_max.  ``left'' and ``right''
@@ -1070,6 +1074,7 @@ end:species1
 %\end{minipage}
 
 \subsubsection{\inlineemph{laser} blocks in multiple dimensions.}
+\label{sec:multilaser}
 
 \scaledcapimage{./images/profile_flat}{flatlaser}{Constant laser profile}{0.4}
 \scaledcapimage{./images/profile_gauss}{gausslaser}{Gaussian laser profile}{0.4}
@@ -1447,6 +1452,7 @@ and Figure~\ref{2dcone} in 3D and 2D respectively.
 \pagebreak
 
 \section{{\EPOCH} for end users}
+\label{sec:endusers}
 
 \subsection{Structure of the {\EPOCH} codes}
 When obtained, the {\EPOCH} codes all have a similar structure. Inside the
@@ -2114,6 +2120,7 @@ end:control
 \end{boxverbatim}
 
 \subsection{MPI in {\EPOCH}}
+\label{sec:mpi}
 {\EPOCH} is a parallel PIC code using the standard MPI 2.0 library. However, the
 code has been written in such a way that it is possible to use most of the code
 with no knowledge of MPI at all. However, this does mean that there are some
@@ -2917,8 +2924,10 @@ MatLab software. These are still under development so are not shipped with the
 code. If they are required, they can be supplied on demand.
 
 \section{{\EPOCH} for advanced end users}
+\label{sec:advancedusers}
 
 \subsection{{\EPOCH} internal representation of particles}
+\label{partrep}
 Since not all problems in plasma physics can be described in terms of an
 initial distribution of thermal plasma, it is also possible to manually
 control properties of each individual pseudoparticle for an initial
@@ -3429,6 +3438,8 @@ the distribution function, as this is done automatically by the
 {\bf sample\_dist\_function} function.
 
 \section{Customising {\EPOCH}}
+\label{sec:customising}
+
 This section details how to setup {\EPOCH} with additional parameters so that
 it can be handed as a black box to new and/or inexperienced users. There are
 various ways of doing this, ranging from simply giving the end user
@@ -4038,15 +4049,16 @@ permanently expanding the deck, error trapping should always be written.
 }
 
 \section{{\EPOCH} developers manual}
+
 This section of the manual is aimed at people who intend to edit the {\EPOCH}
 source code to extend or modify existing features, add new diagnostics or
 develop new physics packages. It is expected that anyone reading this part of
 the manual will be familiar with the material covered in the main manual,
 particularly the notices about the layout of particle, particle\_list and
-particle\_family structures in the ``{\EPOCH} for advanced end users'' section
+particle\_family structures in the ``\titleref{sec:advancedusers}'' section
 of the main manual. A good working knowledge of linked lists is also critical to
 the understanding of the code and again an introduction to linked lists is
-given in the ``{\EPOCH} for advanced end users'' section.
+given in the ``\titleref{sec:advancedusers}'' section.
 
 A quick note: Some files have the normal Fortran file extension .f90, while
 some have the slightly unusual .F90. The difference is that files with the
@@ -4242,12 +4254,13 @@ is explained here
 \subsection{The files in \inlinecode{src/user\_interaction}}
 \begin{itemize}
 \item custom\_deck.f90 - This file is where and end user can temporarily
-  extend the input deck. Described in the ``Extending {\EPOCH}'' section.
+  extend the input deck. Described in the ``\titleref{sec:customising}''
+  section.
 \item custom\_laser.f90 - The file where an end user specifies laser time
   profiles without using the input deck.
 \item custom\_parser.f90 - The file where an end user can temporarily add new
-  functions and constants to the input deck. It is described in the ``Extending
-  {\EPOCH}'' section of this manual.
+  functions and constants to the input deck. It is described in the
+  ``\titleref{sec:customising}'' section of this manual.
 \item helper.F90 - This file contains all the internal workings of the
   autoloader. This is in user\_interaction for historical reasons, since early
   versions of the code required the end user to modify some parts of the
@@ -4259,6 +4272,7 @@ is explained here
 \end{itemize}
 
 \section{{\EPOCH} makefile}
+
 The makefile supplied with {\EPOCH} is a standard GNU make makefile, which must
 be user modified to allow a developer to add new files to the code. {\EPOCH}'s
 makefile is quite large, so an explanation of how to add new files and new
@@ -4312,6 +4326,7 @@ you need to add it to the definition of the environment variable
 \inlinecode{\$(SRCDIR)} rather than hard-coding \inlinecode{src} into the path.
 
 \section{{\EPOCH} core programming}
+
 {\EPOCH} is designed so that it can fairly easily be extended while still being
 written in (more or less) standard Fortran90 and MPI1.2. This section details
 in increasing complexity what a programmer needs to know to extend {\EPOCH} with
@@ -4711,8 +4726,7 @@ reconstruction of $B_x$ (i.e second order) then the point between
 $B_x(1/2) = \left(B_x(1)+B_x(0)\right)/2$. Similarly, if you want to set zero
 gradient on the boundary then for $E_x$ you set \inlinecode{ex(-1) = ex(1)},
 whereas for $B_x$ you would set \inlinecode{bx(0) = bx(1)}. This is explained
-in more detail in the section which describes the existing {\EPOCH} boundary
-conditions.
+in more detail in Section~\ref{sec:bcs}.
 
 In the particle pusher, time centred field variables are needed for second
 order accuracy, so an FDTD scheme is used to advance the fields. This looks
@@ -5094,6 +5108,7 @@ undefined (and likely wrong) if the code runs with different timesteps on
 different processors.
 
 \subsection{Boundary conditions}
+\label{sec:bcs}
 Boundary conditions in {\EPOCH} are split into three types
 \begin{itemize}
 \item Simple field boundaries.
@@ -5192,8 +5207,8 @@ routines, since by connecting the processors cyclically in a periodic direction
 the domain boundary effectively becomes another internal processor boundary.
 
 \subsubsection{Laser and outflow boundaries}
-Setting up lasers is explained in the relevant section in the first part of the
-manual and the way in which the laser specification in the input deck works is
+Setting up lasers is explained in Section~\ref{sec:lasers}
+and the way in which the laser specification in the input deck works is
 described later, so this section just describes how the actual laser and
 outflow routines in \inlinecode{laser.F90} work.\\
 
@@ -5333,7 +5348,7 @@ particles to the ghost cells and then call this routine.
 
 These routines can be used for most MPI calls required by all but the most
 extreme modifications to {\EPOCH}. More details on the parallel
-implementation of {\EPOCH} is given in the section {\it MPI in \EPOCH}, which
+implementation of {\EPOCH} is given in the section ``\titleref{sec:mpi}'', which
 includes information on more extreme changes to {\EPOCH}. However,
 realistically one should already be a proficient MPI programmer before
 attempting to perform extensive modification to {\EPOCH}.
@@ -6155,6 +6170,7 @@ subroutine for lasers attached to different boundaries. It is
 recommended that a developer examine this code when developing new routines.
 
 \subsection{{\EPOCH} I/O}
+\label{sec:io}
 
 {\EPOCH} uses a file format called {\it CFD} which was custom developed for use
 with codes developed by CFSA at the University of Warwick. There is documentation
@@ -6285,10 +6301,10 @@ the variable from the metadata in the CFD file, and it will now be available to
 view in all CFD reading packages.
 
 There is a working variable called \inlinecode{data} which is large enough to
-contain the data which is large enough to store a derived variable. It is
+store a derived variable. It is
 therefore recommended that to calculate derived variables a new subroutine
 should be created which populates \inlinecode{data} with the required variable
-and then write it to disk. An example would look like:
+and then writes it to disk. An example would look like:
 \begin{boxverbatim}
 IF (IAND(dumpmask(30), code)) THEN
   CALL calc_my_variable(data)
@@ -6300,13 +6316,12 @@ where \inlinecode{calc\_my\_variable} is a function which calculates the
 variable which you wish to write. The form of this function depends on the type
 of variable to be calculated and is given in the next section.
 
-
 \subsection{Adding a particle variable}
 The next simplest type of output to add is a new property for all particles. To
-add a new particle variables dump two things are needed: a call to the CFD
-command to write the data and an iterator function to iterate through all the
-particles. The iterators are stored in the file {\it iterators.F90}. An example
-iterator is:
+add new particle variables to the output dump, two things are needed: a call
+to the CFD command to write the data and an iterator function to iterate
+through all the particles. The iterators are stored in the file
+{\it iterators.F90}. An example iterator is:
 \begin{boxverbatim}
 ! Iterator for particle processor
 SUBROUTINE iterate_species(data, n_points, start)
@@ -6329,12 +6344,12 @@ SUBROUTINE iterate_species(data, n_points, start)
     DO WHILE (ASSOCIATED(current_list) .AND. (partcount .LT. n_points))
       DO WHILE (ASSOCIATED(cur) .AND. (partcount .LT. n_points))
         partcount = partcount+1
-        data(partcount) = REAL(current_family%id, num) ! This is
-           ! the line which writes the data
+        ! This is the line which writes the data
+        data(partcount) = REAL(current_family%id, num)
         cur=>cur%next
       ENDDO
       ! If the current partlist is exhausted, switch to the next one
-      IF (.NOT. ASSOCIATED(cur)) CALL Advance_particle_list(current_list, cur)
+      IF (.NOT. ASSOCIATED(cur)) CALL advance_particle_list(current_list, cur)
     ENDDO
     ! If the current particle_family is exhausted then switch to the next one
     DO WHILE (.NOT. ASSOCIATED(cur))
@@ -6349,34 +6364,32 @@ SUBROUTINE iterate_species(data, n_points, start)
 END SUBROUTINE iterate_species
 \end{boxverbatim}
 
-This is a fairly complicated routine, and includes routines to deal with the
-possibility of particle species not being dumped, and other similar
-effects. Luckily, there is only one line in the routine which needs to change
-to output a new routine. The is the line:
+This is a fairly complicated routine which includes code for dealing with the
+possibility of particle species not being dumped, and other complicated
+book keeping. Luckily, there is only one line in the routine which needs to
+change to output a new variable. The is the line:
 \begin{boxverbatim}
   data(partcount) = REAL(current_family%id, num)
 \end{boxverbatim}
 
 To write a new iterator, you just have to copy the skeleton of an existing
 iterator and change this line to copy your particle property into the ``data''
-array. The details of how this routine works is explained in the ``particles,
-particle\_lists and particle\_families'' of the ``deep internals'' section of
-the developer guide. Once your new iterator has been written and added into the
+array. The details of how this routine works is explained in Section~\ref{partrep}. Once your new iterator has been written and added into the
 {\it iterators.F90} file, it's time to add the CFD routine to actually write
 the data. The routine is:
 \begin{boxverbatim}
-CALL cfd_write_nd_particle_variable_with_iterator_all(name, groupname, &
-    iterator_name, npart_dump_global, n_part_per_it, gridname, gridgroup, &
+CALL cfd_write_nd_particle_variable_with_iterator_all(name, class, &
+    iterator, npart_dump_global, n_part_per_it, mesh_name, mesh_class, &
     subtype_particle_var)
 \end{boxverbatim}
 
 The parameters this time are
 \begin{itemize}
 \item name - The name of the variable to be output.
-\item groupname- The name of the group that the variable is in. Normally all
+\item class - The name of the group that the variable is in. Normally all
   {\EPOCH} particle variables are in group ``particle'', but there is no reason
   to enforce this.
-\item iterator\_name - The name of the iterator function that you created in
+\item iterator - The name of the iterator function that you created in
   the previous step. Note that this is not a string but simply the name of the
   function.
 \item npart\_dump\_global - The number of particles to be written to disk
@@ -6384,29 +6397,29 @@ The parameters this time are
   named variable ``npart\_dump\_global''.
 \item npart\_per\_it - The number of particles to write for each loop of the
   iterator. This should normally be the named variable ``npart\_per\_it''.
-\item gridname - The name of the grid (particle positions) that the variable
+\item mesh\_name - The name of the grid (particle positions) that the variable
   corresponds to. In {\EPOCH}, this is ``Particles''.
-\item gridgroup - The group of the grid (particle positions) that the variable
+\item mesh\_class - The group of the grid (particle positions) that the variable
   corresponds to. In {\EPOCH}, this is ``part\_grid''.
 \item subtype\_particle\_var - An MPI type representing the layout of particles
-  across processors species by species. For a default particle variable, this
+  across processors, species by species. For a default particle variable, this
   is the named variable ``subtype\_particle\_var''.
 \end{itemize}
 
 Once again, looking at how this is implemented for one of the existing
-variables (e.g. Px) is probably the most enlightening way to see how it
+variables (e.g. px) is probably the most enlightening way to see how it
 works. As for the fluid variables, the new variable will appear in IDL, Matlab
 and VisIt.
 
-At this point, it is possible to write any property which is similar to the
+At this point it is possible to write any property which is similar to the
 default field variables or the default particle properties. It becomes slightly
 more challenging if you want to write other types of variable into an output
 file. Before you can do this, you really need to fully understand how the MPI
-parallelism is implemented in {\EPOCH} by reading the section {\it MPI in
-{\EPOCH}}. A full description of how to do this is beyond the scope of this
-manual, but the same basic commands should be used to write to the CFD file as
-are used to write more normal variables, and the CFD manual should be consulted
-if more sophisticated changes are needed.
+parallelism is implemented in {\EPOCH} by reading the section
+``\titleref{sec:mpi}''. A full description of how to do this is beyond the
+scope of this manual, but the same basic commands should be used to write to
+the CFD file as are used to write more normal variables, and the CFD manual
+should be consulted if more sophisticated changes are needed.
 
 \pagebreak
 
@@ -6808,7 +6821,7 @@ that it tokenizes the string each time it is called. Tokenizing the string is a
 time consuming process, so if the string is to be evaluated several times for
 different reasons (for example, the time profile for the laser) then a
 different procedure should be followed using the lower level parser routines,
-which are described in the section on the maths parser.
+which are described in Section~\ref{sec:maths}.
 \pagebreak
 
 \subsection{Permanently adding blocks to the input deck}
@@ -6951,9 +6964,10 @@ The existing blocks in the code are read in the following files
 The existing structure of the blocks is simple enough in most cases that it
 should be fairly easy to add new elements if needed. The most likely change
 needed is to change the list of variables to dump in the \inlinecode{output}
-block. How to do this is detailed in the section on {\EPOCH} I/O.
+block. How to do this is detailed in Section~\ref{sec:io}.
 
 \subsection{Permanently adding functions, constants to {\EPOCH}}
+\label{sec:maths}
 In much the same way that it is possible to permanently add new blocks to the
 input deck, it is also possible to permanently add functions and constants to
 {\EPOCH}'s maths parser. Although adding new operators is possible, it is
@@ -7071,10 +7085,11 @@ no need to deal with further parsing. Next, simply call
 evaluation stack.
 
 \section{Developing an extension to {\EPOCH}}
+\label{sec:extend}
 
 Exactly how to extend {\EPOCH} depends heavily upon what you intend to add. The
 simplest things to add are new diagnostics, and this is detailed in
-the section on {\EPOCH} I/O. Other places where changes are likely to be made
+Section~\ref{sec:io}. Other places where changes are likely to be made
 are the following:
 \begin{itemize}
 \item The field solver - Changing the field solver to add new laser-like
