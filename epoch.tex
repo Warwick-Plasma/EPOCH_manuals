@@ -1446,12 +1446,6 @@ This deck produces and initial condition which looks like Figure~\ref{3dcone}
 and Figure~\ref{2dcone} in 3D and 2D respectively.
 \pagebreak
 
-\section{{\EPOCH} core algorithm}
-\scaledcapimage{./images/coreblock}{coreblock}{Block diagram of the core
-  routines in {\EPOCH}}{0.5}
-EPOCH CORE ALGORITHM GOES HERE.
-
-\pagebreak
 \section{{\EPOCH} for end users}
 
 \subsection{Structure of the {\EPOCH} codes}
@@ -5475,11 +5469,10 @@ TYPE(particle_list), INTENT(INOUT) :: partlist
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{test\_partlist} is a routine which tests for various possible types
-of error within a particle\_list object. It has various possible return codes
-for different errors, with the different possible error codes either signified
-by a specific negative value for errors so severe that the main tests cannot be
-run, or with a bitmask for errors in the main tests. The possible specific value
-return codes are
+of error within a particle\_list object. It has a number of possible return
+codes for different errors, using negative values for errors so severe that
+the main tests cannot be run, or with a bitmask for errors in the main tests.
+The return codes are:
 \begin{itemize}
 \item 0 - No error, particle\_list has passed all tests.
 \item -1 - Either the head or tail of the particle\_list object is NULL. This is
@@ -5522,7 +5515,7 @@ particles can be added to it. It DOES NOT delete the particle\_list object
 itself, since it does not know whether or not the particle\_list is dynamically
 allocated. If using dynamically allocated particle\_list objects then it is up
 to the user to deallocate them AFTER the attached particles are destroyed using
-\inlinecode{destroy\_partlist}
+\inlinecode{destroy\_partlist}.
 \\[0.5cm]
 {\Large Notes\\}
 If a particle\_list is deleted without deleting the attached particle objects,
@@ -5546,7 +5539,7 @@ TYPE(particle_list), INTENT(INOUT) :: partlist1, partlist2
 point to the same linked list of particles as \inlinecode{partlist1}. It does
 not copy the particles, just sets the head and tail pointers of
 \inlinecode{partlist1} to point to the same particle objects as
-\inlinecode{partlist1}
+\inlinecode{partlist1}.
 \\[0.5cm]
 {\Large Notes\\}
 
@@ -5561,7 +5554,7 @@ TYPE(particle_list), INTENT(INOUT) :: head, tail
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{append\_partlist} is a routine which attaches the particles
+\inlinecode{append\_partlist} is a routine which takes the particles
 attached to the particle\_list object \inlinecode{tail} and adds them to the
 end of the linked list for particle\_list \inlinecode{head}. The particle\_list
 \inlinecode{tail} is then set to be an empty particle\_list.
@@ -5582,7 +5575,7 @@ TYPE(particle), POINTER :: new_particle
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{add\_particle\_to\_partlist} is the routine which adds a new
+\inlinecode{add\_particle\_to\_partlist} adds a new
 particle (\inlinecode{new\_particle}) to the end of the linked list of
 particles in the particle\_list object \inlinecode{partlist}. It deals with
 cases of empty particle\_list objects automatically.
@@ -5662,7 +5655,7 @@ TYPE(particle), POINTER :: a_particle
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{pack\_particle} and \inlinecode{unpack\_particle} are subroutines
-which are used to transfer all the information about a particle
+which are used to copy all the information about a particle
 necessary for the particle to be transferred to another processor into a
 temporary array before sending to another processor. If a new particle property
 has been added to the particle then these routines must be modified to allow
@@ -5670,7 +5663,7 @@ the copying of the new data into the array. The parameter \inlinecode{data} is
 a REAL(num) array of length \inlinecode{nvars} and is the array into which the
 data either must be packed or from which it must be
 unpacked. \inlinecode{a\_particle} is the particle object which must either have
-its data copied into the array or the a particle object which must be
+its data copied into the array or be
 populated with data from the array. No restriction is placed on how the
 data should be packed into the data array, but obviously
 \inlinecode{pack\_particle} and \inlinecode{unpack\_particle} must be inverse
@@ -6419,7 +6412,8 @@ if more sophisticated changes are needed.
 
 \subsection{Precompiler directives}
 {\EPOCH} uses precompiler directives to switch certain features of the code on
-or off. The precompiler directives all begin with \# and look like:
+or off. The precompiler directives all begin with a ``\#'' character and look
+like:
 \begin{boxverbatim}
 #ifdef MY_PRECOMPILER_DIRECTIVE
   SOME_FORTRAN_OF_SOME_KIND
@@ -6427,51 +6421,56 @@ or off. The precompiler directives all begin with \# and look like:
   SOME_OTHER_FORTRAN
 #endif
 \end{boxverbatim}
-and they behave in a very simple manner. The precompiler runs BEFORE the
-Fortran compiler and until it reaches a precompiler directive, it just creates
+They behave in a very simple manner. The precompiler runs BEFORE the
+Fortran compiler and, until it reaches a precompiler directive, it just creates
 a temporary file which is an exact copy of the source file. When it reaches a
 precompiler directive of this kind it treats the \#ifdef commands as
-if/then/else statements. If the IF test passes and
+if/then/else statements. If
 \inlinecode{MY\_PRECOMPILER\_DIRECTIVE} was defined in the makefile then
 \inlinecode{SOME\_FORTRAN\_OF\_SOME\_KIND} is pushed out to the temporary
-file. Otherwise \inlinecode{SOME\_OTHER\_FORTRAN} is sent to the temporary
-files. The precompiler directives themselves are never output to the temporary
-file. The Fortran compiler then compiles this temporary file (or named pipe or
-some other implementation of the same idea), unaware that this wasn't then
-entire source file as written by the human programmer.
+file. Otherwise \inlinecode{SOME\_OTHER\_FORTRAN} is written instead.
+The precompiler directives themselves are never output to the temporary
+file. Once then preprocessor has finished, it passes this temporary file
+to the Fortran compiler which can then compile it just like any other
+standard Fortran file.
 
 \subsubsection{When to use precompiler directives}
 \begin{itemize}
 \item When adding properties to the \inlinecode{particle} structure.
 \item When adding time consuming calculations to the particle pusher.
 \end{itemize}
-It is perfectly acceptable to use precompiler directives in other cases as
-well, but they should not be used as a substitute for having input deck flags
-controlling new parts of the code.
+Precompiler directives should be avoided when there is no significant
+performance gain or memory reduction to be made. Wherever possible, optional
+features should be controlled by parameters in the input deck.
 
 \subsubsection{The directive printing routine on code startup}
 When {\EPOCH} starts it prints the precompiler directives that it was built with
 and what they mean. This isn't required, but has proved very useful and is
-implemented in a very simple way.  Simply open the file
+implemented in a very simple way. Just open the file
 \inlinecode{src/housekeeping/welcome.F90} and find the subroutine
 \inlinecode{compiler\_directives}. There are a large block of precompiler
 directives which read:
 \begin{boxverbatim}
 #ifdef TRACER_PARTICLES
-  WRITE(*,*) "Tracer particle support -DTRACER_PARTICLES"
+    defines = IOR(defines, c_def_tracer_particles)
+    WRITE(*, *) "Tracer particle support -DTRACER_PARTICLES"
 #endif
 \end{boxverbatim}
 
 Simply add a new element to the end of the list.
 \begin{boxverbatim}
 #ifdef MY_PRECOMPILER_DIRECTIVE
-  WRITE(*,*) "My new physics -DMY_PRECOMPILER_DIRECTIVE"
+    defines = IOR(defines, c_def_my_precompiler_directive)
+    WRITE(*,*) "My new physics -DMY_PRECOMPILER_DIRECTIVE"
 #endif
 \end{boxverbatim}
 
+You will also need to add #c_def_my_precompiler_directive# to the list of
+constants in #src/shared_data.F90#.
+
 \subsubsection{Precompiler directives and the input deck}
 In theory, it is possible for someone to request a feature of the code in the
-input deck which this version of the code hasn't been compiled with. In this
+input deck which this version hasn't been compiled with. In this
 case, there is a special error code \inlinecode{c\_err\_pp\_options\_wrong}
 which causes the input deck parser to give a meaningful error. You should also
 set the string\linebreak \inlinecode{extended\_error\_string} to be the define
@@ -6496,14 +6495,9 @@ compilers do not allow strings to exceed 512 characters in length.
 
 \subsubsection{{\EPOCH} string handling routines}
 
-Listed here are all the string handling routines (other than the core maths
-parser routine which are documented elsewhere) which are still currently used
-in {\EPOCH}. Simply looking at the code reveals some other routines which are
-historical remnants, left in place to make testing current versions of {\EPOCH}
-against earlier versions easier, and they will probably not remain in
-place. Any routines in \inlinecode{src/deck/strings.F90} and
-\inlinecode{src/deck/strings\_advanced.F90} which are not mentioned in this
-documentation are legacy routines and SHOULD NOT BE USED.
+Listed here are the string handling routines (other than those in the core
+maths parser routine which are documented elsewhere) which are currently used
+in {\EPOCH}.
 
 \pagebreak
 \begin{codedef}
@@ -6519,12 +6513,13 @@ LOGICAL :: str_cmp
 {\Large Description\\}
 \inlinecode{str\_cmp} is the routine which does all the string comparisons in
 {\EPOCH}. It deals with leading and trailing whitespace automatically and
-automatically tests for length differences. It does not test for strings being
+tests for length differences. It does not test for strings being
 valid substrings of each other, only for full equality.
 \\[0.5cm]
 {\Large Notes\\}
 A developer should always use \inlinecode{str\_cmp} rather than doing their own
-string testing to ensure consistent behaviour across the entire of {\EPOCH}.
+string testing to ensure consistent behaviour across the entire {\EPOCH} code
+base.
 
 \pagebreak
 \begin{codedef}
@@ -6623,12 +6618,12 @@ recognises the strings
 \item z\_min or back - c\_bd\_z\_min.
 \item z\_max or front - c\_bd\_z\_max.
 \end{itemize}
-and returns the associated direction code (given after the dash in the
+It returns the associated direction code (given after the dash in the
 definition).
 \\[0.5cm]
 {\Large Notes\\}
-If you're writing something which required attaching something to a boundary,
-whether a boundary condition, a diagnostic or some other routine then this is
+If you're writing code which requires attaching something to a boundary,
+whether a boundary condition, a diagnostic or some other routine, then this is
 the routine that should be used. Note that in order to prevent confusion when
 moving input decks between different dimension versions of {\EPOCH}, each code
 only recognises the strings for boundaries that it actually has.
@@ -6729,7 +6724,7 @@ rounding routines in the maths parser to force other behaviour.
 This routine should be used when evaluating most strings into integers. Note
 that this routine evaluates spatially dependent quantities at (0,0) on each
 processor, so will give unpredictable results when spatially dependent
-quantities are given to it (like rho, ex etc.). To evaluate a spatially varying
+quantities are given to it (like rho, bx etc.). To evaluate a spatially varying
 quantity use \inlinecode{evaluate\_string\_in\_space}.
 
 \pagebreak
@@ -6774,7 +6769,7 @@ maths parser.
 This routine should be used when evaluating most strings into reals. Note that
 this routine evaluates spatially dependent quantities at (0,0) on each
 processor, so will give unpredictable results when spatially dependent
-quantities are given to it (like rho, ex etc.). To evaluate a spatially varying
+quantities are given to it (like rho, bx etc.). To evaluate a spatially varying
 quantity use \inlinecode{evaluate\_string\_in\_space}.
 
 \pagebreak
@@ -6806,7 +6801,7 @@ ALLOCATE(data(0:nx+1,0:ny+1)
 CALL evaluate_string_in_space(string, data, (/0,nx+1/), (/0:ny+1/), err)
 \end{boxverbatim}
 {\Large Notes\\}
-This routine is suitable to evaluate expressions over the entire or parts of
+This routine is suitable to evaluate expressions over a subsection or all of
 the domain, and is used in this way in the initial condition deck parser
 routines. However, the routine does have one significant weakness, which is
 that it tokenizes the string each time it is called. Tokenizing the string is a
@@ -6819,7 +6814,7 @@ which are described in the section on the maths parser.
 \subsection{Permanently adding blocks to the input deck}
 
 While using the \inlinecode{custom\_deck} subroutine is a good way of passing
-parameters into the code or for developing the code, it is not suitable for
+parameters into the code or for temporary additions, it is not suitable for
 permanent additions to the code. Adding new blocks to the code permanently is
 very similar to doing it temporarily, but requires changes to some of the
 subroutines in \inlinecode{deck.F90}.\\
@@ -6854,25 +6849,25 @@ need to be read, then new variables should be created in the same place with
 similar names using the \inlinecode{c\_ds\_} prefix.
 
 The layout of \inlinecode{start\_block} and \inlinecode{end\_block} is very
-simple, and simply tests \inlinecode{deck\_state} to makes sure that the deck
-reader is reading the right file, then uses \inlinecode{str\_cmp} to test the
-block name, and then if necessary calls the correct routine to deal with the
+simple, and just tests \inlinecode{deck\_state} to make sure that the deck
+reader is reading the right file. It then uses \inlinecode{str\_cmp} to test the
+block name and if necessary calls the correct routine to deal with the
 start or finish of a block.
 
 The main routine which needs to be explained is \inlinecode{handle\_block},
-which is the function which determines which subroutine to call to parse the
+which is the function that determines which subroutine to call for parsing the
 elements of a given block. The function is very simple and has the same basic
 sequence as the \inlinecode{start\_block} and \inlinecode{end\_block}
-functions. First check what file is being parsed by checking
+functions. First determine what file is being parsed by checking
 \inlinecode{deck\_state}, then use \inlinecode{str\_cmp} to compare the
 \inlinecode{block\_name} parameter with the list of known block names. What
-happens next is dependent on exactly what a developer wants their block to do,
-but at the simplest level, the routine simply calls another function which
+happens next is dependent on exactly what a developer wants their block to do.
+At the simplest level the routine simply calls another function which
 takes the element\_name and element\_value as
 parameters and returns an error code from Appendix A determining the success or
 failure of reading the element. Some blocks have slightly more sophisticated
-entries in \inlinecode{handle\_deck} such as the \inlinecode{species} block in
-the initial conditions file reader which strips the species number off the end
+entries in \inlinecode{handle\_deck}, such as the \inlinecode{species} block in
+the initial conditions file reader. This strips the species number off the end
 of the block name and passes it to the handler routine. The routines that deal
 with constants and DEOs are implemented before any tests to
 \inlinecode{deck\_state} since it is valid to set constants and DEOs in any
@@ -6887,26 +6882,26 @@ all the necessary parts of a block have been set. The subroutines are contained
 in the same file as the routine which is called in \inlinecode{handle\_block} to
 handle elements of the block. The error handler functions should return an
 error code from Appendix A, usually \inlinecode{c\_err\_missing\_elements}. The
-return code from the error handle function should then be \inlinecode{IOR}ed
+return code from the error handler function should then be \inlinecode{IOR}ed
 with \inlinecode{errcode\_deck} to allow error codes to be returned from
 several different checks with errors occurring.
 
 \subsubsection{The element handler routines for deck elements}
-The exact form of the handler routines is up to the end user, the only {\it
+The exact form of the handler routines is up to the end user. The only {\it
 requirements} are that the routine should return an error code detailing
 whether or not there are any problems with reading the block and that the error
 code should be \inlinecode{c\_err\_none} if either the element name or element
 value are the special constant \inlinecode{blank}. The typical implementation
-of an element handler routine is shown in the routine
+of an element handler routine is shown in the file
 \inlinecode{src/deck/deck\_control\_block.f90}, and this general layout should
-be copied for compatibility if this is possible.\\
+be copied for compatibility if possible.\\
 
 Sometimes, it is useful to have each new block correspond to a new instance of
 an object in the code. An example of this in {\EPOCH} is in
 \inlinecode{src/deck/deck\_ic\_laser\_block.f90} where each new laser block in
 the input deck corresponds to a new laser being attached to a boundary. This is
-allowed by implementing the lasers as a linked list on each boundary, with a
-new laser object being created when a laser block is started, the laser
+accomplished by implementing the lasers as a linked list on each boundary,
+with a new laser object being created when a laser block is started, the laser
 information being set during the main reader routine, and then the laser being
 attached to the linked list by a call to \inlinecode{attach\_laser} in
 \inlinecode{src/laser.f90} when the block is ended. When a new laser block is
@@ -6916,12 +6911,12 @@ as desired.
 \subsubsection{Naming new element handler files}
 While the name of the function which deals with elements of a new block is up
 to the end user, the file should try to follow the form of the existing
-names. That is the name should have the following form, remembering that words
+names. That is, the name should have the following form, remembering that words
 should be spaced out using \_ characters.
 \begin{itemize}
 \item Begin with \inlinecode{deck\_}.
-\item If the block isn't in the main input deck (input.deck) then there
-  should be a code here which details which input deck file is begin read
+\item If the block is associated with initial conditions or I/O then there
+  should be a code here which details
   when this block is valid. For the existing input deck files this would be
   \subitem \inlinecode{ic\_} for the initial conditions file.
   \subitem \inlinecode{eio\_} for the extended I/O file.
@@ -6961,16 +6956,16 @@ block. How to do this is detailed in the section on {\EPOCH} I/O.
 \subsection{Permanently adding functions, constants to {\EPOCH}}
 In much the same way that it is possible to permanently add new blocks to the
 input deck, it is also possible to permanently add functions and constants to
-{\EPOCH}'s maths parser, although adding new operators is possible, it is
+{\EPOCH}'s maths parser. Although adding new operators is possible, it is
 sufficiently likely to cause problems with the operation of the maths parser
 that it is formally not recommended by the author of the program, and hence is
 not documented here.
 
 \subsubsection{Adding the new tokenizer handle}
 When adding a new function or constant to the maths parser using the temporary
-routines, there are routines, \inlinecode{register\_function} or
-\inlinecode{register\_constant} which give a numerical handle which is the token
-used to represent that function or constant after the text has been parser
+routines, there are two calls (\inlinecode{register\_function} and
+\inlinecode{register\_constant}) which give a numerical handle. This is the
+token used to represent that function or constant after the text has been parsed
 (remember that {\EPOCH}'s maths parser tokenizes before evaluation!). When
 permanently adding objects to the maths parser, the tokenizer handles have to
 be set up manually. This takes place in \inlinecode{src/shared\_data.F90} in
@@ -6987,8 +6982,8 @@ look like:
 \end{boxverbatim}
 Constants beginning with \inlinecode{c\_const\_} are tokenizer handles for
 constants, and those beginning with \inlinecode{c\_func\_} are tokenizer handles
-for functions. Each number has to be unique and has to be less than a number
-which represents the lower bound of values reserved for temporary or deck
+for functions. Each number must be unique and has to be less than
+the lower bound of values reserved for temporary or deck
 specified values. This means that any tokenizer handle for a function has to be
 less than the value of the variable \inlinecode{c\_func\_custom\_lowbound} and
 any handle for a constant must be less than
@@ -6996,22 +6991,20 @@ any handle for a constant must be less than
 value of \inlinecode{c\_func\_custom\_lowbound} and
 \inlinecode{c\_const\_deck\_lowbound} to
 allow the use of more values for internal constants and functions, although
-care should be taken, since this means that you are at the point of having {\it
-thousands} of constants or functions, and some simplification is probably
-needed, since the maths parser is probably rather slow by this point. If
-\inlinecode{c\_const\_deck\_lowbound} is increased then the constant
+care should be taken since this could lead to performance issues.
+If \inlinecode{c\_const\_deck\_lowbound} is increased then the constant
 \inlinecode{c\_constant\_custom\_lowbound} should be increased by the same
-amount (The values between \inlinecode{c\_const\_deck\_lowbound} and\linebreak
+amount (the values between \inlinecode{c\_const\_deck\_lowbound} and
 \inlinecode{c\_constant\_custom\_lowbound-1} are used for constants specified
 inside the input deck while values greater than or equal to
 \inlinecode{c\_constant\_custom\_lowbound} are used for constants specified
-by\linebreak \inlinecode{register\_constant}.
+by \inlinecode{register\_constant}.
 
 Once the tokenizer handle is specified in \inlinecode{shared\_parser\_data}, it
 is now possible to extend the main areas of the maths parser. Note that from
-here on it, you MUST always use the constant named handle, NEVER the numerical
-value that you specified for the value of the handle, otherwise combining
-functions and constants from several sources becomes much harder.
+here on, you MUST always use the constant named handle, NEVER the numerical
+value that you specified for the value of the handle. If this is not done
+then combining functions and constants from several sources becomes much harder.
 
 \subsubsection{Adding the new function or constant to the tokenizer}
 The next stage is to add the string representation of your constant or function
@@ -7020,8 +7013,7 @@ to the tokenizer routines in
 find either the function \inlinecode{as\_constant} or \inlinecode{as\_function}
 and look at the existing code. These functions are just long lists of
 \inlinecode{str\_cmp} commands followed by code to deal with custom
-functions/constants. To add the new code, just add an additional line looking
-like:
+functions/constants. To add the new code, create an additional line such as:
 \begin{boxverbatim}
   IF (str_cmp(name, "my_const")) as_constant = c_const_my_const
   .
@@ -7040,8 +7032,8 @@ The evaluator is the part of the code that actually takes the streams of tokens
 produced by the tokenizer and evaluates them into a number. The relevant parts
 of the evaluator for adding new constants or functions are in
 \inlinecode{src/parser/evaluator\_blocks.F90} and the functions which may need
-changing are \inlinecode{do\_constant} and \inlinecode{do\_functions} which are
-both passed up to five parameters, these parameters being
+changing are \inlinecode{do\_constant} and \inlinecode{do\_functions}. These are
+both passed up to five parameters:
 \begin{itemize}
 \item #INTEGER :: opcode# - The operation code, this is the tokenizer handle
   which was defined in \inlinecode{shared\_parser\_data}.
@@ -7056,11 +7048,11 @@ both passed up to five parameters, these parameters being
 
 The rest of the routine to set a constant is as simple as testing for the
 tokenizer handle already set up in \inlinecode{shared\_parser\_data} and then
-calling the subroutine \inlinecode{push\_on\_eval} which pushes the final
+calling the subroutine \inlinecode{push\_on\_eval}. This pushes the final
 constant onto the evaluation stack which is used by the RPN parser. The basic
-sequence for functions is similar except for the addition of the code to read
-the values that the function takes, this is again the subroutine
-\inlinecode{get\_values} which is also used in custom function. The calling
+sequence for functions is similar except for the addition of a code to read
+the values that the function takes. This is again the subroutine
+\inlinecode{get\_values} which is also used in custom\_function. The calling
 sequence in \inlinecode{do\_function} looks like:
 \begin{boxverbatim}
   IF (opcode .EQ. c_func_gauss) THEN
@@ -7069,24 +7061,23 @@ sequence in \inlinecode{do\_function} looks like:
     RETURN
   ENDIF
 \end{boxverbatim}
-Simple call the \inlinecode{get\_values} subroutine passing the number of
+Simply call the \inlinecode{get\_values} subroutine, passing the number of
 required parameters and an array of type \inlinecode{REAL(num)} which is at
-least as long as the number of required parameters, and the array is populated
-by the values passed into the function, constants and maths expressions are
+least as long as the number of required parameters. The array is populated
+by the values passed into the function. Constants and maths expressions are
 already evaluated by the time that this section of code is reached, so there is
-no need to deal with further parsing. Then simply call
+no need to deal with further parsing. Next, simply call
 \inlinecode{push\_on\_eval} to push the result of your function onto the
 evaluation stack.
 
 \section{Developing an extension to {\EPOCH}}
 
 Exactly how to extend {\EPOCH} depends heavily upon what you intend to add. The
-simplest thing is to add a new diagnostic to the code, and this is detailed in
-the section on {\EPOCH} I/O. Other than simply adding new diagnostics to the
-code, there are a few main places where changes to the code will probably be
-needed to develop and extension to {\EPOCH}. These are
+simplest things to add are new diagnostics, and this is detailed in
+the section on {\EPOCH} I/O. Other places where changes are likely to be made
+are the following:
 \begin{itemize}
-\item The field solver - Changing the field solver to add new laser like
+\item The field solver - Changing the field solver to add new laser-like
   boundaries, add spatial smoothing to remove noise, add high order field
   solvers etc.
 \item The particle pusher - Change the basic physical model of {\EPOCH} by
@@ -7100,15 +7091,14 @@ needed to develop and extension to {\EPOCH}. These are
   extensions to {\EPOCH} should be placed in here.
 \end{itemize}
 
-Changing the field solver or the particle pusher or the l is fairly easily
-accomplished by reading the section of this manual detailing the relevant part
-of the code, reading through the code making sure that it all makes sense and
-then make the necessary changes. The general sequence for writing an extension
-would be
+Changing the field solver, the particle pusher or boundary routines
+is fairly easy to accomplish by reading the section of this manual that
+details the relevant code. The general sequence for writing an extension
+would be:
 \begin{itemize}
 \item Add any new global variables needed to \inlinecode{shared\_data.F90}.
 \item Add the meat of your change to the code.
-\item Test the change to your code. Make absolutely sure that you can turn your
+\item Test the changes to your code. Make absolutely sure that you can turn your
   change to the code off.
 \item Add controls for your extension to the input deck reader.
 \end{itemize}
@@ -7116,36 +7106,36 @@ would be
 \subsection{The main driver routine}
 When adding completely new routines to the code, they should be added to the
 file \inlinecode{src/epoch\{n\}d.F90}. This routine simply calls other routines
-which perform the actual execution of the code. The first section of the code
-controls the setup of the basic parts of the code, MPI initialisation and
-setting up initial conditions. If you wish to add new startup conditions then
-you should find out at which point of this routine sufficient parts of the
-initial conditions are setup. The setup of the code is fairly complicated, but
+to perform the actual execution of the code. The first section of the code
+controls basic setup, MPI initialisation and
+initial conditions. If you wish to add new startup conditions then
+you should find the location in this routine where the
+initial conditions are setup. The code is fairly complicated, but
 there are a few key points at which the code significantly changes state.
 \begin{itemize}
 \item After the call to \inlinecode{read\_deck} the code has read the basic
   information from the input deck files and any tests or changes which have to
   be made to input deck values should be made immediately after this line. Note
-  that although the variables from the deck have been set and have been stored
-  to the correct variables, none of these values have been used, so allocatable
-  variables haven't been allocated. The grid does not exist at this point.
+  that although the variables from the deck have been set,
+  none of these values have been used so allocatable
+  variables have yet to be allocated. The grid does not exist at this point.
 \item After the call to \inlinecode{open\_files} the code has finished
   allocating all field variables, although particles may not yet have been set
   up. The grid now exists.
 \item There are now a series of \inlinecode{IF} statements which test for
   things like \linebreak\inlinecode{IF (IOR(ictype, c\_ic\_autoload) .NE. 0)}.
-  These lines are the lines which test for all the possible states of the
+  These are the lines which test for all possible states of the
   initial conditions. The last test is for the manual load routine
   (\inlinecode{c\_ic\_manual}). After this test all the particles have been
   loaded and are now on their correct processor. The load balancer has now been
   called at least once so the domains may no longer be identical.
-\item The main loop is a simple do loop beginning with just a single command of
-  \inlinecode{DO}. Inside this loop there are several calls the routines which
+\item The main loop is a simple do loop beginning with just the single command
+  \inlinecode{DO}. Inside this loop there are several calls to routines which
   actually advance the system. Most routines which can change currents should
-  take place after the particle pusher but before the final update for the E
-  and B routines. These routines are
+  take place after the particle pusher but before the final update for the $E$
+  and $B$ fields. These routines are
   \subitem \inlinecode{set\_dt} - This routine sets the timestep.
-  \subitem \inlinecode{update\_eb\_fields\_half} - Time centre the E and B
+  \subitem \inlinecode{update\_eb\_fields\_half} - Time centre the $E$ and $B$
     fields.
   \subitem \inlinecode{push\_particles} - The particle pusher.
   \subitem \inlinecode{reorder\_particles\_to\_grid} - Groups particles into
@@ -7154,12 +7144,12 @@ there are a few key points at which the code significantly changes state.
     which needs to have nearby particles grouped together should take place
     after the call to this routine.
   \subitem \inlinecode{split\_particles} - The very early beta particle
-    splitting operator. Doesn't really work yet, do not use!
+    splitting operator. Doesn't really work yet, so do not use!
   \subitem \inlinecode{reattach\_particles\_to\_mainlist} - Undoes the
     particle grouping and rebuilds the main list of particles used by the
     particle pusher. Any routine which needs to have nearby particles grouped
     together should take place before the call to this routine.
-  \subitem \inlinecode{update\_eb\_fields\_final} - Updates the E and B
+  \subitem \inlinecode{update\_eb\_fields\_final} - Updates the $E$ and $B$
     fields to the full timestep.
 \item After the call to \inlinecode{update\_eb\_fields\_final} the code is
   ready for another timestep. Any routines which do not change the time
@@ -7168,7 +7158,7 @@ there are a few key points at which the code significantly changes state.
 \end{itemize}
 
 \subsection{The particle reordering routine}
-If the code is compiled with the right flags during the main loop then the
+If the code is compiled with the right flags then during the main loop the
 particles are grouped into a linked list for each cell in the domain, with all
 the particles which are in that cell linked into the list. The main list
 \inlinecode{species(ispecies)\%attached\_list} is empty and cannot be used
@@ -7187,9 +7177,8 @@ the other lists are simply appended to that list when the particles are
 reattached to the main list.\\
 
 You should not write an extension to the code which requires the use of the
-particle reordering routines if it is not necessary since these routines on
-their own take almost 1/20 of the particle pusher which can be quite
-significant.
+particle reordering routines if it can be avoided since these routines
+have a significant impact on performance.
 
 \pagebreak
 
@@ -7198,7 +7187,7 @@ significant.
     {\bf APPENDICES}
   \end{center}
 \section{Error Codes}
-The input deck and maths parser in {\EPOCH} uses various named error codes to
+The input deck and maths parser in {\EPOCH} use various named error codes to
 report on errors which occur during the evaluation of the input deck. These
 codes are
 \begin{itemize}
@@ -7206,27 +7195,27 @@ codes are
   no error has occurred.
 \item c\_err\_unknown\_block - In the input deck a block has been found which is
   not known. This should be returned in \inlinecode{handle\_custom\_block} if
-  it is passed any block but one with which it is familiar.
+  it is passed any block that it has not been written to handle.
 \item c\_err\_unknown\_element - In the input deck an element of a valid block
   has been found which is not known. This should be returned in
   \inlinecode{handle\_custom\_block} if an element is requested which is
   unknown.
 \item c\_err\_preset\_element - An element of the input deck has already been
   set and is being set again. Usually this is an indication of a malformed input
-  deck file, so \inlinecode{handle\_custom\_block} should try to identify
-  situations where this happens and pass return this error message if the
+  deck file, so \inlinecode{handle\_custom\_block} should try to
+  identify such situations and return this error message if
   subsequent attempts to set the variable are being ignored.
 \item c\_err\_preset\_element\_use\_later - An element of the input deck has
   already been set and is being set again. Usually this is an indication of a
   malformed input deck file, so \inlinecode{handle\_custom\_block} should try to
-  identify situations where this happens and pass return this error message if
-  the subsequent attempts to set the variable are still successful.
+  identify such situations and return this error message if
+  the subsequent attempts to set the variable override previous ones.
 \item {\bf c\_err\_bad\_value} - A value which is being evaluated for the right
   hand side of an element assignment is in some way invalid. Internally to the
-  code this usually means that an string which must be interpreted as an maths
-  expression or a numerical constant is in some way malformed. It is also
+  code this usually means that a string which must be interpreted as a maths
+  expression or numerical constant is in some way malformed. It is also
   acceptable to return this error code when a value has been passed which is
-  invalid for some other reason (the value is outside an acceptable range etc.)
+  invalid for some other reason (the value is outside an acceptable range, etc.)
 \item {\bf c\_err\_missing\_elements} - This is an error code returned when the
   code is testing to make sure that all necessary elements of an input deck
   file have been specified. It should be returned when some required parameter
@@ -7235,28 +7224,28 @@ codes are
   where execution is impossible and the code must terminate once the input deck
   has been read. Some other error codes automatically set c\_err\_terminate,
   but it can always be IOR'ed with any error code to force the code to exit.
-  Note that just returning c\_err\_terminate will just cause the code to
+  Note that just returning c\_err\_terminate will cause the code to
   silently quit.
 \item {\bf c\_err\_required\_element\_not\_set} - This means that the code
   cannot parse an input deck element since another element which must be known
   beforehand has not been set. This is intended for things like setting the
   species information where the number of species must be known in
   advance. This error code uses the extended error string to give user friendly
-  feedback, if you return this error code then you should set
+  feedback. If you return this error code then you should set
   extended\_error\_string to be equal to the name of the required element which
   has not been set. If multiple previous elements are required then the code
   should be set up so that it checks for the presence of the required elements
   in order and reports on missing elements so that the end user can fix them
   one by one.
-\item c\_err\_pp\_options\_wrong - If you've written a part of the code so that
-  the part is controlled by preprocessor options then you should return this
+\item c\_err\_pp\_options\_wrong - If you've written a section of the code that
+  is controlled by preprocessor options then you should return this
   error message if someone attempts to set input deck elements which refer to
   that part when the correct preprocessor options are not used. This means that
   the user is aware of the fact that the requested feature will not be
   active. This error code also uses the extended error string to give user
   friendly feedback. If you return this error code, you should set the string
-  extended\_error\_string to the define command (``-DPER\_PARTICLE\_WEIGHT'')
-  that would turn on the requested feature of the code.
+  extended\_error\_string to the define command that would turn on the
+  requested feature of the code (``-DPER\_PARTICLE\_WEIGHT'', for example).
 \item {\bf c\_err\_other} - This error code is a catch all error which causes
   the code to quit with a sarcastic error message. It's mainly intended for
   debugging and is used before the final error code is implemented.
