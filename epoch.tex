@@ -9,7 +9,7 @@
 \definecolor{warwickmid}{cmyk}{0.69,0.34,0.0,0.0}
 \definecolor{warwicklight}{cmyk}{1.0,0.0,0.0,0.0}
 \definecolor{warwickred}{cmyk}{0.0,1.0,0.65,0.15}
-\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\newcommand{\HRule}{\rule[0.3cm]{\linewidth}{0.5mm}}
 \newcommand{\emphtext}{\color{warwickdark} \fontfamily{phv}\selectfont\Large\bf}
 \newcommand{\simpleboxverbatim}{\begin{Verbatim}[obeytabs=true,frame=single,
   framerule=0.5mm,rulecolor=\color{warwickmid},formatcom=\color{black}]}
@@ -30,11 +30,9 @@
 \newcommand{\scaledcapimage}[4]
   {{\begin{figure}[hbt!]\centering\includegraphics[scale=#4]{#1}\caption{#3}
     \label{#2} \end{figure}}}
-\newcommand{\codedef}
-  {\begin{Verbatim}[formatcom=\color{warwickred},fontsize=\Large,hfuzz=0pt]}
-\newcommand{\coderule}{
-{\color{warwickred}\vspace{-0.5cm}\HRule}
-\codedef}
+
+\DefineVerbatimEnvironment{codedef}{Verbatim}
+  {formatcom=\color{warwickred},fontsize=\Large,commandchars=\\\{\}}
 
 \begin{document}
 {
@@ -5163,13 +5161,12 @@ type of boundary condition that the two apply is obvious from the name, but
 the two functions have different calling conventions.
 
 \pagebreak
-\codedef
+\begin{codedef}
 SUBROUTINE field_zero_gradient
-\end{Verbatim}
-\coderule
+\HRule
 REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: field
 LOGICAL, INTENT(IN) :: force
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/boundary.F90}\\
@@ -5186,13 +5183,12 @@ is set to \inlinecode{.TRUE.} to override the boundary condition values.
 {\Large Notes\\ \\}
 
 \pagebreak
-\codedef
+\begin{codedef}
 SUBROUTINE field_clamp_zero
-\end{Verbatim}
-\coderule
+\HRule
 REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: field
 INTEGER, DIMENSION(ndims), INTENT(IN) :: stagger
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Description\\}
 \inlinecode{field\_clamp\_zero} is the routine which clamps the field given by
@@ -5305,12 +5301,11 @@ There are three routines which deal with MPI exchange for field variables in
 deals with using MPI to sum variables at processor boundaries rather than
 synchronise ghost cells.\\\\
 
-\codedef
+\begin{codedef}
 SUBROUTINE field_bc
-\end{Verbatim}
-\coderule
+\HRule
 REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: field
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/boundary.F90}\\
@@ -5334,12 +5329,11 @@ balancing routine when fields with both the old and new sizes must be handled
 at the same time.
 
 \pagebreak
-\codedef
+\begin{codedef}
 SUBROUTINE processor_summation_bcs
-\end{Verbatim}
-\coderule
+\HRule
 REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: field
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/boundary.F90}\\
@@ -5365,18 +5359,17 @@ realistically one should already be a proficient MPI programmer before
 attempting to perform extensive modification to {\EPOCH}.
 
 \subsection{Particle List control functions}
-Collections of particles in {\EPOCH} are represented by Particle List
+Collections of particles in {\EPOCH} are represented by the #particle_List#
 object. These objects abstract much of the operation of the linked lists,
 including adding and removing particles and sending particles to other
 processors. The functions are as follows:
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION create_empty_partlist(partlist)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5393,15 +5386,14 @@ instead.
 {\Large Notes\\}
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION create_unsafe_partlist(partlist, a_particle, &
     n_elements)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 TYPE(particle), POINTER :: a_particle
 INTEGER(KIND=8), INTENT(IN) :: n_elements
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5418,33 +5410,31 @@ on safe particle lists.
 {\Large Notes\\}
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION create_unsafe_partlist_by_tail(partlist, head, &
     tail)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 TYPE(particle), POINTER :: head, tail
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Description\\}
 \inlinecode{create\_unsafe\_partlist\_by\_tail} is almost identical to
-\inlinecode{create\_unsafe\_partlist}, but instead of specifying a the first
+\inlinecode{create\_unsafe\_partlist}, but instead of specifying the first
 particle and a number of elements, the user specifies the first and last
-elements of the subset of the particle list. If the particle objects specified
+elements in the subset of the particle list. If the particle objects specified
 for head and tail are not in the same partlist or tail actually comes before
 head then the routine will fail in an undefined manner.
 \\[0.5cm]
 {\Large Notes\\}
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION create_allocated_partlist(partlist, n_elements)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 INTEGER(KIND=8), INTENT(IN) :: n_elements
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5461,15 +5451,14 @@ particle\_list objects will not change in the future. This routine will
 be modified to reflect any changes in the underlying code.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION create_filled_partlist(partlist, data_in, &
     n_elements)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 REAL(num), DIMENSION(:), INTENT(IN) :: data_in
 INTEGER(KIND=8), INTENT(IN) :: n_elements
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5489,12 +5478,11 @@ particle\_list objects will not change in the future. This routine will
 be modified to reflect any changes in the underlying code.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION test_partlist(partlist)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5531,12 +5519,11 @@ written in such a way that it is impossible for a particle\_list object to
 become corrupted.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION destroy_partlist(partlist)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5559,12 +5546,11 @@ happens regularly then the code will quickly crash, usually with a SIG\_SEGV
 error.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION copy_partlist(partlist1, partlist2)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist1, partlist2
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5579,12 +5565,11 @@ not copy the particles, just sets the head and tail pointers of
 {\Large Notes\\}
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION append_partlist(head, tail)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: head, tail
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5600,13 +5585,12 @@ This routine can only append one safe particle\_list to another safe
 particle\_list.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION add_particle_to_partlist(partlist, new_particle)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 TYPE(particle), POINTER :: new_particle
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5622,14 +5606,13 @@ If you want to add a new particle to the end of a particle list you should
 always use this routine.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION remove_particle_from_partlist(partlist, &
     a_particle)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 TYPE(particle), POINTER :: a_particle
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5651,12 +5634,11 @@ As a general rule, you should only use this routine to remove particles from a
 simple particle\_list which is a singly referenced primary, safe particle\_list.
 
 \pagebreak
-\codedef
+\begin{codedef}
 SUBROUTINE setup_partlists()
-\end{Verbatim}
-\coderule
+\HRule
 
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5681,14 +5663,13 @@ the correct number when that preprocessor directive is active. For example
 \end{Verbatim}
 
 \pagebreak
-\codedef
+\begin{codedef}
 SUBROUTINE   pack_particle(data, a_particle)
 SUBROUTINE unpack_particle(data, a_particle)
-\end{Verbatim}
-\coderule
+\HRule
 REAL(num), DIMENSION(:), INTENT(INOUT) :: data
 TYPE(particle), POINTER :: a_particle
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5721,12 +5702,11 @@ found at \url{http://www.macresearch.org/%
 advanced_fortran_90_callbacks_with_the_transfer_function}.
 
 \pagebreak
-\codedef
+\begin{codedef}
 SUBROUTINE display_particle(a_particle)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle), POINTER :: a_particle
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5736,13 +5716,12 @@ Displays the key information about a particle given by the parameter
 \inlinecode{a\_particle}. Used by\linebreak \inlinecode{compare\_particles}.
 \\[0.5cm]
 
-\codedef
+\begin{codedef}
 FUNCTION compare_particles(particle1, particle2)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle), POINTER :: particle1, particle2
 LOGICAL :: compare_particles
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5755,15 +5734,14 @@ this routine should also be modified to test for equivalence of the new
 properties.
 \\[0.5cm]
 
-\codedef
+\begin{codedef}
 SUBROUTINE test_packed_particles(partlist, data, &
     npart_in_data)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(IN) :: partlist
 REAL(num), DIMENSION(:), INTENT(IN) :: data
 INTEGER(KIND=8), INTENT(IN) :: npart_in_data
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5791,13 +5769,12 @@ processors.
 \\[0.5cm]
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION partlist_send(partlist, dest)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 INTEGER, INTENT(IN) :: dest
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5817,13 +5794,12 @@ version of \inlinecode{partlist\_send}, but at present no need for such a
 routine has been found.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION partlist_recv(partlist, src)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 INTEGER, INTENT(IN) :: src
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5852,15 +5828,14 @@ an empty particle\_list to receive the data.
 \end{itemize}
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION partlist_send_recv(partlist_send, partlist_recv, &
     dest, src)
-\end{Verbatim}
-\coderule
+\HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist_send
 TYPE(particle_list), INTENT(INOUT) :: partlist_recv
 INTEGER, INTENT(IN) :: dest, src
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/partlist.F90}\\
@@ -5996,12 +5971,11 @@ the general purpose subroutines are described here, since most of the other
 routines are fairly clear and use these routines internally.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION create_particle_subtype(npart_local)
-\end{Verbatim}
-\coderule
+\HRule
 INTEGER(KIND=8), INTENT(IN) :: npart_local
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/mpi\_subtype\_control.F90}\\
@@ -6021,15 +5995,14 @@ processor 2 etc.'' rather than ``All of species 1, All of species 2''. To create
 this type of layout use \inlinecode{create\_ordered\_particle\_subtype}
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION create_ordered_particle_subtype(n_species_dump, &
     npart_local)
-\end{Verbatim}
-\coderule
+\HRule
 INTEGER, INTENT(IN) :: n_species_dump
 INTEGER(KIND=8), DIMENSION(n_species_dump), &
     INTENT(IN) :: npart_local
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/mpi\_subtype\_control.F90}\\
@@ -6048,16 +6021,15 @@ species 2 etc.'' as opposed to \inlinecode{create\_particle\_subtype}. It does,
 however, need rather more memory and is slower.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION create_field_subtype(n{x,y,z}_local, &
     cell_start_{x,y,z}_local)
-\end{Verbatim}
-\coderule
+\HRule
 INTEGER, INTENT(IN) :: n_x_local, n_y_local, n_z_local
 INTEGER, INTENT(IN) :: cell_start_x_local
 INTEGER, INTENT(IN) :: cell_start_y_local
 INTEGER, INTENT(IN) :: cell_start_z_local
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/housekeeping/mpi\_subtype\_control.F90}\\
@@ -6552,13 +6524,12 @@ place. Any routines in \inlinecode{src/deck/strings.F90} and
 documentation are legacy routines and SHOULD NOT BE USED.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION str_cmp(str_in, str_test)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in, str_test
 LOGICAL :: str_cmp
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
@@ -6574,14 +6545,13 @@ A developer should always use \inlinecode{str\_cmp} rather than doing their own
 string testing to ensure consistent behaviour across the entire of {\EPOCH}.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION as_real_simple(str_in, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 REAL(num) :: as_real_simple
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
@@ -6602,14 +6572,13 @@ mathematical expression. The routine is used inside the maths parser to parse
 simple numbers.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION as_integer_simple(str_in, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 INTEGER :: as_integer_simple
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
@@ -6631,14 +6600,13 @@ input deck parameters, since there is no reason to restrict the user from
 specifying mathematical expressions.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION as_long_integer_simple(str_in, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 INTEGER(KIND=8) :: as_long_integer_simple
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
@@ -6651,14 +6619,13 @@ INTEGER(KIND=8) :: as_long_integer_simple
 {\Large Notes\\}
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION as_direction(str_in, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 INTEGER :: as_direction
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
@@ -6685,14 +6652,13 @@ moving input decks between different dimension versions of {\EPOCH}, each code
 only recognises the strings for boundaries that it actually has.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION as_logical(str_in, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 Logical :: as_logical
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings.F90}\\
@@ -6707,15 +6673,14 @@ You should use this rather than using a 0/1 boolean flag in the input deck for
 consistency.
 
 \pagebreak
-\codedef
+\begin{codedef}
 SUBROUTINE split_off_int(str_in, str_out, int_out, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 CHARACTER(LEN=entry_length), INTENT(OUT) :: str_out
 INTEGER, INTENT(OUT) :: int_out
 INTEGER, INTENT(INOUT) :: err
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
@@ -6734,14 +6699,13 @@ specific block parsers. Again, this routine should be used to split strings
 like this rather than coding a new routine.
 
 \pagebreak
-\codedef
+\begin{codedef}
 SUBROUTINE split_range(str_in, real1, real2, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 REAL(num), INTENT(OUT) :: real1, real2
 INTEGER, INTENT(INOUT) :: err
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
@@ -6762,14 +6726,13 @@ routine in the future. It is expected that the function will have the same name
 and behaviour, but might have subtle differences.}
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION as_integer(str_in, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 INTEGER :: as_integer
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
@@ -6788,14 +6751,13 @@ quantities are given to it (like rho, ex etc.). To evaluate a spatially varying
 quantity use \inlinecode{evaluate\_string\_in\_space}.
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION as_long_integer(str_in, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 INTEGER(KIND=8) :: as_long_integer
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
@@ -6811,14 +6773,13 @@ This routine should be used when evaluating strings which are likely to be too
 large to be stored in an INTEGER(KIND=4).
 
 \pagebreak
-\codedef
+\begin{codedef}
 FUNCTION as_real(str_in, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 REAL(num) :: as_real
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
@@ -6835,17 +6796,16 @@ quantities are given to it (like rho, ex etc.). To evaluate a spatially varying
 quantity use \inlinecode{evaluate\_string\_in\_space}.
 
 \pagebreak
-\codedef
+\begin{codedef}
 SUBROUTINE evaluate_string_in_space(str_in, data_out, &
     xrange, {yrange}, {zrange}, err)
-\end{Verbatim}
-\coderule
+\HRule
 CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
 REAL(num), DIMENSION(1:,{1:},{1:}), INTENT(OUT) :: data_out
 INTEGER, DIMENSION(2), INTENT(IN) :: xrange, {yrange}
 INTEGER, DIMENSION(2), INTENT(IN) :: {zrange}
 INTEGER, INTENT(INOUT) :: err
-\end{Verbatim}
+\end{codedef}
 \vspace{1cm}
 {\Large Location\\}
 \inlinecode{src/deck/strings\_advanced.F90}\\
