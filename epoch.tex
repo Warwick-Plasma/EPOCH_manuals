@@ -1,7 +1,7 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{url,graphicx,tabularx,array}
 \usepackage[margin=.5in,nohead]{geometry}
-\usepackage{color}
+\usepackage{color,verbatim,framed}
 \usepackage{moreverb}
 \usepackage{fancyvrb}
 \usepackage{amsmath}
@@ -11,11 +11,6 @@
 \definecolor{warwickred}{cmyk}{0.0,1.0,0.65,0.15}
 \newcommand{\HRule}{\rule[0.3cm]{\linewidth}{0.5mm}}
 \newcommand{\emphtext}{\color{warwickdark} \fontfamily{phv}\selectfont\Large\bf}
-\newcommand{\simpleboxverbatim}{\begin{Verbatim}[obeytabs=true,frame=single,
-  framerule=0.5mm,rulecolor=\color{warwickmid},formatcom=\color{black}]}
-\newcommand{\boxverbatim}[1]{\begin{Verbatim}[obeytabs=true,frame=single,
-  framerule=0.5mm,rulecolor=\color{warwickmid},formatcom=\color{black},
-  label=#1]}
 \newcommand{\inlinecode}[1]{{\color{warwickred} \bf\texttt{#1}}}
 \newcommand{\code}[1]{{\texttt{#1}}}
 \newcommand{\qtt}[1]{``{\code{#1}}''}
@@ -30,6 +25,43 @@
 \newcommand{\scaledcapimage}[4]
   {{\begin{figure}[hbt!]\centering\includegraphics[scale=#4]{#1}\caption{#3}
     \label{#2} \end{figure}}}
+\definecolor{shadecolor}{cmyk}{0.2,0.05,0.0,0.0}
+\setlength{\FrameRule}{0.6mm}
+
+\newenvironment{lboxverbatim}[1]{
+\setlength{\FrameSep}{0pt}
+%\topsep=0ex\relax
+\def\FrameCommand{\fboxsep=0pt \colorbox{shadecolor}}
+\MakeFramed{\FrameRestore}
+\vspace{-13.5pt}
+\fvset{label=#1}
+\boxverb
+}{
+\endboxverb
+\vspace{-13.5pt}
+\endMakeFramed
+}
+\newenvironment{boxverbatim}{\lboxverbatim{none}}{\endlboxverbatim}
+
+\newenvironment{nbboxverbatim}[1]{
+\noindent\minipage{\textwidth}
+\setlength{\FrameSep}{0pt}
+%\topsep=0ex\relax
+\def\FrameCommand{\fboxsep=0pt \colorbox{shadecolor}}
+\MakeFramed{\FrameRestore}
+\fvset{label=#1}
+\boxverb
+}{
+\endboxverb
+\vspace{-13.5pt}
+\endMakeFramed
+\endminipage
+\vspace{5pt}
+}
+
+\DefineVerbatimEnvironment{boxverb}{Verbatim}
+  {frame=single,framerule=0.5mm,rulecolor=\color{warwickmid},
+   formatcom=\color{black}}
 
 \DefineVerbatimEnvironment{codedef}{Verbatim}
   {formatcom=\color{warwickred},fontsize=\Large,commandchars=\\\{\}}
@@ -139,8 +171,8 @@ works. Some of the material covered in these getting started guides will also
 appear in the body of the manual.
 
 \subsection{Running {\EPOCH} and basic control of EPOCH1D}
-When the code is run, the output is\\
-\boxverbatim{Command line output}
+When the code is run, the output is
+\begin{lboxverbatim}{Command line output}
 @@@@@@@@  @@@@@@      @@@@    @@@@@@@@  @@    @@    @@@@@@    @@@@@@
 @@@@@@@@  @@@@@@      @@@@    @@@@@@@@  @@    @@    @@@@@@    @@@@@@
 @@        @@    @@  @@    @@  @@        @@    @@       @@@    @@  @@
@@ -167,7 +199,7 @@ Welcome to EPOCH1D Version 2.1
  *************************************************************
 
  Specify output directory
-\end{Verbatim}
+\end{lboxverbatim}
 
 At which point the end user should simply type in the name of the directory
 where the code output is to be placed. This directory must also include the
@@ -189,7 +221,7 @@ The \cemph{control} block sets up the basic code properties for the
 domain, the end time of the code, the load balancer and the types of initial
 conditions to use.
 
-\boxverbatim{control block}
+\begin{lboxverbatim}{control block}
 begin:control
    nx=2000 # in x
    npart=200*200*40
@@ -208,7 +240,7 @@ begin:control
    # restart_snapshot=98
    neutral_background=T
 end:control
-\end{Verbatim}
+\end{lboxverbatim}
 
 As illustrated in the above code block, the ``\#'' symbol is treated as a
 comment character and the code ignores everything on a line following this
@@ -261,12 +293,12 @@ of the domain. Some types of boundaries allow EM wave sources (lasers) to be
 attached to a boundary. Lasers are attached at the initial conditions
 stage.
 
-\boxverbatim{boundaries block}
+\begin{lboxverbatim}{boundaries block}
 begin:boundaries
    bc_x_min=simple_laser
    bc_x_max=simple_outflow
 end:boundaries
-\end{Verbatim}
+\end{lboxverbatim}
 
 {\emphtext bc\_x\_min} - The condition for the left boundary.
 ``xbc\_left'' is accepted as a synonym.\\
@@ -310,7 +342,7 @@ one or more boundaries then the code will no longer necessarily conserve mass.}
 
 \subsubsection{\inlineemph{species} block}
 
-\boxverbatim{species block}
+\begin{lboxverbatim}{species block}
 begin:species
    n_species=2
 
@@ -330,7 +362,7 @@ begin:species
    name2=Carbon
    dump2=T
 end:species
-\end{Verbatim}
+\end{lboxverbatim}
 
 {\emphtext n\_species} - This MUST be the first entry in the species block and
 specifies the number of species in the simulation. After this line, the
@@ -440,7 +472,7 @@ by addition as in: \inlinecode{px = always + species}.\\
 When applied to a variable, these codes are referred to as a
 \inlineemph{dumpmask}.\\
 
-\boxverbatim{output block}
+\begin{lboxverbatim}{output block}
 begin:output
    # If use_offset_grid is true then the code dumps a grid which
    # displays positions relative to the left hand edge of the window
@@ -485,7 +517,7 @@ begin:output
    distribution_functions=always
    particle_probes=never
 end:output
-\end{Verbatim}
+\end{lboxverbatim}
 
 {\emphtext use\_offset\_grid} - When using moving windows some visualisation
 programs (notably VisIt) show the motion of the window by moving the
@@ -581,7 +613,7 @@ details the blocks that can be set to set up the initial conditions.
 
 \subsubsection{\inlineemph{constants} and \inlineemph{DEO} blocks}
 
-\boxverbatim{constant block}
+\begin{lboxverbatim}{constant block}
 begin:constant
    lambda=1.0e-6 # 1 micron wavelength
    omega=2.0*pi*c/lambda
@@ -597,14 +629,14 @@ begin:constant
    wy=1e-6
    y=0.0
 end:constant
-\end{Verbatim}
+\end{lboxverbatim}
 
-\boxverbatim{deo block}
+\begin{lboxverbatim}{deo block}
 begin:deo
    slope=exp(-2.0*(y/wy)^2)
    blob=gauss(sqrt(x^2+y^2),0.0,1.0e-6)
 end:deo
-\end{Verbatim}
+\end{lboxverbatim}
 
 The initial conditions deck in {\EPOCH} is set up, using the normal maths
 expressions, by setting the density and temperature for each species which is
@@ -657,7 +689,7 @@ the code where needed.
 Laser blocks attach an EM wave source to a boundary which is set as
 \inlineemph{simple\_laser}.
 
-\boxverbatim{laser block}
+\begin{lboxverbatim}{laser block}
 begin:laser
    boundary=x_min
    amp=3.222499e13
@@ -670,7 +702,7 @@ begin:laser
    t_start=0.0
    t_end=80.0e-15
 end:laser
-\end{Verbatim}
+\end{lboxverbatim}
 
 As already mentioned in the discussion of laser boundaries in the boundaries
 block, lasers are attached to compatible boundaries here in the initial
@@ -762,7 +794,8 @@ timestep is reduced from that for EM waves. The latest version of {\EPOCH}
 includes a high order field solver to attempt to reduce this.
 
 \subsubsection{\inlineemph{species\inlinecode{n}} block}
-\boxverbatim{species{\it n} block}
+
+\begin{lboxverbatim}{species{\it n} block}
 begin:species2
    rho=if(abs(x) lt thick,den_max,0.0)
    rho=if((x gt -thick) and (abs(y) gt 2e-6),0.0,rho(2))
@@ -777,7 +810,7 @@ begin:species1
    temp_y=temp_x(1)
    minrho=0.1 * den_max
 end:species1
-\end{Verbatim}
+\end{lboxverbatim}
 
 The actual initial conditions are specified in one or more blocks called
 species blocks. There should be one of these blocks for each species which is
@@ -829,13 +862,13 @@ the distribution function for this species. At present the drift\_\{x,y,z\}
 parameter CANNOT vary in space and is just a single constant.
 
 \subsubsection{\inlineemph{species\_external\inlinecode{n}} block}
-\boxverbatim{species\_external{\it n} block}
+\begin{lboxverbatim}{species\_external{\it n} block}
 begin:species_external2
    rho=Data/ic.dat
    offset=80000
    temp_x=Data/ic.dat
 end:species_external2
-\end{Verbatim}
+\end{lboxverbatim}
 
 The penultimate type of block in the initial conditions deck is the
 species\_external\inlinecode{n} block. It is very similar to the ic.deck
@@ -866,7 +899,7 @@ files, NOT Fortran unformatted files. It is possible to read Fortran
 unformatted files using the offset element, but care must be taken!}\\
 
 \subsubsection{\inlineemph{fields} block}
-\boxverbatim{fields block}
+\begin{lboxverbatim}{fields block}
 begin:fields
    ex=sin(pi*x/length_x)
    ey=cos(pi*x/length_x)
@@ -875,7 +908,7 @@ begin:fields
    by=-1.0
    bz=0
 end:fields
-\end{Verbatim}
+\end{lboxverbatim}
 
 The final type of block in the {\EPOCH} input deck is the fields block. This
 allows you to specify the electric and magnetic fields at any point in the
@@ -916,7 +949,7 @@ in {\EPOCH} more useful. These will be covered in the following sections.\\
 
 \subsubsection{Changes to the \inlineemph{control} block}
 
-\boxverbatim{Changed control block}
+\begin{lboxverbatim}{Changed control block}
 begin:control
    .
    .
@@ -930,7 +963,7 @@ begin:control
    .
    .
 end:control
-\end{Verbatim}
+\end{lboxverbatim}
 
 The modified control block in EPOCH2D and 3D is very similar to the control
 block already introduced for EPOCH1D. All that is added are new elements
@@ -948,7 +981,7 @@ simulations.\\
 
 \subsubsection{Changes to the \inlineemph{boundaries} block}
 
-\boxverbatim{Changed boundaries block}
+\begin{lboxverbatim}{Changed boundaries block}
 begin:boundaries
    .
    .
@@ -957,7 +990,7 @@ begin:boundaries
    bc_z_min=simple_laser
    bc_z_max=simple_outflow
 end:boundaries
-\end{Verbatim}
+\end{lboxverbatim}
 
 The modified boundary block includes new boundary conditions for the additional
 boundaries that are introduced in higher dimensions. These available boundaries
@@ -1006,8 +1039,7 @@ present these are not very interesting initial conditions.
 
 The next example extends this to a more useful initial condition.\\
 
-\noindent\begin{minipage}{\textwidth}
-\boxverbatim{species block to set up Gaussian density blob}
+\begin{nbboxverbatim}{species block to set up Gaussian density blob}
 begin:constant
    width=2.5e-6 # 2.5 microns
 end:constant
@@ -1019,11 +1051,10 @@ end:deo
 begin:species1
    rho=1.0e19 * gauss(r,0.0,width)
 end:species1
-\end{Verbatim}
-\end{minipage}
+\end{nbboxverbatim}
 %
-\begin{minipage}{\textwidth}
-\boxverbatim{species block to set up Gaussian density blob}
+%\begin{minipage}{\textwidth}
+\begin{lboxverbatim}{species block to set up Gaussian density blob}
 begin:constant
    width=2.5e-6 # 2.5 microns
 end:constant
@@ -1035,8 +1066,8 @@ end:deo
 begin:species1
    rho=1.0e19 * (1.0-gauss(r,0.0,width))
 end:species1
-\end{Verbatim}
-\end{minipage}
+\end{lboxverbatim}
+%\end{minipage}
 
 \subsubsection{\inlineemph{laser} blocks in multiple dimensions.}
 
@@ -1081,8 +1112,7 @@ would be required to allow a laser to propagate in from a corner.\\
 
 \subsubsection{Distribution functions}
 %
-\begin{minipage}{\textwidth}
-\boxverbatim{dist\_fn block}
+\begin{nbboxverbatim}{dist\_fn block}
 begin:dist_fn
    name=x_px
    ndims=2
@@ -1103,8 +1133,7 @@ begin:dist_fn
    include_species_2=T
    include_species_3=T
 end:dist_fn
-\end{Verbatim}
-\end{minipage}
+\end{nbboxverbatim}
 
 One way of considering the PIC methodology is based on the idea of using the
 simulation pseudoparticles as Monte-Carlo sampling points of the phase space
@@ -1202,9 +1231,8 @@ there will be empty sections of the distribution function plot.}
 An obvious simple test problem to do with {\EPOCH} is the electron two stream
 instability. An example of a nice dramatic two stream instability can be
 obtained using EPOCH1D by setting the code with the following input deck
-files.\\
-
-\boxverbatim{input.deck}
+files.
+\begin{lboxverbatim}{input.deck}
 begin:control
    # global number of gridpoints
    nx=400 # in x
@@ -1297,9 +1325,9 @@ begin:output
 end:output
 
 include:ic.deck
-\end{Verbatim}
+\end{lboxverbatim}
 
-\boxverbatim{ic.deck}
+\begin{lboxverbatim}{ic.deck}
 begin:constant
    drift_p=2.5e-24
    temp=273
@@ -1317,7 +1345,7 @@ begin:species2
    drift_x=-drift_p
    rho=dens
 end:species2
-\end{Verbatim}
+\end{lboxverbatim}
 
 \scaledcapimage{./images/late}{tsilate}{The final state of the electron
   phase space for the two stream instability example.}{0.4}
@@ -1337,9 +1365,8 @@ The final output from this simulation is shown in Figure~\ref{tsilate}.
 \subsubsection{Structured density profile in EPOCH2D}
 A simple but useful example for EPOCH2D is to have a highly structured initial
 condition to show that this is still easy to implement in {\EPOCH}. A good
-example initial condition would be\\
-
-\boxverbatim{ic.deck}
+example initial condition would be:
+\begin{lboxverbatim}{ic.deck}
 begin:constant
   den_peak=1.0e19
 end:constant
@@ -1352,7 +1379,7 @@ end:species1
 begin:species2
   rho=rho(1)
 end:species2
-\end{Verbatim}
+\end{lboxverbatim}
 
 Although not included here, the input deck associated with these initial
 conditions sets \inlineemph{species1} to be electrons and \inlineemph{species2}
@@ -1370,9 +1397,8 @@ density should look like Figure~\ref{densitycomplex}
 
 \subsubsection{A hollow cone in 3D}
 A more useful example of an initial condition is to create a hollow cone. This
-is easy to do in both 2D and 3D, but is presented here in 3D form.\\
-
-\boxverbatim{ic.deck}
+is easy to do in both 2D and 3D, but is presented here in 3D form.
+\begin{lboxverbatim}{ic.deck}
 begin:constants
    den_cone=1.0e22
 end:constants
@@ -1392,7 +1418,7 @@ end:species2
 begin:species1
    rho=rho(2) * 22.0
 end:species1
-\end{Verbatim}
+\end{lboxverbatim}
 
 To convert this to 2D, simply replace the line
 \inlinecode{r=sqrt(y\^{}2+z\^{}2)} with the line \inlinecode{r=abs(y)}. The
@@ -1508,9 +1534,8 @@ binary file by typing:\\
 \indent\inlinecode{./bin/epoch2d}\\
 or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
-reads\\
-
-\simpleboxverbatim
+reads:
+\begin{boxverbatim}
 Welcome to EPOCH2D Version 2.1
 
  The code was compiled with the following compile time options
@@ -1522,7 +1547,7 @@ Welcome to EPOCH2D Version 2.1
  *************************************************************
 
  Specify output directory
-\end{Verbatim}
+\end{boxverbatim}
 
 At this point, the user simply types in the name of the (already existing)
 output directory and the code will read the input deck files inside the
@@ -1541,10 +1566,10 @@ documentation for more details.
 \subsection{Compiler flags and preprocessor defines}
 As already stated, some features of the code are controlled by compiler
 preprocessor directives. The flags for these preprocessor directives are
-specified in ``Makefile'' and are placed on the line which reads\\
-\simpleboxverbatim
+specified in ``Makefile'' and are placed on the line which reads:
+\begin{boxverbatim}
 DEFINES = -DPER_PARTICLE_WEIGHT
-\end{Verbatim}
+\end{boxverbatim}
 To turn on the effect given by a given preprocessor directive, just add the
 command \inlinecode{-D\{directive\}} to the \inlinecode{DEFINES} line. The
 options currently controlled by the preprocessor are:\\
@@ -1590,20 +1615,20 @@ options currently controlled by the preprocessor are:\\
 \end{itemize}
 
 So to turn on per particle weighting and particle debugging, the line would
-look like:\\
-\simpleboxverbatim
+look like:
+\begin{boxverbatim}
 DEFINES = -DPER_PARTICLE_WEIGHT -DPARTICLE_DEBUG
-\end{Verbatim}
+\end{boxverbatim}
 
 If a user requests an option which the code has not been compiled to support
 then the code will give an error message as follows:
-\simpleboxverbatim
+\begin{boxverbatim}
  ***WARNING***
  The element "particle_probes" of block "output" cannot be set
  because the code has not been compiled with the correct preprocessor options.
  Code will continue, but to use selected features, please recompile with the
  -DPARTICLE_PROBES option
-\end{Verbatim}
+\end{boxverbatim}
 
 It is also possible to pass other flags to the compiler. In ``Makefile'' there
 is a line which reads\\
@@ -1657,8 +1682,8 @@ writer of the extension for assistance. The eleven built in blocks are
 \end{itemize}
 
 \subsubsection{The control block}
-The control block of a valid input deck for EPOCH2D reads as follows\\
-\simpleboxverbatim
+The control block of a valid input deck for EPOCH2D reads as follows:
+\begin{boxverbatim}
 begin:control
    # global number of gridpoints
    nx=512 # in x
@@ -1689,7 +1714,7 @@ begin:control
    # Setting it to T makes the initial electric field 0
    neutral_background=T
 end:control
-\end{Verbatim}
+\end{boxverbatim}
 
 Most of the control block is self explanatory, but there are two parts which
 need further description. \\
@@ -1721,8 +1746,8 @@ excess or depletion at t=0.\\
 
 \subsubsection{The boundaries block}
 The next section of the input deck describes the boundary conditions. The
-boundaries block for EPOCH3D is as follows:\\
-\simpleboxverbatim
+boundaries block for EPOCH3D is as follows:
+\begin{boxverbatim}
 begin:boundaries
    bc_x_min=other
    bc_x_max=other
@@ -1731,7 +1756,7 @@ begin:boundaries
    bc_z_min=other
    bc_z_max=other
 end:boundaries
-\end{Verbatim}
+\end{boxverbatim}
 
 This block is fairly self explanatory and describes the boundary conditions
 applied to each of the 6 faces of the cuboid which represents the extents of
@@ -1756,8 +1781,8 @@ driven boundaries and absorbing boundaries.\\
 
 \subsubsection{The species block}
 The next section of the input deck describes the particle species used in the
-code. An example species block for any {\EPOCH} code is given below\\
-\simpleboxverbatim
+code. An example species block for any {\EPOCH} code is given below.
+\begin{boxverbatim}
 begin:species
    n_species=2
 
@@ -1775,7 +1800,7 @@ begin:species
    name2=Electron
    dump2=T
 end:species
-\end{Verbatim}
+\end{boxverbatim}
 
 The species block is slightly more complex than preceding blocks in that the
 number of species described in a block must be specified in advance. While
@@ -1816,8 +1841,8 @@ number of particles in the simulation will be lower than expected.\\
 \subsubsection{The output block}
 The next section of the input deck is the output section. It describes the
 data that the user wants dumped from the code and an example block from any
-version of {\EPOCH} is given below\\
-\simpleboxverbatim
+version of {\EPOCH} is given below.
+\begin{boxverbatim}
 begin:output
    # If use_offset_grid is true then the code dumps a
    # grid which displays positions relative to the
@@ -1859,7 +1884,7 @@ begin:output
    mass_density=always
    charge_density=always
 end:output
-\end{Verbatim}
+\end{boxverbatim}
 
 The first set of options control the type and frequency of output dumps. They
 are used as follows\\
@@ -1933,8 +1958,8 @@ introduces new particles so that for each species the new particles have a
 given number density, temperature and number of pseudoparticles per cell. It
 is not currently possible to turn off the reintroduction of particles to allow
 a pulse to travel into a vacuum region, although this is being developed. The
-block looks like\\
-\simpleboxverbatim
+block looks like:
+\begin{boxverbatim}
 begin:window
    move_window=T
    window_v_x=3.0e8
@@ -1942,7 +1967,7 @@ begin:window
    bc_x_min_after_move=simple_outflow
    bc_x_max_after_move=simple_outflow
 end:window
-\end{Verbatim}
+\end{boxverbatim}
 
 \begin{itemize}
 \item move\_window - Logical flag determining whether or not to move the
@@ -2054,8 +2079,8 @@ block called {\it constant} which simply contains the constants which you want
 to set up. Suppose, for example, that you have a problem in 1D where the Debye
 length is known and you want the box to be a fixed number of Debye lengths,
 and the grid spacing to always be at least 0.5 Debye lengths, you would set
-that up as follows\\
-\simpleboxverbatim
+that up as follows:
+\begin{boxverbatim}
 begin:constant
   l_debye=1.0e-6 # Debye length is 1 micrometer
   n_debye_in_box = 100 # number of debye lengths in simulation
@@ -2071,7 +2096,7 @@ begin:control
   nx = if(n_gp_per_debye gt 2, n_gridpoints, n_debye_in_box * 2)
   length_x = l_metres
 end:control
-\end{Verbatim}
+\end{boxverbatim}
 
 Note that in this case, it is still up to the user to ensure that the Debye
 length is actually the value given in \inlinecode{l\_debye} by setting the
@@ -2079,8 +2104,8 @@ initial conditions. The named constants are created the first time they are
 specified, and can be reset at will. It is possible to have several instances
 of the constant block, either creating new constants or resetting existing
 ones. It is possible to end other blocks, define constants, and then
-restart the block, so this is valid\\
-\simpleboxverbatim
+restart the block, so this is valid:
+\begin{boxverbatim}
 begin:control
    # some of control block
 end:control
@@ -2092,7 +2117,7 @@ end:constant
 begin:control
    # rest of control block
 end:control
-\end{Verbatim}
+\end{boxverbatim}
 
 \subsection{MPI in {\EPOCH}}
 {\EPOCH} is a parallel PIC code using the standard MPI 2.0 library. However, the
@@ -2160,9 +2185,8 @@ internally.
 \subsubsection{Setting autoloader parameters within {\EPOCH}}
 Within {\EPOCH}, there are Fortran90 structures which represent the information
 needed by the autoloader for each species. In 2D, the definition of these
-structures is
-
-\simpleboxverbatim
+structures is:
+\begin{boxverbatim}
 TYPE :: initial_condition_block
 
   REAL(num), DIMENSION(:,:), ALLOCATABLE :: rho ! Number density
@@ -2171,7 +2195,7 @@ TYPE :: initial_condition_block
   REAL(num) :: maxrho ! Maximum density
 
 END TYPE initial_condition_block
-\end{Verbatim}
+\end{boxverbatim}
 
 In 1D, there is one fewer dimension to both arrays, and in 3D there is one
 more dimension to both arrays. An instance of the structure is created for
@@ -2192,8 +2216,8 @@ elements of this structure have the following definitions (again in 2D)\\
 \end{itemize}
 
 So an example of setting up a cold plasma block for all species in 2D would
-look like
-\simpleboxverbatim
+look like:
+\begin{boxverbatim}
 SUBROUTINE ic_early
 
   INTEGER :: ispecies
@@ -2212,7 +2236,7 @@ SUBROUTINE ic_early
   ENDDO
 
 END SUBROUTINE ic_early
-\end{Verbatim}
+\end{boxverbatim}
 
 This sets up a plasma slab with a density of 100 particles per square metre
 between x=-1 and x=+1 with no restriction on y. Note that density is never set
@@ -2238,8 +2262,7 @@ in much the same way as the ``ic\_early'' routine except that in
 whereas in ``manual\_load'' they will contain any changes made in ``ic\_early''
 and in the external initial conditions. So to take a (very silly) example, I
 could use the following code to change the slab to have a finite width in y.
-
-\simpleboxverbatim
+\begin{boxverbatim}
   SUBROUTINE manual_load
 
     INTEGER :: ispecies
@@ -2254,7 +2277,7 @@ could use the following code to change the slab to have a finite width in y.
     ENDDO
 
   END SUBROUTINE manual_load
-\end{Verbatim}
+\end{boxverbatim}
 
 Once this has been added, the output becomes that shown in Figure~\ref{square}.
 Both Figures~\ref{slab} and \ref{square} are from runs with the same number of
@@ -2272,8 +2295,7 @@ from the input deck. These blocks have the same maths capabilities as other
 input deck blocks, but with some additional constants and functions which
 only make sense when specifying initial conditions.\\
 
-\noindent\begin{minipage}{\textwidth}
-\simpleboxverbatim
+\begin{nbboxverbatim}{none}
 begin:constant
    partdens=1.0e25
    wpe=sqrt(partdens * qe^2/(me * epsilonnought))
@@ -2294,8 +2316,7 @@ begin:species2
    temp_y=temp_x(1)
    minrho=0.3*partdens
 end:species2
-\end{Verbatim}
-\end{minipage}
+\end{nbboxverbatim}
 
 In the above example we have made use of the ``species'' block for specifying
 initial conditions. There is one species block for each species given in
@@ -2373,7 +2394,7 @@ allow it to work with some fairly fundamental features of the maths parser
 used in {\EPOCH}.\\
 All that is required now is to give an example. A good example is to reproduce
 the previous example of an isolated plasma block in 2D. This would look like:
-\simpleboxverbatim
+\begin{boxverbatim}
 begin:species1
    # first set density in the range 0->1
    # cut down density in x direction
@@ -2403,7 +2424,7 @@ begin:species2
    # Set the minimum density for this species
    minrho=0.3*100.0
 end:species2
-\end{Verbatim}
+\end{boxverbatim}
 
 This produces the same output as that shown in Figure~\ref{square}, since
 the two sets of initial conditions are exactly equivalent to each other.
@@ -2416,15 +2437,15 @@ brackets.
 
 \subsubsection{Setting autoloader properties from an external binary file}
 It is possible to load external data files into variables used by the
-autoloader. In the input deck this is done as follows
-\simpleboxverbatim
+autoloader. In the input deck this is done as follows:
+\begin{boxverbatim}
 begin:species_external1
    rho=Data/data.file
    offset=80000
    temp_x=Data/data.file
    temp_y=Data/data.file
 end:species_external1
-\end{Verbatim}
+\end{boxverbatim}
 
 The species\_external block is very similar to the species block, except that
 where you would normally specify a functional form for a variable, you now
@@ -2436,8 +2457,8 @@ offset} bytes from the start of the file. {\bf offset} is reset to zero at the
 start of a new {\it species\_external} block, but is not reset within a given
 {\it species\_external} block. Therefore, in the example above, {\bf temp\_x}
 and {\bf temp\_y} are assigne the same values. The data is immediately loaded
-into the requested variable, so it is valid to do the following.
-\simpleboxverbatim
+into the requested variable, so it is valid to do the following:
+\begin{boxverbatim}
 begin:species_external1
    rho=Data/data.file
    offset=80000
@@ -2448,11 +2469,10 @@ begin:species1
    rho=rho(1)*partdens
    temp_y=temp_x(1)
 end:species1
-\end{Verbatim}
+\end{boxverbatim}
 It is also possible to load data from external files using the internal
-autoloader routines. This is done as follows
-
-\simpleboxverbatim
+autoloader routines. This is done as follows:
+\begin{boxverbatim}
 SUBROUTINE ic_early
 
   INTEGER :: ispecies
@@ -2471,7 +2491,7 @@ SUBROUTINE ic_early
   ENDDO
 
 END SUBROUTINE ic_early
-\end{Verbatim}
+\end{boxverbatim}
 
 \subsection{Deferred Evaluation Objects (DEOs)}
 In addition to custom constants it is also possible to set up deferred
@@ -2481,7 +2501,7 @@ information used in defining initial conditions. DEOs are evaluated at the
 point in the deck where they are used so they can include spatial
 information. DEOs are relatively memory intensive, so should only be used when
 required. An example would be:
-\simpleboxverbatim
+\begin{boxverbatim}
 begin:deo
    r=sqrt(x^2+y^2)
 end:deo
@@ -2501,7 +2521,7 @@ begin:species1
    # Set the minimum density for this species
    minrho=0.3*partdens
 end:species1
-\end{Verbatim}
+\end{boxverbatim}
 This example produces a circular rather than a square density enhancement.
 
 \subsection{Lasers}
@@ -2515,8 +2535,7 @@ anywhere initial conditions are specified.
 To introduce a laser into the code from the input deck, you simply add a
 ``laser'' block for every laser that you want. It is perfectly valid to add as
 many lasers as required to a boundary. A laser block looks like:
-
-\simpleboxverbatim
+\begin{boxverbatim}
 begin:laser
    boundary=x_min
    amp=3.88191e13
@@ -2529,7 +2548,7 @@ begin:laser
    t_end=end
    id=1
 end:laser
-\end{Verbatim}
+\end{boxverbatim}
 
 \begin{itemize}
 \item boundary - The boundary on which to attach the laser. Options are x\_min,
@@ -2566,8 +2585,8 @@ multiple lasers will be additively combined on the boundary.
 \subsubsection{Lasers in the internal initial conditions}
 You can add lasers at any point in the internal initial conditions routines,
 using the internal representation of a laser in the code, which is a Fortran
-TYPE called \inlinecode{laser\_block}
-\simpleboxverbatim
+TYPE called \inlinecode{laser\_block}.
+\begin{boxverbatim}
 TYPE :: laser_block
   ! Boundary to which laser is attached
   INTEGER :: direction
@@ -2584,7 +2603,7 @@ TYPE :: laser_block
   REAL(num) :: pol_angle = 0.0_num, angle = 0.0_num
   REAL(num) :: t_start = 0.0_num, t_end = 0.0_num
 END TYPE laser_block
-\end{Verbatim}
+\end{boxverbatim}
 Most of these items are the same as their equivalents in the input deck and
 are set in the same way. The detailed description is
 \begin{itemize}
@@ -2607,7 +2626,7 @@ are set in the same way. The detailed description is
 
 To actually set up a laser is fairly simple, as shown below. The following
 code creates a laser and attaches it to the left hand boundary.
-\simpleboxverbatim
+\begin{boxverbatim}
 TYPE(laser_block), POINTER :: new_laser
 
 ALLOCATE(new_laser)
@@ -2620,7 +2639,7 @@ DO iy = 1, ny
   new_laser%profile(iy) = exp(-y(iy)**2)
 ENDDO
 CALL attach_laser(new_laser)
-\end{Verbatim}
+\end{boxverbatim}
 After the call to \inlinecode{attach\_laser} the laser is attached to the
 correct boundary. Since new\_laser is a pointer, it is valid to then reallocate
 the same variable again to create and attach further lasers. It is valid to
@@ -2631,9 +2650,9 @@ is not valid to call \inlinecode{laser\_init} on an already initialised laser.
 If you specify a laser's time profile in the input deck then you need take no
 further action. However, if you specify a laser within the code or wish to
 have more control, you can specify the laser time profile internally. In this
-case, the relevant function is in:
-\inlinecode{user\_interaction/custom\_laser.f90}
-\simpleboxverbatim
+case, the relevant function is in
+\inlinecode{user\_interaction/custom\_laser.f90}.
+\begin{boxverbatim}
 FUNCTION custom_laser_time_profile(laser)
 
   TYPE(laser_block), INTENT(IN) :: laser
@@ -2646,7 +2665,7 @@ FUNCTION custom_laser_time_profile(laser)
   ENDIF
 
 END FUNCTION custom_laser_time_profile
-\end{Verbatim}
+\end{boxverbatim}
 The function returns just the time profile part of the laser and the
 amplitude specified when the laser is set up is still applied, so normally you
 would want custom\_laser\_time\_profile to run between 0 and 1.
@@ -2675,7 +2694,7 @@ on the spatial axis, meaning that the result is less smooth than normal
 properties from the code. This will be improved in a future release.
 
 \subsubsection{Distribution functions in the input deck}
-\simpleboxverbatim
+\begin{boxverbatim}
 begin:dist_fn
    name=x_px
    ndims=2
@@ -2697,7 +2716,7 @@ begin:dist_fn
    include_species_1=T
    include_species_2=T
 end:dist_fn
-\end{Verbatim}
+\end{boxverbatim}
 \begin{itemize}
 \item name - The name that the distribution function should have in output
   dumps.
@@ -2730,7 +2749,7 @@ end:dist_fn
 Using distribution functions within {\EPOCH} is similar to using them from an
 input deck. To add a distribution function output in any of the initial
 conditions subroutines, the sequence looks like:
-\simpleboxverbatim
+\begin{boxverbatim}
   TYPE(distribution_function_block), POINTER :: work
 
   ALLOCATE(work)
@@ -2750,7 +2769,7 @@ conditions subroutines, the sequence looks like:
   work%restrictions(4,:) = (/-3.0e-20, 3.0e-20/)
   work%use_species(1:2) = .TRUE.
   CALL attach_dist_fn(work)
-\end{Verbatim}
+\end{boxverbatim}
 This code would create exactly the same distribution function as the
 preceding input deck section.
 
@@ -2786,7 +2805,7 @@ you want to record particles travelling in both directions then use two
 particle probes.
 
 \subsubsection{Particle probes in the input deck}
-\simpleboxverbatim
+\begin{boxverbatim}
 begin:probe
    name=electron_back_probe
 
@@ -2802,7 +2821,7 @@ begin:probe
 
    dump=always
 end:probe
-\end{Verbatim}
+\end{boxverbatim}
 \begin{itemize}
 \item name - The name that the probe should have in output dumps. Output
   variables are then named this as a prefix. For example, the block shown
@@ -2915,9 +2934,8 @@ all the autoloader phases, to allow manual tweaking of autoloader specified
 initial conditions.
 
 Inside the code, particles are represented by a Fortran90 TYPE called
-``particle''. The current definition of this type (in 2D) is
-
-\simpleboxverbatim
+``particle''. The current definition of this type (in 2D) is:
+\begin{boxverbatim}
 ! Object representing a particle
   TYPE :: particle
     REAL(num), DIMENSION(3) :: part_p
@@ -2935,7 +2953,7 @@ Inside the code, particles are represented by a Fortran90 TYPE called
     INTEGER :: processor_at_t0
 #endif
   END TYPE particle
-\end{Verbatim}
+\end{boxverbatim}
 Note the presence of the preprocessor directives, meaning that charge and mass
 only exist if the \inlinecode{-DPER\_PARTICLE\_CHARGEMASS} define was put in
 the makefile. If you want to access a property that does not seem to be
@@ -2967,9 +2985,8 @@ The ``particle'' properties can be explained as follows:
 Collections of particles are represented by another Fortran TYPE, called
 \inlinecode{particle\_list}. This type represents all the properties of a
 collection of particles and is used behind the scenes to deal with
-inter-processor communication of particles. The definition of the type is
-
-\simpleboxverbatim
+inter-processor communication of particles. The definition of the type is:
+\begin{boxverbatim}
   TYPE :: particle_list
     TYPE(particle), POINTER :: head
     TYPE(particle), POINTER :: tail
@@ -2979,7 +2996,7 @@ inter-processor communication of particles. The definition of the type is
 
     TYPE(particle_list), POINTER :: next, prev
   END TYPE particle_list
-\end{Verbatim}
+\end{boxverbatim}
 \begin{itemize}
 \item head - The first particle in the linked list.
 \item tail - The last particle in the linked list.
@@ -2995,9 +3012,8 @@ inter-processor communication of particles. The definition of the type is
 
 An entire species of particles is represented by another Fortran TYPE, this
 time called \linebreak\inlinecode{particle\_family}. This represents all the
-properties which are common to all particles in a species. The definition is
-
-\simpleboxverbatim
+properties which are common to all particles in a species. The definition is:
+\begin{boxverbatim}
   TYPE :: particle_family
     CHARACTER(entry_length) :: name
 
@@ -3010,7 +3026,7 @@ properties which are common to all particles in a species. The definition is
     REAL(num) :: mass
     INTEGER(KIND=8) :: count
   END TYPE particle_family
-\end{Verbatim}
+\end{boxverbatim}
 
 \begin{itemize}
 \item name - The name of the particle species, used in the output dumps etc.
@@ -3046,36 +3062,34 @@ are slightly esoteric concepts, while being key to the operation of {\EPOCH} a
 brief overview of them is presented here.\\
 
 The simplest possible form of a linked list element would be a TYPE which
-looks like
-
-\simpleboxverbatim
+looks like:
+\begin{boxverbatim}
 TYPE :: linked_list
   TYPE(linked_list), POINTER :: next
   TYPE(linked_list), POINTER :: prev
 END TYPE linked_list
-\end{Verbatim}
+\end{boxverbatim}
 
 You also have to have a pointer to the start of the list, and to speed up
 adding new elements to the list, you normally also keep a pointer to the
 last element of the list. Therefore, you would also have variables which look
-like
-\simpleboxverbatim
+like:
+\begin{boxverbatim}
 TYPE(linked_list) :: head, tail
-\end{Verbatim}
+\end{boxverbatim}
 
 Since Fortran pointers are not initialised in any particular state, you have
 to remember to set the head and tail pointers to explicitly point nowhere
 (normally called a null pointer by analogy with the older C style
-pointers). This is done using the nullify command
-\simpleboxverbatim
+pointers). This is done using the nullify command.
+\begin{boxverbatim}
 NULLIFY(head)
 NULLIFY(tail)
-\end{Verbatim}
+\end{boxverbatim}
 
 The same thing is important when creating a new linked list element, so you
-would normally have a creation function for linked list elements
-
-\simpleboxverbatim
+would normally have a creation function for linked list elements.
+\begin{boxverbatim}
 SUBROUTINE create_element(element)
 
   TYPE(linked_list), POINTER, INTENT(INOUT) :: element
@@ -3085,7 +3099,7 @@ SUBROUTINE create_element(element)
   NULLIFY(element%prev)
 
 END SUBROUTINE create_element
-\end{Verbatim}
+\end{boxverbatim}
 Note that the allocate function can be used on pointers in the same way that
 it can be used with variables which have the allocatable attribute. However,
 there is one important difference between a pointer and an allocatable
@@ -3104,7 +3118,7 @@ on each cycle, the entire memory can very quickly be used up.
 
 So, to add a new element to the list you would have a subroutine which looks
 like:
-\simpleboxverbatim
+\begin{boxverbatim}
 SUBROUTINE add_element(element)
 
   TYPE(linked_list), POINTER, INTENT(IN) :: element
@@ -3122,12 +3136,11 @@ SUBROUTINE add_element(element)
   tail=>element
 
 END SUBROUTINE add_element
-\end{Verbatim}
+\end{boxverbatim}
 This subroutine adds the new Fortran operator of ``$=>$'' which means ``points
 to''. Unlike C or similar languages, Fortran pointers try to be partially
-transparent to the end user, so the following code would fail
-
-\simpleboxverbatim
+transparent to the end user, so the following code would fail:
+\begin{boxverbatim}
 PROGRAM test
 
   REAL, TARGET :: a = 10.0
@@ -3136,7 +3149,7 @@ PROGRAM test
   b = a
 
 END PROGRAM test
-\end{Verbatim}
+\end{boxverbatim}
 
 This happens because Fortran will try to copy the value of ``a'' into ``b''.
 However, ``b'' is a pointer which hasn't been initialised, so the code will
@@ -3150,9 +3163,8 @@ keep Fortran pointers ``safer'' than C style pointers. The correct code would
 use \inlinecode{b$=>$a}, at which point ``b'' is set to point to ``a'' and
 can then be used everywhere in place of ``a''.
 
-So, to set up a linked list of n elements, you would use the following code
-
-\simpleboxverbatim
+So, to set up a linked list of n elements, you would use the following code:
+\begin{boxverbatim}
 TYPE(linked_list), POINTER :: new
 NULLIFY(new)
 
@@ -3160,11 +3172,11 @@ DO i = 1,n
   CALL create_element(new)
   CALL add_element(new)
 ENDDO
-\end{Verbatim}
+\end{boxverbatim}
 
 To then run through the elements of your newly created linked list, you would
 use code like:
-\simpleboxverbatim
+\begin{boxverbatim}
 TYPE(linked_list), POINTER :: current
 
 current=>head
@@ -3172,7 +3184,7 @@ DO WHILE(ASSOCIATED(current))
   ! Do stuff
   current=>current%next
 ENDDO
-\end{Verbatim}
+\end{boxverbatim}
 
 This code snippet introduces one new function ``ASSOCIATED'', which tells you
 whether a pointer is a null pointer or not (this is why it is so important to
@@ -3196,8 +3208,7 @@ list are operated on. Although there are many tricks which can be performed
 with linked lists, the only other aspect which needs to be explained is how
 to delete elements. A subroutine to remove a single element from a linked list
 would look like:
-
-\simpleboxverbatim
+\begin{boxverbatim}
 SUBROUTINE remove_element(element)
 
   TYPE(linked_list), POINTER, INTENT(INOUT) :: element
@@ -3221,7 +3232,7 @@ SUBROUTINE remove_element(element)
   ENDIF
 
 END SUBROUTINE remove_element
-\end{Verbatim}
+\end{boxverbatim}
 
 Once again, this code looks slightly counter-intuitive, but if you go through
 step by step, it's fairly simple. In the following discussion the element
@@ -3250,7 +3261,7 @@ called ``P'' and the element after ``C'' (if it exists) is called ``N''
 \end{itemize}
 
 Therefore, code to remove some elements from a linked list would look like:
-\simpleboxverbatim
+\begin{boxverbatim}
 TYPE(linked_list), POINTER :: current, next
 
 current=>head
@@ -3262,7 +3273,7 @@ DO WHILE(ASSOCIATED(current))
   ENDIF
   current=>next
 ENDDO
-\end{Verbatim}
+\end{boxverbatim}
 Note that ``current'' must be deallocated explicitly even after it has been
 removed from the linked list to prevent a memory leak. Note also that the
 pointer to the ``next'' element is saved before ``current'' is deallocated.
@@ -3273,8 +3284,7 @@ than the two otherwise required.
 After all the descriptions of the types, actually setting the properties of
 the particles is fairly simple. The following is an example which positions
 the particles correctly in 2D space, but doesn't set any momentum.
-
-\simpleboxverbatim
+\begin{boxverbatim}
 SUBROUTINE manual_load
 
   TYPE(particle), POINTER :: current
@@ -3301,7 +3311,7 @@ SUBROUTINE manual_load
   ENDDO
 
 END SUBROUTINE manual_load
-\end{Verbatim}
+\end{boxverbatim}
 
 This produces output identical to that shown in Figure~\ref{slab}. Note that
 I completely ignored the question of domain decomposition when setting up the
@@ -3330,7 +3340,7 @@ Maxwell-Juttner distribution is correct. The next version of {\EPOCH} will have
 an option to use the Maxwell-Juttner distribution rather than a Maxwellian
 distribution. An example of using {\bf momentum\_from\_temperature} is given
 below.
-\simpleboxverbatim
+\begin{boxverbatim}
 SUBROUTINE manual_load
 
   TYPE(particle), POINTER :: current
@@ -3366,7 +3376,7 @@ SUBROUTINE manual_load
   ENDDO
 
 END SUBROUTINE manual_load
-\end{Verbatim}
+\end{boxverbatim}
 
 While the autoloader is capable of dealing with most required initial thermal
 distributions, you may want to set up non-thermal initial conditions. The code
@@ -3375,8 +3385,7 @@ function which can be used to deal with most non-thermal distributions. To use
 the helper function, you need two to define two 1D arrays which are the x and
 y axes for the distribution function. An example of using the helper function
 is given below.
-
-\simpleboxverbatim
+\begin{boxverbatim}
 SUBROUTINE manual_load
 
   TYPE(particle), POINTER :: current
@@ -3416,7 +3425,7 @@ SUBROUTINE manual_load
   ENDDO
 
 END SUBROUTINE manual_load
-\end{Verbatim}
+\end{boxverbatim}
 
 This is a very simple example where the distribution function is a Maxwellian
 which could have been set up using the {\bf momentum\_from\_temperature}
@@ -3444,9 +3453,7 @@ enough to be require significant work on the part of an unfamiliar user to
 understand. In this case, it can be helpful to use the ability to specify
 constants in an input deck to parameterise the file. So, to go back to a slight
 variation on an earlier example:
-
-
-\simpleboxverbatim
+\begin{boxverbatim}
 begin:species1
    # first set density in the range 0->1
    # cut down density in x direction
@@ -3476,12 +3483,11 @@ begin:species2
    # Set the minimum density for this species
    minrho=0.3*100.0
 end:species2
-\end{Verbatim}
+\end{boxverbatim}
 
 The particle density (100.0) is hard coded into the deck file in several
-places. It would be easier if this was given to a new user as
-
-\simpleboxverbatim
+places. It would be easier if this was given to a new user as:
+\begin{boxverbatim}
 begin:constant
    particle_density=100.0 # Particle number density
 end:constant
@@ -3515,7 +3521,7 @@ begin:species2
    # Set the minimum density for this species
    minrho=0.3*particle_density
 end:species2
-\end{Verbatim}
+\end{boxverbatim}
 
 It is also possible to parameterise other elements of initial conditions in a
 similar fashion. This is generally a good idea, since it makes the
@@ -3526,8 +3532,7 @@ Again, this is just a readability change to the normal input.deck file, but it
 also makes changing and understanding external initial conditions rather
 simpler. In this case, entire parts of the initial conditions are moved into a
 DEO in order to make changing them at a later date easier. For example:
-
-\simpleboxverbatim
+\begin{boxverbatim}
 begin:constant
    particle_density=100.0 # Particle number density
 end:constant
@@ -3560,12 +3565,11 @@ begin:species2
    # Set the minimum density for this species
    minrho=0.3*particle_density
 end:species2
-\end{Verbatim}
+\end{boxverbatim}
 
 This creates the same output as before. It is now trivial to modify the
 profiles later. For example:
-
-\simpleboxverbatim
+\begin{boxverbatim}
 begin:constant
    particle_density=100.0 # Particle number density
 end:constant
@@ -3599,7 +3603,7 @@ begin:species2
    # Set the minimum density for this species
    minrho=0.3*particle_density
 end:species2
-\end{Verbatim}
+\end{boxverbatim}
 
 This changes the code to run with a Gaussian density profile rather then a step
 function. Again, this can be extended as far as required.
@@ -3630,26 +3634,24 @@ and the user is returned an integer handle for the registered object. The
 numerical handle must be stored so that that all of the functions in this
 module can access it, so they should be placed after the \inlinecode{IMPLICIT
 NONE} statement at the top of the file and defined as:
-
-\simpleboxverbatim
+\begin{boxverbatim}
 INTEGER :: c_func_lorentz
 INTEGER :: c_const_phi
-\end{Verbatim}
+\end{boxverbatim}
 
 Note that the names given to the constants is obviously at the developers
 discretion, but these names comply with the {\EPOCH} style guide.
 Actually registering the objects is done in the \inlinecode{register\_objects}
 subroutine which should include lines to register functions and constants.
 An example is given below.
-
-\simpleboxverbatim
+\begin{boxverbatim}
 SUBROUTINE register_objects
 
   c_func_lorentz = register_function("lorentz")
   c_const_phi = register_constant("phi")
 
 END SUBROUTINE register_objects
-\end{Verbatim}
+\end{boxverbatim}
 
 Note that the input deck parser is case sensitive, so the strings which are
 given to \inlinecode{register\_function} and \inlinecode{register\_constant}
@@ -3661,9 +3663,8 @@ give error messages since they haven't yet been implemented.
 \subsubsection{Setting up new constants}
 
 Once a new constant has been registered it must be described using the
-\inlinecode{custom\_constant} function. In 2D this function looks like
-
-\simpleboxverbatim
+\inlinecode{custom\_constant} function. In 2D this function looks like:
+\begin{boxverbatim}
 FUNCTION custom_constant(opcode, ix, iy, errcode)
 
   INTEGER, INTENT(IN) :: opcode, ix, iy
@@ -3676,7 +3677,7 @@ FUNCTION custom_constant(opcode, ix, iy, errcode)
   errcode = IOR(errcode, c_err_unknown_element)
 
 END FUNCTION custom_constant
-\end{Verbatim}
+\end{boxverbatim}
 
 The parameters are
 
@@ -3699,8 +3700,7 @@ The parameters are
 
 The function should just return the evaluated value of the constant requested
 by \inlinecode{opcode}. This might look like:
-
-\simpleboxverbatim
+\begin{boxverbatim}
 FUNCTION custom_constant(opcode, ix, iy, errcode)
 
   INTEGER, INTENT(IN) :: opcode, ix, iy
@@ -3718,7 +3718,7 @@ FUNCTION custom_constant(opcode, ix, iy, errcode)
   errcode = IOR(errcode, c_err_unknown_element)
 
 END FUNCTION custom_constant
-\end{Verbatim}
+\end{boxverbatim}
 
 Note that when \inlinecode{opcode} is successfully recognised, the code sets
 the return value and returns straight away. This is how all constants should
@@ -3735,9 +3735,8 @@ and will return a value of $\pi$.
 
 Setting up the new function \inlinecode{lorentz} is very similar to setting up
 the new constant. The relevant function is \inlinecode{custom\_function} and
-when empty looks like
-
-\simpleboxverbatim
+when empty looks like:
+\begin{boxverbatim}
 FUNCTION custom_function(opcode, ix, iy, errcode)
 
   INTEGER, INTENT(IN) :: opcode, ix, iy
@@ -3751,7 +3750,7 @@ FUNCTION custom_function(opcode, ix, iy, errcode)
   errcode = IOR(errcode, c_err_unknown_element)
 
 END FUNCTION custom_function
-\end{Verbatim}
+\end{boxverbatim}
 
 The parameters are
 
@@ -3777,9 +3776,8 @@ parameters to be returned and \inlinecode{values} is a \inlinecode{REAL(num)}
 array of length \inlinecode{n} which will hold the returned values .  In this
 implementation of the Lorentzian function there are three parameters: The
 dependent variable, the location parameter and the scale parameter. The code
-to implement the function therefore looks like
-
-\simpleboxverbatim
+to implement the function therefore looks like:
+\begin{boxverbatim}
 FUNCTION custom_function(opcode, ix, iy, errcode)
 
   INTEGER, INTENT(IN) :: opcode, ix, iy
@@ -3802,12 +3800,11 @@ FUNCTION custom_function(opcode, ix, iy, errcode)
   errcode = IOR(errcode, c_err_unknown_element)
 
 END FUNCTION custom_function
-\end{Verbatim}
+\end{boxverbatim}
 
 This function is then available at any point in the input deck and if I return
-to the previous example ic.deck file, it would be used as follows
-
-\simpleboxverbatim
+to the previous example ic.deck file, it would be used as follows:
+\begin{boxverbatim}
 begin:constant
    particle_density=100.0 # Particle number density
 end:constant
@@ -3840,7 +3837,7 @@ begin:species2
    # Set the minimum density for this species
    minrho=0.3*particle_density
 end:species2
-\end{Verbatim}
+\end{boxverbatim}
 
 It is therefore clear that the new lorentz function is essentially the same as
 the built in gauss function. Note that due to the way that the parser works,
@@ -3898,8 +3895,7 @@ not. If the blockname is known then the code should return the error code
 \inlinecode{c\_err\_none} (No error). If the blockname is not known then the
 code should return \inlinecode{c\_err\_unknown\_block} and the deck parser will
 just skip the block. In operation, this looks like:
-
-\simpleboxverbatim
+\begin{boxverbatim}
 FUNCTION handle_custom_block(blockname, element, value)
 
   CHARACTER(LEN=entry_length), INTENT(IN) :: blockname, element, value
@@ -3918,7 +3914,7 @@ FUNCTION handle_custom_block(blockname, element, value)
   handle_custom_block = c_err_unknown_block
 
 END FUNCTION handle_custom_block
-\end{Verbatim}
+\end{boxverbatim}
 
 In order to simply Fortran's rather annoying string handling behaviour, several
 helper functions have been defined and the most used one is
@@ -3932,8 +3928,7 @@ deck. To test for known elements they should just be checked against a known
 list of names using \inlinecode{str\_cmp} and return the error code
 \inlinecode{c\_err\_unknown\_element} if the element isn't a known element. This
 looks like:
-
-\simpleboxverbatim
+\begin{boxverbatim}
 FUNCTION handle_custom_block(blockname, element, value)
 
   CHARACTER(LEN=entry_length), INTENT(IN) :: blockname, element, value
@@ -3965,7 +3960,7 @@ FUNCTION handle_custom_block(blockname, element, value)
   handle_custom_block = c_err_unknown_block
 
 END FUNCTION handle_custom_block
-\end{Verbatim}
+\end{boxverbatim}
 
 This version of the code will allow you to add a new block called ``custom''
 with elements\linebreak
@@ -3993,8 +3988,7 @@ Fortran90 variable. These helper functions are:
 They are used pretty much as expected, except that the return value is passed
 to the functions so that they can report errors while trying to parse the
 string. An example would then be:
-
-\simpleboxverbatim
+\begin{boxverbatim}
 FUNCTION handle_custom_block(blockname, element, value)
 
   CHARACTER(LEN=entry_length), INTENT(IN) :: blockname, element, value
@@ -4028,7 +4022,7 @@ FUNCTION handle_custom_block(blockname, element, value)
   handle_custom_block = c_err_unknown_block
 
 END FUNCTION handle_custom_block
-\end{Verbatim}
+\end{boxverbatim}
 
 It is possible to perform more advanced types of evaluation of maths
 expressions such as reading arrays etc. but this is beyond the scope of this
@@ -4286,16 +4280,16 @@ newfile.F90\\
 \\ This tells the makefile to compile the final code using your new file, the
 next thing to do is to add a line which tells the code about the dependencies
 for your file. Lower down in the makefile, you'll find a section with lines
-which look like
-\simpleboxverbatim
+which look like:
+\begin{boxverbatim}
 iocontrol.o: iocontrol.f90 input.o iocommon.o job_info.o output.o
-\end{Verbatim}
+\end{boxverbatim}
 Add a new line for describing all the FILES (NOT modules) which are used by
 your new file. If you USE shared\_data, mpi\_subtype\_control and stack in
-your file then the line would look like
-\simpleboxverbatim
+your file then the line would look like:
+\begin{boxverbatim}
 newfile.o: newfile.F90 shared_data.o mpi_subtype_control.o stack.o
-\end{Verbatim}
+\end{boxverbatim}
 Note the structure of the line with ONLY the source file for the new file
 specified, all other used files specify the intermediate .o files. The
 remaining element of the makefile which needs to be modified is to add your
@@ -4304,17 +4298,16 @@ new file. This is achieved very simply by adding ``newfile.o'' to the dependency
 list for those files which USE your modules. For example if you've written new
 I/O routines and USE your modules in diagnostics, you'd just change the line
 for diagnostics from:
-
-\simpleboxverbatim
+\begin{boxverbatim}
 diagnostics.o: diagnostics.F90 calc_df.o deck.o dist_fn.o encoded_source.o \
   iterators.o mpi_subtype_control.o output_particle.o probes.o
-\end{Verbatim}
+\end{boxverbatim}
 to
-\simpleboxverbatim
+\begin{boxverbatim}
 diagnostics.o: diagnostics.F90 calc_df.o deck.o dist_fn.o encoded_source.o \
   iterators.o mpi_subtype_control.o output_particle.o probes.o \
   newfile.o
-\end{Verbatim}
+\end{boxverbatim}
 
 Note that the backslash characters are line continuation marks in makefiles.
 
@@ -4414,9 +4407,8 @@ function to disk.
 \subsubsection{Initial conditions (autoloader) variables}
 Initial conditions for the autoloader for a given species are described in
 {\EPOCH} by the Fortran TYPE \inlinecode{initial\_conditions\_block}. The
-definition (in 3D) is
-
-\simpleboxverbatim
+definition (in 3D) is:
+\begin{boxverbatim}
 TYPE :: initial_condition_block
 
   REAL(num), DIMENSION(:,:,:), POINTER :: rho
@@ -4426,7 +4418,7 @@ TYPE :: initial_condition_block
   REAL(num) :: maxrho
 
 END TYPE initial_condition_block
-\end{Verbatim}
+\end{boxverbatim}
 
 In 1D, the arrays have one fewer index, and in 3D they have one more.
 \begin{itemize}
@@ -4442,15 +4434,15 @@ In 1D, the arrays have one fewer index, and in 3D they have one more.
 \end{itemize}
 
 The initial conditions themselves are in the variable
-\simpleboxverbatim
+\begin{boxverbatim}
 TYPE(initial_condition_block), DIMENSION(:), ALLOCATABLE :: initial_conditions
-\end{Verbatim}
+\end{boxverbatim}
 which is allocated to an array of size \inlinecode{1:n\_species}.
 
 \subsubsection{Particles and particle species}
 Particles are represented as linked lists of Fortran TYPES. The definition of
-the particle type is
-\simpleboxverbatim
+the particle type is:
+\begin{boxverbatim}
   ! Object representing a particle
   TYPE :: particle
     REAL(num), DIMENSION(3) :: part_p
@@ -4468,7 +4460,7 @@ the particle type is
     INTEGER :: processor_at_t0
 #endif
   END TYPE particle
-\end{Verbatim}
+\end{boxverbatim}
 And the descriptions are
 \begin{itemize}
 \item REAL(num) :: part\_p(3) - The particle momentum. Always dimension 3 even
@@ -4496,7 +4488,7 @@ particle communication layer is described later.\\
 
 The entire linked list of particles is encapsulated in another Fortran TYPE,
 called \inlinecode{particle\_list}, which is defined as:
-\simpleboxverbatim
+\begin{boxverbatim}
 ! Object representing a collection of particles
 ! Used internally by the MPI particle transfer code
 TYPE :: particle_list
@@ -4508,7 +4500,7 @@ TYPE :: particle_list
 
   TYPE(particle_list), POINTER :: next, prev
 END TYPE particle_list
-\end{Verbatim}
+\end{boxverbatim}
 And its properties are:
 \begin{itemize}
 \item TYPE(particle), POINTER :: head - The first particle in the linked list.
@@ -4538,7 +4530,7 @@ particles between processors.\\
 \\
 The particle species are represented by yet another Fortran TYPE, this time
 called \inlinecode{particle\_family}, which is defined as:
-\simpleboxverbatim
+\begin{boxverbatim}
   ! Object representing a particle species
   TYPE :: particle_family
     ! Core properties
@@ -4583,7 +4575,7 @@ called \inlinecode{particle\_family}, which is defined as:
     TYPE(particle_probe), POINTER :: attached_probes
 #endif
   END TYPE particle_family
-\end{Verbatim}
+\end{boxverbatim}
 Again, most of these properties are self explanatory, but they are detailed
 below.
 \begin{itemize}
@@ -4852,8 +4844,7 @@ spacing $\Delta x$ this gives a final formula for the field at a particle of
 
 In the code calculating the strength of a cell centred field on the particle
 is done as follows.
-
-\simpleboxverbatim
+\begin{boxverbatim}
   REAL(num) :: cell_x_r, cell_frac_x
   INTEGER :: cell_x
   REAL(num) :: gx(-2:2)
@@ -4874,7 +4865,7 @@ is done as follows.
   DO ix = -sf_order, sf_order
     f_part = f_part + F(cell_x+ix) * gx(ix)
   ENDDO
-\end{Verbatim}
+\end{boxverbatim}
 
 where \inlinecode{f\_part} is the field at the particle location. The variable
 \inlinecode{sf\_order} contains the shape function order parameter which
@@ -4883,9 +4874,8 @@ which are overlapped by the particle shape function. It is defined in
 \inlinecode{shared\_data.F90} and should only be changed by the developer if a
 new particle shape function is being added.  In 2D or 3D, you just calculate gy
 in the same manner as gx and calculate the weight over all the cells affected
-by the individual 1D shape functions. In 2D this looks like
-{\small
-\simpleboxverbatim
+by the individual 1D shape functions. In 2D this looks like:
+\begin{boxverbatim}
   CALL grid_to_particle(cell_frac_x, gx)
   CALL grid_to_particle(cell_frac_y, gy)
   f_part = 0.0_num
@@ -4894,13 +4884,13 @@ by the individual 1D shape functions. In 2D this looks like
       f_part = f_part + f(cell_x+ix, cell_y+iy) * gx(ix) *gy(iy)
     ENDDO
   ENDDO
-\end{Verbatim}
-}
+\end{boxverbatim}
+
 Inside the particle pusher the E and B fields are not cell centred fields, but
 Yee staggered. This means that there is a small change to the above mentioned
 example. In 1D this change looks like
 
-\simpleboxverbatim
+\begin{boxverbatim}
   REAL(num) :: cell_x_r, cell_frac_x
   INTEGER :: cell_x1, cell_x2
   REAL(num) :: gx(-2:2), hx(-2:2)
@@ -4935,13 +4925,12 @@ example. In 1D this change looks like
   DO ix = -sf_order, sf_order
     ex_part = ex_part + ex(cell_x2+ix) * hx(ix)
   ENDDO
-\end{Verbatim}
+\end{boxverbatim}
 
 In 2D and 3D, you just combine the shifted and unshifted shape functions and
 associated cell positions depending on the position of the variable in the
-cell. Therefore, in 3D and using the loop notation for clarity you would get
-
-\simpleboxverbatim
+cell. Therefore, in 3D and using the loop notation for clarity you would get:
+\begin{boxverbatim}
   DO iz = -sf_order, sf_order
     DO iy = -sf_order, sf_order
       DO ix = -sf_order, sf_order
@@ -4959,7 +4948,7 @@ cell. Therefore, in 3D and using the loop notation for clarity you would get
       ENDDO
     ENDDO
   ENDDO
-\end{Verbatim}
+\end{boxverbatim}
 
 Since $E_x$ is staggered half a grid cell in the x direction, whereas $B_x$ is
 staggered by half a grid cell in the y and z directions.
@@ -5002,9 +4991,8 @@ for the case where grid properties are interpolated to the particle
 position. This form is used in the particle pusher to perform the current
 update and in the routines in \inlinecode{src/io/calc\_df.F90} to copy particle
 properties onto the grid for output. The form from calc\_df is rather clearer
-and easier to see in operation. In 1D it looks like
-
-\simpleboxverbatim
+and easier to see in operation. In 1D it looks like:
+\begin{boxverbatim}
   cell_x_r = part_x / dx
   cell_x  = NINT(cell_x_r)
   cell_frac_x = REAL(cell_x, num) - cell_x_r
@@ -5015,18 +5003,18 @@ and easier to see in operation. In 1D it looks like
   DO ix = -sf_order, sf_order
     data_array(cell_x+ix) = data_array(cell_x+ix) + gx(ix)  * data
   ENDDO
-\end{Verbatim}
+\end{boxverbatim}
 
 Once again multi-dimensional codes just have the weighting functions multiplied
-together
-\simpleboxverbatim
+together.
+\begin{boxverbatim}
   DO iy = -sf_order, sf_order
     DO ix = -sf_order, sf_order
       data_array(cell_x+ix,cell_y+iy) = data_array(cell_x+ix,cell_y+iy) + &
           gx(ix) *gy(iy) * data
     ENDDO
   ENDDO
-\end{Verbatim}
+\end{boxverbatim}
 
 \subsubsection{Current calculation}
 {\EPOCH} uses the Villasenor and Buneman (Villasenor and Buneman, Computer
@@ -5084,28 +5072,26 @@ additional timestep constraints should be coded into this subroutine. This
 should be implemented after the existing \inlinecode{dt=} lines but before the
 line \inlinecode{dt = dt\_multiplier * dt}. Such a modification should be set so
 that it only changes the timestep if the timestep is MORE restrictive than that
-calculated from the core code. An example would be
-
-\simpleboxverbatim
+calculated from the core code. An example would be:
+\begin{boxverbatim}
    dt = dtx*dty/SQRT(dtx**2+dty**2)
    dt = MIN(dt, my_new_dt)
-\end{Verbatim}
+\end{boxverbatim}
 
 In the core {\EPOCH} code the timestep can be calculated identically on each
 processor, so there is no requirement to synchronise the timestep across
 multiple processors. If your new timestep restriction uses information local to
 each processor then some additional lines must be added to the
 \inlinecode{set\_dt} routine after the timestep has been calculated which
-should read
-
-\simpleboxverbatim
+should read:
+\begin{boxverbatim}
   REAL(num) :: dt_global
           .
           .
           .
   CALL MPI_ALLREDUCE(dt_global, dt, 1, mpireal, MPI_MIN, comm, errcode)
   dt = dt_global
-\end{Verbatim}
+\end{boxverbatim}
 
 This uses another MPI command to determine the most restrictive timestep across
 all processors. {\EPOCH} is not written in a way that permits operation with
@@ -5655,12 +5641,12 @@ into an array of REAL(num) values is controlled in the functions
 {\Large Notes\\}
 If the particle type gains additional properties as the result of preprocessor
 directives then there should be a line which increments \inlinecode{nvars} by
-the correct number when that preprocessor directive is active. For example
-\simpleboxverbatim
+the correct number when that preprocessor directive is active. For example:
+\begin{boxverbatim}
 #ifdef PER_PARTICLE_CHARGEMASS
   nvar = nvar+2
 #endif
-\end{Verbatim}
+\end{boxverbatim}
 
 \pagebreak
 \begin{codedef}
@@ -6147,14 +6133,13 @@ three routines: \inlinecode{redistribute\_field} and either
 depending on the dimensionality of your code. To redistribute full field
 variables the routine to use is \inlinecode{redistribute\_field}, and an
 example of using the code looks like:
-
-\simpleboxverbatim
+\begin{boxverbatim}
   temp = 0.0_num
   CALL redistribute_field(new_domain, bz, temp)
   DEALLOCATE(bz)
   ALLOCATE(bz(-2:nx_new+3,-2:ny_new+3))
   bz = temp
-\end{Verbatim}
+\end{boxverbatim}
 
 In this calling sequence the
 \inlinecode{redistribute\_field} subroutine is used to redistribute the field
@@ -6187,12 +6172,11 @@ to add the output of new variables to {\EPOCH}. To add a new variable to
 library which is part of {\EPOCH}. The file output from {\EPOCH} takes place in
 {\it diagnostics.F90}, so to add new variables to the output you must
 add additional code there. Looking through the listings, you will see two lines:
-
-\simpleboxverbatim
+\begin{boxverbatim}
   CALL cfd_open(filename, rank, comm, MPI_MODE_CREATE + MPI_MODE_WRONLY)
 
   CALL cfd_close()
-\end{Verbatim}
+\end{boxverbatim}
 
 These, as may be expected, are the commands which open and close the CFD
 file. It is perfectly possible to create new CFD files containing only your own
@@ -6211,9 +6195,9 @@ of arbitrary data into a CFD file which are described later.
 Looking through {\it diagnostics.F90} there are many lines with commands which
 begin \inlinecode{cfd\_}, but they are all prepended with a command which looks
 like:
-\simpleboxverbatim
+\begin{boxverbatim}
   IF (IAND(dumpmask(28), code) .NE. 0) THEN
-\end{Verbatim}
+\end{boxverbatim}
 This is the method by which {\EPOCH} allows the end user to specify whether a
 variable should be dumped, and whether it should only be dumped at
 full/partial/restart dumps. #dumpmask# is an integer array, the length of which is
@@ -6235,9 +6219,9 @@ When adding a new variable to be written to disk, the value of
 \inlinecode{num\_vars\_to\_dump} should be increased to match the number of new
 written variables. Next, open the file \inlinecode{src/deck/deck\_io\_block.F90}
 and find the line:
-\simpleboxverbatim
+\begin{boxverbatim}
   CHARACTER(LEN=entry_length), DIMENSION(io_block_elements) :: io_block_name =  ...
-\end{Verbatim}
+\end{boxverbatim}
 
 Simply add new strings for your new variables to the end of the
 definitions. These new variable names should then be placed in your input decks
@@ -6260,7 +6244,7 @@ size as the field arrays.
 A derived variable is defined on the same grid as the main simulation variables
 and must be written to disk in such a way as to stitch the parts of the grid
 from each processor together. This is achieved using one of the routines:
-\simpleboxverbatim
+\begin{boxverbatim}
 CALL cfd_write_1d_cartesian_variable_parallel(name, group_name, dims, &
     stagger, grid_name, grid_group, variable(1:nx), subtype_field)
 
@@ -6269,7 +6253,7 @@ CALL cfd_write_2d_cartesian_variable_parallel(name, group_name, dims, &
 
 CALL cfd_write_3d_cartesian_variable_parallel(name, group_name, dims, &
     stagger, grid_name, grid_group, variable(1:nx,1:ny,1:nz), subtype_field)
-\end{Verbatim}
+\end{boxverbatim}
 The parameters have the following types and meanings:
 
 \begin{itemize}
@@ -6311,14 +6295,14 @@ There is a working variable called \inlinecode{data} which is large enough to
 contain the data which is large enough to store a derived variable. It is
 therefore recommended that to calculate derived variables a new subroutine
 should be created which populates \inlinecode{data} with the required variable
-and then write it to disk. An example would look like
-\simpleboxverbatim
+and then write it to disk. An example would look like:
+\begin{boxverbatim}
 IF (IAND(dumpmask(30), code)) THEN
   CALL calc_my_variable(data)
   CALL cfd_write_2d_cartesian_variable_parallel("my_variable", "derived", &
       dims, stagger, grid_name, grid_group, data(1:nx,1:ny), subtype_field)
 ENDIF
-\end{Verbatim}
+\end{boxverbatim}
 where \inlinecode{calc\_my\_variable} is a function which calculates the
 variable which you wish to write. The form of this function depends on the type
 of variable to be calculated and is given in the next section.
@@ -6329,9 +6313,8 @@ The next simplest type of output to add is a new property for all particles. To
 add a new particle variables dump two things are needed: a call to the CFD
 command to write the data and an iterator function to iterate through all the
 particles. The iterators are stored in the file {\it iterators.F90}. An example
-iterator is
-
-\simpleboxverbatim
+iterator is:
+\begin{boxverbatim}
 ! Iterator for particle processor
 SUBROUTINE iterate_species(data, n_points, start)
 
@@ -6371,15 +6354,15 @@ SUBROUTINE iterate_species(data, n_points, start)
   n_points = partcount
 
 END SUBROUTINE iterate_species
-\end{Verbatim}
+\end{boxverbatim}
 
 This is a fairly complicated routine, and includes routines to deal with the
 possibility of particle species not being dumped, and other similar
 effects. Luckily, there is only one line in the routine which needs to change
-to output a new routine. The is the line
-\simpleboxverbatim
+to output a new routine. The is the line:
+\begin{boxverbatim}
   data(partcount) = REAL(current_family%id, num)
-\end{Verbatim}
+\end{boxverbatim}
 
 To write a new iterator, you just have to copy the skeleton of an existing
 iterator and change this line to copy your particle property into the ``data''
@@ -6387,12 +6370,12 @@ array. The details of how this routine works is explained in the ``particles,
 particle\_lists and particle\_families'' of the ``deep internals'' section of
 the developer guide. Once your new iterator has been written and added into the
 {\it iterators.F90} file, it's time to add the CFD routine to actually write
-the data. The routine is
-\simpleboxverbatim
+the data. The routine is:
+\begin{boxverbatim}
 CALL cfd_write_nd_particle_variable_with_iterator_all(name, groupname, &
     iterator_name, npart_dump_global, n_part_per_it, gridname, gridgroup, &
     subtype_particle_var)
-\end{Verbatim}
+\end{boxverbatim}
 
 The parameters this time are
 \begin{itemize}
@@ -6436,14 +6419,14 @@ if more sophisticated changes are needed.
 
 \subsection{Precompiler directives}
 {\EPOCH} uses precompiler directives to switch certain features of the code on
-or off. The precompiler directives all begin with \# and look like
-\simpleboxverbatim
+or off. The precompiler directives all begin with \# and look like:
+\begin{boxverbatim}
 #ifdef MY_PRECOMPILER_DIRECTIVE
   SOME_FORTRAN_OF_SOME_KIND
 #else
   SOME_OTHER_FORTRAN
 #endif
-\end{Verbatim}
+\end{boxverbatim}
 and they behave in a very simple manner. The precompiler runs BEFORE the
 Fortran compiler and until it reaches a precompiler directive, it just creates
 a temporary file which is an exact copy of the source file. When it reaches a
@@ -6472,20 +6455,19 @@ and what they mean. This isn't required, but has proved very useful and is
 implemented in a very simple way.  Simply open the file
 \inlinecode{src/housekeeping/welcome.F90} and find the subroutine
 \inlinecode{compiler\_directives}. There are a large block of precompiler
-directives which read
-
-\simpleboxverbatim
+directives which read:
+\begin{boxverbatim}
 #ifdef TRACER_PARTICLES
   WRITE(*,*) "Tracer particle support -DTRACER_PARTICLES"
 #endif
-\end{Verbatim}
+\end{boxverbatim}
 
-Simply add a new element to the end of the list
-\simpleboxverbatim
+Simply add a new element to the end of the list.
+\begin{boxverbatim}
 #ifdef MY_PRECOMPILER_DIRECTIVE
   WRITE(*,*) "My new physics -DMY_PRECOMPILER_DIRECTIVE"
 #endif
-\end{Verbatim}
+\end{boxverbatim}
 
 \subsubsection{Precompiler directives and the input deck}
 In theory, it is possible for someone to request a feature of the code in the
@@ -6502,10 +6484,10 @@ command for the missing preprocessor directive i.e
 Fortran is not a language famous for its string handling capabilities, but due
 to the presence of the input deck {\EPOCH} has fairly extensive string handling
 routines. Strings used are all of the standard Fortran \inlinecode{CHARACTER}
-type and are defined as
-\simpleboxverbatim
+type and are defined as:
+\begin{boxverbatim}
 CHARACTER(LEN=entry_length) :: string
-\end{Verbatim}
+\end{boxverbatim}
 \inlinecode{entry\_length} is a global constant defined in
 \inlinecode{src/shared\_data.F90} which can be increased to allow {\EPOCH} to
 handle longer strings. There may be reasons to increase this length if you wish
@@ -6817,12 +6799,12 @@ a tokenized maths expression over a region of the domain. The dimensionality of
 \inlinecode{zrange} depend on the dimensionality of the code being used. The
 \inlinecode{{\it $\alpha$}range} parameters represent the indices in that
 direction over which the expression should be evaluated. For example, in 2D to
-evaluate an expression over the entire domain, the code would look like
-\simpleboxverbatim
+evaluate an expression over the entire domain, the code would look like:
+\begin{boxverbatim}
 REAL(num), DIMENSION(:,:), ALLOCATABLE :: data
 ALLOCATE(data(0:nx+1,0:ny+1)
 CALL evaluate_string_in_space(string, data, (/0,nx+1/), (/0:ny+1/), err)
-\end{Verbatim}
+\end{boxverbatim}
 {\Large Notes\\}
 This routine is suitable to evaluate expressions over the entire or parts of
 the domain, and is used in this way in the initial condition deck parser
@@ -6993,8 +6975,8 @@ used to represent that function or constant after the text has been parser
 permanently adding objects to the maths parser, the tokenizer handles have to
 be set up manually. This takes place in \inlinecode{src/shared\_data.F90} in
 the module \inlinecode{shared\_parser\_data}. There are several lines which
-look like
-\simpleboxverbatim
+look like:
+\begin{boxverbatim}
   INTEGER, PARAMETER :: c_const_ix = 40
   INTEGER, PARAMETER :: c_const_iy = 41
   .
@@ -7002,7 +6984,7 @@ look like
   .
   INTEGER, PARAMETER :: c_func_interpolate = 22
   INTEGER, PARAMETER :: c_func_tanh = 23
-\end{Verbatim}
+\end{boxverbatim}
 Constants beginning with \inlinecode{c\_const\_} are tokenizer handles for
 constants, and those beginning with \inlinecode{c\_func\_} are tokenizer handles
 for functions. Each number has to be unique and has to be less than a number
@@ -7039,14 +7021,14 @@ find either the function \inlinecode{as\_constant} or \inlinecode{as\_function}
 and look at the existing code. These functions are just long lists of
 \inlinecode{str\_cmp} commands followed by code to deal with custom
 functions/constants. To add the new code, just add an additional line looking
-like
-\simpleboxverbatim
+like:
+\begin{boxverbatim}
   IF (str_cmp(name, "my_const")) as_constant = c_const_my_const
   .
   .
   .
   IF (str_cmp(name, "my_func"))  as_function = c_func_my_func
-\end{Verbatim}
+\end{boxverbatim}
 Note that neither routine returns immediately after recognising the name of the
 function/constant. This allows users to override built in constants or
 functions with custom versions using \inlinecode{register\_constant} and
@@ -7079,15 +7061,14 @@ constant onto the evaluation stack which is used by the RPN parser. The basic
 sequence for functions is similar except for the addition of the code to read
 the values that the function takes, this is again the subroutine
 \inlinecode{get\_values} which is also used in custom function. The calling
-sequence in \inlinecode{do\_function} looks like
-
-\simpleboxverbatim
+sequence in \inlinecode{do\_function} looks like:
+\begin{boxverbatim}
   IF (opcode .EQ. c_func_gauss) THEN
     CALL get_values(3, values)
     CALL push_on_eval(EXP(-((values(1)-values(2))/values(3))**2))
     RETURN
   ENDIF
-\end{Verbatim}
+\end{boxverbatim}
 Simple call the \inlinecode{get\_values} subroutine passing the number of
 required parameters and an array of type \inlinecode{REAL(num)} which is at
 least as long as the number of required parameters, and the array is populated
