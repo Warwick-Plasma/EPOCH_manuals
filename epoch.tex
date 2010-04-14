@@ -1,6 +1,6 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{url,graphicx,tabularx,array,titleref}
-\usepackage[margin=.5in,nohead]{geometry}
+\usepackage[hmargin=.47in,vmargin=0.6in,nohead]{geometry}
 \usepackage{color,verbatim,framed}
 \usepackage{moreverb}
 \usepackage{fancyvrb}
@@ -26,7 +26,7 @@
 \newcommand{\scaledcapimage}[4]
   {{\begin{figure}[hbt!]\centering\includegraphics[scale=#4]{#1}\caption{#3}
     \label{#2} \end{figure}}}
-\definecolor{shadecolor}{cmyk}{0.2,0.05,0.0,0.0}
+\definecolor{shadecolor}{cmyk}{0.1,0.05,0.0,0.0}
 \setlength{\FrameRule}{0.6mm}
 
 \newenvironment{lboxverbatim}[1]{
@@ -1058,7 +1058,7 @@ end:species1
 \end{nbboxverbatim}
 %
 %\begin{minipage}{\textwidth}
-\begin{lboxverbatim}{species block to set up Gaussian density blob}
+\begin{nbboxverbatim}{species block to set up Gaussian density blob}
 begin:constant
    width=2.5e-6 # 2.5 microns
 end:constant
@@ -1070,7 +1070,7 @@ end:deo
 begin:species1
    rho=1.0e19 * (1.0-gauss(r,0.0,width))
 end:species1
-\end{lboxverbatim}
+\end{nbboxverbatim}
 %\end{minipage}
 
 \subsubsection{\inlineemph{laser} blocks in multiple dimensions.}
@@ -2826,8 +2826,8 @@ end:probe
 \begin{itemize}
 \item name - The name that the probe should have in output dumps. Output
   variables are then named this as a prefix. For example, the block shown
-  above will result in the name \inlinecode{electron\_back\_probe\_px} for
-  the x momentum. The particle positions would just be called
+  above will result in the name\linebreak \inlinecode{electron\_back\_probe\_px} for
+  the x momentum. The particle positions would just be called\linebreak
   \inlinecode{electron\_back\_probe}.
 \item x1 - The x position of the first probe node.
 \item y1 - The y position of the first probe node.
@@ -3014,7 +3014,7 @@ inter-processor communication of particles. The definition of the type is:
 \end{itemize}
 
 An entire species of particles is represented by another Fortran TYPE, this
-time called \linebreak\inlinecode{particle\_family}. This represents all the
+time called\linebreak \inlinecode{particle\_family}. This represents all the
 properties which are common to all particles in a species. The definition is:
 \begin{boxverbatim}
   TYPE :: particle_family
@@ -4613,12 +4613,12 @@ below.
 \item #TYPE(particle_list) :: attached_list# - This is the
   \inlinecode{particle\_list} object which holds the particles assigned to this
   species on this processor. Particles are attached to this list at all
-  \linebreak times EXCEPT when they are explicitly split when the code is
-  compiled with the\linebreak
+  times EXCEPT when they are explicitly split when the code is
+  compiled with the
   \inlinecode{PARTICLE\_CELL\_DIVISION} option. When the code is compiled with
   \inlinecode{PARTICLE\_CELL\_DIVISION}, the particles are attached to
   \inlinecode{attached\_list} except between the calls to
-  \inlinecode{reorder\_particles\_to\_grid} and
+  \inlinecode{reorder\_particles\_to\_grid} and\linebreak
   \inlinecode{reattach\_particles\_to\_mainlist} in
   \inlinecode{epoch{\it n}d.F90} where the particles are instead attached to
   \inlinecode{secondary\_list}. This is explained later.
@@ -4634,7 +4634,7 @@ below.
   particle splitting is suppressed.
 \item #TYPE(particle_list), DIMENSION(:,:,:), POINTER :: secondary_list# - When
   the code is compiled with the \inlinecode{-DPARTICLE\_CELL\_DIVISION} option,
-  the code allocates \inlinecode{secondary\_list(0:nx+1,0:ny+1,0:nz+1)} and then
+  the code allocates\linebreak \inlinecode{secondary\_list(0:nx+1,0:ny+1,0:nz+1)} and then
   loops over all particles. It calculates the cell in which each particle is and
   moves the particle from \inlinecode{attached\_list} to the correct element of
   \inlinecode{secondary\_list} for that cell. This means the particles which are
@@ -6479,7 +6479,7 @@ Simply add a new element to the end of the list.
 \end{boxverbatim}
 
 You will also need to add #c_def_my_precompiler_directive# to the list of
-constants in #src/shared_data.F90#.
+constants in\linebreak #src/shared_data.F90#.
 
 \subsubsection{Precompiler directives and the input deck}
 In theory, it is possible for someone to request a feature of the code in the
@@ -6487,8 +6487,8 @@ input deck which this version hasn't been compiled with. In this
 case, there is a special error code \inlinecode{c\_err\_pp\_options\_wrong}
 which causes the input deck parser to give a meaningful error. You should also
 set the string\linebreak \inlinecode{extended\_error\_string} to be the define
-command for the missing preprocessor directive i.e
-\linebreak\inlinecode{extended\_error\_string = "-DMY\_PRECOMPILER\_DIRECTIVE"}
+command for the missing preprocessor directive i.e\linebreak
+\inlinecode{extended\_error\_string = "-DMY\_PRECOMPILER\_DIRECTIVE"}
 
 \section{{\EPOCH} front end programming}
 
@@ -7008,11 +7008,11 @@ allow the use of more values for internal constants and functions, although
 care should be taken since this could lead to performance issues.
 If \inlinecode{c\_const\_deck\_lowbound} is increased then the constant
 \inlinecode{c\_constant\_custom\_lowbound} should be increased by the same
-amount (the values between \inlinecode{c\_const\_deck\_lowbound} and
+amount (the values between \inlinecode{c\_const\_deck\_lowbound} and\linebreak
 \inlinecode{c\_constant\_custom\_lowbound-1} are used for constants specified
 inside the input deck while values greater than or equal to
 \inlinecode{c\_constant\_custom\_lowbound} are used for constants specified
-by \inlinecode{register\_constant}.
+by\linebreak \inlinecode{register\_constant}.
 
 Once the tokenizer handle is specified in \inlinecode{shared\_parser\_data}, it
 is now possible to extend the main areas of the maths parser. Note that from
@@ -7037,7 +7037,7 @@ functions/constants. To add the new code, create an additional line such as:
 \end{boxverbatim}
 Note that neither routine returns immediately after recognising the name of the
 function/constant. This allows users to override built in constants or
-functions with custom versions using \inlinecode{register\_constant} and
+functions with custom versions using\linebreak \inlinecode{register\_constant} and
 \inlinecode{register\_function}. This is not significant, since tokenizing
 should never be used in a speed critical part of the code.
 
@@ -7138,7 +7138,7 @@ there are a few key points at which the code significantly changes state.
   allocating all field variables, although particles may not yet have been set
   up. The grid now exists.
 \item There are now a series of \inlinecode{IF} statements which test for
-  things like \linebreak\inlinecode{IF (IOR(ictype, c\_ic\_autoload) .NE. 0)}.
+  things like\linebreak \inlinecode{IF (IOR(ictype, c\_ic\_autoload) .NE. 0)}.
   These are the lines which test for all possible states of the
   initial conditions. The last test is for the manual load routine
   (\inlinecode{c\_ic\_manual}). After this test all the particles have been
