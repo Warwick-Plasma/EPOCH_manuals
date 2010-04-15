@@ -1449,6 +1449,7 @@ function:
 
 This deck produces and initial condition which looks like Figure~\ref{3dcone}
 and Figure~\ref{2dcone} in 3D and 2D respectively.
+
 \pagebreak
 
 \section{{\EPOCH} for end users}
@@ -4065,6 +4066,9 @@ some have the slightly unusual .F90. The difference is that files with the
 .F90 extension are passed through the preprocessor before they are compiled
 allowing the use of precompiler directives (the \#ifdef commands).
 
+\scaledcapimage{./images/coreblock2}{coreblock}{Block diagram of the core
+  routines in {\EPOCH}}{0.5}
+
 \section{General layout of the {\EPOCH} code}
 
 The names of the source files in {\EPOCH} are fairly self explanatory but, for
@@ -5221,8 +5225,8 @@ polarisation states. In the X direction,
 + \partial_zB_x -\frac{j_y}{\epsilon_0}
 \]
 \[
-\partial_t(E_z \mp B_y) \pm \partial_x(E_z \mp B_y) = \pm \partial_yE_x
-- \partial_zB_x -\frac{j_y}{\epsilon_0}
+\partial_t(E_z \mp B_y) \pm \partial_x(E_z \mp B_y) = \pm \partial_zE_x
+- \partial_yB_x -\frac{j_z}{\epsilon_0}
 \]
 It is then possible to rewrite these equations to provide a boundary condition
 on $B_z$ and $B_y$ to give propagating EM waves at the boundary. For waves
