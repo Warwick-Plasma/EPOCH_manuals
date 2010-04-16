@@ -236,10 +236,11 @@ code terminates.\\
 nsteps or t\_end is satisfied.}\\
 
 {\emphtext x\_min} - The position of the left hand edge of the domain in
-metres. Can be negative.\\
+metres. Can be negative. ``x\_start'' is accepted as a synonym.\\
 
 {\emphtext x\_max} - The position of the right hand edge of the domain in
-metres. Must be greater than \inlineemph{x\_min}.\\
+metres. Must be greater than \inlineemph{x\_min}.
+``x\_end'' is accepted as a synonym.\\
 
 {\emphtext dt\_multiplier} - Factor by which the timestep is multiplied before
 it is applied in the code. Must be less than one.\\
@@ -269,9 +270,11 @@ begin:boundaries
 end:boundaries
 \end{Verbatim}
 
-{\emphtext bc\_x\_min} - The condition for the left boundary.\\
+{\emphtext bc\_x\_min} - The condition for the left boundary.
+``xbc\_left'' is accepted as a synonym.\\
 
-{\emphtext bc\_x\_max} - The condition for the right boundary.\\
+{\emphtext bc\_x\_max} - The condition for the right boundary.
+``xbc\_right'' is accepted as a synonym.\\
 
 There are four boundary types in {\EPOCH} and each boundary of the domain can
 have one and only one of these boundaries attached to it. These boundary types
@@ -680,7 +683,8 @@ multidimensional lasers. This is covered in detail in the section on
 multidimensional {\EPOCH}.\\
 
 {\emphtext boundary} - The boundary on which to attach the laser.
-In 1D, the directions can be either x\_min or x\_max.\\
+In 1D, the directions can be either x\_min or x\_max.  ``left'' and ``right''
+are accepted as a synonyms for ``x\_min'' and ``x\_max''.\\
 
 {\emphtext amp} - The amplitude of the E field of the laser.\\
 
@@ -962,10 +966,10 @@ boundaries that are introduced in higher dimensions. These available boundaries
 are exactly the same as in 1D, with the additional boundaries being:\\
 
 \begin{tabular}{rcl}
-\inlineemph{bc\_y\_min} &-& bottom of domain\\
-\inlineemph{bc\_y\_max} &-& top of domain\\
-\inlineemph{bc\_z\_min} &-& back of domain\\
-\inlineemph{bc\_z\_max} &-& front of domain\\
+\inlineemph{bc\_y\_min} &-& bottom of domain. ``ybc\_down'' is also accepted.\\
+\inlineemph{bc\_y\_max} &-& top of domain. ``ybc\_up'' is also accepted.\\
+\inlineemph{bc\_z\_min} &-& back of domain. ``zbc\_back'' is also accepted.\\
+\inlineemph{bc\_z\_max} &-& front of domain. ``zbc\_front'' is also accepted.\\
 \end{tabular} \\
 
 These are equivalent to the existing 1D simulations except that the moving
@@ -1954,9 +1958,10 @@ end:window
   swapping of a laser boundary to a simple outflow boundary. Boundary codes
   are the same as when just specifying normal boundaries. If a boundary value
   isn't specified then it is assumed that the boundary isn't changed when the
-  window starts moving.
+  window starts moving. ``xbc\_left\_after\_move'' is accepted as a synonym.
 \item bc\_x\_max\_after\_move - The boundary condition which should apply to
   the right boundary after the window has started moving.
+  ``xbc\_right\_after\_move'' is accepted as a synonym.
 \end{itemize}
 
 The basic input deck has now been considered fully, but it remains to point
@@ -2531,7 +2536,8 @@ end:laser
 \begin{itemize}
 \item boundary - The boundary on which to attach the laser. Options are x\_min,
   x\_max, y\_min, y\_max, z\_min and z\_max. This must be the first element of
-  the block.
+  the block. ``left'', ``right'', ``down'', ``up'', ``back'' and ``front'' are
+  accepted as synonyms.
 \item amp - The amplitude of the laser.
 \item profile - The spatial profile of the laser. This should be a spatial
   function not including any values in the direction normal to the boundary
@@ -6661,12 +6667,12 @@ INTEGER :: as_direction
 \inlinecode{as\_direction} is used when assigning a laser to a boundary and
 recognises the strings
 \begin{itemize}
-\item x\_min - c\_bd\_x\_min.
-\item x\_max - c\_bd\_x\_max.
-\item y\_min - c\_bd\_y\_min.
-\item y\_max - c\_bd\_y\_max.
-\item z\_min - c\_bd\_z\_min.
-\item z\_max - c\_bd\_z\_max.
+\item x\_min or left - c\_bd\_x\_min.
+\item x\_max or right - c\_bd\_x\_max.
+\item y\_min or down - c\_bd\_y\_min.
+\item y\_max or up - c\_bd\_y\_max.
+\item z\_min or back - c\_bd\_z\_min.
+\item z\_max or front - c\_bd\_z\_max.
 \end{itemize}
 and returns the associated direction code (given after the dash in the
 definition).
