@@ -5,7 +5,7 @@
 \begin{document} 
 
 \title{CFD File Format Reference Card}
-\author{C.S.Brady}
+\author{Original author: C.S.Brady\\Most recent version: K.Bennett}
 \maketitle
 \section{Definitions}
 \begin{tabular}{c | c | c}
@@ -19,116 +19,114 @@ STRING   & CHARACTER & char*\\
 The KIND of a floating point number is determined within the file structure. Any reader must be capable of dealing with both single and double precision floating point numbers. There are currently no plans to support arbitrary precision floating point.\\\\
 To save space in this document, arrays are represented so that\\\\
 REAL(2)\\\\
- means an array of length 2 of type REAL. If the number in the brackets is itself an array then it means expand the inner array into multiple indices for the outer array. This would mean that REAL(nPoints) for a 3D array where (nPoints =[nx,ny,nz]) would expand into REAL(nx,ny,nz)\\\\
+ means an array of length 2 of type REAL. If the number in the brackets is itself an array then it means expand the inner array into multiple indices for the outer array. This would mean that REAL(npoints) for a 3D array where (npoints =[nx,ny,nz]) would expand into REAL(nx,ny,nz)\\\\
  Where multidimensional arrays are specified they are laid out in FORTRAN style on disk, first index is striped over first.\\
 \section{File Header}
 The start of a CFD file will always look like this.\\
 \begin{itemize}
-\item STRING(3) :: CFD - Always ``CFD'' in a valid file
-\item INTEGER :: Header\_offset - The length of the file header. Jumps to start of blocks
-\item INTEGER :: Block\_Header\_Size - The length in bytes of the block header. Once a reader has read all that it knows of a block header, it must skip on until it is this many bytes from the start of the block to ensure that is has passed the entire header.
-\item INTEGER :: CFD\_Version - Version number. If this is higher than the version of the reader then the reader MUST fail, file WILL almost certainly not be readable.
-\item INTEGER :: CFD\_Revision - Revision number. If this is higher than the version of the reader then it should try to continue. Revision changes only add data to structures, never remove or move data.
-\item INTEGER :: MaxStringLen - All strings in the file are of this length. Allocate this much space for all future string variables.
-\item INTEGER :: nBlocks - The number of blocks in the file. When writing this should be zero until the file is written. It is also permissable to increment this by one once a given block in the file has been written.
+\item STRING(3) :: cfd - Always ``CFD'' in a valid file
+\item INTEGER :: header\_offset - The length of the file header. Jumps to start of blocks
+\item INTEGER :: block\_header\_size - The length in bytes of the block header. Once a reader has read all that it knows of a block header, it must skip on until it is this many bytes from the start of the block to ensure that is has passed the entire header.
+\item INTEGER :: cfd\_version - Version number. If this is higher than the version of the reader then the reader MUST fail, file WILL almost certainly not be readable.
+\item INTEGER :: cfd\_revision - Revision number. If this is higher than the version of the reader then it should try to continue. Revision changes only add data to structures, never remove or move data.
+\item INTEGER :: max\_string\_len - All strings in the file are of this length. Allocate this much space for all future string variables.
+\item INTEGER :: nblocks - The number of blocks in the file. When writing this should be zero until the file is written. It is also permissable to increment this by one once a given block in the file has been written.
+\item INTEGER :: endianness - An integer used to indicate the endianness of the file. This is a fixed constant which should never need to be changed.
+\item INTEGER :: jobid1 - See below
+\item INTEGER :: jobid2 - These two integers uniquely identify the simulation which wrote the data. Currently the time in seconds and milliseconds is used but this may change.
+\item INTEGER :: step - The simulation step number.
+\item REAL16 :: time - The simulation time.
 \end{itemize}
-The first block is written immediatly after the end of the file header. Remember to use header\_offset to jump to the start of the blocks rather than just assuming that you're in the correct place once you've read the header.
+The first block is written immediately after the end of the file header. Remember to use header\_offset to jump to the start of the blocks rather than just assuming that you're in the correct place once you've read the header.
 \section{Block Headers}
 All blocks have the same header which is of the following form.\\
 \begin{itemize}
-\item STRING :: Block\_Name - The name of the current block
-\item STRING :: Block\_Class - The class name of the current block (used to group together similar variables)
-\item INTEGER :: Block\_Type - The type of the block. If a reader can't read this type of block then it should use Block\_Length to skip it.
-\item INTEGER8 :: Metadata\_Length - The length of the metadata at the start of a block (nx,ny etc. before the real data) INCLUDING the block header. Once a reader has read as much of the metadata as it can it should advance from the start of the block to Metadata\_Length to ensure that it has skipped the entire metadata.
-\item INTEGER8 :: Block\_Length - The length of the entire block including the block header and metadata length. Once a reader has read a block, it should skip a distance of Block\_Length from the start of the block to ensure that it is now in position to read the next block.
+\item STRING :: block\_name - The name of the current block
+\item STRING :: block\_class - The class name of the current block (used to group together similar variables)
+\item INTEGER :: block\_type - The type of the block. If a reader can't read this type of block then it should use block\_length to skip it.
+\item INTEGER8 :: metadata\_length - The length of the metadata at the start of a block (nx,ny etc. before the real data) INCLUDING the block header. Once a reader has read as much of the metadata as it can it should advance from the start of the block to metadata\_length to ensure that it has skipped the entire metadata.
+\item INTEGER8 :: block\_length - The length of the entire block including the block header and metadata length. Once a reader has read a block, it should skip a distance of block\_length from the start of the block to ensure that it is now in position to read the next block.
 \end{itemize}
 \subsection{Block Type Constants}
 \begin{itemize}
-  \item TYPE\_SCRIBBLE=-1 - Deleted block. Code should ignore.
-  \item TYPE\_ADDITIONAL=0 - Internal block. Code should ignore.
-  \item TYPE\_MESH=1 - Block describing a mesh or grid.
-  \item TYPE\_MESH\_VARIABLE=2 - Block describing a variable on a mesh.
-  \item TYPE\_SNAPSHOT=3 - Block describing the timestate of an output.
+  \item c\_type\_scribble = -1 - Deleted block. Code should ignore.
+  \item c\_type\_additional = 0 - internal block. code should ignore.
+  \item c\_type\_mesh = 1 - block describing a mesh or grid.
+  \item c\_type\_mesh\_variable = 2 - block describing a variable on a mesh.
+  \item c\_type\_snapshot = 3 - block describing the timestate of an output.
 \end{itemize}
 There are additional types, but they are not essential for an understanding of the format.
-\section{TYPE\_MESH}
-All types of mesh are subtypes of TYPE\_MESH
+\section{c\_type\_mesh}
+All types of mesh are subtypes of c\_type\_mesh
 \subsection{Mesh Type Constants}
 \begin{itemize}
-\item MESH\_CARTESIAN=0 - A Cartesian mesh. Does not have to be uniformly space, but must be a simple cartesian mesh.
-\item MESH\_PARTICLE=1 - A particle mesh (fully unstructured unlinked mesh). Each particle is an independant point in space and is not linked to other particles.
+\item c\_mesh\_cartesian = 0 - A Cartesian mesh. Does not have to be uniformly space, but must be a simple cartesian mesh.
+\item c\_mesh\_particle = 1 - A particle mesh (fully unstructured unlinked mesh). Each particle is an independant point in space and is not linked to other particles.
 \end{itemize}
 It is possible to represent other types of mesh in the file format, but this has not been done yet.
 \subsection{Common Mesh Metadata}
 All types of mesh block have the following common metadata.
 \begin{itemize}
-  \item INTEGER :: MeshType - The type of the mesh (Cartesian, Particle etc.)
-  \item INTEGER :: nDims - The dimensionality of the mesh
-  \item INTEGER :: Size\_of\_float - The size of the floating point numbers used in the output dump in bytes. Currently only 4 byte (single precision) and 8 byte (double precision) are supported.
+  \item INTEGER :: mesh\_type - The type of the mesh (Cartesian, Particle etc.)
+  \item INTEGER :: ndims - The dimensionality of the mesh
+  \item INTEGER :: sof - The size of the floating point numbers used in the output dump in bytes. Currently only 4 byte (single precision) and 8 byte (double precision) are supported.
 \end{itemize}
-\subsection{MESH\_CARTESIAN}
+\subsection{c\_mesh\_cartesian}
 The metadata and data for a Cartesian mesh is
 \begin{itemize}
-\item INTEGER(nDims) :: nPoints - The number of grid points in each dimension.
-\item REAL(2,nDims)  :: minmax - The extents of the grid in each dimension.
+\item INTEGER(ndims) :: npoints - The number of grid points in each dimension.
+\item REAL(2,ndims)  :: minmax - The extents of the grid in each dimension.
 \item END OF METADATA
-\item REAL(nPoints(1)) :: Data\_1 - The gridpoints for axis 1.
-\item REAL(nPoints(2)) :: Data\_2 - The gridpoints for axis 2.
+\item REAL(npoints(1)) :: data\_1 - The gridpoints for axis 1.
+\item REAL(npoints(2)) :: data\_2 - The gridpoints for axis 2.
 \item ...
-\item REAL(nPoints(nDims)) :: Data\_nDims - The gridpoints for axis nDims.
+\item REAL(npoints(ndims)) :: data\_ndims - The gridpoints for axis ndims.
 \end{itemize}
-\subsection{MESH\_PARTICLE}
+\subsection{c\_mesh\_particle}
 The metadata and data for a Particle mesh is
 \begin{itemize}
-\item INTEGER :: Particle\_Coord\_Type - The type of coordinate system for the particles. This is currently ignored and the particle positions is assumed Cartesian.
-\item INTEGER8 :: nPart - The number of particles.
-\item REAL(2,nDims) :: minmax - The extents of the particle range in each dimension
+\item INTEGER :: particle\_coord\_type - The type of coordinate system for the particles. This is currently ignored and the particle positions is assumed Cartesian.
+\item INTEGER8 :: npart - The number of particles.
+\item REAL(2,ndims) :: minmax - The extents of the particle range in each dimension
 \item END OF METADATA
-\item REAL(nPart) :: Particle\_Pos\_1 - The particle coordinates in dimension 1
+\item REAL(npart) :: particle\_pos\_1 - The particle coordinates in dimension 1
 \item ...
-\item REAL(nPart) :: Particle\_Pos\_nDim - The particle coordinates in dimension nDim.
+\item REAL(npart) :: particle\_pos\_ndim - The particle coordinates in dimension nDim.
 \end{itemize}
 Note that particle positions are stored in the slightly odd order of xxxxxxxx...yyyyyyyyyy...zzzzzzzz. This will probably change in later releases of the CFD format since it has turned out to be an unmitigated pain.
 
-\section{TYPE\_MESH\_VARIABLE}
+\section{c\_type\_mesh\_variable}
 The way that mesh variables are written is very similar to the way that meshs are written. There are several sanity checks in the format which means that much of the metadata is written for both the mesh variable and the mesh on which it resides.
 \subsection{Mesh Variable Type Constants}
 \begin{itemize}
-\item VAR\_CARTESIAN=0 - A Cartesian variable. Does not have to be uniformly space, but must be a simple cartesian mesh.
-\item VAR\_PARTICLE=1 - A particle variable (fully unstructured unlinked mesh). Each particle is an independant point in space and is not linked to other particles.
+\item c\_var\_cartesian = 0 - A Cartesian variable. Does not have to be uniformly space, but must be a simple cartesian mesh.
+\item c\_var\_particle = 1 - A particle variable (fully unstructured unlinked mesh). Each particle is an independant point in space and is not linked to other particles.
 \end{itemize}
 \subsection{Common Mesh Variable Metadata}
 All types of mesh variable block have the following common metadata.
 \begin{itemize}
-  \item INTEGER :: VariableType - The type of the variable (Cartesian, Particle etc.)
-  \item INTEGER :: nDims - The dimensionality of the variable
-  \item INTEGER :: Size\_of\_float - The size of the floating point numbers used in the output dump in bytes. Currently only 4 byte (single precision) and 8 byte (double precision) are supported.
+  \item INTEGER :: variable\_type - The type of the variable (Cartesian, Particle etc.)
+  \item INTEGER :: ndims - The dimensionality of the variable
+  \item INTEGER :: sof - The size of the floating point numbers used in the output dump in bytes. Currently only 4 byte (single precision) and 8 byte (double precision) are supported.
 \end{itemize}
-\subsection{VAR\_CARTESIAN}
+\subsection{c\_var\_cartesian}
 \begin{itemize}
-\item  INTEGER(nDims) :: nPoints - The number of points in each direction. Checked against the value from the mesh.
-\item  REAL(2)  :: Extents - The extents of the data represented by the data. Note that this is NOT the same as the extents of the mesh, it is the range of the data itself.
-\item  REAL(nDims) :: Stagger - For variables which are staggered relative to the underlying grid, this parameter represents the distance that the variable is from the gridpoint in multiples of the grid spacing.
-\item STRING :: MeshName - The name of the mesh that the variable is associated
-\item STRING :: MeshClass - The class of the mesh that the variable is associated. This must match a mesh which will exist when the file is completed in both Name and Class or some readers will not work.
+\item  INTEGER(ndims) :: npoints - The number of points in each direction. Checked against the value from the mesh.
+\item  REAL(2)  :: extents - The extents of the data represented by the data. Note that this is NOT the same as the extents of the mesh, it is the range of the data itself.
+\item  REAL(ndims) :: stagger - For variables which are staggered relative to the underlying grid, this parameter represents the distance that the variable is from the gridpoint in multiples of the grid spacing.
+\item STRING :: mesh\_name - The name of the mesh that the variable is associated
+\item STRING :: mesh\_class - The class of the mesh that the variable is associated. This must match a mesh which will exist when the file is completed in both Name and Class or some readers will not work.
 \item END OF METADATA
-\item REAL(nPoints) :: Data - The data is written as a FORTRAN ordered multidimensional array.
+\item REAL(npoints) :: data - The data is written as a FORTRAN ordered multidimensional array.
 \end{itemize}
-\subsection{VAR\_PARTICLE}
+\subsection{c\_var\_particle}
 \begin{itemize}
-\item  INTEGER8 :: nPart - The number of particles. Checked against the value from the mesh.
-\item  REAL(2)  :: Extents - The extents of the data represented by the data. Note that this is NOT the same as the extents of the mesh, it is the range of the data itself.
-\item STRING :: MeshName - The name of the mesh that the variable is associated
-\item STRING :: MeshClass - The class of the mesh that the variable is associated. This must match a mesh which will exist when the file is completed in both Name and Class or some readers will not work.
+\item  INTEGER8 :: npart - The number of particles. Checked against the value from the mesh.
+\item  REAL(2)  :: extents - The extents of the data represented by the data. Note that this is NOT the same as the extents of the mesh, it is the range of the data itself.
+\item STRING :: mesh\_name - The name of the mesh that the variable is associated
+\item STRING :: mesh\_class - The class of the mesh that the variable is associated. This must match a mesh which will exist when the file is completed in both Name and Class or some readers will not work.
 \item END OF METADATA
-\item REAL(nPart) :: Data - The data is written as a 1D array with the same ordering of particles as when the mesh is written.
-\end{itemize}
-\section{TYPE\_SNAPSHOT}
-This block is slightly strange in that there is no data, just metadata, so skipping the block and skipping the metadata is equivalent
-\begin{itemize}
-\item INTEGER :: cycle - The cycle number for the output. This is normally the iteration number of a core solver where the output was written, but could validly be just the output dump number.
-\item REAL(KIND=8) :: time - The time associated with the current snapshot.
-\item END OF METADATA
+\item REAL(npart) :: data - The data is written as a 1D array with the same ordering of particles as when the mesh is written.
 \end{itemize}
 \section{Ideal sequence for reading CFD files}
 This section details the sequence that an ideal CFD reader should follow to parse a CFD file.
@@ -141,9 +139,9 @@ This section details the sequence that an ideal CFD reader should follow to pars
 \item If not then exit with an error message about getting a new reader
 \item Check that the revision is less than or equal to the revision of the standard that the reader is written to.
 \item If not then print a warning message, but continue
-\item If the nBlocks field is zero then exit since the file hasn't been finished yet.
-\item Set the file pointer to Header\_Offset to skip the file header (NOTE you cannot assume that you are at the end of the file header after reading the known fields, since it is valid to extend the file header with new information and only increment the revision number)
-\item Loop over nBlocks
+\item If the nblocks field is zero then exit since the file hasn't been finished yet.
+\item Set the file pointer to header\_offset to skip the file header (NOTE you cannot assume that you are at the end of the file header after reading the known fields, since it is valid to extend the file header with new information and only increment the revision number)
+\item Loop over nblocks
 \item Store the current position of the filepointer (block\_start)
 \item Read the block header
 \item Determine whether the reader can deal with the type of block which is described by the header. Also check for user request for this variable etc.
@@ -152,9 +150,9 @@ This section details the sequence that an ideal CFD reader should follow to pars
 \item Store the filepointer (metadata\_start).
 \item Read the block metadata for the correct type of block.
 \item Move the filepointer to metadata\_start + metadata\_length.
-\item Read the block data. It is valid to skip this step if you only want access to the block metadata (the VisIT plugin works in this way when populating the VisIT metadata server).
+\item Read the block data. It is valid to skip this step if you only want access to the block metadata (the VisIt plugin works in this way when populating the VisIt metadata server).
 \item Since it is possible for a version change to add new data at the end of the data section, move the filepointer to block\_start + block\_length.
-\item Check whether the filepointer is at the end of the file. The nBlocks variable should always be accurate, but you should check.
+\item Check whether the filepointer is at the end of the file. The nblocks variable should always be accurate, but you should check.
 \item {\textbf End Loop}
 \item Close the file.
 \end{itemize}
