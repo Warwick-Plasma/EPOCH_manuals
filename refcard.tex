@@ -82,9 +82,9 @@ All blocks have the same header which is of the following form.\\
   start of the block to metadata\_length to ensure that it has skipped the
   entire metadata.
 \item INTEGER8 :: block\_length - The length of the entire block including the
-  block header and metadata length. Once a reader has read a block, it should
-  skip a distance of block\_length from the start of the block to ensure that
-  it is now in position to read the next block.
+  metadata length (but not the block header). Once a reader has read a block,
+  it should skip a distance of block\_length from the start of the block to
+  ensure that it is now in position to read the next block.
 \end{itemize}
 
 \subsection{Block Type Constants}
