@@ -176,31 +176,37 @@ appear in the body of the manual.
 \subsection{Running {\EPOCH} and basic control of EPOCH1D}
 When the code is run, the output is
 \begin{lboxverbatim}{Command line output}
-@@@@@@@@  @@@@@@      @@@@    @@@@@@@@  @@    @@    @@@@@@    @@@@@@
-@@@@@@@@  @@@@@@      @@@@    @@@@@@@@  @@    @@    @@@@@@    @@@@@@
-@@        @@    @@  @@    @@  @@        @@    @@       @@@    @@  @@
-@@        @@    @@  @@    @@  @@        @@    @@       @@@    @@  @@
-@@        @@    @@  @@    @@  @@        @@    @@       @@@    @@    @@
-@@        @@    @@  @@    @@  @@        @@    @@       @@@    @@    @@
-@@@@@@@@  @@@@@@    @@    @@  @@        @@@@@@@@       @@@    @@    @@
-@@@@@@@@  @@@@@@    @@    @@  @@        @@@@@@@@       @@@    @@    @@
-@@        @@        @@    @@  @@        @@    @@       @@@    @@    @@
-@@        @@        @@    @@  @@        @@    @@       @@@    @@    @@
-@@        @@        @@    @@  @@        @@    @@       @@@    @@  @@
-@@        @@        @@    @@  @@        @@    @@       @@@    @@  @@
-@@@@@@@@  @@          @@@@    @@@@@@@@  @@    @@    @@@@@@@@  @@@@@@
-@@@@@@@@  @@          @@@@    @@@@@@@@  @@    @@    @@@@@@@@  @@@@@@
-
-Welcome to EPOCH1D Version 2.1
-
+     @@@@@@@@  @@@@@@      @@@@    @@@@@@@@  @@    @@    @@@@@@    @@@@@@       
+     @@@@@@@@  @@@@@@      @@@@    @@@@@@@@  @@    @@    @@@@@@    @@@@@@       
+     @@        @@    @@  @@    @@  @@        @@    @@      @@@@    @@  @@       
+     @@        @@    @@  @@    @@  @@        @@    @@      @@@@    @@  @@       
+     @@        @@    @@  @@    @@  @@        @@    @@      @@@@    @@    @@     
+     @@        @@    @@  @@    @@  @@        @@    @@      @@@@    @@    @@     
+     @@@@@@@@  @@@@@@    @@    @@  @@        @@@@@@@@      @@@@    @@    @@     
+     @@@@@@@@  @@@@@@    @@    @@  @@        @@@@@@@@      @@@@    @@    @@     
+     @@        @@        @@    @@  @@        @@    @@      @@@@    @@    @@     
+     @@        @@        @@    @@  @@        @@    @@      @@@@    @@    @@     
+     @@        @@        @@    @@  @@        @@    @@      @@@@    @@  @@       
+     @@        @@        @@    @@  @@        @@    @@      @@@@    @@  @@       
+     @@@@@@@@  @@          @@@@    @@@@@@@@  @@    @@    @@@@@@@@  @@@@@@       
+     @@@@@@@@  @@          @@@@    @@@@@@@@  @@    @@    @@@@@@@@  @@@@@@       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+ 
+ Welcome to EPOCH1D Version 2.2             
+ 
  The code was compiled with the following compile time options
  *************************************************************
  Per particle weighting -DPER_PARTICLE_WEIGHT
  Tracer particle support -DTRACER_PARTICLES
  Particle probe support -DPARTICLE_PROBES
- Particle ionisation model -DPARTICLE_IONISE
  *************************************************************
-
+ 
+ Code is running on 1 processing elements
+ 
+ 
  Specify output directory
 \end{lboxverbatim}
 
@@ -242,6 +248,9 @@ begin:control
 
    # restart_snapshot=98
    neutral_background=T
+
+   # field_order=2
+   # stdout_frequency=10
 end:control
 \end{lboxverbatim}
 
@@ -289,6 +298,14 @@ dump to restart the code from.\\
 {\emphtext neutral\_background} - Logical flag indicating whether to
 solve Poisson's equation at t=0 or assume that there is a neutralising
 background field. If ``T'' then Poisson's equation is solved.\\
+
+{\emphtext field\_order} - Order of the finite difference scheme used for
+solving Maxwell's equations. Can be 2, 4 or 6. If not specified, the default
+is to use a second order scheme.\\
+
+{\emphtext stdout\_frequency} - If specified then the code will print a one
+line status message to stdout after every given number or timesteps. The
+default is to print nothing to screen.
 
 \subsubsection{\inlineemph{boundaries} block}
 The {\emphtext boundaries} block sets the boundary conditions of each boundary
@@ -347,80 +364,136 @@ one or more boundaries then the code will no longer necessarily conserve mass.}
 
 \begin{lboxverbatim}{species block}
 begin:species
-   n_species=2
-
-   # electrons
-   charge1=-1.0
-   mass1=1.0
-   npart1=2000*100
-   frac1=0.5
-   name1=Electron
-   dump1=T
-
-   # carbon4+
-   charge2=4.0
-   mass2=1836.0*12
-   npart2=2000*100
-   frac2=0.5
-   name2=Carbon
-   dump2=T
+   name=electron
+   charge=-1.0
+   mass=1.0
+   npart=2000*100
+   dump=T
+   # frac=1.0
+   # tracer=F
+   rho=1.e4
+   temp=1e6
 end:species
 \end{lboxverbatim}
 
-{\emphtext n\_species} - This MUST be the first entry in the species block and
-specifies the number of species in the simulation. After this line, the
-properties of any numbered species may be set in any order. The species are
-numbered from 1 to \inlineemph{n\_species}.\\
+{\emphtext name} - This specifies the name of the particle species defined
+in the current block. This name can include any alphanumeric characters in
+the basic ASCII set. The name is used to identify the species in any
+consequent input block. \\
 
-{\emphtext charge\inlinecode{n}} - This sets the charge of species n in
+{\emphtext NOTE: IT IS IMPOSSIBLE TO SET TWO SPECIES WITH THE SAME NAME!}\\
+
+{\emphtext charge} - This sets the charge of the species in
 multiples of the electron charge. Negative numbers are used for negatively
 charged particles.\\
 
-{\emphtext mass\inlinecode{n}} - This sets the mass of species n in multiples
+{\emphtext mass} - This sets the mass of the species in multiples
 of the electron mass. Negative numbers are not trapped and effectively swap the
 charge of the species. This is not recommended since it breaks the
 mass\_density diagnostic.\\
 
-{\emphtext npart\inlinecode{n}} - This specifies the number of pseudoparticles
-which should be loaded into the simulation domain for species n. This is the
+{\emphtext npart} - This specifies the number of pseudoparticles
+which should be loaded into the simulation domain for the species. This is the
 most convenient way of loading particles for simulations containing multiple
 species with different number densities. If these are specified then
 \inlineemph{npart} (the global number of particles specified in the control
 block) is ignored for this species. It should not be specified at the same time
-as fracn for a given species.\\
+as frac for a given species.\\
 
-{\emphtext frac\inlinecode{n}} - This specifies what fraction of npart (the
+{\emphtext frac} - This specifies what fraction of npart (the
 global number of particles specified in the control block) should be assigned
-to species n. \\
+to the species. \\
 
-{\emphtext NOTE: fracn should not be specified at the same time as npartn for a
+{\emphtext NOTE: frac should not be specified at the same time as npart for a
 given species.}\\
 
-{\emphtext name\inlinecode{n}} - This specifies the name of particle species
-n. This name can include any alphanumeric characters in the basic ASCII
-set. The name is used to identify the species in any species specific output
-information. \\
-
-{\emphtext NOTE: DO NOT SET TWO SPECIES WITH THE SAME NAME!}\\
-
-{\emphtext dump\inlinecode{n}} - Logical flag detailing whether or not to dump
-the information about species n. If set to ``F'', then the species information
+{\emphtext dump} - Logical flag detailing whether or not to dump
+information about the species. If set to ``F'', then the species information
 is not dumped when writing ANY species specific diagnostics, although it is
-included in global diagnostics (i.e in the example if ``dump2=F'' were specified
-then there would be no ``mass\_density\_carbon'', but the mass of the carbon
+included in global diagnostics (i.e in the example if ``dump=F'' were specified
+then there would be no ``mass\_density\_electron'', but the mass of the electron
 would be considered when calculating ``mass\_density'') and restart dumps.\\
 
-{\emphtext tracer\inlinecode{n}} - Logical flag switching particle species n
+{\emphtext tracer} - Logical flag switching the particle species
 into tracer particles. Tracer particles are enabled with the correct
 precompiler option, and when set for a given species make that species move
 correctly for its charge and mass, but contribute no current. This means that
 these particles are passive tracers in the plasma.\\
 
+The species blocks are also used for specifying initial conditions for
+the particle species. The elements of the species block used for setting
+initial conditions are:\\
+
+{\emphtext rho} - Particle number density in $m^{-3}$. Despite the name, this
+is NOT the mass density. As soon as a rho= line has been parsed, the values are
+calculated for the whole domain and are available for reuse on the right hand
+side of an expression. This is seen in the above example in the first two lines
+for species2, where the density is first set and then corrected.\\
+
+{\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
+distribution in K. To specify a temperature in ev, simply use the deck
+parser. So for example temp\_x=4*kev*kb gives a 4kev temperature.\\
+
+{\emphtext temp} - Sets an isotropic temperature distribution in K. Does not
+give thermal distribution in ignorable directions. If both temp and a specific
+temp\_x, temp\_y, temp\_z parameter is specified then the last to appear in the
+deck has precedence.\\
+
+{\emphtext minrho} - Minimum particle number density in $m^{-3}$. When the
+number density in a cell falls below minrho the autoloader does not load any
+pseudoparticles into that cell to minimize the number of low weight,
+unimportant particles. If set to 0 then all cells are loaded with particles.\\
+
+{\emphtext maxrho} - Maximum particle number density in $m^{-3}$. When the
+number density in a cell rises above maxrho the autoloader clips the density to
+maxrho allowing easy implementation of exponential rises to plateaus.\\
+
+{\emphtext drift\_\{x,y,z\}} - Specifies a momentum space offset in kgms-2 to
+the distribution function for this species. At present the drift\_\{x,y,z\}
+parameter CANNOT vary in space and is just a single constant.
+
+\subsubsection{\inlineemph{species\_external\inlinecode{n}} block}
+\begin{lboxverbatim}{species\_external{\it n} block}
+begin:species_external2
+   rho='Data/ic.dat'
+   offset=80000
+   temp_x='Data/ic.dat'
+end:species_external2
+\end{lboxverbatim}
+
+The penultimate type of block in the initial conditions deck is the
+species\_external\inlinecode{n} block. It is very similar to the ic.deck
+\inlineemph{species\inlinecode{n}} block, but instead of specifying the
+initial conditions mathematically in the input deck, you specify the filename
+of a simple binary file containing the information required. The use of this
+block is very simple and is shown in the example above.\\
+
+All the elements which exist in the simple \inlineemph{species\inlinecode{n}}
+block also exist in the \inlineemph{species\_external\inlinecode{n}} block,
+and the value on the right hand side should be the filename which holds the
+data wanted. An additional element is also introduced, the offset element which
+is the offset in bytes from which the start of the file where the data should
+be read from. As a given line in the block executes, the file is opened, the
+file handle is moved to the point specified by the offset parameter, the data
+is read and the file is then closed. Therefore, unless the offset value is
+changed between data reading lines the same data will be read into all the
+variables. The data is read in as soon as a line is executed, and so it is
+perfectly possible to load data from a file with the
+\inlineemph{species\_external\inlinecode{n}} block and then modify the data
+with a \inlineemph{species\inlinecode{n}} block.\\
+
+The file should be a simple binary file consisting of floating point numbers of
+the same precision as \inlinecode{\_num} in the core {\EPOCH} code.\\
+
+{\emphtext NOTE: The files that are expected by this block are SIMPLE BINARY
+files, NOT Fortran unformatted files. It is possible to read Fortran
+unformatted files using the offset element, but care must be taken!}\\
+
 \subsubsection{\inlineemph{output} block}
 Output in {\EPOCH} is handled using the custom designed CFD (\inlineemph{Compact
 Flexible Datatype}) self defining file format which will be covered in more
 detail in a later set of notes and comes with readers for ITT IDL and LLNL
-VisIt, with additional readers for Mathworks Matlab and Yorick under
+VisIt, with an additional reader for Mathworks Matlab under
 development. What the code should output and when it should output it is
 specified in the ``output'' block of the input deck which will be covered over
 the next few pages, but a quick note should be made on the types of output and
@@ -815,92 +888,6 @@ begin:species1
    minrho=0.1 * den_max
 end:species1
 \end{lboxverbatim}
-
-The actual initial conditions are specified in one or more blocks called
-species blocks. There should be one of these blocks for each species which is
-to have its initial conditions set from the external initial conditions.\\
-
-Each block is started with a\\
-
-{\emphtext begin:species\inlinecode{n}}\\
-\\
-line, and ends with an associated\\
-
-{\emphtext end:species\inlinecode{n}}\\
-\\
-line. The species number n is the same species number which is assigned
-properties in the species block of input.deck. So if you assigned species 1 the
-properties of an electron then the initial conditions given in the block
-species1 would be the initial conditions used to set up the electrons. Note
-that as in the example above the species do not have to be specified in any
-given numerical order. The above example positions carbon 4+ ions (species2)
-and then positions four times the number of electrons with the same
-profile. The elements of the species block are:\\
-
-{\emphtext rho} - Particle number density in $m^{-3}$. Despite the name, this
-is NOT the mass density. As soon as a rho= line has been parsed, the values are
-calculated for the whole domain and are available for reuse on the right hand
-side of an expression. This is seen in the above example in the first two lines
-for species2, where the density is first set and then corrected.\\
-
-{\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
-distribution in K. To specify a temperature in ev, simply use the deck
-parser. So for example temp\_x=4*kev*kb gives a 4kev temperature.\\
-
-{\emphtext temp} - Sets an isotropic temperature distribution in K. Does not
-give thermal distribution in ignorable directions. If both temp and a specific
-temp\_x, temp\_y, temp\_z parameter is specified then the last to appear in the
-deck has precedence.\\
-
-{\emphtext minrho} - Minimum particle number density in $m^{-3}$. When the
-number density in a cell falls below minrho the autoloader does not load any
-pseudoparticles into that cell to minimize the number of low weight,
-unimportant particles. If set to 0 then all cells are loaded with particles.\\
-
-{\emphtext maxrho} - Maximum particle number density in $m^{-3}$. When the
-number density in a cell rises above maxrho the autoloader clips the density to
-maxrho allowing easy implementation of exponential rises to plateaus.\\
-
-{\emphtext drift\_\{x,y,z\}} - Specifies a momentum space offset in kgms-2 to
-the distribution function for this species. At present the drift\_\{x,y,z\}
-parameter CANNOT vary in space and is just a single constant.
-
-\subsubsection{\inlineemph{species\_external\inlinecode{n}} block}
-\begin{lboxverbatim}{species\_external{\it n} block}
-begin:species_external2
-   rho=Data/ic.dat
-   offset=80000
-   temp_x=Data/ic.dat
-end:species_external2
-\end{lboxverbatim}
-
-The penultimate type of block in the initial conditions deck is the
-species\_external\inlinecode{n} block. It is very similar to the ic.deck
-\inlineemph{species\inlinecode{n}} block, but instead of specifying the
-initial conditions mathematically in the input deck, you specify the filename
-of a simple binary file containing the information required. The use of this
-block is very simple and is shown in the example above.\\
-
-All the elements which exist in the simple \inlineemph{species\inlinecode{n}}
-block also exist in the \inlineemph{species\_external\inlinecode{n}} block,
-and the value on the right hand side should be the filename which holds the
-data wanted. An additional element is also introduced, the offset element which
-is the offset in bytes from which the start of the file where the data should
-be read from. As a given line in the block executes, the file is opened, the
-file handle is moved to the point specified by the offset parameter, the data
-is read and the file is then closed. Therefore, unless the offset value is
-changed between data reading lines the same data will be read into all the
-variables. The data is read in as soon as a line is executed, and so it is
-perfectly possible to load data from a file with the
-\inlineemph{species\_external\inlinecode{n}} block and then modify the data
-with a \inlineemph{species\inlinecode{n}} block.\\
-
-The file should be a simple binary file consisting of floating point numbers of
-the same precision as \inlinecode{\_num} in the core {\EPOCH} code.\\
-
-{\emphtext NOTE: The files that are expected by this block are SIMPLE BINARY
-files, NOT Fortran unformatted files. It is possible to read Fortran
-unformatted files using the offset element, but care must be taken!}\\
 
 \subsubsection{\inlineemph{fields} block}
 \begin{lboxverbatim}{fields block}
@@ -1537,16 +1524,18 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
-Welcome to EPOCH2D Version 2.1
-
+ Welcome to EPOCH2D Version 2.2             
+ 
  The code was compiled with the following compile time options
  *************************************************************
  Per particle weighting -DPER_PARTICLE_WEIGHT
  Tracer particle support -DTRACER_PARTICLES
  Particle probe support -DPARTICLE_PROBES
- Particle ionisation model -DPART_IONISE
  *************************************************************
-
+ 
+ Code is running on 1 processing elements
+ 
+ 
  Specify output directory
 \end{boxverbatim}
 
@@ -1581,7 +1570,10 @@ options currently controlled by the preprocessor are:\\
   the codes more advanced features require this and it is turned on by
   default. It can be turned off to save on memory, but this is recommended
   only for advanced users.
-\item PARTICLE\_CELL\_DIVISION - After the code has updated the particle
+\item PER\_PARTICLE\_CHARGE\_MASS - By default, the particle charge and
+  mass are specified on a per-species basis. With this flag enabled, charge
+  and mass become a per-particle property.
+\item SPLIT\_PARTICLES\_AFTER\_PUSH - After the code has updated the particle
   positions, it splits the particles into separate lists for each grid
   cell. Some features of the code (like collision operators) require this
   feature to be on, but it is off by default.
@@ -1590,6 +1582,8 @@ options currently controlled by the preprocessor are:\\
   on. This is a debug mode for code development.
 \item FIELD\_DEBUG - The code also outputs information about where the
   processor boundaries are in space. This is a debug mode for code development.
+\item PARSER\_DEBUG - The code outputs more detailed information whilst
+  parsing the input deck. This is a debug mode for code development.
 \item PARTICLE\_IONISE - Activate the particle ionisation code (BETA).
 \item PARTICLE\_COUNT\_UPDATE - Makes the code keep global particle counts for
   each species on each processor. This information isn't needed by the core
@@ -1611,8 +1605,12 @@ options currently controlled by the preprocessor are:\\
   copies of particles until the next output dump, it is a heavyweight
   diagnostic. Therefore, this diagnostic is only enabled when the code is
   compiled with this directive.
-\item SPLINE\_FOUR - Swap the code from a 2nd order cloud in cell PIC code to
-  using 4th order spline particle shape functions.
+\item PARTICLE\_SHAPE\_TOPHAT - By default, the code uses a 1st order
+  b-spline (triangle) shape function to represent particles. Using this flag
+  changes the particle representation to that of a top-hat function
+  (0th order b-spline).
+\item PARTICLE\_SHAPE\_BSPLINE3 - This flag changes the particle representation
+  to that of a 3rd order b-spline shape function.
 \end{itemize}
 
 So to turn on per particle weighting and particle debugging, the line would
@@ -7274,3 +7272,69 @@ Those error codes with names in {\bf BOLD} are those which will cause the code
 to terminate.
 
 \end{document}
+begin:control
+
+  #global number of gridpoints
+  nx=400 #in x
+  ny=400 #in y
+  npart=16.0e5
+
+  #maximum number of iterations
+  #set to -1 to run until finished
+  nsteps=0
+
+  #final time of simulation
+  t_end=50.0e-15
+
+  #size of domain
+  x_min=-10e-6
+  x_max=10e-6
+  y_min=-10e-6
+  y_max=10e-6
+
+  #Don't know if this should be in the deck or not
+  dt_multiplier=0.8
+
+  #dlb_threshold=1.0
+
+  #restart_snapshot=98
+
+  #Setting neutral_background to F makes the code solve
+  #Poisson's equation for the initial electric field
+  #Setting it to T makes the initial electric field 0
+  neutral_background=T
+
+end:control
+
+
+begin:boundaries
+
+  bc_x_min=simple_laser
+  bc_x_max=simple_outflow
+  bc_y_min=periodic
+  bc_y_max=periodic
+
+end:boundaries
+
+
+begin:species
+
+  name=Electron
+  charge=-1.0
+  mass=1.0
+  frac=0.5
+  dump=T
+  tracer=T
+  rho=den_max
+  temp=1e6
+
+end:species
+
+
+begin:species
+
+  name=Electron
+  rho=rho(Palladium) * 22.0
+  temp=1e6
+
+end:species
