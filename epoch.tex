@@ -10,7 +10,7 @@
 \definecolor{warwicklight}{cmyk}{1.0,0.0,0.0,0.0}
 \definecolor{warwickred}{cmyk}{0.0,1.0,0.65,0.15}
 \newcommand{\HRule}{\rule[0.3cm]{\linewidth}{0.5mm}}
-\newcommand{\emphtext}{\color{warwickdark} \fontfamily{phv}\selectfont\Large\bf}
+\newcommand{\emphtext}{\color{warwickdark} \fontfamily{phv}\selectfont\large\bf}
 \newcommand{\inlinecode}[1]{{\color{warwickred} \bf\texttt{#1}}}
 \newcommand{\sectit}[1]{See the section titled ``{\bf\titleref{sec:#1}}''.}
 \newcommand{\code}[1]{{\texttt{#1}}}
@@ -195,7 +195,7 @@ When the code is run, the output is
                                                                                 
                                                                                 
  
- Welcome to EPOCH1D Version 2.2             
+ Welcome to EPOCH1D Version 2.3             
  
  The code was compiled with the following compile time options
  *************************************************************
@@ -316,21 +316,30 @@ stage.
 \begin{lboxverbatim}{boundaries block}
 begin:boundaries
    bc_x_min=simple_laser
-   bc_x_max=simple_outflow
+   bc_x_max_field=simple_outflow
+   bc_x_max_particle=simple_outflow
 end:boundaries
 \end{lboxverbatim}
 
-{\emphtext bc\_x\_min} - The condition for the left boundary.
-``xbc\_left'' is accepted as a synonym.\\
+{\emphtext bc\_x\_min} - The condition for the left boundary for both fields
+and particles. ``xbc\_left'' is accepted as a synonym.\\
 
-{\emphtext bc\_x\_max} - The condition for the right boundary.
-``xbc\_right'' is accepted as a synonym.\\
+{\emphtext bc\_x\_min\_\{field,particle\}} - The condition for the left
+boundary for \{fields,particles\}.\linebreak ``xbc\_left\_\{field,particle\}''
+is accepted as a synonym.\\
 
-There are four boundary types in {\EPOCH} and each boundary of the domain can
+{\emphtext bc\_x\_max} - The condition for the right boundary for both fields
+and particles. ``xbc\_right'' is accepted as a synonym.\\
+
+{\emphtext bc\_x\_max\_\{field,particle\}} - The condition for the right
+boundary for \{fields,particles\}.\linebreak ``xbc\_right\_\{field,particle\}''
+is accepted as a synonym.\\
+
+There are six boundary types in {\EPOCH} and each boundary of the domain can
 have one and only one of these boundaries attached to it. These boundary types
 are:\\
 
-{\emphtext periodic} - A simple periodic boundary condition. Fields and
+{\emphtext periodic} - A simple periodic boundary condition. Fields and/or
 particles reaching one edge of the domain are wrapped round to the opposite
 boundary.\\
 
@@ -357,29 +366,61 @@ condition again allows outflowing characteristics to flow unchanged, but this
 time the inflowing characteristics are set to zero. The particles are again
 simply removed from the simulation when they reach the boundary.\\
 
-{\emphtext NOTE: If either simple\_laser or simple\_outflow are specified on
+{\emphtext reflect} - A perfectly reflecting boundary condition.\\
+
+{\emphtext open} - When applied to fields, EM waves outflowing characteristics
+propagate through the boundary. Particles are transmitted through the boundary
+and removed from the system.\\
+
+{\emphtext NOTE: If simple\_laser, simple\_outflow or open are specified on
 one or more boundaries then the code will no longer necessarily conserve mass.}
+
 
 \subsubsection{\inlineemph{species} block}
 
 \begin{lboxverbatim}{species block}
 begin:species
-   name=electron
+   # electrons
+   name=Electron
    charge=-1.0
    mass=1.0
-   npart=2000*100
+   frac=0.5
+   # npart=2000*100
    dump=T
-   # frac=1.0
    # tracer=F
    rho=1.e4
    temp=1e6
+
+   temp_x=0.0
+   temp_y=temp_x(Electron)
+   minrho=0.1 * den_max
+end:species
+
+begin:species
+   # carbon4+
+   name=Carbon
+   charge=4.0
+   mass=1836.0*12
+   frac=0.5
+   # npart=2000*100
+   dump=T
+
+   rho=if(abs(x) lt thick,den_max,0.0)
+   rho=if((x gt -thick) and (abs(y) gt 2e-6),0.0,rho(Carbon))
+   temp_x=temp_x(Electron)
+   temp_y=temp_x(Electron)
+end:species
+
+begin:species
+   name=Electron
+   rho=4.0*rho(Carbon)
 end:species
 \end{lboxverbatim}
 
 {\emphtext name} - This specifies the name of the particle species defined
 in the current block. This name can include any alphanumeric characters in
 the basic ASCII set. The name is used to identify the species in any
-consequent input block. \\
+consequent input block.\\
 
 {\emphtext NOTE: IT IS IMPOSSIBLE TO SET TWO SPECIES WITH THE SAME NAME!}\\
 
@@ -402,7 +443,7 @@ as frac for a given species.\\
 
 {\emphtext frac} - This specifies what fraction of npart (the
 global number of particles specified in the control block) should be assigned
-to the species. \\
+to the species.\\
 
 {\emphtext NOTE: frac should not be specified at the same time as npart for a
 given species.}\\
@@ -411,7 +452,7 @@ given species.}\\
 information about the species. If set to ``F'', then the species information
 is not dumped when writing ANY species specific diagnostics, although it is
 included in global diagnostics (i.e in the example if ``dump=F'' were specified
-then there would be no ``mass\_density\_electron'', but the mass of the electron
+then there would be no ``Mass\_Density\_Electron'', but the mass of the electron
 would be considered when calculating ``mass\_density'') and restart dumps.\\
 
 {\emphtext tracer} - Logical flag switching the particle species
@@ -421,14 +462,22 @@ correctly for its charge and mass, but contribute no current. This means that
 these particles are passive tracers in the plasma.\\
 
 The species blocks are also used for specifying initial conditions for
-the particle species. The elements of the species block used for setting
+the particle species. The initial conditions in {\EPOCH} can be specified in
+various ways, but the easiest way is to specify the initial conditions in the
+input deck file. This allows any initial condition which can be specified
+everywhere in space by a number density and a drifting Maxwellian distribution
+function.
+These are built up using the normal maths
+expressions, by setting the density and temperature for each species which is
+then used by the autoloader to actually position the particles.\\
+The elements of the species block used for setting
 initial conditions are:\\
 
 {\emphtext rho} - Particle number density in $m^{-3}$. Despite the name, this
 is NOT the mass density. As soon as a rho= line has been parsed, the values are
 calculated for the whole domain and are available for reuse on the right hand
 side of an expression. This is seen in the above example in the first two lines
-for species2, where the density is first set and then corrected.\\
+for the carbon species, where the density is first set and then corrected.\\
 
 {\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
 distribution in K. To specify a temperature in ev, simply use the deck
@@ -448,39 +497,41 @@ unimportant particles. If set to 0 then all cells are loaded with particles.\\
 number density in a cell rises above maxrho the autoloader clips the density to
 maxrho allowing easy implementation of exponential rises to plateaus.\\
 
-{\emphtext drift\_\{x,y,z\}} - Specifies a momentum space offset in kgms-2 to
-the distribution function for this species. At present the drift\_\{x,y,z\}
-parameter CANNOT vary in space and is just a single constant.
+{\emphtext drift\_\{x,y,z\}} - Specifies a momentum space offset in $kgms^{-1}$
+to the distribution function for this species. At present the drift\_\{x,y,z\}
+parameter CANNOT vary in space and is just a single constant.\\
 
-\subsubsection{\inlineemph{species\_external\inlinecode{n}} block}
-\begin{lboxverbatim}{species\_external{\it n} block}
-begin:species_external2
+{\emphtext mass\_density} - Particle mass density in $kgm^{-3}$. This is
+used, together with particle mass, to calculate the number density for the
+particle species.  As soon as a mass\_density= line has been parsed, the
+values of rho are
+calculated for the whole domain and are available for reuse on the right hand
+side of an expression.\\
+
+It is also possible to set initial conditions for a particle species
+using an external file.  Instead of specifying the
+initial conditions mathematically in the input deck, you specify in quotation
+marks the filename of a simple binary file containing the information required.
+
+\begin{lboxverbatim}{external initial conditions}
+begin:species
+   name=Electron
    rho='Data/ic.dat'
    offset=80000
    temp_x='Data/ic.dat'
-end:species_external2
+end:species
 \end{lboxverbatim}
 
-The penultimate type of block in the initial conditions deck is the
-species\_external\inlinecode{n} block. It is very similar to the ic.deck
-\inlineemph{species\inlinecode{n}} block, but instead of specifying the
-initial conditions mathematically in the input deck, you specify the filename
-of a simple binary file containing the information required. The use of this
-block is very simple and is shown in the example above.\\
 
-All the elements which exist in the simple \inlineemph{species\inlinecode{n}}
-block also exist in the \inlineemph{species\_external\inlinecode{n}} block,
-and the value on the right hand side should be the filename which holds the
-data wanted. An additional element is also introduced, the offset element which
-is the offset in bytes from which the start of the file where the data should
+An additional element is also introduced, the offset element which
+is the offset in bytes from the start of the file where the data should
 be read from. As a given line in the block executes, the file is opened, the
 file handle is moved to the point specified by the offset parameter, the data
 is read and the file is then closed. Therefore, unless the offset value is
 changed between data reading lines the same data will be read into all the
 variables. The data is read in as soon as a line is executed, and so it is
-perfectly possible to load data from a file with the
-\inlineemph{species\_external\inlinecode{n}} block and then modify the data
-with a \inlineemph{species\inlinecode{n}} block.\\
+perfectly possible to load data from a file and then modify the data using
+a mathematical expression.\\
 
 The file should be a simple binary file consisting of floating point numbers of
 the same precision as \inlinecode{\_num} in the core {\EPOCH} code.\\
@@ -488,6 +539,33 @@ the same precision as \inlinecode{\_num} in the core {\EPOCH} code.\\
 {\emphtext NOTE: The files that are expected by this block are SIMPLE BINARY
 files, NOT Fortran unformatted files. It is possible to read Fortran
 unformatted files using the offset element, but care must be taken!}\\
+
+Finally, there are several parameters for controlling the behaviour of
+experimental features. These are early implementations and are not currently
+recommended for use in production runs.\\
+
+{\emphtext split} - Logical flag which enables a basic particle splitting
+operator for this particle species. If this flag is true then the code
+attempts to split the particles when the pseudoparticle number density drops
+too low. The scheme works mechanically but has undesirable properties at
+present.\\
+
+{\emphtext npart\_max} - Used with the particle splitting operator. When
+the total number of particles equals this number, further particle splitting
+is suppressed.\\
+
+{\emphtext ionise} - Logical flag which enables a basic ionisation model for
+this particle species.\\
+
+{\emphtext ionise\_to\_species} - The species name for the next ionised
+state of this species.\\
+
+{\emphtext release\_species\_on\_ionise} - Specifies what type of particle
+should be released when this species ionises (i.e. which species is the
+electron).\\
+
+{\emphtext ionisation\_energy} - The ionisation energy for the next
+ionisation of this species.\\
 
 \subsubsection{\inlineemph{output} block}
 Output in {\EPOCH} is handled using the custom designed CFD (\inlineemph{Compact
@@ -675,19 +753,17 @@ dumpmask.\\
 exact way that temperature is calculated in the code is likely to vary in the
 near future.\\
 
-{\emphtext distribution\_function} - Dumpmask for outputting distribution
+{\emphtext distribution\_functions} - Dumpmask for outputting distribution
 functions specified in the input deck. Each individual distribution function
 can have its own dumpmask, but this one is more restrictive.\\
 
-\subsection{External initial conditions}
+{\emphtext particle\_probes} - Dumpmask for outputting particle probes
+specified in the input deck. Each individual particle probe
+can have its own dumpmask, but this one is more restrictive.\\
 
-The initial conditions in {\EPOCH} can be specified in various ways, but the
-easiest way is to specify the initial conditions in the input deck file. This
-allows any initial condition which can be specified everywhere in space by a
-number density and a drifting Maxwellian distribution function. This section
-details the blocks that can be set to set up the initial conditions.
+% fix: ejected_particles
 
-\subsubsection{\inlineemph{constants} and \inlineemph{DEO} blocks}
+\subsection{\inlineemph{constants} and \inlineemph{DEO} blocks}
 
 \begin{lboxverbatim}{constant block}
 begin:constant
@@ -714,12 +790,8 @@ begin:deo
 end:deo
 \end{lboxverbatim}
 
-The initial conditions deck in {\EPOCH} is set up, using the normal maths
-expressions, by setting the density and temperature for each species which is
-then used by the autoloader to actually position the particles.\\
-
-Before moving on to the blocks which actually set up the initial conditions
-there are other helpful blocks which should be explained. These are called
+There are two block types which help to make the input deck more flexible
+and maintainable. These are called
 \inlineemph{constants} and \inlineemph{DEO}s which allow you to define
 constants and maths parser expressions which can be used by name later in the
 deck.\\
@@ -807,6 +879,9 @@ be unique, but all lasers with the same id will have the same time profile.\\
 
 {\emphtext pol\_angle} - Polarisation angle for the laser in radians.\\
 
+{\emphtext pol} - This is identical to \inlineemph{pol\_angle} with the angle
+specified in degrees rather than radians.\\
+
 {\emphtext phase} - phase shift for the laser in radians.\\
 
 {\emphtext t\_profile} - Used to specify the time profile for the laser. Should
@@ -869,25 +944,6 @@ stability criteria and allows the resolution of sharp temporal gradients. This
 is an inferior solution since the FDTD scheme has increased error as the
 timestep is reduced from that for EM waves. The latest version of {\EPOCH}
 includes a high order field solver to attempt to reduce this.
-
-\subsubsection{\inlineemph{species\inlinecode{n}} block}
-
-\begin{lboxverbatim}{species{\it n} block}
-begin:species2
-   rho=if(abs(x) lt thick,den_max,0.0)
-   rho=if((x gt -thick) and (abs(y) gt 2e-6),0.0,rho(2))
-   temp_x=0.0
-   temp_y=temp_x(1)
-   minrho=0.1 * den_max
-end:species2
-
-begin:species1
-   rho=4.0*rho(2)
-   temp_x=temp_x(1)
-   temp_y=temp_x(1)
-   minrho=0.1 * den_max
-end:species1
-\end{lboxverbatim}
 
 \subsubsection{\inlineemph{fields} block}
 \begin{lboxverbatim}{fields block}
@@ -1039,9 +1095,10 @@ begin:deo
    r=sqrt(x^2+y^2)
 end:deo
 
-begin:species1
+begin:species
+   name=Electron
    rho=1.0e19 * gauss(r,0.0,width)
-end:species1
+end:species
 \end{nbboxverbatim}
 %
 %\begin{minipage}{\textwidth}
@@ -1054,9 +1111,10 @@ begin:deo
    r=sqrt(x^2+y^2)
 end:deo
 
-begin:species1
+begin:species
+   name=Electron
    rho=1.0e19 * (1.0-gauss(r,0.0,width))
-end:species1
+end:species
 \end{nbboxverbatim}
 %\end{minipage}
 
@@ -1121,9 +1179,8 @@ begin:dist_fn
    resolution1=1
    resolution2=5000
 
-   include_species_1=F
-   include_species_2=T
-   include_species_3=T
+   include_species:Electron
+   include_species:Carbon
 end:dist_fn
 \end{nbboxverbatim}
 
@@ -1147,9 +1204,9 @@ blocks is as follows:\\
 {\emphtext name} - The name of the distribution function when it is
 output. This name is appended with the name of each species for which the data
 is output and so, for example, when applied to a species named
-carbon the output is called \inlineemph{x\_px\_carbon}. The Cartesian grid
+carbon the output is called \inlineemph{x\_px\_Carbon}. The Cartesian grid
 which describes the axes of the distribution function would then be called
-\inlineemph{grid\_x\_px\_carbon}.\\
+\inlineemph{grid\_x\_px\_Carbon}.\\
 
 {\emphtext ndims} - The number of dimensions in this phase space
 reconstruction. Due to difficulties in visualising data in more than three
@@ -1162,15 +1219,15 @@ distribution functions in the output section of input.deck.\\
 
 {\emphtext direction\inlinecode{n}} - This is a code representing the direction
 which is calculated to run along axis \inlinecode{n}. This can be any one of:
-dir\_x, dir\_y, dir\_z, dir\_px, dir\_py, dir\_pz, with spatial codes only
-being available in dimensionalities of the code which have that
-direction. Therefore dir\_z does not exist in EPOCH1D or EPOCH2D.\\
+dir\_x, dir\_y, dir\_z, dir\_px, dir\_py, dir\_pz, dir\_en, dir\_gamma\_m1
+with spatial codes only being available in dimensionalities of the code which
+have that direction. Therefore dir\_z does not exist in EPOCH1D or EPOCH2D.\\
 
 {\emphtext range\inlinecode{n}} - The range between which this axis should
 run. This is in the form of (minimum, maximum). The rangen parameter is ignored
 when applied to a spatial direction since all spatial directions run over
 the whole domain. For momentum directions this parameter is specified in
-$kgms^{-2}$. If the range of a momentum direction is set so that the maximum
+$kgms^{-1}$. If the range of a momentum direction is set so that the maximum
 and the minimum are both zero then the code will automatically set the range to
 exactly span the range of particle momenta at the point of writing the dump.\\
 
@@ -1181,17 +1238,16 @@ point numbers and NOT maths parser expressions.}\\
 direction. Once again this is ignored for spatial dimensions where the
 resolution is always the same as the resolution of the underlying simulation.\\
 
-{\emphtext include\_species\_\inlinecode{n}} - Logical flag indicating whether
-the species defined in the input.deck as species number n should be included
+{\emphtext include\_species} - Specifies a species which should be included
 in the output. This is useful since it is rare that momentum limits are
 appropriate for both electrons and ions, so usually for a given dist\_fn block
 only electrons or ions are considered. It is possible to have two dist\_fn
 blocks with the same name but different momentum ranges and different
-include\_species\_n settings produce the effect of a single diagnostic for
+include\_species settings produce the effect of a single diagnostic for
 all species in the output file.\\
 
 {\emphtext NOTE: If using multiple dist\_fn blocks with the same name MAKE SURE
-that the same species is not included in both blocks, since the data for both
+that the same species is are included in both blocks, since the data for both
 would be written but only the first block would be available in the reader
 routines.}\\
 
@@ -1256,21 +1312,21 @@ begin:boundaries
 end:boundaries
 
 begin:species
-   n_species=2
-
    # Rightwards travelling electrons
-   charge1=-1
-   mass1=1.0
-   frac1=0.5
-   name1=Right
-   dump1=T
+   name=Right
+   charge=-1
+   mass=1.0
+   frac=0.5
+   dump=T
+end:species
 
+begin:species
    # Leftwards travelling electrons
-   charge2=-1
-   mass2=1.0
-   frac2=0.5
-   name2=Left
-   dump2=T
+   name=Left
+   charge=-1
+   mass=1.0
+   frac=0.5
+   dump=T
 end:species
 
 begin:output
@@ -1326,17 +1382,19 @@ begin:constant
    dens=10
 end:constant
 
-begin:species1
+begin:species
+   name=Right
    temp_x=temp
    drift_x=drift_p
    rho=dens
-end:species1
+end:species
 
-begin:species2
+begin:species
+   name=Left
    temp_x=temp
    drift_x=-drift_p
    rho=dens
-end:species2
+end:species
 \end{lboxverbatim}
 
 \scaledcapimage{./images/late}{tsilate}{The final state of the electron
@@ -1363,22 +1421,24 @@ begin:constant
   den_peak=1.0e19
 end:constant
 
-begin:species1
+begin:species
+  name=Electron
   rho=den_peak*(sin(4.0*pi*x/length_x+pi/4))*(sin(8.0*pi*y/length_y)+1)
   minrho=0.1*den_peak
-end:species1
+end:species
 
-begin:species2
-  rho=rho(1)
-end:species2
+begin:species
+  name=Proton
+  rho=rho(Electron)
+end:species
 \end{lboxverbatim}
 
 Although not included here, the input deck associated with these initial
-conditions sets \inlineemph{species1} to be electrons and \inlineemph{species2}
-to be protons. The species block for \inlineemph{species1} is specified
+conditions sets the properties for the Electron and Proton species.
+The species block for \inlineemph{Electron} is specified
 first, setting up the ion density to be a highly structured 2D sinusoidal
-profile. The species block for \inlineemph{species2} is then set to simply
-match the density of \inlineemph{species1}, enforcing charge neutrality. On
+profile. The species block for \inlineemph{Proton} is then set to simply
+match the density of \inlineemph{Electron}, enforcing charge neutrality. On
 its own this initial condition does nothing and so only needs to run for 0
 timesteps (\inlineemph{nsteps=0} in input.deck). The resulting electron number
 density should look like Figure~\ref{densitycomplex}
@@ -1401,15 +1461,17 @@ begin:deo
    r=sqrt(y^2+z^2)
 end:deo
 
-begin:species2
+begin:species
+   name=Proton
    rho=if((r gt ri) and(r lt ro),den_cone,0.0)
-   rho=if((x gt 3.0e-6) and (x lt 4.0e-6) and (r lt ri),den_cone,rho(2))
-   rho=if(x gt 4e-6,0.0,rho(2))
-end:species2
+   rho=if((x gt 3.0e-6) and (x lt 4.0e-6) and (r lt ri),den_cone,rho(Proton))
+   rho=if(x gt 4e-6,0.0,rho(Proton))
+end:species
 
-begin:species1
-   rho=rho(2) * 22.0
-end:species1
+begin:species
+   name=Electron
+   rho=rho(Proton) * 22.0
+end:species
 \end{lboxverbatim}
 
 To convert this to 2D, simply replace the line
@@ -1450,13 +1512,14 @@ epoch{n}d directory, there are 3 subdirectories:
 \item src - The {\EPOCH} source code.
 \item IDL - The IDL routines needed to open the Compact Flexible Datatype
   (CFD) files which the code outputs.
-\item VisIt - The files for creating a plug-in for the LLNL VisIt parallel
-  visualisation tool for reading CFD files.
-\item Data - A sample data directory containing example input deck files.
+\item example\_decks - A sample data directory containing example input deck
+  files.
 \end{itemize}
-there are also 10 files:
+there are also 11 files:
 
 \begin{itemize}
+\item Changelog.txt - A brief overview of the change history for each
+  released version of {\EPOCH}.
 \item cleandir - A script which deletes the output files generated by the
   {\EPOCH} code from an output directory while leaving the input files needed to
   run the code.
@@ -1524,7 +1587,7 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
- Welcome to EPOCH2D Version 2.2             
+ Welcome to EPOCH2D Version 2.3             
  
  The code was compiled with the following compile time options
  *************************************************************
@@ -1672,9 +1735,8 @@ writer of the extension for assistance. The eleven built in blocks are
 \item window - Contains information about the moving window if the code is
   used in that fashion.
 \item constant - Contains information about user defined constants.
-\item species\_external - Contains information about particle species to be
-  read from external binary input files.
 \item deo - Contains information about deferred execution objects.
+\item fields - Contains information about EM fields.
 \item laser - Contains information about laser sources.
 \item dist\_fn - Contains information about distribution functions.
 \item probe - Contains information about particle probes.
@@ -1714,6 +1776,58 @@ begin:control
    neutral_background=T
 end:control
 \end{boxverbatim}
+
+The allowed entries are as follows:\\
+
+{\emphtext nx, ny, nz} - Number of grid points in the x,y,z direction. There
+must be sufficient gridpoints so that (x\_max-x\_min)/nx $< \lambda_d$, where
+$\lambda_d$ is the Debye length. (Similarly for the y and z directions.)\\
+
+{\emphtext npart} - The global number of pseudoparticles in the
+simulation. This parameter does not need to be given if a specific number
+of particles is supplied for each particle species. Specifying both will just
+use the number of particles supplied for each species.\\
+
+{\emphtext nsteps} - The number of iterations of the core solver before the
+code terminates. Negative numbers instruct the code to only terminate at
+\inlineemph{t\_end}.\\
+
+{\emphtext t\_end} - The final simulation time in simulation seconds before the
+code terminates.\\
+
+{\emphtext NOTE: The code will terminate if EITHER of the above conditions on
+nsteps or t\_end is satisfied.}\\
+
+{\emphtext \{x,y,z\}\_min} - Minimum grid position of the domain in
+metres. Can be negative. ``\{x,y,z\}\_start'' is accepted as a synonym.\\
+
+{\emphtext \{x,y,z\}\_max} - Maximum grid position of the domain in
+metres. Must be greater than \inlineemph{\{x,y,z\}\_min}.
+``\{x,y,z\}\_end'' is accepted as a synonym.\\
+
+{\emphtext dt\_multiplier} - Factor by which the timestep is multiplied before
+it is applied in the code. Must be less than one.\\
+
+{\emphtext dlb\_threshold} - Number indicating the minimum ratio between the
+load on the least loaded processor to the most loaded processor. Set to 1 means
+always balance, set to 0 means never balance. If this parameter is not
+specified then the code will only be load balanced at initialisation time.\\
+
+{\emphtext restart\_snapshot} - The number of a previously written restart
+dump to restart the code from.\\
+
+{\emphtext neutral\_background} - Logical flag indicating whether to
+solve Poisson's equation at t=0 or assume that there is a neutralising
+background field. If ``T'' then Poisson's equation is solved.\\
+
+{\emphtext field\_order} - Order of the finite difference scheme used for
+solving Maxwell's equations. Can be 2, 4 or 6. If not specified, the default
+is to use a second order scheme.\\
+
+{\emphtext stdout\_frequency} - If specified then the code will print a one
+line status message to stdout after every given number or timesteps. The
+default is to print nothing to screen.\\
+
 
 Most of the control block is self explanatory, but there are two parts which
 need further description. \\
@@ -1783,21 +1897,12 @@ The next section of the input deck describes the particle species used in the
 code. An example species block for any {\EPOCH} code is given below.
 \begin{boxverbatim}
 begin:species
-   n_species=2
-
    # H+ ions
-   charge1=1.0
-   mass1=1800.0
-   frac1=0.5
-   name1=Proton
-   dump1=T
-
-   # electrons
-   charge2=-1.0
-   mass2=1.0
-   frac2=0.5
-   name2=Electron
-   dump2=T
+   name=Proton
+   charge=1.0
+   mass=1800.0
+   frac=0.5
+   dump=T
 end:species
 \end{boxverbatim}
 
@@ -1945,7 +2050,7 @@ There are also variables which are defined on the underlying grid.\\
 \item charge\_density - Dump the charge density.
 \end{itemize}
 
-\subsection{The window block}
+\subsubsection{The window block}
 {\EPOCH} can include an optional block which causes the simulation domain to
 operate as a moving window. At present, it is only possible to have the window
 moving at a constant speed parallel to the x direction, although the window
@@ -2009,12 +2114,20 @@ The maths parser in {\EPOCH}  has the following constants
 \item kb - Boltzmann's constant.
 \item me - Mass of an electron.
 \item qe - Charge of an electron.
+\item c - Speed of light.
 \item epsilonnought - Permeability of free space.
 \item munought - Permittivity of free space.
-\item length\_x - The length of the simulation box in the x direction.
-\item length\_y - The length of the simulation box in the y direction (2D and 3D
-  only).
-\item length\_z - The length of the simulation box in the z direction (3D only).
+\item ev - Electronvolt.
+\item kev - Kilo-Electronvolt.
+\item mev - Mega-Electronvolt.
+\item time - Initial simulation time.
+\item length\_\{x,y,z\} - The length of the simulation box in the x,y,z direction.
+\item dx,dy,dz - Grid spacing in the x,y,z direction.
+\item \{x,y,z\}\_min - Grid coordinate of the minimum x,y,z boundary.
+\item \{x,y,z\}\_max - Grid coordinate of the maximum x,y,z boundary.
+\item nx,ny,nz - Number of grid points in the x,y,z direction.
+\item x,y,z - Grid coordinates in the x,y,z direction.
+\item ix,iy,iz - Grid index in the x,y,z direction.
 \end{itemize}
 
 It is also possible for an end user to specify custom constants both within
@@ -2041,6 +2154,18 @@ The maths parser in {\EPOCH} has the following functions
 \item tanh(a) - Hyperbolic tangent.
 \item sinh(a) - Hyperbolic sine.
 \item cosh(a) - Hyperbolic cosine.
+\item abs(a) - Absolute value.
+\item loge(a) - Natural logarithm.
+\item log10(a) - Base-10 logarithm.
+\item log\_base(a,b) - Base-b logarithm.
+% fix: interpolate
+% fix: gauss
+% fix: semigauss
+% fix: critical
+% fix: rho
+% fix: temp,temp_{x,y,z}
+% fix: e{x,y,z}
+% fix: b{x,y,z}
 \end{itemize}
 
 It is also possible for an end user to specify custom functions within the
@@ -2143,11 +2268,11 @@ know about. These constants are:
 
 There are also up to three arrays which are available for use.
 \begin{itemize}
-\item x(-1:nx+2) - Position of a given gridpoint in real units in the x
+\item x(-2:nx+3) - Position of a given gridpoint in real units in the x
   direction.
-\item y(-1:ny+2) - Position of a given gridpoint in real units in the y
+\item y(-2:ny+3) - Position of a given gridpoint in real units in the y
   direction (2D and 3D).
-\item z(-1:nz+2) - Position of a given gridpoint in read units in the z
+\item z(-2:nz+3) - Position of a given gridpoint in read units in the z
   direction (3D).
 \end{itemize}
 
@@ -2202,9 +2327,9 @@ more dimension to both arrays. An instance of the structure is created for
 each particle species and is named ``initial\_conditions(ispecies)''. The
 elements of this structure have the following definitions (again in 2D)\\
 \begin{itemize}
-\item rho(-1:nx+2,-1:ny+2) - Particle number density at all spatial
-  positions in the grid. Must be defined fully between -1:nx+2 and -1:ny+2.
-\item temp(-1:nx+2,-1:ny+2,1:3) - Temperature of a thermal distribution at all
+\item rho(-2:nx+3,-2:ny+3) - Particle number density at all spatial
+  positions in the grid. Must be defined fully between -2:nx+3 and -2:ny+3.
+\item temp(-2:nx+3,-2:ny+3,1:3) - Temperature of a thermal distribution at all
   spatial positions in the grid, and independently in each dimension
   (including ignorable directions). The final dimension is the direction in
   which to apply the specified thermal distribution.
@@ -2226,8 +2351,8 @@ SUBROUTINE ic_early
   DO ispecies = 1, n_species
     initial_conditions(ispecies)%temp = 0.0_num
     initial_conditions(ispecies)%minrho = 1.4_num
-    DO iy = -1, ny+2
-      DO ix = -1, nx+2
+    DO iy = -2, ny+3
+      DO ix = -2, nx+3
         slab = 0.0_num
         IF (x(ix) .LT. 1.0_num .AND. x(ix) .GT. -1.0_num) slab = 100.0
         initial_conditions(ispecies)%rho(ix,iy) = 1.0_num + slab
@@ -2268,8 +2393,8 @@ could use the following code to change the slab to have a finite width in y.
     INTEGER :: ispecies
 
     DO ispecies = 1, n_species
-      DO iy = -1, ny+2
-        DO ix = -1, nx+2
+      DO iy = -2, ny+3
+        DO ix = -2, nx+3
           IF (y(iy) .GT. 1.0_num .OR. y(iy) .LT. -1.0_num) &
               initial_conditions(ispecies)%rho(ix,iy) = 1.0_num
         ENDDO
@@ -2301,27 +2426,28 @@ begin:constant
    wpe=sqrt(partdens * qe^2/(me * epsilonnought))
 end:constant
 
-begin:species1
+begin:species
+   name=s1
    rho=interpolate(x,-(6.0e-6),0.2,(10.0e-6),0.2,(11.0e-6),
             1.0,(150.0e-6),1.0,(150.5e-6),0.2,(420.0e-6),0.2,6)
-   rho=rho(1)*partdens
+   rho=rho(s1)*partdens
    temp_x=300.0
-   temp_y=temp_x(1)
+   temp_y=temp_x(s1)
    minrho=0.3*partdens
-end:species1
+end:species
 
-begin:species2
-   rho=rho(1)
-   temp_x=temp_x(1)
-   temp_y=temp_x(1)
+begin:species
+   name=s2
+   rho=rho(s1)
+   temp_x=temp_x(s1)
+   temp_y=temp_x(s1)
    minrho=0.3*partdens
-end:species2
+end:species
 \end{nbboxverbatim}
 
 In the above example we have made use of the ``species'' block for specifying
-initial conditions. There is one species block for each species given in
-the global species block, and each species is identified by the addition of the
-species number after the word ``species''.
+initial conditions. There is one block for each species 
+and each species is identified by the ``name'' entry.
 The ``species'' block has the following possible elements. If an element
 is not specified then it is left with the same value that it was specified
 either at code startup (everything zero), or at the end of the ``ic\_early''
@@ -2345,7 +2471,7 @@ routine.\\
 \item maxrho - Maximum particle number density in $m^{-3}$. When the number
   density in a cell rises above maxrho the autoloader clips the density to
   maxrho allowing easy implementation of exponential rises to plateaus.
-\item drift\_\{x,y,z\} - Specifies a momentum space offset in kgms-2 to
+\item drift\_\{x,y,z\} - Specifies a momentum space offset in $kgms^{-1}$ to
   the distribution function for this species. At present the drift\_\{x,y,z\}
   parameter CANNOT vary in space and is just a single constant.
 \end{itemize}
@@ -2395,35 +2521,36 @@ used in {\EPOCH}.\\
 All that is required now is to give an example. A good example is to reproduce
 the previous example of an isolated plasma block in 2D. This would look like:
 \begin{boxverbatim}
-begin:species1
+begin:species
+   name=s1
    # first set density in the range 0->1
    # cut down density in x direction
    rho=if ((x gt -1) and (x lt 1),1.0,0.2)
    # cut down density in y direction
-   rho=if ((y gt -1) and (y lt 1),rho(1),0.2)
+   rho=if ((y gt -1) and (y lt 1),rho(s1),0.2)
 
    # multiply density by real particle density
-   rho=rho(1)*100.0
+   rho=rho(s1)*100.0
 
    # Set the temperature to be zero
    temp_x=0.0
-   temp_y=temp_x(1)
+   temp_y=temp_x(s1)
 
    # Set the minimum density for this species
    minrho=0.3*100.0
-end:species1
+end:species
 
-begin:species2
-   # Just copy the density for species 1
-   rho=rho(1)
+begin:species
+   # Just copy the density for species s1
+   rho=rho(s1)
 
-   # Just copy the temperature from species 1
-   temp_x=temp_x(1)
-   temp_y=temp_y(1)
+   # Just copy the temperature from species s1
+   temp_x=temp_x(s1)
+   temp_y=temp_y(s1)
 
    # Set the minimum density for this species
    minrho=0.3*100.0
-end:species2
+end:species
 \end{boxverbatim}
 
 This produces the same output as that shown in Figure~\ref{square}, since
@@ -2439,36 +2566,35 @@ brackets.
 It is possible to load external data files into variables used by the
 autoloader. In the input deck this is done as follows:
 \begin{boxverbatim}
-begin:species_external1
-   rho=Data/data.file
+begin:species
+   name=s1
+   rho='Data/data.file'
    offset=80000
-   temp_x=Data/data.file
-   temp_y=Data/data.file
+   temp_x='Data/data.file'
+   temp_y='Data/data.file'
 end:species_external1
 \end{boxverbatim}
 
-The species\_external block is very similar to the species block, except that
+This method of specifying initial conditions is very similar to using the
+maths parser, except that
 where you would normally specify a functional form for a variable, you now
-specify a filename. Other variables such as {\bf minrho} and {\bf maxrho}
-still work as in the {\it species} block. It is possible to specify
+specify a filename.  It is possible to specify
 multiple variables in a single file using the {\bf offset} element. When the
 offset is set, the next data read from a file is read with an offset of {\bf
 offset} bytes from the start of the file. {\bf offset} is reset to zero at the
-start of a new {\it species\_external} block, but is not reset within a given
-{\it species\_external} block. Therefore, in the example above, {\bf temp\_x}
-and {\bf temp\_y} are assigne the same values. The data is immediately loaded
+start of a new {\it species} block, but is not reset within a given
+{\it species} block. Therefore, in the example above, {\bf temp\_x}
+and {\bf temp\_y} are assigned the same values. The data is immediately loaded
 into the requested variable, so it is valid to do the following:
 \begin{boxverbatim}
-begin:species_external1
-   rho=Data/data.file
+begin:species
+   name=s1
+   rho='Data/data.file'
+   rho=rho(s1)*partdens
    offset=80000
-   temp_x=Data/data.file
-end:species_external1
-
-begin:species1
-   rho=rho(1)*partdens
-   temp_y=temp_x(1)
-end:species1
+   temp_x='Data/data.file'
+   temp_y=temp_x(s1)
+end:species
 \end{boxverbatim}
 It is also possible to load data from external files using the internal
 autoloader routines. This is done as follows:
@@ -2506,21 +2632,22 @@ begin:deo
    r=sqrt(x^2+y^2)
 end:deo
 
-begin:species1
+begin:species
+   name=s1
    # first set density in the range 0->1
    # cut down density in x direction
    rho=if ((r lt 1),1.0,0.2)
 
    # multiply density by real particle density
-   rho=rho(1)*partdens
+   rho=rho(s1)*partdens
 
    # Set the temperature to be zero
    temp_x=0.0
-   temp_y=temp_x(1)
+   temp_y=temp_x(s1)
 
    # Set the minimum density for this species
    minrho=0.3*partdens
-end:species1
+end:species
 \end{boxverbatim}
 This example produces a circular rather than a square density enhancement.
 
@@ -2713,8 +2840,8 @@ begin:dist_fn
    resolution1=1
    resolution2=100
 
-   include_species_1=T
-   include_species_2=T
+   include_species:s1
+   include_species:s2
 end:dist_fn
 \end{boxverbatim}
 \begin{itemize}
@@ -2741,7 +2868,7 @@ end:dist_fn
   restriction that is more restrictive than the range applied. This is not
   trapped as an error and such parts of the distribution function are
   guaranteed to be empty.
-\item include\_species\_\{n\} - Whether to calculate the distribution function
+\item include\_species - Whether to calculate the distribution function
   for this species.
 \end{itemize}
 
@@ -2815,7 +2942,7 @@ begin:probe
    x2=50.0e-6
    y2=50.0e-6
 
-   probe_species=1
+   probe_species:s1
    ek_min=0.0
    ek_max=-1.0
 
@@ -2832,7 +2959,7 @@ end:probe
 \item y1 - The y position of the first probe node.
 \item x2 - The x position of the second probe node.
 \item y2 - The y position of the seconds probe node.
-\item probe\_species - The species number to which this probe should be
+\item probe\_species - The species to which this probe should be
   applied. To probe several species, use several probe blocks in the input
   deck.
 \item ek\_min - The minimum kinetic energy of particles to store information
@@ -3458,35 +3585,39 @@ understand. In this case, it can be helpful to use the ability to specify
 constants in an input deck to parameterise the file. So, to go back to a slight
 variation on an earlier example:
 \begin{boxverbatim}
-begin:species1
+begin:species
+   name=s1
+
    # first set density in the range 0->1
    # cut down density in x direction
    rho=if ((x gt -1) and (x lt 1),1.0,0.2)
    # cut down density in y direction
-   rho=if ((y gt -1) and (y lt 1),rho(1),0.2)
+   rho=if ((y gt -1) and (y lt 1),rho(s1),0.2)
 
    # multiply density by real particle density
-   rho=rho(1)*100.0
+   rho=rho(s1)*100.0
 
    # Set the temperature to be zero
    temp_x=0.0
-   temp_y=temp_x(1)
+   temp_y=temp_x(s1)
 
    # Set the minimum density for this species
    minrho=0.3*100.0
-end:species1
+end:species
 
-begin:species2
-   # Just copy the density for species 1
-   rho=rho(1)
+begin:species
+   name=s2
 
-   # Just copy the temperature from species 1
-   temp_x=temp_x(1)
-   temp_y=temp_y(1)
+   # Just copy the density for species s1
+   rho=rho(s1)
+
+   # Just copy the temperature from species s1
+   temp_x=temp_x(s1)
+   temp_y=temp_y(s1)
 
    # Set the minimum density for this species
    minrho=0.3*100.0
-end:species2
+end:species
 \end{boxverbatim}
 
 The particle density (100.0) is hard coded into the deck file in several
@@ -3496,35 +3627,39 @@ begin:constant
    particle_density=100.0 # Particle number density
 end:constant
 
-begin:species1
+begin:species
+   name=s1
+
    # first set density in the range 0->1
    # cut down density in x direction
    rho=if ((x gt -1) and (x lt 1),1.0,0.2)
    # cut down density in y direction
-   rho=if ((y gt -1) and (y lt 1),rho(1),0.2)
+   rho=if ((y gt -1) and (y lt 1),rho(s1),0.2)
 
    # multiply density by real particle density
-   rho=rho(1)*particle_density
+   rho=rho(s1)*particle_density
 
    # Set the temperature to be zero
    temp_x=0.0
-   temp_y=temp_x(1)
+   temp_y=temp_x(s1)
 
    # Set the minimum density for this species
    minrho=0.3*particle_density
-end:species1
+end:species
 
-begin:species2
-   # Just copy the density for species 1
-   rho=rho(1)
+begin:species
+   name=s2
 
-   # Just copy the temperature from species 1
-   temp_x=temp_x(1)
-   temp_y=temp_y(1)
+   # Just copy the density for species s1
+   rho=rho(s1)
+
+   # Just copy the temperature from species s1
+   temp_x=temp_x(s1)
+   temp_y=temp_y(s1)
 
    # Set the minimum density for this species
    minrho=0.3*particle_density
-end:species2
+end:species
 \end{boxverbatim}
 
 It is also possible to parameterise other elements of initial conditions in a
@@ -3546,29 +3681,33 @@ begin:deo
    profile_y=if((y gt -1) and (y lt 1),1.0,0.2)
 end:deo
 
-begin:species1
+begin:species
+   name=s1
+
    # multiply density by real particle density
    rho=particle_density * profile_x * profile_y
 
    # Set the temperature to be zero
    temp_x=0.0
-   temp_y=temp_x(1)
+   temp_y=temp_x(s1)
 
    # Set the minimum density for this species
    minrho=0.3*particle_density
-end:species1
+end:species
 
-begin:species2
-   # Just copy the density for species 1
-   rho=rho(1)
+begin:species
+   name=s2
 
-   # Just copy the temperature from species 1
-   temp_x=temp_x(1)
-   temp_y=temp_y(1)
+   # Just copy the density for species s1
+   rho=rho(s1)
+
+   # Just copy the temperature from species s1
+   temp_x=temp_x(s1)
+   temp_y=temp_y(s1)
 
    # Set the minimum density for this species
    minrho=0.3*particle_density
-end:species2
+end:species
 \end{boxverbatim}
 
 This creates the same output as before. It is now trivial to modify the
@@ -3583,30 +3722,33 @@ begin:deo
    profile_y=gauss(y,0.0,1.0)
 end:deo
 
-begin:species1
+begin:species
+   name=s1
 
    # multiply density by real particle density
    rho=particle_density * profile_x * profile_y
 
    # Set the temperature to be zero
    temp_x=0.0
-   temp_y=temp_x(1)
+   temp_y=temp_x(s1)
 
    # Set the minimum density for this species
    minrho=0.3*particle_density
-end:species1
+end:species
 
-begin:species2
-   # Just copy the density for species 1
-   rho=rho(1)
+begin:species
+   name=s2
 
-   # Just copy the temperature from species 1
-   temp_x=temp_x(1)
-   temp_y=temp_y(1)
+   # Just copy the density for species s1
+   rho=rho(s1)
+
+   # Just copy the temperature from species s1
+   temp_x=temp_x(s1)
+   temp_y=temp_y(s1)
 
    # Set the minimum density for this species
    minrho=0.3*particle_density
-end:species2
+end:species
 \end{boxverbatim}
 
 This changes the code to run with a Gaussian density profile rather then a step
@@ -3818,29 +3960,33 @@ begin:deo
    profile_y=lorentz(y,0.0,1.0)
 end:deo
 
-begin:species1
+begin:species
+   name=s1
+
    # multiply density by real particle density
    rho=particle_density * profile_x * profile_y
 
    # Set the temperature to be zero
    temp_x=0.0
-   temp_y=temp_x(1)
+   temp_y=temp_x(s1)
 
    # Set the minimum density for this species
    minrho=0.3*particle_density
-end:species1
+end:species
 
-begin:species2
-   # Just copy the density for species 1
-   rho=rho(1)
+begin:species
+   name=s2
 
-   # Just copy the temperature from species 1
-   temp_x=temp_x(1)
-   temp_y=temp_y(1)
+   # Just copy the density for species s1
+   rho=rho(s1)
+
+   # Just copy the temperature from species s1
+   temp_x=temp_x(s1)
+   temp_y=temp_y(s1)
 
    # Set the minimum density for this species
    minrho=0.3*particle_density
-end:species2
+end:species
 \end{boxverbatim}
 
 It is therefore clear that the new lorentz function is essentially the same as
@@ -7272,69 +7418,3 @@ Those error codes with names in {\bf BOLD} are those which will cause the code
 to terminate.
 
 \end{document}
-begin:control
-
-  #global number of gridpoints
-  nx=400 #in x
-  ny=400 #in y
-  npart=16.0e5
-
-  #maximum number of iterations
-  #set to -1 to run until finished
-  nsteps=0
-
-  #final time of simulation
-  t_end=50.0e-15
-
-  #size of domain
-  x_min=-10e-6
-  x_max=10e-6
-  y_min=-10e-6
-  y_max=10e-6
-
-  #Don't know if this should be in the deck or not
-  dt_multiplier=0.8
-
-  #dlb_threshold=1.0
-
-  #restart_snapshot=98
-
-  #Setting neutral_background to F makes the code solve
-  #Poisson's equation for the initial electric field
-  #Setting it to T makes the initial electric field 0
-  neutral_background=T
-
-end:control
-
-
-begin:boundaries
-
-  bc_x_min=simple_laser
-  bc_x_max=simple_outflow
-  bc_y_min=periodic
-  bc_y_max=periodic
-
-end:boundaries
-
-
-begin:species
-
-  name=Electron
-  charge=-1.0
-  mass=1.0
-  frac=0.5
-  dump=T
-  tracer=T
-  rho=den_max
-  temp=1e6
-
-end:species
-
-
-begin:species
-
-  name=Electron
-  rho=rho(Palladium) * 22.0
-  temp=1e6
-
-end:species
