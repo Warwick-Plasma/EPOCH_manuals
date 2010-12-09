@@ -498,8 +498,7 @@ number density in a cell rises above maxrho the autoloader clips the density to
 maxrho allowing easy implementation of exponential rises to plateaus.\\
 
 {\emphtext drift\_\{x,y,z\}} - Specifies a momentum space offset in $kgms^{-1}$
-to the distribution function for this species. At present the drift\_\{x,y,z\}
-parameter CANNOT vary in space and is just a single constant.\\
+to the distribution function for this species.\\
 
 {\emphtext mass\_density} - Particle mass density in $kgm^{-3}$. This is
 used, together with particle mass, to calculate the number density for the
@@ -1477,8 +1476,8 @@ end:species
 To convert this to 2D, simply replace the line
 \inlinecode{r=sqrt(y\^{}2+z\^{}2)} with the line \inlinecode{r=abs(y)}. The
 actual work in these initial conditions is done by the three lines inside the
-block for \inlineemph{species2}. Each of these lines performs a very specific
-function:
+block for the \inlineemph{Proton} species. Each of these lines performs a very
+specific function:
 
 \begin{enumerate}
 \item Creates the outer cone. Simply tests whether \inlinecode{r} is within
@@ -6733,9 +6732,9 @@ routine sets the bitmask \inlinecode{c\_err\_bad\_value} on the parameter
 {\Large Notes\\}
 This routine is used internally in several parts of the code when parsing
 things like numbers which are parts of strings (i.e. the 1 in
-\inlinecode{begin:species1}). It probably shouldn't be used to directly parse
-input deck parameters, since there is no reason to restrict the user from
-specifying mathematical expressions.
+\inlinecode{direction1} for distribution functions). It probably shouldn't
+be used to directly parse input deck parameters, since there is no reason to
+restrict the user from specifying mathematical expressions.
 
 \pagebreak
 \begin{codedef}
