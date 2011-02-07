@@ -1,31 +1,39 @@
+\newcommand{\ver}{1}
+\newcommand{\rev}{0}
+\newcommand{\sdfversion}{{{\ver}.{\rev}}}
+\ifdefined\epoch
+\newcommand{\subsec}{\subsection}
+\newcommand{\subsubsec}{\subsubsection}
+\else
 \documentclass[12pt]{article}
+\newcommand{\subsec}{\section}
+\newcommand{\subsubsec}{\subsection}
 %\usepackage{url,graphicx,tabularx,array}
 \usepackage[hmargin=.47in,vmargin=0.5in,nohead]{geometry}
 \setlength{\footskip}{20pt}
-% \usepackage{color}
+%\usepackage{color}
 \usepackage[table]{xcolor}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{longtable}
 \usepackage{ltxtable}
 \setlength{\heavyrulewidth}{0.09em}
-\newcommand{\ver}{1}
-\newcommand{\rev}{0}
-\newcommand{\version}{{{\ver}.{\rev}}}
 
 
 \begin{document}
 
 \begin{center}
 {\huge\bfseries Description of the SDF File Format for
-  Version {\version}}\\[0.4cm]
+  Version {\sdfversion}}\\[0.4cm]
 {\Large Keith Bennett}\\[0.1cm]
 {\large\today}\\[0.4cm]
 \end{center}
+\fi
 
 % \author{Keith Bennett}
 
-\section{Introduction}
+\section{The SDF File Format}
+\label{sec:sdf}
 The CFSA group at the University of Warwick actively maintains several
 complex codebases and has plans to expand the variety of codes in the future.
 To ease maintenance and facilitate sharing of data between codes it is
@@ -46,11 +54,11 @@ number of dependencies required to make use of the format.
 We have chosen to call this format ``SDF'' which stands for ``Self Describing
 Format''. Files written to this format will have the suffix ``.sdf''.
 
-This document should fully describe the contents of an SDF version {\version}
+This document should fully describe the contents of an SDF version {\sdfversion}
 file. From this it should be possible to write a compliant library for
 reading and writing SDF files.
 
-\section{File Structure}
+\subsec{File Structure}
 
 The layout of an SDF file is as follows:\\
 
@@ -86,10 +94,10 @@ metadata in a contiguous block without having to skip the data block each
 time. This can be achieved by placing an extra copy of the metadata at
 the end of the file.
 
-\section{File Header}
+\subsec{File Header}
 Every SDF file starts with a header containing basic global information
 about the file and its contents. The data written to the file header in
-version {\version} of the format is as follows:\\
+version {\sdfversion} of the format is as follows:\\
 
 \begin{center}
 \begin{tabularx}{0.9\textwidth}[!hbt]{cclX}
@@ -215,7 +223,7 @@ within a single dump file. It defaults to 64.
 For the sake of brevity, this length will be referred to as ``s'' throughout
 the remainder of this document.
 
-\section{Block Headers}
+\subsec{Block Headers}
 All block headers are exactly the same size and contain the same information.
 They contain information which is required by all blocks to identify
 their contents, such as an identifier, data location, etc.
@@ -389,7 +397,7 @@ The possible values for ``datatype'' are itemised below.\\
 \end{tabularx}
 \end{center}\vspace{10pt}
 
-\section{Block Types}
+\subsec{Block Types}
 
 In this section we describe the metadata and data contents for each of
 the possible block types. Note that as the format evolves more block types
@@ -403,7 +411,7 @@ read from the block header, since the block header size may change in
 future revisions. For this reason you should always seek to a position
 ``m'' bytes after the start of the block before reading the block metadata.
 
-\subsection{c\_blocktype\_plain\_mesh and c\_blocktype\_point\_mesh}
+\subsubsec{c\_blocktype\_plain\_mesh and c\_blocktype\_point\_mesh}
 
 Since grid based meshes and point meshes are quite similar, we will describe
 them both here. A mesh defines the locations at which variables are defined.
@@ -541,7 +549,7 @@ the first method will be the most convenient. At a later time, we may switch
 to using the second method if it proves more useful. This can easily be done
 by defining a new blocktype and incrementing the revision number.
 
-\subsection{c\_blocktype\_plain\_variable and c\_blocktype\_point\_variable}
+\subsubsec{c\_blocktype\_plain\_variable and c\_blocktype\_point\_variable}
 
 As with the mesh data described previously, the grid based variables and
 point variables are quite similar so we will describe them both here.
@@ -701,7 +709,7 @@ the given variable at each point on the mesh. Since each the location of
 each point in space is known fully, there is no need for a stagger variable.
 The data is in the form of a 1d array with ``np'' elements.
 
-\subsection{c\_blocktype\_constant}
+\subsubsec{c\_blocktype\_constant}
 
 This block is used for writing a simple constant to the file. Since the
 data written is small, there is no need for a separate data block and
@@ -723,7 +731,7 @@ the value is just written into the metadata section.\\
 Here, ``m'' is the size of ``block\_header\_length'' as specified in the file
 header and ``t'' is the size of the datatype specified in the block header.
 
-\subsection{c\_blocktype\_array}
+\subsubsec{c\_blocktype\_array}
 
 This block is used for writing a simple array to the file. This array
 is not associated with any mesh and therefore cannot be plotted on a
@@ -751,7 +759,7 @@ and ``e'' is the number of elements all specified in the block header.
 
 
 
-\subsection{c\_blocktype\_run\_info}
+\subsubsec{c\_blocktype\_run\_info}
 
 This block contains information about the code which was used to generate
 the SDF file and further details relating to the simulation, such as
@@ -806,7 +814,7 @@ hardware on which it was run, etc.\\
 Here, ``m'' is the size of ``block\_header\_length'' and``s'' is the size of
 ``string\_length'' both specified in the file header.
 
-\subsection{c\_blocktype\_source}
+\subsubsec{c\_blocktype\_source}
 
 This block contains the source code which was used to generate the binary
 which generated this SDF file. It is written as one long stream of bytes.
@@ -817,7 +825,7 @@ metadata is required to describe this output so the contents begin at
 ``data\_size'' in the block header.
 
 
-\subsection{c\_blocktype\_stitched\_tensor, \_material, \_matvar and \_species}
+\subsubsec{c\_blocktype\_stitched\_tensor, \_material, \_matvar and \_species}
 
 Variables in SDF files are written so that they correspond to spatial meshes
 wherever possible. This means that variables which have multiple components,
@@ -973,7 +981,7 @@ with a specific material from a multi-material mesh.\\
 \end{center}\vspace{10pt}
 
 
-\subsection{c\_blocktype\_particle\_family}
+\subsubsec{c\_blocktype\_particle\_family}
 
 Finally, we come to unluckly blocktype 13.
 This blocktype has not yet been finalised and it is not clear how best to
@@ -1059,7 +1067,7 @@ Any comments or suggestions are welcome.\\
 \end{center}\vspace{10pt}
 
 
-\section{Ideal sequence for reading SDF files}
+\subsec{Ideal sequence for reading SDF files}
 This section details the sequence that an ideal SDF reader should follow to
 parse a SDF file.
 \begin{itemize}
@@ -1120,4 +1128,7 @@ parsed once, so a good reader should then do the following checks
   should NOT fail at this point if it's possible to continue.
 \end{itemize}
 
+\ifdefined\epoch
+\else
 \end{document}
+\fi
