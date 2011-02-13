@@ -367,14 +367,14 @@ begin:species
    # npart = 2000*100
    dump = T
    # tracer = F
-   number_density = 1.e4
+   density = 1.e4
    temp = 1e6
 
    temp_x = 0.0
    temp_y = temp_x(Electron)
-   number_density_min = 0.1 * den_max
-   number_density = if(abs(x) lt thick,den_max,0.0)
-   number_density = if((x gt -thick) and (abs(y) gt 2e-6),0.0,number_density(Carbon))
+   density_min = 0.1 * den_max
+   density = if(abs(x) lt thick, den_max, 0.0)
+   density = if((x gt -thick) and (abs(y) gt 2e-6), 0.0, density(Carbon))
 end:species
 
 begin:species
@@ -386,7 +386,7 @@ begin:species
    # npart = 2000*100
    dump = T
 
-   number_density = 0.25*number_density(Electron)
+   density = 0.25*density(Electron)
    temp_x = temp_x(Electron)
    temp_y = temp_x(Electron)
 end:species
@@ -450,22 +450,22 @@ then used by the autoloader to actually position the particles. \\
 The elements of the species block used for setting
 initial conditions are:\\
 
-{\emphtext number\_density} - Particle number density in $m^{-3}$.
-As soon as a number\_density= line has been read, the values are
+{\emphtext density} - Particle number density in $m^{-3}$.
+As soon as a density= line has been read, the values are
 calculated for the whole domain and are available for reuse on the right hand
 side of an expression. This is seen in the above example in the first two lines
 for the carbon species, where the density is first set and then corrected.\\
 This parameter is mandatory.\\
 
-{\emphtext number\_density\_min} - Minimum particle number density in $m^{-3}$.
-When the number density in a cell falls below number\_density\_min the
+{\emphtext density\_min} - Minimum particle number density in $m^{-3}$.
+When the number density in a cell falls below density\_min the
 autoloader does not load any pseudoparticles into that cell to minimise the
 number of low weight, unimportant particles. If set to 0 then all cells are
 loaded with particles. This is the default.\\
 
-{\emphtext number\_density\_max} - Maximum particle number density in $m^{-3}$.
-When the number density in a cell rises above number\_density\_max the
-autoloader clips the density to number\_density\_max allowing easy
+{\emphtext density\_max} - Maximum particle number density in $m^{-3}$.
+When the number density in a cell rises above density\_max the
+autoloader clips the density to density\_max allowing easy
 implementation of exponential rises to plateaus. If it is a negative value
 then no clipping is performed. This is the default.\\
 
@@ -495,7 +495,7 @@ marks the filename of a simple binary file containing the information required.
 \begin{lboxverbatim}{external initial conditions}
 begin:species
    name = Electron
-   number_density = 'Data/ic.dat'
+   density = 'Data/ic.dat'
    offset = 80000
    temp_x = 'Data/ic.dat'
 end:species
@@ -601,7 +601,6 @@ begin:output
    charge = never
    mass = never
    particle_weight = never
-   species_id = never
 
    # Properties on grid
    grid = always
@@ -613,7 +612,6 @@ begin:output
    bz = always
    jx = always
    jy = always
-   jz = never
    ekbar = always + species
    mass_density = never + species
    charge_density = always
@@ -696,10 +694,6 @@ particle mass.\\
 describes how many real particles each pseudoparticle represents. Restart
 variable.\\
 
-{\emphtext species\_id} - The dump mask for the number representing which
-particle species a given particle is. This is the same as the number assigned
-to that particle species in the species block. Restart variable.\\
-
 {\emphtext grid} - The dumpmask for the Cartesian grid which defines the
 locations of the grid variables. No grid variables can be plotted in VisIt
 unless this variable is output.\\
@@ -759,10 +753,10 @@ deleted and replaced with the new one. This happens without warning.\\
 
 \begin{lboxverbatim}{constant block}
 begin:constant
-   lambda = 1.0e-6 # 1 micron wavelength
+   lambda = 1.06 * micron
    omega = 2.0*pi*c/lambda
    den_crit = critical(omega)
-   scale = 3.5e-6 # microns
+   scale = 3.5 * micron
    den_max = 5.0*den_crit
    thick = 300e-9
    pplength = 6000e-9
@@ -807,7 +801,7 @@ begin:laser
    boundary = x_min
    id = 1
    irradiance_w_cm2 = 1.0e15
-   lambda = 1.06 * microns
+   lambda = 1.06 * micron
    pol_angle = 0.0
    phase = 0.0
    t_profile = gauss(time,40.0e-15,40.0e-15)
@@ -847,7 +841,7 @@ This parameter is optional and is not used under normal conditions.\\
 
 {\emphtext lambda} - Wavelength in a vacuum for the laser specified in $m$.
 If you want to specify in $\mu m$ then you can multiply by the constant
-``microns''. One of \inlineemph{lambda} or \inlineemph{omega} is a
+``micron''. One of \inlineemph{lambda} or \inlineemph{omega} is a
 required parameter.\\
 
 {\emphtext pol\_angle} - Polarisation angle for the laser in radians.
@@ -1079,26 +1073,26 @@ The next example extends this to a more useful initial condition.\\
 
 \begin{nbboxverbatim}{species block to set up Gaussian density blob}
 begin:constant
-   width = 2.5e-6 # 2.5 microns
+   width = 2.5 * micron
    r = sqrt(x^2+y^2)
 end:constant
 
 begin:species
    name = Electron
-   number_density = 1.0e19 * gauss(r,0.0,width)
+   density = 1.0e19 * gauss(r,0.0,width)
 end:species
 \end{nbboxverbatim}
 %
 %\begin{minipage}{\textwidth}
 \begin{nbboxverbatim}{species block to set up Gaussian density blob}
 begin:constant
-   width = 2.5e-6 # 2.5 microns
+   width = 2.5 * micron
    r = sqrt(x^2+y^2)
 end:constant
 
 begin:species
    name = Electron
-   number_density = 1.0e19 * (1.0-gauss(r,0.0,width))
+   density = 1.0e19 * (1.0-gauss(r,0.0,width))
 end:species
 \end{nbboxverbatim}
 %\end{minipage}
@@ -1300,111 +1294,85 @@ obtained using EPOCH1D by setting the code with the following input deck
 files.
 \begin{lboxverbatim}{input.deck}
 begin:control
-   # global number of gridpoints
-   nx = 400 # in x
-   npart = 3200
+  nx = 400
+  npart = 3200
 
-   # maximum number of iterations
-   # set to -1 to run until finished
-   nsteps = -1
+  #final time of simulation
+  t_end = 1.5e-1
 
-   # final time of simulation
-   t_end = 1.5e-1
-
-   # size of domain
-   x_min = 0
-   x_max = 5.0e5
+  #size of domain
+  x_min = 0
+  x_max = 5.0e5
 end:control
 
+
 begin:boundaries
-   bc_x_min = periodic
-   bc_x_max = periodic
+  bc_x_min = periodic
+  bc_x_max = periodic
 end:boundaries
 
-begin:species
-   # Rightwards travelling electrons
-   name = Right
-   charge = -1
-   mass = 1.0
-   frac = 0.5
-   dump = T
-end:species
 
-begin:species
-   # Leftwards travelling electrons
-   name = Left
-   charge = -1
-   mass = 1.0
-   frac = 0.5
-   dump = T
-end:species
-
-begin:output
-   # If use_offset_grid is true then the code dumps a
-   # grid which displays positions relative to the
-   # Left hand edge of the window
-   use_offset_grid = F
-   # number of timesteps between output dumps
-   dt_snapshot = 1.5e-3
-   # Number of dt_snapshot between full dumps
-   full_dump_every = 1
-   restart_dump_every = -1
-   force_final_to_be_restartable = T
-
-   # Properties at particle positions
-   particles = always
-   px = always
-   py = never
-   pz = never
-   vx = never
-   vy = never
-   vz = never
-   charge = never
-   mass = never
-   particle_weight = never
-   species_id = always
-
-   # Properties on grid
-   grid = always
-   ex = always
-   ey = always
-   ez = always
-   bx = always
-   by = always
-   bz = always
-   jx = always
-   jy = never
-   jz = never
-   ekbar = always
-   mass_density = never + species
-   charge_density = never
-   number_density = always + species
-   temperature = never
-end:output
-
-include:ic.deck
-\end{lboxverbatim}
-
-\begin{lboxverbatim}{ic.deck}
 begin:constant
-   drift_p = 2.5e-24
-   temp = 273
-   dens = 10
+  drift_p = 2.5e-24
+  temp = 273
+  dens = 10
 end:constant
 
-begin:species
-   name = Right
-   temp_x = temp
-   drift_x = drift_p
-   number_density = dens
-end:species
 
 begin:species
-   name = Left
-   temp_x = temp
-   drift_x = -drift_p
-   number_density = dens
+  # Rightwards travelling electrons
+  name = Right
+  charge = -1
+  mass = 1.0
+  frac = 0.5
+  dump = T
+  temp_x = temp
+  drift_x = drift_p
+  rho = dens
 end:species
+
+
+begin:species
+  # Leftwards travelling electrons
+  name = Left
+  charge = -1
+  mass = 1.0
+  frac = 0.5
+  dump = T
+  temp_x = temp
+  drift_x = -drift_p
+  rho = dens
+end:species
+
+
+begin:output
+  # number of timesteps between output dumps
+  dt_snapshot = 1.5e-3
+  # Number of dt_snapshot between full dumps
+  full_dump_every = 1
+
+  # Properties at particle positions
+  particles = always
+  px = always
+
+  # Properties on grid
+  grid = always
+  ex = always
+  ey = always
+  ez = always
+  bx = always
+  by = always
+  bz = always
+  jx = always
+  ekbar = always
+  mass_density = never + species
+  charge_density = always
+  number_density = always + species
+  temperature = always + species
+
+  # extended io
+  distribution_functions = always
+end:output
 \end{lboxverbatim}
 
 \scaledcapimage{./images/late}{tsilate}{The final state of the electron
@@ -1438,13 +1406,13 @@ end:constant
 
 begin:species
   name = Electron
-  number_density = den_peak*(sin(4.0*pi*x/length_x+pi/4))*(sin(8.0*pi*y/length_y)+1)
-  number_density_min = 0.1*den_peak
+  density = den_peak*(sin(4.0*pi*x/length_x+pi/4))*(sin(8.0*pi*y/length_y)+1)
+  density_min = 0.1*den_peak
 end:species
 
 begin:species
   name = Proton
-  number_density = number_density(Electron)
+  density = density(Electron)
 end:species
 \end{lboxverbatim}
 
@@ -1462,25 +1430,33 @@ density should look like Figure~\ref{densitycomplex}
 A more useful example of an initial condition is to create a hollow cone. This
 is easy to do in both 2D and 3D, but is presented here in 3D form.
 \begin{lboxverbatim}{ic.deck}
-begin:constants
-   den_cone = 1.0e22
-   ri = abs(x-5.0e-6)
-   ro = ri+1.0e-6
-   r = sqrt(y^2+z^2)
-end:constants
+begin:constant
+  den_cone = 1.0e22
+  ri = abs(x - 5.0e-6) - 0.5e-6
+  ro = abs(x - 5.0e-6) + 0.5e-6
+  xi = 3.0e-6 - 0.5e-6
+  xo = 3.0e-6 + 0.5e-6
+  r = sqrt(y^2 + z^2)
+end:constant
 
 begin:species
-   name = Proton
-   number_density = if((r gt ri) and (r lt ro), den_cone, 0.0)
-   number_density = if(x gt 3.0e-6, den_cone, number_density(Proton))
-   number_density = if(x lt 4.0e-6, den_cone, number_density(Proton))
-   number_density = if(r lt ri, den_cone, number_density(Proton))
-   number_density = if(x gt 4e-6, 0.0, number_density(Proton))
+  name = proton
+  charge = 1.0
+  mass = 1836.2
+  frac = 0.5
+  rho = if((r gt ri) and (r lt ro), den_cone, 0.0)
+  rho = if((x gt xi) and (x lt xo) and (r lt ri), den_cone, rho(proton))
+  rho = if(x gt xo, 0.0, rho(proton))
+  dump = T
 end:species
 
 begin:species
-   name = Electron
-   number_density = number_density(Proton) * 22.0
+  name = electron
+  charge = -1.0
+  mass = 1.0
+  frac = 0.5
+  rho = rho(proton)
+  dump = T
 end:species
 \end{lboxverbatim}
 
@@ -1810,7 +1786,8 @@ code terminates.\\
 nsteps or t\_end is satisfied.}\\
 
 {\emphtext \{x,y,z\}\_min} - Minimum grid position of the domain in
-metres. These are required parameters. Can be negative. ``\{x,y,z\}\_start'' is accepted as a synonym.\\
+metres. These are required parameters. Can be negative. ``\{x,y,z\}\_start''
+is accepted as a synonym.\\
 
 {\emphtext \{x,y,z\}\_max} - Maximum grid position of the domain in
 metres. These are required parameters. Must be greater than
@@ -1947,11 +1924,9 @@ data that the user wants dumped from the code and an example block from any
 version of {\EPOCH} is given below.
 \begin{boxverbatim}
 begin:output
-   # If use_offset_grid is true then the code dumps a
-   # grid which displays positions relative to the
-   # Left hand edge of the window
+   # If use_offset_grid is true then the code dumps a grid which
+   # displays positions relative to the left hand edge of the window
    use_offset_grid = T
-
    # number of timesteps between output dumps
    dt_snapshot = 1.0e-14
    # Number of dt_snapshot between full dumps
@@ -1965,12 +1940,9 @@ begin:output
    py = never
    pz = never
    vx = full
-   vy = full
-   vz = never
    charge = full
    mass = full
    particle_weight = always
-   species_id = always
 
    # Properties on grid
    grid = always
@@ -2035,7 +2007,6 @@ dumpmask of ``never''.\\
 \item mass - Dump particle mass.
 \item particle\_weight - Dump the weight value for each particle. (The weight
   is the number of real particles represented by a given pseudoparticle).
-\item species\_id - Dump the species number for each particle.
 \end{itemize}
 
 There are also variables which are defined on the underlying grid. All entries
@@ -2124,7 +2095,7 @@ The maths parser in {\EPOCH}  has the following constants
 \item ev - Electronvolt.
 \item kev - Kilo-Electronvolt.
 \item mev - Mega-Electronvolt.
-\item microns - A convenience symbol for specifying wavelength in microns
+\item micron - A convenience symbol for specifying wavelength in microns
 rather than metres.
 \item W\_cm2 - A convenience symbol for specifying irradiance in $W/cm^2$
 rather than $W/m^2$.
@@ -2168,8 +2139,9 @@ The maths parser in {\EPOCH} has the following functions
 \item loge(a) - Natural logarithm.
 \item log10(a) - Base-10 logarithm.
 \item log\_base(a,b) - Base-b logarithm.
-\item number\_density(a) - Returns the density for species a.
-\item temp\_\{x,y,z\}(a) - Returns temperature in the x, y or z direction for species a.
+\item density(a) - Returns the density for species a.
+\item temp\_\{x,y,z\}(a) - Returns temperature in the x, y or z direction for
+    species a.
 \item temp(a) - Returns the isotropic temperature for species a.
 \item e\{x,y,z\}(x,y,z) - Returns the x, y or z component of the electric
     field at the specified location.
@@ -2238,17 +2210,17 @@ that up as follows:
 \begin{boxverbatim}
 begin:constant
   l_debye = 1.0e-6 # Debye length is 1 micrometer
-  n_debye_in_box = 100 # number of debye lengths in simulation
+  n_debye = 100 # number of debye lengths in simulation
   n_gridpoints = 100 # number of grid points requested
-  l_metres = l_debye * n_debye_in_box # length of simulation box in metres
-  n_gp_per_debye = n_gridpoints/n_debye_in_box # number of gridpoints per debye length
+  l_metres = l_debye * n_debye # length of simulation box in metres
+  n_gp_per_debye = n_gridpoints/n_debye # number of gridpoints per debye length
 end:constant
 
 begin:control
   # if the number of gridpoints per debye length is greater than 2
   # use the requested number of gridpoints, otherwise use enough
   # that there are two gridpoints per debye length
-  nx = if(n_gp_per_debye gt 2, n_gridpoints, n_debye_in_box * 2)
+  nx = if(n_gp_per_debye gt 2, n_gridpoints, n_debye * 2)
   length_x = l_metres
 end:control
 \end{boxverbatim}
@@ -2321,20 +2293,20 @@ end:constant
 
 begin:species
    name = s1
-   number_density = interpolate(x,-(6.0e-6),0.2,(10.0e-6),0.2,(11.0e-6),
+   density = interpolate(x,-(6.0e-6),0.2,(10.0e-6),0.2,(11.0e-6),
             1.0,(150.0e-6),1.0,(150.5e-6),0.2,(420.0e-6),0.2,6)
-   number_density = number_density(s1)*partdens
+   density = density(s1)*partdens
    temp_x = 300.0
    temp_y = temp_x(s1)
-   number_density_min = 0.3*partdens
+   density_min = 0.3*partdens
 end:species
 
 begin:species
    name = s2
-   number_density = number_density(s1)
+   density = density(s1)
    temp_x = temp_x(s1)
    temp_y = temp_x(s1)
-   number_density_min = 0.3*partdens
+   density_min = 0.3*partdens
 end:species
 \end{nbboxverbatim}
 
@@ -2343,8 +2315,8 @@ initial conditions. There is one block for each species
 and each species is identified by the ``name'' entry.
 The ``species'' block has the following possible elements.
 \begin{itemize}
-\item number\_density - Particle number density in $m^{-3}$. 
-  As soon as a number\_density= line has been parsed, the values are
+\item density - Particle number density in $m^{-3}$. 
+  As soon as a density= line has been parsed, the values are
   calculated for the whole domain and are available for reuse on the right hand
   side of an expression.
 \item temp\_\{x,y,z\} - The temperature in each direction for a thermal
@@ -2354,14 +2326,14 @@ The ``species'' block has the following possible elements.
   thermal distribution in ignorable directions. If both temp and a specific
   temp\_x, temp\_y, temp\_z parameter is specified then the last to appear in
   the deck has precedence.
-\item number\_density\_min - Minimum particle number density in $m^{-3}$.
-  When the number density in a cell falls below number\_density\_min the
+\item density\_min - Minimum particle number density in $m^{-3}$.
+  When the number density in a cell falls below density\_min the
   autoloader does not load any
   pseudoparticles into that cell to minimise the number of low weight,
   unimportant particles. If set to 0 then all cells are loaded with particles.
-\item number\_density\_max - Maximum particle number density in $m^{-3}$. When
-  the number density in a cell rises above number\_density\_max the autoloader
-  clips the density to number\_density\_max allowing easy implementation of
+\item density\_max - Maximum particle number density in $m^{-3}$. When
+  the number density in a cell rises above density\_max the autoloader
+  clips the density to density\_max allowing easy implementation of
   exponential rises to plateaus.
 \item drift\_\{x,y,z\} - Specifies a momentum space offset in $kg\ ms^{-1}$ to
   the distribution function for this species. At present the drift\_\{x,y,z\}
@@ -2407,31 +2379,31 @@ begin:species
    name = s1
    # first set density in the range 0->1
    # cut down density in x direction
-   number_density = if ((x gt -1) and (x lt 1),1.0,0.2)
+   density = if ((x gt -1) and (x lt 1),1.0,0.2)
    # cut down density in y direction
-   number_density = if ((y gt -1) and (y lt 1),number_density(s1),0.2)
+   density = if ((y gt -1) and (y lt 1),density(s1),0.2)
 
    # multiply density by real particle density
-   number_density = number_density(s1)*100.0
+   density = density(s1)*100.0
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*100.0
+   density_min = 0.3*100.0
 end:species
 
 begin:species
    # Just copy the density for species s1
-   number_density = number_density(s1)
+   density = density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*100.0
+   density_min = 0.3*100.0
 end:species
 \end{boxverbatim}
 
@@ -2447,7 +2419,7 @@ autoloader. In the input deck this is done as follows:
 \begin{boxverbatim}
 begin:species
    name = s1
-   number_density = 'Data/data.file'
+   density = 'Data/data.file'
    offset = 80000
    temp_x = 'Data/data.file'
    temp_y = 'Data/data.file'
@@ -2468,8 +2440,8 @@ into the requested variable, so it is valid to do the following:
 \begin{boxverbatim}
 begin:species
    name = s1
-   number_density = 'Data/data.file'
-   number_density = number_density(s1)*partdens
+   density = 'Data/data.file'
+   density = density(s1)*partdens
    offset = 80000
    temp_x = 'Data/data.file'
    temp_y = temp_x(s1)
@@ -2578,12 +2550,13 @@ The definition without any such flags is:
   TYPE particle_species
     ! Core properties
     CHARACTER(string_length) :: name
-    TYPE(particle_family), POINTER :: next, prev
+    TYPE(particle_species), POINTER :: next, prev
     INTEGER :: id
     LOGICAL :: dump
 
     REAL(num) :: charge
     REAL(num) :: mass
+    REAL(num) :: weight
     INTEGER(KIND=8) :: count
     TYPE(particle_list) :: attached_list
 
@@ -2591,7 +2564,6 @@ The definition without any such flags is:
     INTEGER(KIND=8) :: npart_per_cell
     REAL(num), DIMENSION(:), POINTER :: density
     REAL(num), DIMENSION(:,:), POINTER :: temperature
-
   END TYPE particle_species
 \end{boxverbatim}
 
@@ -2612,6 +2584,7 @@ temperature arrays.
   specified, this is still populated from the input deck, and now refers to
   the reference charge for the species.
 \item mass - The mass in kg.
+\item weight - The per-species particle weight.
 \item count - The global number of particles of this species (NOTE may not
   be accurate). This will only ever be the number of particles on this
   processor when running on a single processor. While this property will be
@@ -3109,33 +3082,33 @@ begin:species
 
    # first set density in the range 0->1
    # cut down density in x direction
-   number_density = if ((x gt -1) and (x lt 1),1.0,0.2)
+   density = if ((x gt -1) and (x lt 1),1.0,0.2)
    # cut down density in y direction
-   number_density = if ((y gt -1) and (y lt 1),number_density(s1),0.2)
+   density = if ((y gt -1) and (y lt 1),density(s1),0.2)
 
    # multiply density by real particle density
-   number_density = number_density(s1)*100.0
+   density = density(s1)*100.0
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*100.0
+   density_min = 0.3*100.0
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   number_density = number_density(s1)
+   density = density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*100.0
+   density_min = 0.3*100.0
 end:species
 \end{boxverbatim}
 
@@ -3151,33 +3124,33 @@ begin:species
 
    # first set density in the range 0->1
    # cut down density in x direction
-   number_density = if ((x gt -1) and (x lt 1),1.0,0.2)
+   density = if ((x gt -1) and (x lt 1),1.0,0.2)
    # cut down density in y direction
-   number_density = if ((y gt -1) and (y lt 1),number_density(s1),0.2)
+   density = if ((y gt -1) and (y lt 1),density(s1),0.2)
 
    # multiply density by real particle density
-   number_density = number_density(s1)*particle_density
+   density = density(s1)*particle_density
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*particle_density
+   density_min = 0.3*particle_density
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   number_density = number_density(s1)
+   density = density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*particle_density
+   density_min = 0.3*particle_density
 end:species
 \end{boxverbatim}
 
@@ -3204,28 +3177,28 @@ begin:species
    name = s1
 
    # multiply density by real particle density
-   number_density = particle_density * profile_x * profile_y
+   density = particle_density * profile_x * profile_y
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*particle_density
+   density_min = 0.3*particle_density
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   number_density = number_density(s1)
+   density = density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*particle_density
+   density_min = 0.3*particle_density
 end:species
 \end{boxverbatim}
 
@@ -3242,28 +3215,28 @@ begin:species
    name = s1
 
    # multiply density by real particle density
-   number_density = particle_density * profile_x * profile_y
+   density = particle_density * profile_x * profile_y
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*particle_density
+   density_min = 0.3*particle_density
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   number_density = number_density(s1)
+   density = density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*particle_density
+   density_min = 0.3*particle_density
 end:species
 \end{boxverbatim}
 

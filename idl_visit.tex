@@ -188,7 +188,9 @@ IDL> ?
 % ONLINE_HELP: Starting the IDL online help assistant.
 IDL>
 \end{boxverbatim}
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/idl_help}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/idl_help}
+  \end{center}
 
   The documentation is divided into books aimed at users or developers and
   is fully searchable and cross indexed.
@@ -237,14 +239,16 @@ IDL>
 IDL> plot,[1,2,3],[2,2,5]
 \end{boxverbatim}
   Gives rise to the following plot:
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/idl_simple_plot}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/idl_simple_plot}
+  \end{center}
 
   As a more concrete example, we will now take a one-dimensional slice through
-  the 2D \qtt{Number\_Density} array read in from our SDF data file. In this
-  example we will give the $x$ and $y$ axes labels by passing extra parameters
-  to the \qtt{plot} routine. A full list of parameters can be found in the
-  on-line documentation. In this example we also make use of the \qtt{\$} 
-  symbol which is IDL's line continuation character.
+  the 2D\linebreak \qtt{Number\_Density} array read in from our SDF data file.
+  In this example we will give the $x$ and $y$ axes labels by passing extra
+  parameters to the \qtt{plot} routine. A full list of parameters can be found
+  in the on-line documentation. In this example we also make use of the
+  \qtt{\$} symbol which is IDL's line continuation character.
 
 \begin{boxverbatim}
 IDL> data = getdata(0)
@@ -252,7 +256,9 @@ IDL> plot,data.grid.x,data.number_density[*,50],xtitle='x', $
 IDL>    ytitle='number density'
 \end{boxverbatim}
   This command generates the following plot:
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/idl_plot}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/idl_plot}
+  \end{center}
 
 \subsection{Postscript Plots}
   The plots shown so far have just been screen-shots of the interactive
@@ -283,7 +289,9 @@ IDL> set_plot,'x'
 
   This set of commands results in the following plot being written to
   a file named \qtt{out.ps}.
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/idl_ps_plot}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/idl_ps_plot}
+  \end{center}
   By default, IDL draws its own set of fonts called ``Hershey vector fonts".
   Much better looking results can be obtained by using a postscript font
   instead. These options are passed as parameters to the \cmd{device}
@@ -315,7 +323,9 @@ IDL>    ystyle=1,nlevels=200,/fill
   Issuing these commands gives us the contour plot shown below. Note that
   the colour table used is not the default one but has been constructed to
   be similar to the one used by VisIt.
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/idl_contour}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/idl_contour}
+  \end{center}
 
 
 \subsection{Shaded Surface Plots in IDL}
@@ -334,7 +344,9 @@ IDL> loadct,3
 IDL> shade_surf,data.number_density,data.grid.x,data.grid.y,xstyle=1, $
 IDL>    ystyle=1,xtitle='x',ytitle='y',ztitle='number density',charsize=3
 \end{boxverbatim}
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/idl_shade_surf}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/idl_shade_surf}
+  \end{center}
 
 \subsection{Interactive Plotting}
   Finally, in recent versions of IDL it is now possible to perform all of
@@ -345,7 +357,9 @@ IDL>    ystyle=1,xtitle='x',ytitle='y',ztitle='number density',charsize=3
 \begin{boxverbatim}
 IDL> iplot,data.grid.x,data.number_density[*,50]
 \end{boxverbatim}
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/idl_iplot}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/idl_iplot}
+  \end{center}
 
   IDL is an extremely useful tool but it also comes with a fairly hefty
   price tag. If you are not part of an organisation that will buy it for
@@ -391,20 +405,24 @@ MatLab software.
 
   \begin{itemize}
   \item
-    Initially developed by the Department of Energy (DOE) Advanced Simulation and Computing Initiative (ASCI) 
+    Initially developed by the Department of Energy (DOE) Advanced Simulation
+    and Computing Initiative (ASCI) 
   \item
-    Now developed and maintained by the Lawrence Livermore National Laboratory along with a group of external contributors
+    Now developed and maintained by the Lawrence Livermore National Laboratory
+    along with a group of external contributors
   \item
     Written in C++ and supports python and Java interfaces
   \item
-    Available for UNIX (Irix, Tru64, AIX, Linux, Solaris), Mac OS X (10.3, 10.4), and Windows platforms
+    Available for UNIX (Irix, Tru64, AIX, Linux, Solaris), Mac OS X
+    (10.3, 10.4), and Windows platforms
   \item
     Open source and freely available under the BSD license
   \item
     Plots, operators and database readers are implemented as plugins allowing
     the VisIt to be dynamically extended at run-time
   \item
-    Powerful set of tools for manipulating, analysing and visualising 3D datasets
+    Powerful set of tools for manipulating, analysing and visualising 3D
+    datasets
   \item
     Parallel and distributed architecture for visualising huge data sets
   \end{itemize}
@@ -414,7 +432,9 @@ MatLab software.
   from the projects web page which is found at the URL
   {\tt https://wci.llnl.gov/codes/visit/}
 
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/visit_web}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/visit_web}
+  \end{center}
 
   There are full instructions for compiling the project from source code
   along with build scripts written to help ease the process. However, this
@@ -488,7 +508,9 @@ MatLab software.
   to analyse data located on a remote UNIX workstation.
 
 \subsection{Loading Data Into VisIt}
-  \begin{center}\includegraphics[height=0.7\textheight]{images/visit_db_list}\end{center}
+  \begin{center}
+    \includegraphics[height=0.7\textheight]{images/visit_db_list}
+  \end{center}
 
   The most straightforward method for loading data into VisIt is to
   start the application and then browse the filesystem for the dataset
@@ -513,7 +535,9 @@ MatLab software.
   Yet another method for selecting the dataset to use is by opening a
   previously saved session file. Will discuss this further in a later section
 
-  \begin{center}\includegraphics[height=0.7\textheight]{images/visit_select_var}\end{center}
+  \begin{center}
+    \includegraphics[height=0.7\textheight]{images/visit_select_var}
+  \end{center}
   Once a SDF file has been successfully loaded the \qm{Plots} menu item
   will become un-greyed and the cycle numbers for each file in the virtual
   database will be displayed. If we navigate to one of the plot types we
@@ -541,7 +565,9 @@ MatLab software.
   indicating each contour level and not a filled version. Instead we
   choose \qm{Plots $\Rightarrow$ Pseudocolor $\Rightarrow$ Derived $\Rightarrow$
   Number\_Density} and then hit the \qm{Draw} button.
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/visit_contour}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/visit_contour}
+  \end{center}
 
   There are many, many settings which can alter the visual appearance
   of plots generated by VisIt. The first point of call is usually to
@@ -555,13 +581,17 @@ MatLab software.
   main VisIt menu pane. This will drop down to reveal a list containing
   the plot and all operators acting on it. Double-clicking on an operator
   will launch the corresponding \qm{OpAtts} dialogue.
-  \begin{center}\includegraphics[width=0.7\linewidth]{images/visit_attrib}\end{center}
+  \begin{center}
+    \includegraphics[width=0.7\linewidth]{images/visit_attrib}
+  \end{center}
 
   Another important tool for controlling the appearance of plots can
   be found in \qm{Controls $\Rightarrow$ Annotation} from the VisIt menu
   bar. This allows all of the plot annotations to be modified such as
   the legend, title, axis labels, etc.
-  \begin{center}\includegraphics[width=0.6\linewidth]{images/visit_annot}\end{center}
+  \begin{center}
+    \includegraphics[width=0.6\linewidth]{images/visit_annot}
+  \end{center}
 
 \subsection{1D Plotting in VisIt}
   A 1D plot in VisIt is called a \qm{Curve} plot. We already mentioned that
@@ -578,7 +608,9 @@ MatLab software.
   the \qm{Pseudocolor} plot window. When we release the mouse button a
   new plot window pops up containing a \qm{Curve} plot of the data just
   selected.
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/visit_curve}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/visit_curve}
+  \end{center}
 
   In order to change the attributes for this plot, we must first select
   \qm{Active window} number 2 in the main VisIt pane.
@@ -594,7 +626,9 @@ MatLab software.
   In the pop up dialogue click on the \qm{Elevation height relative to XY
   limits} and then \qm{Apply}. Click \qm{Yes} when the warning dialogue pops
   up.
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/visit_shade_surf}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/visit_shade_surf}
+  \end{center}
 
   To make this plot look similar to the one generated by IDL, we have changed
   the colour table using \qm{Controls $\Rightarrow$ Color table}.
@@ -612,7 +646,9 @@ MatLab software.
 
   As an example, we can combine the three components of electric field
   to generate a single electric field vector.
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/visit_expression_vector}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/visit_expression_vector}
+  \end{center}
 
   Now when we return to the \qm{Plots} menu we see that the \qm{Vector}
   and \qm{Streamline} plot types have been activated and we can use them
@@ -649,7 +685,9 @@ MatLab software.
   the end of the process the images can be converted into a movie using
   whatever tool best accomplishes the task.
 
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/visit_movie}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/visit_movie}
+  \end{center}
   Another useful tip is to select the \qm{Later, tell me the command to
   run} radio button. This will output a long command which can run from
   a UNIX terminal screen. The advantage is that no X session is required
@@ -700,7 +738,9 @@ MatLab software.
   directory \txt{\$HOME/visit/current/.visit/} (assuming you have unpacked
   the VisIt tarball into your home directory).
 
-  \begin{center}\includegraphics[width=0.8\linewidth]{images/visit_host_profile}\end{center}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{images/visit_host_profile}
+  \end{center}
 
   Create a new profile by clicking on the \qm{New profile} button and filling
   out some of the form fields. The important ones to change are \qm{Profile

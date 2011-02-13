@@ -141,7 +141,7 @@ is explained here
   from previous output dumps.
 \item shape\_functions.F90 - Contain the particle shape functions used for
   calculating the particle weighting.
-\item split\_particles.F90 - Is the implementation of a demonstration of
+\item split\_particle.F90 - Is the implementation of a demonstration of
   particle splitting routines.
 \item utilities.f90 - Contains growable arrays used by the species block parser.
 \item version\_data.F90 - Contains version information for the current {\EPOCH}
@@ -359,10 +359,9 @@ The variables \inlinecode{cell\_{\it \{x,y,z\}}\_start} and
 \inlinecode{cell\_{\it \{x,y,z\}}\_end} represent the part of a global array
 which is held by the current processor. Since {\EPOCH} is an MPI code, there
 doesn't exist a single copy of any of the global arrays anywhere, but if there
-did then each processor would be responsible for the slice which runs\\
-(cell\_x\_min(rank):cell\_x\_max(rank),
-cell\_y\_min(rank):cell\_y\_max(rank),
-cell\_z\_min(rank):cell\_z\_max(rank))\\
+did then each processor would be responsible for the slice which runs
+(cell\_x\_min(rank):cell\_x\_max(rank), 
+cell\_y\_min(rank):cell\_y\_max(rank)) in 2D.
 These variables are used internally in the load balancer, where it is updated,
 but is also used when calculating distribution functions. Here it is used to
 define the extents of the MPI type which is used to write the distribution
@@ -392,29 +391,29 @@ Initial conditions for the autoloader for a given species are described in
 definition (in 3D) is:
 \begin{boxverbatim}
 TYPE initial_condition_block
-  REAL(num), DIMENSION(:,:,:), POINTER :: den
+  REAL(num), DIMENSION(:,:,:), POINTER :: density
   REAL(num), DIMENSION(:,:,:,:), POINTER :: temp
   REAL(num), DIMENSION(:,:,:,:), POINTER :: drift
 
-  REAL(num) :: number_density_min
-  REAL(num) :: number_density_max
+  REAL(num) :: density_min
+  REAL(num) :: density_max
 END TYPE initial_condition_block
 \end{boxverbatim}
 
 In 2D, the arrays have one fewer index, and in 1D they have two fewer.
 
 \begin{itemize}
-\item REAL(num) :: den - Number density for the particles in the species. When
-  defined runs (-2:nx+3,-2:ny+3,-2:nz+3).
+\item REAL(num) :: density - Number density for the particles in the species.
+  When defined runs (-2:nx+3,-2:ny+3,-2:nz+3).
 \item REAL(num) :: temp - Temperature in Kelvin of the species in space. When
   defined runs (-2:nx+3,-2:ny+3,-2:nz+3,1:3). The final index of the array
   is a direction index, used to give anisotropic thermal distributions.
 \item REAL(num) :: drift - Velocity drift in $m/s$ of the species in space. When
   defined runs (-2:nx+3,-2:ny+3,-2:nz+3,1:3). The final index of the array
   is the velocity direction component.
-\item number\_density\_min - The minimum density below which the autoloader
+\item density\_min - The minimum density below which the autoloader
   should not load particles.
-\item number\_density\_max - The maximum density above which the autoloader
+\item density\_max - The maximum density above which the autoloader
   should clip the density function.
 \end{itemize}
 
@@ -752,10 +751,10 @@ called \inlinecode{particle\_species}, which is defined as:
     TYPE(particle_species), POINTER :: next, prev
     INTEGER :: id
     LOGICAL :: dump
-    INTEGER :: subtype
 
     REAL(num) :: charge
     REAL(num) :: mass
+    REAL(num) :: weight
     INTEGER(KIND=8) :: count
     TYPE(particle_list) :: attached_list
 
@@ -810,6 +809,7 @@ below.
   Coulombs.
 \item #REAL(num) :: mass# - The mass of a single particle of the species in
   kilograms.
+\item #REAL(num) :: weight# - The per-species particle weight.
 \item #INTEGER(KIND=8) :: count# - The number of particles of this species on
   all processors. NOTE that this is only accurate if the code is compiled with
   the correct preprocessor options. Without the correct preprocessor options,
@@ -2451,7 +2451,8 @@ When adding a new variable to be written to disk, the value of
 written variables. Next, open the file \inlinecode{src/deck/deck\_io\_block.F90}
 and find the line:
 \begin{boxverbatim}
-  CHARACTER(LEN=entry_length), DIMENSION(io_block_elements) :: io_block_name = ...
+  CHARACTER(LEN=entry_length), DIMENSION(io_block_elements) :: &
+      io_block_name = ...
 \end{boxverbatim}
 
 Simply add new strings for your new variables to the end of the
@@ -2554,7 +2555,7 @@ through all the particles. The iterators are stored in the file
     INTEGER :: part_count
 
     IF (start)  THEN
-      CALL start_particle_list(current_family, current_list, cur)
+      CALL start_particle_list(current_species, current_list, cur)
     ENDIF
 
     part_count = 0
@@ -2794,7 +2795,7 @@ INTEGER(KIND=8) :: as_long_integer_simple
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{as\_long\_integer\_simple} is equivalent to
-\inlinecode{as\_integer\_simple}, but returns the larger
+\inlinecode{as\_integer\_simple}, but returns the larger\linebreak
 \inlinecode{INTEGER(KIND=8)} rather than a normal \inlinecode{INTEGER(KIND=4)}.
 \\[0.5cm]
 {\Large Notes\\}
@@ -2928,8 +2929,8 @@ rounding routines in the maths parser to force other behaviour.
 This routine should be used when evaluating most strings into integers. Note
 that this routine evaluates spatially dependent quantities at (0,0) on each
 processor, so will give unpredictable results when spatially dependent
-quantities are given to it (like number\_density, bx etc.). To evaluate a spatially varying
-quantity use \inlinecode{evaluate\_string\_in\_space}.
+quantities are given to it (like density, bx etc.). To evaluate a spatially
+varying quantity use \inlinecode{evaluate\_string\_in\_space}.
 
 \pagebreak
 \begin{codedef}
@@ -2973,8 +2974,8 @@ maths parser.
 This routine should be used when evaluating most strings into reals. Note that
 this routine evaluates spatially dependent quantities at (0,0) on each
 processor, so will give unpredictable results when spatially dependent
-quantities are given to it (like number\_density, bx etc.). To evaluate a spatially varying
-quantity use \inlinecode{evaluate\_string\_in\_space}.
+quantities are given to it (like density, bx etc.). To evaluate a spatially
+varying quantity use \inlinecode{evaluate\_string\_in\_space}.
 
 \pagebreak
 \begin{codedef}
@@ -3362,28 +3363,28 @@ begin:species
    name = s1
 
    # multiply density by real particle density
-   number_density = particle_density * profile_x * profile_y
+   density = particle_density * profile_x * profile_y
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*particle_density
+   density_min = 0.3*particle_density
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   number_density = number_density(s1)
+   density = density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   number_density_min = 0.3*particle_density
+   density_min = 0.3*particle_density
 end:species
 \end{boxverbatim}
 
@@ -3452,7 +3453,8 @@ FUNCTION handle_custom_block(blockname, element, value)
   INTEGER :: ix, iy
   IF (str_cmp(blockname, "custom")) THEN
     IF (element .EQ. blank .OR. value .EQ. blank) THEN
-       ! If element or value are blank then just testing block so return c_err_none
+       ! If element or value are blank then just testing block so
+       ! return c_err_none
        handle_custom_block = c_err_none
        RETURN
      ENDIF
@@ -3486,7 +3488,8 @@ FUNCTION handle_custom_block(blockname, element, value)
 
   IF (str_cmp(blockname, "custom")) THEN
     IF (element .EQ. blank .OR. value .EQ. blank) THEN
-      ! If element or value are blank then just testing block so return c_err_none
+      ! If element or value are blank then just testing block so
+      ! return c_err_none
       handle_custom_block = c_err_none
       RETURN
     ENDIF
@@ -3545,7 +3548,8 @@ FUNCTION handle_custom_block(blockname, element, value)
   INTEGER :: ix, iy
   IF (str_cmp(blockname, "custom")) THEN
     IF (element .EQ. blank .OR. value .EQ. blank) THEN
-      ! If element or value are blank then just testing block so return c_err_none
+      ! If element or value are blank then just testing block so
+      ! return c_err_none
       handle_custom_block = c_err_none
       RETURN
     ENDIF
@@ -3779,8 +3783,8 @@ there are a few key points at which the code significantly changes state.
     and would be the right place to add a collision operator. Any routine
     which needs to have nearby particles grouped together should take place
     after the call to this routine.
-  \subitem \inlinecode{split\_particles} - The very early beta particle
-    splitting operator. Doesn't really work yet, so do not use!
+  \subitem \inlinecode{split\_particles} - The particle
+    splitting operator.
   \subitem \inlinecode{reattach\_particles\_to\_mainlist} - Undoes the
     particle grouping and rebuilds the main list of particles used by the
     particle pusher. Any routine which needs to have nearby particles grouped

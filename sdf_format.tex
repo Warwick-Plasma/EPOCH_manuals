@@ -356,7 +356,7 @@ as constants in the SDF Fortran module, as indicated by the ``c\_'' prefix.\\
   no interface in a mixed cell.
   \\\midrule
 
-  c\_blocktype\_particle\_family & 13 & Information about a particle family.
+  c\_blocktype\_particle\_species & 13 & Information about a particle species.
 \end{tabularx}
 \end{center}\vspace{10pt}
 
@@ -845,8 +845,8 @@ field. The blocks which are itemised to be combined into a tensor
 may be either point data or regular grid based data but the
 type used must be consistent with the mesh on which the resulting tensor
 is to be defined.
-For a ``c\_blocktype\_stitched\_tensor'' block, the metadata to be written
-is as follows:\\
+For a\linebreak ``c\_blocktype\_stitched\_tensor'' block, the metadata to be
+written is as follows:\\
 
 \begin{center}
 \begin{tabularx}{0.9\textwidth}[!hbt]{cclX}
@@ -981,7 +981,7 @@ with a specific material from a multi-material mesh.\\
 \end{center}\vspace{10pt}
 
 
-\subsubsec{c\_blocktype\_particle\_family}
+\subsubsec{c\_blocktype\_particle\_species}
 
 Finally, we come to unluckly blocktype 13.
 This blocktype has not yet been finalised and it is not clear how best to
@@ -1093,8 +1093,8 @@ parse a SDF file.
   pointer to ``summary\_info\_location''.
 \item Loop over ``nblocks''
 \item Skip this step for the first block. For all subsequent blocks, set the
-  file pointer to ``next\_block\_location'' given in the block header for the
-  previous block.
+  file pointer to\linebreak ``next\_block\_location'' given in the block header
+  for the previous block.
 \item Store the current file pointer value as ``block\_start''.
 \item Read the block header
 \item Determine whether the reader can deal with the type of block which is
