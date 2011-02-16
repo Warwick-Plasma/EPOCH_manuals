@@ -53,7 +53,7 @@ pdf: $(latexfile1).pdf $(latexfile2).pdf
 ps: $(latexfile1).ps $(latexfile2).ps
 
 distclean: clean
-	rm -f images/*.eps $(latexfile1).pdf $(latexfile2).pdf \
+	rm -f $(EPS) $(latexfile1).pdf $(latexfile2).pdf \
 	    $(latexfile1).ps $(latexfile2).ps
 
 clean:
