@@ -1627,7 +1627,10 @@ options currently controlled by the preprocessor are:\\
   processor boundaries are in space. This is a debug mode for code development.
 \item PARSER\_DEBUG - The code outputs more detailed information whilst
   parsing the input deck. This is a debug mode for code development.
-\item PARTICLE\_IONISE - Activate the particle ionisation code (BETA).
+\item PARTICLE\_IONISE - Activate the particle ionisation code (ALPHA). This
+  turns on an implementation of ionisation that is intended for demonstration
+  purposes only. Anyone seriously wanting to study the effects of ionisation
+  should implement their own model.
 \item PARTICLE\_COUNT\_UPDATE - Makes the code keep global particle counts for
   each species on each processor. This information isn't needed by the core
   algorithm, but can be useful for developing some types of additional physics
