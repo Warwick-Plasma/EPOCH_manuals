@@ -1,0 +1,95 @@
+\documentclass[12pt,a4paper]{article}
+\newcommand{\version}{3.0}
+
+\usepackage{pdfpages}
+\usepackage{url,graphicx,tabularx,array,titleref,booktabs}
+\usepackage[hmargin=.47in,vmargin=0.6in,nohead]{geometry}
+\usepackage{color,verbatim,framed}
+\usepackage{moreverb}
+\usepackage{xr}
+%\usepackage{upgreek}
+\usepackage{fancyvrb}
+%\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{appendix}
+\usepackage{color}
+\usepackage{tabularx}
+\usepackage{graphicx}
+%\usepackage{fullpage}
+\usepackage{enumerate}
+\usepackage{bold-extra}
+%\usepackage{fix-cm}
+\definecolor{txt}{rgb}{0,0,1}
+\definecolor{cmd}{rgb}{0,1,0}
+\newcommand{\txt}[1]{{\color{txt}{\tt #1}}}
+\newcommand{\cmd}[1]{{\color{cmd}{\tt #1}}}
+\definecolor{warwickdark}{cmyk}{1.0,0.6,0.0,0.06}
+\definecolor{warwickmid}{cmyk}{0.69,0.34,0.0,0.0}
+\definecolor{warwicklight}{cmyk}{1.0,0.0,0.0,0.0}
+\definecolor{warwickred}{cmyk}{0.0,1.0,0.65,0.15}
+\newcommand{\HRule}{\rule[0.3cm]{\linewidth}{0.5mm}}
+\newcommand{\emphtext}{\color{warwickdark} \fontfamily{phv}\selectfont\large\bf}
+\newcommand{\inlinecode}[1]{{\color{warwickred} \bf\texttt{#1}}}
+\newcommand{\sectit}[1]{See the section titled ``{\bf\titleref{sec:#1}}''.}
+\newcommand{\sect}[1]{Section~\ref{sec:#1}}
+\newcommand{\code}[1]{{\texttt{#1}}}
+%\newcommand{\qtt}[1]{``{\code{#1}}''}
+\newcommand{\inlineemph}[1]{{\color{warwicklight} \bf{#1}}}
+\newcommand{\inlineemtt}{\color{warwicklight} \fontfamily{phv}\selectfont\ttfamily\bfseries}
+\newcommand{\cemph}[1]{{\inlineemph{#1}}}
+\newcommand{\EPOCH}{{\color{warwickdark}\fontfamily{phv}\selectfont{EPOCH}}}
+% Caption before Label to fix strange problem with not putting in subsection
+% numbers. DO NOT CHANGE.
+\newcommand{\captionedimage}[3]
+  {{\begin{figure}[hbt!]\centering\includegraphics{#1}\caption{#3}\label{#2}
+    \end{figure}}}
+\newcommand{\scaledcapimage}[4]
+  {{\begin{figure}[hbt!]\centering\includegraphics[scale=#4]{#1}\caption{#3}
+    \label{#2} \end{figure}}}
+
+\newcommand{\tony}[1]{{\color{warwickred} \bf{TONY'S COMMENT:} \bf{#1}}\\}
+
+\definecolor{shadecolor}{cmyk}{0.1,0.05,0.0,0.0}
+\setlength{\FrameRule}{0.6mm}
+
+\newenvironment{lboxverbatim}[1]{
+\setlength{\FrameSep}{0pt}
+%\topsep=0ex\relax
+\def\FrameCommand{\fboxsep=0pt \colorbox{shadecolor}}
+\MakeFramed{\FrameRestore}
+\vspace{-13.5pt}
+\fvset{label=#1}
+\boxverb
+}{
+\endboxverb
+\vspace{-13.5pt}
+\endMakeFramed
+}
+\newenvironment{boxverbatim}{\lboxverbatim{none}}{\endlboxverbatim}
+
+\newenvironment{nbboxverbatim}[1]{
+\noindent\minipage{\textwidth}
+\setlength{\FrameSep}{0pt}
+%\topsep=0ex\relax
+\def\FrameCommand{\fboxsep=0pt \colorbox{shadecolor}}
+\MakeFramed{\FrameRestore}
+\fvset{label=#1}
+\boxverb
+}{
+\endboxverb
+\vspace{-13.5pt}
+\endMakeFramed
+\endminipage
+\vspace{5pt}
+}
+
+\DefineVerbatimEnvironment{boxverb}{Verbatim}
+  {frame=single,framerule=0.5mm,rulecolor=\color{warwickmid},
+   formatcom=\color{black}}
+
+\DefineVerbatimEnvironment{codedef}{Verbatim}
+  {formatcom=\color{warwickred},fontsize=\Large,commandchars=\\\{\}}
+%\newcommand{\txt}[1]{{\color{blue}{\tt #1}}}
+%\newcommand{\cmd}[1]{{\color{green}{\tt #1}}}
+\newcommand{\qtt}[1]{``{\tt #1}"}
+\newcommand{\qm}[1]{{\em ``#1"}}

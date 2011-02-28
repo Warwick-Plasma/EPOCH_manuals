@@ -1,5 +1,6 @@
 # set latexfile to the name of the main file without the .tex
-latexfile = epoch
+latexfile1 = epoch_user
+latexfile2 = epoch_dev
 TEX = latex
 PDFTEX = pdflatex
 
@@ -23,29 +24,37 @@ default: pdf
 # reruns latex if needed.  to get rid of this capability, delete the
 # three lines after the rule. 
 # idea from http://ctan.unsw.edu.au/help/uk-tex-faq/Makefile
-$(latexfile).dvi : $(latexfile).tex epoch_dev_title.tex \
-    epoch_user_title.tex sdf_format.tex $(EPS)
-	while ($(TEX) $(latexfile) ; \
-	grep -q "Rerun to get cross" $(latexfile).log ) do true; \
+$(latexfile1).dvi : $(latexfile1).tex $(latexfile2).tex epoch_dev_title.tex \
+    epoch_head.tex epoch_user_title.tex sdf_format.tex $(EPS)
+	while ($(TEX) $(latexfile1) ; \
+	grep -q "Rerun to get cross" $(latexfile1).log ) do true; \
 	done; \
-	$(TEX) $(latexfile)
-
-$(latexfile).pdf : $(latexfile).tex epoch_dev_title.tex \
-    epoch_user_title.tex sdf_format.tex
-	while ($(PDFTEX) $(latexfile) ; \
-	grep -q "Rerun to get cross" $(latexfile).log ) do true; \
+	while ($(TEX) $(latexfile2) ; \
+	grep -q "Rerun to get cross" $(latexfile2).log ) do true; \
 	done; \
-	$(PDFTEX) $(latexfile)
+	$(TEX) $(latexfile1)
 
-$(latexfile).ps : $(latexfile).dvi
-	dvips -t a4 -o $(latexfile).ps $(latexfile).dvi
+$(latexfile1).pdf : $(latexfile1).tex $(latexfile2).tex epoch_dev_title.tex \
+    epoch_head.tex epoch_user_title.tex sdf_format.tex
+	while ($(PDFTEX) $(latexfile1) ; \
+	grep -q "Rerun to get cross" $(latexfile1).log ) do true; \
+	done; \
+	while ($(PDFTEX) $(latexfile2) ; \
+	grep -q "Rerun to get cross" $(latexfile2).log ) do true; \
+	done; \
+	$(PDFTEX) $(latexfile1)
 
-pdf: $(latexfile).pdf
+$(latexfile1).ps : $(latexfile1).dvi $(latexfile2).dvi
+	dvips -t a4 -o $(latexfile1).ps $(latexfile1).dvi
+	dvips -t a4 -o $(latexfile2).ps $(latexfile2).dvi
 
-ps: $(latexfile).ps
+pdf: $(latexfile1).pdf $(latexfile2).pdf
+
+ps: $(latexfile1).ps $(latexfile2).ps
 
 distclean: clean
-	rm -f images/*.eps $(latexfile).pdf $(latexfile).ps
+	rm -f images/*.eps $(latexfile1).pdf $(latexfile2).pdf \
+	    $(latexfile1).ps $(latexfile2).ps
 
 clean:
 	rm -f *.aux *.dvi *.log *.toc
