@@ -800,7 +800,7 @@ Laser blocks attach an EM wave source to a boundary which is set as
 begin:laser
    boundary = x_min
    id = 1
-   irradiance_w_cm2 = 1.0e15
+   intensity_w_cm2 = 1.0e15
    lambda = 1.06 * micron
    pol_angle = 0.0
    phase = 0.0
@@ -824,12 +824,13 @@ are accepted as a synonyms for ``x\_min'' and ``x\_max''.\\
 
 {\emphtext amp} - The amplitude of the $E$ field of the laser in $V/m$.\\
 
-{\emphtext irradiance} - The irradiance (intensity) of the laser in $W/m^2$.
-There is no need to specify both irradiance and amp and the last specified
-in the block is the value used. It is mandatory to specify at least one.\\
+{\emphtext intensity} - The intensity of the laser in $W/m^2$.
+There is no need to specify both intensity and amp and the last specified
+in the block is the value used. It is mandatory to specify at least one.
+``irradiance'' is accepted as a synonym.\\
 
-{\emphtext irradiance\_w\_cm2} - This is identical to the 
-\inlineemph{irradiance} parameter described above, except that the units
+{\emphtext intensity\_w\_cm2} - This is identical to the 
+\inlineemph{intensity} parameter described above, except that the units
 are specified in $W/cm^2$.\\
 
 {\emphtext id} - An id code for the laser. Used if you specify the laser time
@@ -2100,8 +2101,6 @@ The maths parser in {\EPOCH}  has the following constants
 \item mev - Mega-Electronvolt.
 \item micron - A convenience symbol for specifying wavelength in microns
 rather than metres.
-\item W\_cm2 - A convenience symbol for specifying irradiance in $W/cm^2$
-rather than $W/m^2$.
 \item time - Initial simulation time.
 \item length\_\{x,y,z\} - The length of the simulation box in the x,y,z
   direction.
