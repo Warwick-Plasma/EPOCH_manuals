@@ -673,6 +673,14 @@ the feature will be disabled. The default value is ``T''.\\
 a copy of the input decks for the currently running simulation is written
 into the restart dumps. The default value is ``T''.\\
 
+{\emphtext dt\_average} - When averaged variables are being output to
+file, this parameter specifies the simulation time period over which
+averaging is to occur. ``averaging\_period'' is accepted as a synonym.\\
+
+{\emphtext nstep\_average} - When averaged variables are being output to
+file, this parameter specifies the number of time steps over which
+averaging is to occur. ``min\_cycles\_per\_average'' is accepted as a synonym.\\
+
 {\emphtext particles} - The dumpmask for the particle positions. Restart
 variable. No particle variables can be plotted in VisIt unless this is
 dumped.\\
@@ -732,6 +740,9 @@ specified in the input deck. Each individual particle probe
 can have its own dumpmask, but this one takes precedence.\\
 
 % fix: ejected_particles
+% fix: cpml_*
+% fix: ekflux
+% fix: poynt_flux
 
 \subsection{\inlineemph{constant} blocks}
 
@@ -3029,6 +3040,49 @@ end:probe
   drastically if this code only dumps probe information infrequently. If this
   is set to \inlinecode{never} then the code effectively never uses the probe.
 \end{itemize}
+
+\subsection{Data Averaging}
+{\EPOCH} can accumulate an average value for field variables to be written
+to output dumps. These may be requested by using the ``average'' keyword when
+specifying a dump variable. The non-averaged variable will still be written
+to restart dumps but not full or normal dumps. If you also want the
+non-averaged variable to be written then you can add the ``snapshot'' option.
+
+The period of time over which averaging occurs can be specified using the
+``dt\_average'' keyword. Alternatively, you may specify the number of cycles
+over which to perform the averaging using the ``nstep\_average'' keyword.
+If both ``dt\_average'' and ``nstep\_average'' are specified then the
+averaging will be performed over the longest of the two intervals.
+
+Note that previous versions of the code would alter the time step to
+ensure that there were enough cycles between output dumps to satisfy the
+``nstep\_average'' parameter. However, since it affects the accuracy of
+the result, this is no longer the case and only a warning message is issued.
+
+The following shows an example use of averaging in the output block.
+\begin{boxverbatim}
+begin:output
+
+  dt_snapshot = 1.0e-15
+  full_dump_every = 10
+  dt_average = 1.0e-17
+
+  px = always + average + snapshot
+  py = full + average + snapshot
+  pz = full + average
+
+end:output
+\end{boxverbatim}
+
+With this configuration, px will be written in both normal and
+averaged form at normal, full and restart dumps. py will be
+written in both forms at full and restart dumps. Since pz is not
+required for restart, only the average will be written at both
+full and restart dumps.
+
+Only field and derived variables can be averaged currently in EPOCH.
+Particle properties, distribution functions and particle probes cannot
+currently be averaged.
 
 \subsection{Restarting {\EPOCH} from previous output dumps}
 Another possible way of setting up initial conditions in {\EPOCH} is to load in
