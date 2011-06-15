@@ -1921,14 +1921,7 @@ begin:species
 end:species
 \end{boxverbatim}
 
-The species block is slightly more complex than preceding blocks in that the
-number of species described in a block must be specified in advance. While
-for most input deck blocks the structure is completely free-form, the first
-thing specified in the species block must be ``n\_species'' which tells the
-code how many species of particle are present in the code. After that, the
-block is once again free-form, although it makes sense to keep the information
-for each species together. Each species has the following data which must be
-specified in the input deck:\\
+Each species has the following data which may be specified in the input deck:\\
 \begin{itemize}
 \item charge - The charge on the particle in units of the electron charge.
   Required parameter.
@@ -1955,9 +1948,7 @@ specified in the input deck:\\
   but do not contribute any current. Default is ``\inlinecode{F}''
 \end{itemize}
 
-The particle species which a given property refers to is simply set by a
-number after the property name, starting with 1 for the first species and
-ending at n\_species for the final species. A final note: if the values of
+A final note: if the values of
 frac for all species don't add up to one then there will be some particles
 requested which are never assigned a species. These particles are destroyed
 before the code runs to save memory and compute time, but it means that the
