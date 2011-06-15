@@ -365,7 +365,6 @@ begin:species
    mass = 1.0
    frac = 0.5
    # npart = 2000*100
-   dump = T
    # tracer = F
    density = 1.e4
    temp = 1e6
@@ -384,11 +383,12 @@ begin:species
    mass = 1836.0*12
    frac = 0.5
    # npart = 2000*100
-   dump = T
 
    density = 0.25*density(Electron)
    temp_x = temp_x(Electron)
    temp_y = temp_x(Electron)
+
+   dumpmask = full
 end:species
 \end{lboxverbatim}
 
@@ -423,13 +423,18 @@ to the species.\\
 {\emphtext NOTE: frac should not be specified at the same time as npart for a
 given species.}\\
 
-{\emphtext dump} - Logical flag detailing whether or not to dump
-information about the species. If set to ``F'', then the species information
-is not dumped when writing ANY species specific diagnostics, although it is
-included in global diagnostics (i.e in the example if ``dump = F'' were
-specified then there would be no ``Mass\_Density\_Electron'', but the mass of
-the electron would be considered when calculating ``mass\_density'') and
-restart dumps. ``dump = F'' is the default value.\\
+{\emphtext dumpmask} - Determines which output dumps will include this
+particle species. The dumpmask has the same semantics as those used
+by variables in the ``output'' block, described in \sect{output block}.
+The actual dumpmask from the output block is applied first and then
+this one is applied afterwards. For example, if the species block contains
+``dumpmask = full'' and the output block contains ``vx = always''
+then the particle velocity will be only be dumped at full dumps for
+this particle species. The default dumpmask is ``always''.\\
+
+{\emphtext dump} - This logical flag is provided for backwards compatibility.
+If set to ``F'' it has the same meaning as ``dumpmask = never''. If set to
+``T'' it has the same meaning as ``dumpmask = always''.\\
 
 {\emphtext tracer} - Logical flag switching the particle species
 into tracer particles. Tracer particles are enabled with the correct
@@ -561,19 +566,34 @@ valid. These are:\\
 will never be written. If it is a required restart variable then it will be
 written only at restart dumps.\\
 
+{\emphtext full} - This variable will be written at full dumps only.\\
+
 {\emphtext always} - This variable will be written at full, normal and restart
 dumps.\\
 
-{\emphtext full} - This variable will be written at full dumps only.\\
-
 {\emphtext restart} - This variable will be written at restart dumps only.\\
 
-There is also a fifth parameter which can be specified for some variables.\\
+For grid variables derived from summing over particles (ie. ``ekbar'',
+``mass\_density'', ``charge\_density'', ``number\_density'', ``temperature'')
+the following two parameters also apply.\\
 
-{\emphtext species} - The output for this variable should be broken down on a
-species by species basis. This only applies to certain kinds of derived field
-variable, such as mass\_density. It is combined with a restart frequency code
+{\emphtext species} - The derived variable should be output on a
+species by species basis. It is combined with a restart frequency code
 by addition as in: \inlinecode{px = always + species}.\\
+
+{\emphtext no\_sum} - The output for this derived variable should not
+be summed over all species. It is combined with a restart frequency code
+by addition as in: \inlinecode{px = always + no\_sum}.\\
+
+Most grid variables may be averaged over time. This is specified using
+the following dumpmask parameters.\\
+
+{\emphtext average} - The output for this variable should be averaged over
+time.\\
+
+{\emphtext snapshot} - By default, the ``average'' parameter replaces the
+variable with an averaged version of the data. Adding this flag specifies
+that the non-averaged variable should also be dumped to file.\\
 
 When applied to a variable, these codes are referred to as a
 \inlineemph{dumpmask}.
@@ -733,11 +753,19 @@ near future.\\
 
 {\emphtext distribution\_functions} - Dumpmask for outputting distribution
 functions specified in the input deck. Each individual distribution function
-can have its own dumpmask, but this one takes precedence.\\
+can have its own dumpmask and these will be applied after the value of
+``distribution\_functions'' has been considered. For example, if the
+output block contains ``distribution\_functions = full'' and the dist\_fn
+block contains ``dumpmask = always'' then the distribution function will
+only be output at full dumps.\\
 
-{\emphtext particle\_probes} - Dumpmask for outputting particle probes
-specified in the input deck. Each individual particle probe
-can have its own dumpmask, but this one takes precedence.\\
+{\emphtext particle\_probes} - Dumpmask for outputting particle
+probes specified in the input deck. Each individual particle probe
+can have its own dumpmask and these will be applied after the value of
+``particle\_probes'' has been considered. For example, if the
+output block contains ``particle\_probes = always'' and the dist\_fn
+block contains ``dumpmask = full'' then the particle probe will
+only be output at full dumps.\\
 
 % fix: ejected_particles
 % fix: cpml_*
@@ -1242,8 +1270,11 @@ dimensions, this is restricted to being either 2 or 3.\\
 {\emphtext dumpmask} - Determines which output dumps will include this
 distribution function. The dumpmask has the same semantics as those used
 by variables in the ``output'' block, described in \sect{output block}.
-If the ``distribution\_functions'' dumpmask is specified in the ``output''
-block then that will take precedence.\\
+The dumpmask from ``distribution\_functions'' in the output block is applied
+first and then this one is applied afterwards. For example, if the
+dist\_fn block contains ``dumpmask = full'' and the output block contains
+``distribution\_functions = always'' then this distribution function will be
+only be dumped at full dumps. The default dumpmask is ``always''.\\
 
 {\emphtext direction\inlinecode{n}} - This is the direction
 which is calculated to run along axis \inlinecode{n}. This can be any one of:
@@ -1337,7 +1368,6 @@ begin:species
   charge = -1
   mass = 1.0
   frac = 0.5
-  dump = T
   temp_x = temp
   drift_x = drift_p
   rho = dens
@@ -1350,7 +1380,6 @@ begin:species
   charge = -1
   mass = 1.0
   frac = 0.5
-  dump = T
   temp_x = temp
   drift_x = -drift_p
   rho = dens
@@ -1459,7 +1488,6 @@ begin:species
   rho = if((r gt ri) and (r lt ro), den_cone, 0.0)
   rho = if((x gt xi) and (x lt xo) and (r lt ri), den_cone, rho(proton))
   rho = if(x gt xo, 0.0, rho(proton))
-  dump = T
 end:species
 
 begin:species
@@ -1468,7 +1496,6 @@ begin:species
   mass = 1.0
   frac = 0.5
   rho = rho(proton)
-  dump = T
 end:species
 \end{lboxverbatim}
 
@@ -1890,7 +1917,7 @@ begin:species
    charge = 1.0
    mass = 1800.0
    frac = 0.5
-   dump = T
+   dumpmask = full
 end:species
 \end{boxverbatim}
 
@@ -1912,6 +1939,9 @@ specified in the input deck:\\
   the species block.
 \item name - The name of this particle species (as written to the output
   dumps). Required parameter.
+\item dumpmask - When to dump this particle species in normal outputs
+  (this is ignored for restart dumps when enough information is dumped to
+  restart the code). Default is ``\inlinecode{always}''
 \item dump - Whether or not to dump this particle species in normal outputs
   (this is ignored for restart dumps when enough information is dumped to
   restart the code). Default is ``\inlinecode{F}''
@@ -1997,17 +2027,25 @@ are used as follows\\
 \end{itemize}
 
 The remaining items control what data should be dumped at which type of
-output. There are three possible values\\
+output. There are eight possible values\\
 \begin{itemize}
 \item never - This variable will never be dumped unless it is a required restart
   variable in which case it will be dumped at a restart dump.
 \item full - Dump only at a full output dump.
 \item always - Dump at a basic output dump.
+\item restart - Include in restart dumps.
 \item species - When applied to a grid variable which can meaningfully be
   calculated on a per species level, this causes the code to dump per species
   information about that variable. This is simply added to the frequency code,
   i.e. ``mass\_density = always + species'' will cause the mass density to be
   output at every dump for each species and also globally.
+\item no\_sum - By default, grid variables derived from particle data will
+  be summed over all particle species. This flag prevents the calculation
+  and output of this summed variable.
+\item average - The output for this variable should be averaged over time.
+\item snapshot - By default, the ``average'' parameter replaces the
+  variable with an averaged version of the data. Adding this flag specifies
+  that the non-averaged variable should also be dumped to file.
 \end{itemize}
 
 The options are fairly self explanatory, but they are given in more detail
@@ -2565,7 +2603,7 @@ The definition without any such flags is:
     CHARACTER(string_length) :: name
     TYPE(particle_species), POINTER :: next, prev
     INTEGER :: id
-    LOGICAL :: dump
+    INTEGER :: dumpmask
 
     REAL(num) :: charge
     REAL(num) :: mass
@@ -2591,7 +2629,7 @@ temperature arrays.
   used by end users.
 \item id - The species number for this species. This is the same number as is
   used in the input deck to designate the species.
-\item dump - Flag to determine wether or to include this species in output
+\item dumpmask - Determine when to include this species in output
   dumps. Note that the flag is ignored for restart dumps.
 \item charge - The charge in Coulombs. Even if PER\_PARTICLE\_CHARGEMASS is
   specified, this is still populated from the input deck, and now refers to
@@ -3014,7 +3052,7 @@ begin:probe
    ek_min = 0.0
    ek_max = -1.0
 
-   dump = always
+   dumpmask = always
 end:probe
 \end{boxverbatim}
 \begin{itemize}
@@ -3033,7 +3071,7 @@ end:probe
   about. Set to 0 for no minimum kinetic energy.
 \item ek\_max - The maximum kinetic energy of particles to store information
   about. Set to -1 for no maximum kinetic energy.
-\item dump - The dump code for this particle probe. This is the same as that
+\item dumpmask - The dump code for this particle probe. This is the same as that
   for the main output controls in \inlinecode{input.deck}. Note that the code
   has to store copies of particles which pass through the probe until a dump
   occurs. This means that the code's memory requirements can increase
@@ -3045,8 +3083,9 @@ end:probe
 {\EPOCH} can accumulate an average value for field variables to be written
 to output dumps. These may be requested by using the ``average'' keyword when
 specifying a dump variable. The non-averaged variable will still be written
-to restart dumps but not full or normal dumps. If you also want the
-non-averaged variable to be written then you can add the ``snapshot'' option.
+to restart dumps where required for restarting the code but not full or normal
+dumps. If you also want the non-averaged variable to be written then you can
+add the ``snapshot'' option.
 
 The period of time over which averaging occurs can be specified using the
 ``dt\_average'' keyword. Alternatively, you may specify the number of cycles
@@ -3116,7 +3155,7 @@ output files.\\
 If specific ``restart'' dumps are specified in the input deck, or the
 ``force\_final\_to\_be\_restartable'' flag is set then in some cases the
 output is forced to contain enough information to output all the data. These
-restart dumps can be very large, and also override the ``dump'' parameter
+restart dumps can be very large, and also override the ``dumpmask'' parameter
 specified for a species and output the data for that species anyway.
 
 \newpage

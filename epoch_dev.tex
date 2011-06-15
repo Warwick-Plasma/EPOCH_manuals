@@ -752,7 +752,7 @@ called \inlinecode{particle\_species}, which is defined as:
     CHARACTER(string_length) :: name
     TYPE(particle_species), POINTER :: next, prev
     INTEGER :: id
-    LOGICAL :: dump
+    INTEGER :: dumpmask
 
     REAL(num) :: charge
     REAL(num) :: mass
@@ -805,8 +805,8 @@ below.
 \item #INTEGER :: id# - The number of the species, so for the species
   \inlinecode{species\_list(1)}, the id field would be 1. For
   \inlinecode{species\_list(2)}, the id field would be 2 etc.
-\item #LOGICAL :: dump# - Whether or not this species should be dumped in
-  diagnostic output.
+\item #INTEGER :: dumpmask# - Bitmask to determine when this species should be
+  dumped in diagnostic output.
 \item #REAL(num) :: charge# - The charge on a single particle of the species in
   Coulombs.
 \item #REAL(num) :: mass# - The mass of a single particle of the species in
