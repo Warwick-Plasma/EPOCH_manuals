@@ -128,8 +128,8 @@ the material in the first part of the manual.
 If you really want to understand {\EPOCH}
 in full, the only way is to read all of
 this manual and then read through the code. Most of it is commented.
-\pagebreak
 
+\pagebreak
 \section{Getting Started Guides}
 \label{sec:gettingstarted}
 
@@ -235,7 +235,7 @@ character.\\
 
 {\emphtext nx} - Number of grid points in the x direction. This parameter
 is mandatory. There must be sufficient gridpoints so that
-(x\_max-x\_min)/nx $< \lambda_d$, where $\lambda_d$ is the Debye length.\\
+$(x\_max - x\_min)/nx < \lambda_d$, where $\lambda_d$ is the Debye length.\\
 
 {\emphtext npart} - The global number of pseudoparticles in the
 simulation. This parameter does not need to be given if a specific number
@@ -281,7 +281,12 @@ is to use a second order scheme.\\
 
 {\emphtext stdout\_frequency} - If specified then the code will print a one
 line status message to stdout after every given number or timesteps. The
-default (\code{stdout\_frequency = 0}) is to print nothing to screen.
+default (\code{stdout\_frequency = 0}) is to print nothing to screen.\\
+
+{\emphtext use\_random\_seed} - The initial particle distribution is
+generated using a random number generator. By default, {\EPOCH} uses a fixed
+value for the random generator seed so that results are repeatable. If this
+flag is set to ``T'' then the seed will be generated using the system clock.
 
 \subsubsection{\inlineemph{boundaries} block}
 The {\emphtext boundaries} block sets the boundary conditions of each boundary
@@ -343,6 +348,8 @@ time the inflowing characteristics are set to zero. The particles are again
 simply removed from the simulation when they reach the boundary.\\
 
 {\emphtext reflect} - A perfectly reflecting boundary condition.\\
+
+{\emphtext conduct} - Perfectly conducting boundary condition.\\
 
 {\emphtext open} - When applied to fields, EM waves outflowing characteristics
 propagate through the boundary. Particles are transmitted through the boundary
@@ -475,8 +482,7 @@ implementation of exponential rises to plateaus. If it is a negative value
 then no clipping is performed. This is the default.\\
 
 {\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
-distribution in K. To specify a temperature in ev, simply use the deck
-parser. So for example temp\_x = 4*kev/kb gives a 4kev temperature.\\
+distribution in K.\\
 
 {\emphtext temp} - Sets an isotropic temperature distribution in K. Does not
 give thermal distribution in ignorable directions. If both temp and a specific
@@ -530,7 +536,7 @@ unformatted files using the offset element, but care must be taken!}\\
 Output in {\EPOCH} is handled using the custom designed SDF file format
 (\inlineemph{Self Describing Format}) which is documented in \sect{sdf}
 of the developers manual.
-It comes with readers for ITT IDL and LLNL VisIt, and Mathworks MatLab.
+It comes with readers for ITT IDL, LLNL VisIt and Mathworks MatLab.
 The IDL reader is also compatible with the open source GDL tool.
 What the code should output and when it should output it is
 specified in the ``output'' block of the input deck. \\
@@ -643,6 +649,8 @@ begin:output
 end:output
 \end{lboxverbatim}
 
+\noindent{\bf Directives}\\
+
 {\emphtext use\_offset\_grid} - When using moving windows some visualisation
 programs (notably VisIt) show the motion of the window by moving the
 visualisation window rather than by changing the x-axis. Setting this option to
@@ -701,6 +709,24 @@ averaging is to occur. ``averaging\_period'' is accepted as a synonym.\\
 file, this parameter specifies the number of time steps over which
 averaging is to occur. ``min\_cycles\_per\_average'' is accepted as a synonym.\\
 
+{\emphtext distribution\_functions} - Dumpmask for outputting distribution
+functions specified in the input deck. Each individual distribution function
+can have its own dumpmask and these will be applied after the value of
+``distribution\_functions'' has been considered. For example, if the
+output block contains ``distribution\_functions = full'' and the dist\_fn
+block contains ``dumpmask = always'' then the distribution function will
+only be output at full dumps.\\
+
+{\emphtext particle\_probes} - Dumpmask for outputting particle
+probes specified in the input deck. Each individual particle probe
+can have its own dumpmask and these will be applied after the value of
+``particle\_probes'' has been considered. For example, if the
+output block contains ``particle\_probes = always'' and the dist\_fn
+block contains ``dumpmask = full'' then the particle probe will
+only be output at full dumps.\\
+
+\noindent{\bf Particle Variables}\\
+
 {\emphtext particles} - The dumpmask for the particle positions. Restart
 variable. No particle variables can be plotted in VisIt unless this is
 dumped.\\
@@ -722,6 +748,8 @@ particle mass.\\
 describes how many real particles each pseudoparticle represents. Restart
 variable.\\
 
+\noindent{\bf Grid Variables}\\
+
 {\emphtext grid} - The dumpmask for the Cartesian grid which defines the
 locations of the grid variables. No grid variables can be plotted in VisIt
 unless this variable is output.\\
@@ -737,7 +765,12 @@ codes.\\
 {\emphtext j\{x,y,z\}} - The currents pointing in all three directions. Restart
 variables.\\
 
+\noindent{\bf Derived Variables}\\
+
 {\emphtext ekbar} - Mean kinetic energy on grid. Can have species dumpmask.\\
+
+{\emphtext ekflux} - Mean kinetic energy flux in each direction on the grid.
+Can have species dumpmask.\\
 
 {\emphtext mass\_density} - Mass density on grid. Can have species dumpmask.\\
 
@@ -751,28 +784,12 @@ dumpmask.\\
 exact way that temperature is calculated in the code is likely to vary in the
 near future.\\
 
-{\emphtext distribution\_functions} - Dumpmask for outputting distribution
-functions specified in the input deck. Each individual distribution function
-can have its own dumpmask and these will be applied after the value of
-``distribution\_functions'' has been considered. For example, if the
-output block contains ``distribution\_functions = full'' and the dist\_fn
-block contains ``dumpmask = always'' then the distribution function will
-only be output at full dumps.\\
-
-{\emphtext particle\_probes} - Dumpmask for outputting particle
-probes specified in the input deck. Each individual particle probe
-can have its own dumpmask and these will be applied after the value of
-``particle\_probes'' has been considered. For example, if the
-output block contains ``particle\_probes = always'' and the dist\_fn
-block contains ``dumpmask = full'' then the particle probe will
-only be output at full dumps.\\
+{\emphtext poynt\_flux} - Poynting flux in each direction.\\
 
 % fix: ejected_particles
 % fix: cpml_*
-% fix: ekflux
-% fix: poynt_flux
 
-\subsection{\inlineemph{constant} blocks}
+\subsubsection{\inlineemph{constant} block}
 
 The \inlineemph{constant} block type helps to make the input deck more flexible
 and maintainable. It allows you to define constants and maths parser
@@ -830,7 +847,7 @@ In the above example, several pre-defined constants have been used
 \inlineemph{sqrt}). These are described in \sect{constants} and
 \sect{functions}.
 
-\subsubsection{\inlineemph{laser} blocks}
+\subsubsection{\inlineemph{laser} block}
 \label{sec:lasers}
 Laser blocks attach an EM wave source to a boundary which is set as
 \inlineemph{simple\_laser}.
@@ -1019,6 +1036,7 @@ a consequence, the data files generated by higher dimensionality versions of
 {\EPOCH} will be much larger, making the more advanced I/O routines available
 in {\EPOCH} more useful. These will be covered in the following sections.\\
 
+\pagebreak
 \subsubsection{Changes to the \inlineemph{control} block}
 
 \begin{lboxverbatim}{Changed control block}
@@ -1625,12 +1643,15 @@ At this point, the user simply types in the name of the (already existing)
 output directory and the code will read the input deck files inside the
 specified directory and start running. To run the code in parallel, just use
 the normal mpirun or mpiexec scripts supplied by your MPI implementation. If
-you want the code to run unattended, then you will need to specify the output
-directory by piping the directory name in from a file. An example of such a
-file is supplied as ``deck.file'' with the standard distribution of {\EPOCH}. To
-use it, just run the code as\\
+you want the code to run unattended, then you will need to pipe in the
+output directory name to used. The method for doing this varies between MPI
+implementations. For many MPI implementations (such as recent versions of
+OpenMPI) this can be achieved with the following:\\
+\indent\inlinecode{echo Data | mpirun -np 2 ./bin/epoch2d}\\
+Some cluster setups accept the following instead:\\
 \indent\inlinecode{mpirun -np 2 ./bin/epoch2d < deck.file}\\
-and the code will run without user input. Some cluster queueing systems do not
+where ``deck.file'' is a file containing the name of the output directory.
+Some cluster queueing systems do not
 allow the use of input pipes to mpirun. In this case, there is usually a
 ``-stdin'' command line option to specify an input file, see your cluster
 documentation for more details.
@@ -1808,7 +1829,7 @@ end:control
 The allowed entries are as follows:\\
 
 {\emphtext nx, ny, nz} - Number of grid points in the x,y,z direction. There
-must be sufficient gridpoints so that (x\_max-x\_min)/nx $< \lambda_d$, where
+must be sufficient gridpoints so that $(x\_max-x\_min)/nx < \lambda_d$, where
 $\lambda_d$ is the Debye length. (Similarly for the y and z directions.).
 These are required parameters.\\
 
@@ -2142,14 +2163,14 @@ The maths parser in {\EPOCH}  has the following constants
 \item micron - A convenience symbol for specifying wavelength in microns
 rather than metres.
 \item time - Initial simulation time.
-\item length\_\{x,y,z\} - The length of the simulation box in the x,y,z
-  direction.
+\item x,y,z - Grid coordinates in the x,y,z direction.
+\item ix,iy,iz - Grid index in the x,y,z direction.
+\item nx,ny,nz - Number of grid points in the x,y,z direction.
 \item dx,dy,dz - Grid spacing in the x,y,z direction.
 \item \{x,y,z\}\_min - Grid coordinate of the minimum x,y,z boundary.
 \item \{x,y,z\}\_max - Grid coordinate of the maximum x,y,z boundary.
-\item nx,ny,nz - Number of grid points in the x,y,z direction.
-\item x,y,z - Grid coordinates in the x,y,z direction.
-\item ix,iy,iz - Grid index in the x,y,z direction.
+\item length\_\{x,y,z\} - The length of the simulation box in the x,y,z
+  direction.
 \end{itemize}
 
 It is also possible for an end user to specify custom constants both within
@@ -2161,40 +2182,31 @@ subsection. An example of using a constant would be:\\
 \label{sec:functions}
 The maths parser in {\EPOCH} has the following functions
 \begin{itemize}
+\item abs(a) - Absolute value.
+\item floor(a) - Convert real to integer rounding down.
+\item ceil(a) - Convert real to integer rounding up.
+\item nint(a) - Convert real to integer rounding to nearest integer.
 \item sqrt(a) - Square root.
 \item sin(a) - Sine.
 \item cos(a) - Cosine.
 \item tan(a) - Tangent.
-\item exp(a) - Exponential.
 \item asin(a) - Arcsine.
 \item acos(a) - Arccosine.
 \item atan(a) - Arctangent.
-\item if(a,b,c) - Conditional function. If a != 0 the function returns b,
-  otherwise the function returns c.
-\item floor(a) - Convert real to integer rounding down.
-\item ceil(a) - Convert real to integer rounding up.
-\item nint(a) - Convert real to integer rounding to nearest integer.
-\item tanh(a) - Hyperbolic tangent.
 \item sinh(a) - Hyperbolic sine.
 \item cosh(a) - Hyperbolic cosine.
-\item abs(a) - Absolute value.
+\item tanh(a) - Hyperbolic tangent.
+\item exp(a) - Exponential.
 \item loge(a) - Natural logarithm.
 \item log10(a) - Base-10 logarithm.
 \item log\_base(a,b) - Base-b logarithm.
-\item density(a) - Returns the density for species a.
-\item temp\_\{x,y,z\}(a) - Returns temperature in the x, y or z direction for
-    species a.
-\item temp(a) - Returns the isotropic temperature for species a.
-\item e\{x,y,z\}(x,y,z) - Returns the x, y or z component of the electric
-    field at the specified location.
-\item b\{x,y,z\}(x,y,z) - Returns the x, y or z component of the magnetic
-    field at the specified location.
-\item critical($\omega$) - Returns the critical density for the given
-    frequency $\omega$. ie. $n_{crit}(\omega) = \omega^2 m_0 \epsilon_0 / e^2$
 \item gauss($x,x_0,w$) - Calculate a Gaussian profile in variable
     {\it x} centred on {\it $x_0$} with a characteristic width {\it w}.
     $f(x) = \exp{(-((x-x_0)/w)^2)}$. In this expression the
     full width at half maximum is given by $fwhm = 2 w \sqrt{\ln{2}}$
+\item supergauss($x,x_0,w,n$) - This is identical to ``gauss'' except it
+    takes a fourth parameter, {\it n}, which is the power to raise the
+    exponential argument to.
 \item semigauss($t,A,A_0,w$) - Calculate a semi Gaussian profile in variable
     $t$ with maximum amplitude $A$, amplitude at $t=0$ $A_0$ and width $w$.
     The parameter $A_0$ is used to calculate $t_0$, the point at which the
@@ -2211,6 +2223,19 @@ A, & \mbox{otherwise}
 \]
 \item interpolate(interp\_var,....,n\_pairs) - Linear interpolation function,
   explained later.
+\item if(a,b,c) - Conditional function. If a != 0 the function returns b,
+  otherwise the function returns c.
+
+\item density(a) - Returns the density for species a.
+\item temp\_\{x,y,z\}(a) - Returns temperature in the x, y or z direction for
+    species a.
+\item temp(a) - Returns the isotropic temperature for species a.
+\item e\{x,y,z\}(x,y,z) - Returns the x, y or z component of the electric
+    field at the specified location.
+\item b\{x,y,z\}(x,y,z) - Returns the x, y or z component of the magnetic
+    field at the specified location.
+\item critical($\omega$) - Returns the critical density for the given
+    frequency $\omega$. ie. $n_{crit}(\omega) = \omega^2 m_0 \epsilon_0 / e^2$
 \end{itemize}
 
 It is also possible for an end user to specify custom functions within the
@@ -3039,9 +3064,9 @@ begin:probe
    point = (50.0e-6, -50.0e-6)
    normal = (1.0, 0.0)
 
-   probe_species:s1
    ek_min = 0.0
    ek_max = -1.0
+   include_species:s1
 
    dumpmask = always
 end:probe
@@ -3055,9 +3080,9 @@ end:probe
 \item point - An arbitrary point in the plane of the probe.
 \item normal - A vector normal to the plane of the probe, in the direction
   of crossings you wish to monitor.
-\item probe\_species - The species to which this probe should be
+\item include\_species - The species to which this probe should be
   applied. To probe several species, use several probe blocks in the input
-  deck.
+  deck. ``probe\_species'' is accepted as a synonym.
 \item ek\_min - The minimum kinetic energy of particles to store information
   about. Set to 0 for no minimum kinetic energy.
 \item ek\_max - The maximum kinetic energy of particles to store information
@@ -3148,8 +3173,6 @@ If specific ``restart'' dumps are specified in the input deck, or the
 output is forced to contain enough information to output all the data. These
 restart dumps can be very large, and also override the ``dumpmask'' parameter
 specified for a species and output the data for that species anyway.
-
-\newpage
 
 \subsection{Parameterising input decks}
 \label{sec:customising}
@@ -3328,7 +3351,7 @@ end:species
 
 This changes the code to run with a Gaussian density profile rather then a step
 function. Again, this can be extended as far as required.
-
+%
 \include{idl_visit}
 
 \end{document}

@@ -126,7 +126,7 @@ IDL>
   file \txt{0002.sdf} since the dump files are numbered starting from zero.
 %
 \pagebreak
-\subsubsection{Inspecting Data}
+\subsection{Inspecting Data}
 
 \begin{boxverbatim}
 IDL> gridclass = getdata(1,/grid)
@@ -172,7 +172,7 @@ IDL> help,gridclass.grid,/structures
   In a similar way, we would access the \qtt{x} array contained within
   the \qtt{Grid} variable using the identifier \qtt{gridclass.grid.x}.
 
-\subsubsection{Getting Help in IDL}
+\subsection{Getting Help in IDL}
   IDL is a fairly sophisticated scripting environment with a large
   library of tools for manipulating data. Fortunately, it comes with a
   fairly comprehensive array of documentation. This can be accessed by
@@ -375,9 +375,9 @@ IDL> iplot,data.x,data.number_density[*,256]
   no SDF reader for either of these utilities but one may be developed if
   there is sufficient demand.
 
-\subsection{Using VisIt to visualise data}
+\section{Using VisIt to visualise data}
 
-\subsubsection{LLNL VisIt}
+\subsection{LLNL VisIt}
 LLNL's VisIt software is a parallel data visualisation package
 (\inlinecode{https://wci.llnl.gov/codes/visit/}). {\EPOCH} comes with source
 code for the plug-in needed to allow VisIt to load the SDF output files which
@@ -390,9 +390,6 @@ For more experienced
 users of VisIt, the xml file which is used to generate the plug-in is supplied
 in the VisIt subdirectory, called \inlinecode{SDF2.xml}.
 
-\subsubsection{Mathworks MatLab}
-There are also routines to allow the loading of SDF files from Mathworks
-MatLab software.
   Whilst IDL is an excellent tool for visualising 1D and 2D datasets, it
   is extremely poor when it comes to dealing with 3D data. For this purpose,
   we recommend the use of the {\em ``VisIt"} visualisation tool.
