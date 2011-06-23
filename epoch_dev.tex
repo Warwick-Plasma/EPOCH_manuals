@@ -68,184 +68,190 @@ is explained here
 
 \subsection{The files in \inlinecode{src}}
 \begin{itemize}
-\item boundary.f90 - Includes all boundary conditions except laser and
-  transmissive boundaries; including field and particle MPI boundaries, and
+\item\inlinecode{boundary.f90} - Includes all boundary conditions except laser
+  and transmissive boundaries; including field and particle MPI boundaries, and
   field and particle domain boundaries.
-\item epoch\{n\}d.F90 - Main driver for the code. Reading this routine gives
-  the basic layout of the code flow.
-\item fields.f90 - The Maxwell field solver.
-\item laser.f90 - Includes laser and transmissive boundary conditions for each
-  boundary and also the housekeeping routines for the laser objects.
-\item particles.F90 - The particle pusher.
-\item shared\_data.F90 - This file includes all the global variable and type
-  definitions. Usually new variables should be defined in this file.
-\item gen\_commit\_string - This is a script used to generate an ID string
-  when compiling the code.
-\item gen\_src\_module - This is a script which is used at build time to
-  generate a Fortran module containing the source code. This is used for
+\item\inlinecode{epoch\{n\}d.F90} - Main driver for the code. Reading this
+  routine gives the basic layout of the code flow.
+\item\inlinecode{fields.f90} - The Maxwell field solver.
+\item\inlinecode{laser.f90} - Includes laser and transmissive boundary
+  conditions for each boundary and also the housekeeping routines for the laser
+  objects.
+\item\inlinecode{particles.F90} - The particle pusher.
+\item\inlinecode{shared\_data.F90} - This file includes all the global variable
+  and type definitions. Usually new variables should be defined in this file.
+\item\inlinecode{gen\_commit\_string} - This is a script used to generate an ID
+  string when compiling the code.
+\item\inlinecode{gen\_src\_module} - This is a script which is used at build
+  time to generate a Fortran module containing the source code. This is used for
   embedding the {\EPOCH} source code into restart dumps.
 \end{itemize}
 
 \subsection{The files in \inlinecode{src/deck}}
+\label{sec:src_deck}
 \begin{itemize}
-\item deck.F90 - The main input deck routines. Deals with opening files,
-  reading data and MPI distribution of the data to all processes. Also
+\item\inlinecode{deck.F90} - The main input deck routines. Deals with opening
+  files, reading data and MPI distribution of the data to all processes. Also
   includes the routines which deal with calling the right reader routines to
   deal with a given block.
-\item deck\_boundaries\_block.f90 - Reader routine for the ``boundaries'' block
-  of the input deck.
-\item deck\_constant\_block.f90 - Reader routine for ``constants'' blocks in the
-  input deck.
-\item deck\_control\_block.f90 - Reader routine for ``control'' block in the
-  input deck.
-\item deck\_eio\_dist\_fn\_block.f90 - Reader routine for ``dist\_fn'' blocks in
+\item\inlinecode{deck\_boundaries\_block.f90} - Reader routine for the
+  ``boundaries'' block of the input deck.
+\item\inlinecode{deck\_constant\_block.f90} - Reader routine for ``constants''
+  blocks in the input deck.
+\item\inlinecode{deck\_control\_block.f90} - Reader routine for ``control''
+  block in the input deck.
+\item\inlinecode{deck\_dist\_fn\_block.f90} - Reader routine for ``dist\_fn''
+  blocks in the input deck.
+\item\inlinecode{deck\_fields\_block.f90} - Reader routine for ``fields''
+  blocks in the input deck.
+\item\inlinecode{deck\_io\_block.F90} - Reader routine for the ``io'' block in
   the input deck.
-\item deck\_eio\_particle\_probe\_block.f90 - Reader routine for
+\item\inlinecode{deck\_laser\_block.f90} - Reader routine for ``laser'' blocks
+  in the input deck.
+\item\inlinecode{deck\_particle\_probe\_block.F90} - Reader routine for
   ``particle\_probe'' blocks in the input deck.
-\item deck\_ic\_fields\_block.f90 - Reader routine for ``fields'' blocks in the
-  input deck.
-\item deck\_ic\_laser\_block.f90 - Reader routine for ``laser'' blocks in the
-  input deck.
-\item deck\_ic\_species\_block.f90 - Reader routine for ``species'' blocks in
-  the input deck.
-\item deck\_io\_block.F90 - Reader routine for the ``io'' block in the input
-  deck.
-\item deck\_species\_block.F90 - Reader routine for the ``species'' block in the
-  input deck.
-\item deck\_window\_block.f90 - Reader routine for the ``window'' block in the
-  input deck.
-\item strings.F90 - Basic string handling routines such as ``str\_cmp'' and
-  routines for converting strings to numbers WITHOUT using the maths parser
-  are covered in this routine.
-\item strings\_advanced.F90 - The routines which pass maths along to the maths
-  parser routines are here.
+\item\inlinecode{deck\_species\_block.F90} - Reader routine for ``species''
+  blocks in the input deck.
+\item\inlinecode{deck\_window\_block.f90} - Reader routine for the ``window''
+  block in the input deck.
+\item\inlinecode{strings.f90} - Basic string handling routines such as
+  ``str\_cmp'' and routines for converting strings to numbers WITHOUT using the
+  maths parser are covered in this routine.
+\item\inlinecode{strings\_advanced.f90} - The routines which pass maths along
+  to the maths parser routines are here.
 \end{itemize}
 
 \subsection{The files in \inlinecode{src/housekeeping}}
 \begin{itemize}
-\item balance.F90 - Contains the routines for the load balancer and related
+\item\inlinecode{balance.F90} - Contains the routines for the load balancer
+  and related routines.
+\item\inlinecode{current\_smooth.F90} - Contains the current smoothing routines.
+\item\inlinecode{dummy\_encoded\_source.f90} - A dummy module used when the
+  code is being built without the ability to write the source code into restart
+  dumps.
+\item\inlinecode{mpi\_routines.F90} - Contains the routines dealing with the
+  setup of the MPI layer and the creation of the communicator. Also allocates
+  all arrays for the first time before load balancing.
+\item\inlinecode{mpi\_subtype\_control.f90} - Contains the routines that setup
+  the mpi types required by the I/O subsystem.
+\item\inlinecode{particle\_pointer\_advance.f90} - Contains subroutines which
+  walk through the lists of particles and species for I/O purposes.
+\item\inlinecode{partlist.F90} - Contains the routines which deal with the
+  particle lists which are used for inter-processor communication of particles.
+\item\inlinecode{random\_generator.f90} - Contains the random number generator
   routines.
-\item current\_smooth.F90 - Contains the current smoothing routines.
-\item dummy\_encoded\_source.f90 - A dummy module used when the code is
-  being built without the ability to write the source code into restart dumps.
-\item mpi\_routines.F90 - Contains the routines dealing with the setup of the
-  MPI layer and the creation of the communicator. Also allocates all arrays
-  for the first time before load balancing.
-\item mpi\_subtype\_control.F90 - Contains the routines that setup the mpi
-  types required by the I/O subsystem.
-\item particle\_pointer\_advance.F90 - Contains subroutines which walk through
-  the lists of particles and species for I/O purposes.
-\item partlist.F90 - Contains the routines which deal with the particle lists
-  which are used for inter-processor communication of particles.
-\item setup.F90 - Deals with the setup of the grids and domains and restarting
-  from previous output dumps.
-\item shape\_functions.F90 - Contain the particle shape functions used for
-  calculating the particle weighting.
-\item split\_particle.F90 - Is the implementation of a demonstration of
-  particle splitting routines.
-\item utilities.f90 - Contains growable arrays used by the species block parser.
-\item version\_data.F90 - Contains version information for the current {\EPOCH}
-  code.
-\item welcome.F90 - The routine which prints the banner message and compiler
-  options info.
-\item window.F90 - The routines which deal with the moving window.
+\item\inlinecode{setup.F90} - Deals with the setup of the grids and domains and
+  restarting from previous output dumps.
+\item\inlinecode{shape\_functions.F90} - Contain the particle shape functions
+  used for calculating the particle weighting.
+\item\inlinecode{split\_particle.F90} - Is the implementation of a
+  demonstration of particle splitting routines.
+\item\inlinecode{utilities.f90} - Contains growable arrays used by the species
+  block parser.
+\item\inlinecode{version\_data.F90} - Contains version information for the
+  current {\EPOCH} code.
+\item\inlinecode{welcome.F90} - The routine which prints the banner message and
+  compiler options info.
+\item\inlinecode{window.F90} - The routines which deal with the moving window.
 \end{itemize}
 
 \subsection{The files in \inlinecode{src/io}}
 \begin{itemize}
-\item calc\_df.F90 - Despite the slightly confusing name, this subroutine
-  deals with derived functions like number density, charge density and mass
-  density.
-\item diagnostics.F90 - Contains the routines which actually dump the data,
-  decide what to dump and also the routine to calculate the timestep.
-\item dist\_fn.F90 - Contains the routines to calculate the distribution
-  functions, and also the routines handling the requests for distribution
-  functions.
-\item iterators.f90 - Contains the iterator functions used to write particle
-  data into SDF files.
-\item probes.F90 - Contains the routines which write the data from the
-  particle probes. Also includes the routines which deal with user requests to
-  add new particle probes.
-\item sdf\_common.f90 - Core part of the SDF file format. Contains constants and
-  definitions needed by the SDF format. If attempting to implement a SDF
-  reader then look here for values of named constants.
-\item sdf\_control.f90 - Core part of the SDF file format. Contains the routines
-  needed to open and close files etc.
-\item sdf.f90 - Module interface for the SDF file format. This file specifies
-  the application interface to the SDF library.
-\item sdf\_input.f90 - Core part of the SDF file format. Contains the general
-  routines needed for reading data from SDF files.
-\item sdf\_input\_cartesian.f90 - Core part of the SDF file format. Contains the
-  routines needed to read Cartesian meshes and variables from SDF files.
-\item sdf\_input\_functions.f90 - Core part of the SDF file format. Contains the
-  routines needed to traverse the block structure of a SDF file without
-  reading any block specific metadata.
-\item sdf\_input\_point.f90 - Core part of the SDF file format. Contains the
-  routines needed to read particles meshes and variables from SDF files.
-\item sdf\_input\_util.f90 - Core part of the SDF file format. Contains
-  general routines for reading the block structure of SDF files.
-\item sdf\_job\_info.f90 - Contains routines for generating a unique job-id for
-  each simulation run.
-\item sdf\_output.f90 - Core part of the SDF file format. Contains the basic
-  routines needed to write data to a SDF file.
-\item sdf\_output\_cartesian.f90 - Core part of the SDF file format. Contains
-  the routines needed to write Cartesian meshes and variables.
-\item sdf\_output\_point.f90 - Core part of the SDF file format. Contains the
-  routines needed to write particles meshes and variables.
-\item sdf\_output\_util.f90 - Core part of the SDF file format. Contains
-  general routines for writing the block structure of SDF files.
-\item simple\_io.F90 - Contains routines for performing the simple binary I/O
-  required by species\_external and fields\_external blocks.
+\item\inlinecode{calc\_df.F90} - Despite the slightly confusing name, this
+  subroutine deals with derived functions like number density, charge density
+  and mass density.
+\item\inlinecode{diagnostics.F90} - Contains the routines which actually dump
+  the data, decide what to dump and also the routine to calculate the timestep.
+\item\inlinecode{dist\_fn.F90} - Contains the routines to calculate the
+  distribution functions, and also the routines handling the requests for
+  distribution functions.
+\item\inlinecode{iterators.F90} - Contains the iterator functions used to write
+  particle data into SDF files.
+\item\inlinecode{probes.F90} - Contains the routines which write the data from
+  the particle probes. Also includes the routines which deal with user requests
+  to add new particle probes.
+\item\inlinecode{sdf\_common.f90} - Core part of the SDF file format. Contains
+  constants and definitions needed by the SDF format. If attempting to
+  implement a SDF reader then look here for values of named constants.
+\item\inlinecode{sdf\_control.f90} - Core part of the SDF file format. Contains
+  the routines needed to open and close files etc.
+\item\inlinecode{sdf.f90} - Module interface for the SDF file format. This file
+  specifies the application interface to the SDF library.
+\item\inlinecode{sdf\_input.f90} - Core part of the SDF file format. Contains
+  the general routines needed for reading data from SDF files.
+\item\inlinecode{sdf\_input\_cartesian.f90} - Core part of the SDF file format.
+  Contains the routines needed to read Cartesian meshes and variables from SDF
+  files.
+\item\inlinecode{sdf\_input\_functions.f90} - Core part of the SDF file format.
+  Contains the routines needed to traverse the block structure of a SDF file
+  without reading any block specific metadata.
+\item\inlinecode{sdf\_input\_point.f90} - Core part of the SDF file format.
+  Contains the routines needed to read particles meshes and variables from SDF
+  files.
+\item\inlinecode{sdf\_input\_util.f90} - Core part of the SDF file format.
+  Contains general routines for reading the block structure of SDF files.
+\item\inlinecode{sdf\_job\_info.f90} - Contains routines for generating a
+  unique job-id for each simulation run.
+\item\inlinecode{sdf\_output.f90} - Core part of the SDF file format. Contains
+  the basic routines needed to write data to a SDF file.
+\item\inlinecode{sdf\_output\_cartesian.f90} - Core part of the SDF file
+  format. Contains the routines needed to write Cartesian meshes and variables.
+\item\inlinecode{sdf\_output\_point.f90} - Core part of the SDF file format.
+  Contains the routines needed to write particles meshes and variables.
+\item\inlinecode{sdf\_output\_util.f90} - Core part of the SDF file format.
+  Contains general routines for writing the block structure of SDF files.
+\item\inlinecode{simple\_io.f90} - Contains routines for performing the simple
+  binary I/O required by species\_external and fields\_external blocks.
 \end{itemize}
 
 \subsection{The files in \inlinecode{src/parser}}
 \begin{itemize}
-\item evaluate.f90 - Contains the routines which actually evaluate a tokenized
-  expression. The core of this is a simple implementation of an RPN
-  calculator.
-\item evaluator\_blocks.f90 - Contains the routines which evaluate a given
-  token into a numerical values. Actually implements the functions, constants
-  and operators in {\EPOCH}'s maths parser.
-\item shunt.F90 - {\EPOCH}'s implementation of the ``shunting yard'' algorithm
-  used to simultaneously tokenize the input and convert it from infix notation
-  to RPN.
-\item stack.f90 - Deals with routines for pushing onto and popping off
-  stacks.
-\item tokenizer\_blocks.f90 - Deal with converting strings found in a string
-  being tokenized into tokens. Essentially a large collection of ``str\_cmp''
-  commands testing a string against a known name.
+\item\inlinecode{evaluate.f90} - Contains the routines which actually evaluate
+  a tokenized expression. The core of this is a simple implementation of an
+  RPN calculator.
+\item\inlinecode{evaluator\_blocks.f90} - Contains the routines which evaluate
+  a given token into a numerical values. Actually implements the functions,
+  constants and operators in {\EPOCH}'s maths parser.
+\item\inlinecode{shunt.F90} - {\EPOCH}'s implementation of the
+  ``shunting yard'' algorithm used to simultaneously tokenize the input and
+  convert it from infix notation to RPN.
+\item\inlinecode{stack.f90} - Deals with routines for pushing onto and popping
+  off stacks.
+\item\inlinecode{tokenizer\_blocks.f90} - Deal with converting strings found
+  in a string being tokenized into tokens. Essentially a large collection of
+  ``str\_cmp'' commands testing a string against a known name.
 \end{itemize}
 
 \subsection{The files in \inlinecode{src/physics\_packages}}
 \begin{itemize}
-\item ionise.F90 - This is a demonstration of how to implement a physics
-  package. It implements a field ionisation routine using a 1 level Saha
-  equation. It is more intended of a demonstration of how a physics package
-  could be implemented than a ``research ready'' ionisation routine.
-  Anyone seriously wanting to study the effects of ionisation should
-  implement their own model.
+\item\inlinecode{ionise.F90} - This is a demonstration of how to implement a
+  physics package. It implements a field ionisation routine using a 1 level
+  Saha equation. It is more intended of a demonstration of how a physics
+  package could be implemented than a ``research ready'' ionisation routine.
+  Anyone seriously wanting to study the effects of ionisation should implement
+  their own model.
 \end{itemize}
 
 \subsection{The files in \inlinecode{src/user\_interaction}}
 \begin{itemize}
-\item custom\_deck.f90 - This file is where and end user can temporarily
-  extend the input deck. Described in the ``\titleref{sec:customising}''
-  section.
-\item custom\_laser.f90 - The file where an end user specifies laser time
-  profiles without using the input deck.
-\item custom\_parser.f90 - The file where an end user can temporarily add new
-  functions and constants to the input deck. It is described in the
-  ``\titleref{sec:customising}'' section of this manual.
-\item helper.F90 - This file contains all the internal workings of the
-  autoloader. This is in user\_interaction for historical reasons, since early
-  versions of the code required the end user to modify some parts of the
+\item\inlinecode{custom\_deck.f90} - This file is where and end user can
+  temporarily extend the input deck. Described in the
+  ``\titleref{sec:customising}'' section.
+\item\inlinecode{custom\_laser.f90} - The file where an end user specifies
+  laser time profiles without using the input deck.
+\item\inlinecode{custom\_parser.f90} - The file where an end user can
+  temporarily add new functions and constants to the input deck. It is
+  described in the ``\titleref{sec:customising}'' section of this manual.
+\item\inlinecode{helper.F90} - This file contains all the internal workings of
+  the autoloader. This is in user\_interaction for historical reasons, since
+  early versions of the code required the end user to modify some parts of the
   functions contained in this file. As the autoloader has increased in
   complexity, this has ceased to be the case, so it is likely that soon this
   file will be move to ``housekeeping''.
-\item ic\_module.f90 - This file is where the internal and manual initial
-  conditions are set.
-\item particle\_temperature.f90 - Contains the routines for thermally loading
-  a particle species.
+\item\inlinecode{ic\_module.f90} - This file is where the internal and manual
+  initial conditions are set.
+\item\inlinecode{particle\_temperature.F90} - Contains the routines for
+  thermally loading a particle species.
 \end{itemize}
 
 \section{{\EPOCH} makefile}
@@ -281,8 +287,8 @@ remaining element of the makefile which needs to be modified is to add your
 new file as a dependency to all the files which USE modules contained in your
 new file. This is achieved very simply by adding ``newfile.o'' to the dependency
 list for those files which USE your modules. For example if you've written new
-boundary conditions and USE your modules in boundary.F90, you'd just change
-the line for boundary.F90 from:
+boundary conditions and USE your modules in boundary.f90, you'd just change
+the line for boundary.f90 from:
 \begin{boxverbatim}
 boundary.o: boundary.f90 deck_io_block.o particle_temperature.o partlist.o
 \end{boxverbatim}
@@ -316,12 +322,13 @@ common physical constants are defined in \inlinecode{shared\_data.F90} and any
 new physical constants required by extensions to the code should be placed in
 the same location. The constants available in the code are
 \begin{itemize}
+\item pi - Ratio of a circle's circumference to its diameter.
 \item q0 - Charge on electron.
 \item m0 - Rest mass of electron.
 \item c - Speed of light in vacuum.
 \item kb - Boltzmann's constant.
-\item epsilon0 - Permittivity of free space.
 \item mu0 - Permeability of free space.
+\item epsilon0 - Permittivity of free space.
 \item h\_planck - Plank's constant.
 \item ev - The value of an electron volt.
 \end{itemize}
@@ -338,53 +345,50 @@ be left out.
 
 \subsubsection{Shape and size variables}
 \begin{itemize}
-\item INTEGER :: nx. ny, nz - The number of gridpoints on the current
+\item #INTEGER :: nx, ny, nz# - The number of gridpoints on the current
   processor in each direction. This may change when the load balancer
   activates, so always use these variables rather than local copies.
-\item INTEGER :: nx\_global, ny\_global, nz\_global - The number of gridpoints
+\item #INTEGER :: nx_global, ny_global, nz_global# - The number of gridpoints
   in each direction of the whole domain. These numbers will never change and
   will be the numbers read in from the input deck.
-\item INTEGER(KIND=8) :: npart\_global - The global number of particles
+\item #INTEGER(KIND=8) :: npart_global# - The global number of particles
   specified in the input deck. This is not updated as particles leave the
   domain through boundaries etc. so it is not guaranteed to be accurate.
-\item INTEGER :: n\_species - The number of species of particles specified.
-\item INTEGER :: nsteps - The maximum number of steps that the core solver
+\item #INTEGER :: n_species# - The number of species of particles specified.
+\item #INTEGER :: nsteps# - The maximum number of steps that the core solver
   should take.
-\item INTEGER, DIMENSION(1:nproc\_{\it \{x,y,z\}}), ALLOCATABLE :: cell\_{\it
-    \{x,y,z\}}\_start, cell\_{\it \{x,y,z\}}\_end.
-\item INTEGER :: data\_dir\_max\_length - The maximum number of characters in
-  the name of the output directory.
-\item INTEGER :: n\_zeros - The number of leading zeros in the output filenames
-  from {\EPOCH}.
+\setlength{\emergencystretch}{3em}
+\item #INTEGER, DIMENSION(1:nproc{x,y,z}), ALLOCATABLE :: cell_{x,y,z}_min,#
+  \linebreak#cell_{x,y,z}_max# - The variables #cell_{x,y,z}_min# and
+  #cell_{x,y,z}_max# represent the part of a global array which is held by the
+  current processor. Since {\EPOCH} is an MPI code, there doesn't exist a
+  single copy of any of the global arrays anywhere, but if there did then each
+  processor would be responsible for the slice which runs
+  (cell\_x\_min(rank):cell\_x\_max(rank),
+  cell\_y\_min(rank):cell\_y\_max(rank))
+  in 2D.  These variables are used internally in the load balancer, where it is
+  updated, but is also used when calculating distribution functions. Here it is
+  used to define the extents of the MPI type which is used to write the
+  distribution function to disk.
 \end{itemize}
-The variables \inlinecode{cell\_{\it \{x,y,z\}}\_start} and
-\inlinecode{cell\_{\it \{x,y,z\}}\_end} represent the part of a global array
-which is held by the current processor. Since {\EPOCH} is an MPI code, there
-doesn't exist a single copy of any of the global arrays anywhere, but if there
-did then each processor would be responsible for the slice which runs
-(cell\_x\_min(rank):cell\_x\_max(rank), 
-cell\_y\_min(rank):cell\_y\_max(rank)) in 2D.
-These variables are used internally in the load balancer, where it is updated,
-but is also used when calculating distribution functions. Here it is used to
-define the extents of the MPI type which is used to write the distribution
-function to disk.
 
 \subsubsection{Input deck variables}
 \begin{itemize}
-\item CHARACTER(LEN=entry\_length) :: blank - A special string which the input
+\item #CHARACTER(LEN=entry_length) :: blank# - A special string which the input
   deck parser uses to indicate that it's passing a blank string rather than a
   string read from the deck which just happens to be blank.
-\item INTEGER :: deck\_state - An integer determining which type of input deck
-  is being read by the deck parser.
-\item INTEGER, PARAMETER :: num\_vars\_to\_dump - A variable describing the
+\item #INTEGER :: deck_state# - An integer determining the current sweep of
+  the input deck by the deck parser.
+\item #INTEGER, PARAMETER :: num_vars_to_dump# - A variable describing the
   number of variables which should be selectable in the input deck as possible
   variables to dump.
-\item CHARACTER(LEN=entry\_length) :: extended\_error\_string - String used by
+\item #CHARACTER(LEN=entry_length) :: extended_error_string# - String used by
   some error codes in the deck parser to give more user friendly error
   messages.
-\item CHARACTER(LEN=entry\_length) :: project\_name - String read from the
-  input deck and written into the output files to allow the project to be
-  recognised by a reader.
+\item #INTEGER :: data_dir_max_length# - The maximum number of characters in
+  the name of the output directory.
+\item #INTEGER :: n_zeros# - The number of leading zeros in the output filenames
+  from {\EPOCH}.
 \end{itemize}
 
 \subsubsection{Initial conditions (autoloader) variables}
@@ -405,17 +409,17 @@ END TYPE initial_condition_block
 In 2D, the arrays have one fewer index, and in 1D they have two fewer.
 
 \begin{itemize}
-\item REAL(num) :: density - Number density for the particles in the species.
+\item #REAL(num) :: density# - Number density for the particles in the species.
   When defined runs (-2:nx+3,-2:ny+3,-2:nz+3).
-\item REAL(num) :: temp - Temperature in Kelvin of the species in space. When
+\item #REAL(num) :: temp# - Temperature in Kelvin of the species in space. When
   defined runs (-2:nx+3,-2:ny+3,-2:nz+3,1:3). The final index of the array
   is a direction index, used to give anisotropic thermal distributions.
-\item REAL(num) :: drift - Velocity drift in $m/s$ of the species in space. When
-  defined runs (-2:nx+3,-2:ny+3,-2:nz+3,1:3). The final index of the array
+\item #REAL(num) :: drift# - Velocity drift in $m/s$ of the species in space.
+  When defined runs (-2:nx+3,-2:ny+3,-2:nz+3,1:3). The final index of the array
   is the velocity direction component.
-\item density\_min - The minimum density below which the autoloader
+\item #density_min# - The minimum density below which the autoloader
   should not load particles.
-\item density\_max - The maximum density above which the autoloader
+\item #density_max# - The maximum density above which the autoloader
   should clip the density function.
 \end{itemize}
 
@@ -681,21 +685,21 @@ the particle type is:
 \end{boxverbatim}
 And the descriptions are
 \begin{itemize}
-\item REAL(num) :: part\_p(3) - The particle momentum. Always dimension 3 even
+\item #REAL(num) :: part_p(3)# - The particle momentum. Always dimension 3 even
   in 1D and 2D codes.
-\item REAL(num) :: part\_pos({\it ndims}) - The particle position. Has
+\item #REAL(num) :: part_pos(ndims)# - The particle position. Has
   the same dimensions as that of the code.
-\item REAL(num) :: weight - The particle weight if the code is running with
+\item #REAL(num) :: weight# - The particle weight if the code is running with
   per particle weighting.
-\item REAL(num) :: charge - The particle charge in Coulombs if the code is
+\item #REAL(num) :: charge# - The particle charge in Coulombs if the code is
   running with per particle charge.
-\item REAL(nun) :: mass - The particle mass in kilograms if the code is
+\item #REAL(nun) :: mass# - The particle mass in kilograms if the code is
   running with per particle mass.
-\item TYPE(particle), POINTER :: next, prev - The pointers to the next and
+\item #TYPE(particle), POINTER :: next, prev# - The pointers to the next and
   previous elements of the linked list.
-\item INTEGER :: processor - The rank of the processor that the particle
+\item #INTEGER :: processor# - The rank of the processor that the particle
   thinks it is on. Used for debugging.
-\item INTEGER :: processor\_at\_t0 - The rank of the processor that the
+\item #INTEGER :: processor_at_t0# - The rank of the processor that the
   particle started on. Used for debugging.
 \end{itemize}
 Simply adding a new parameter to the definition of the particle type is NOT
@@ -719,21 +723,23 @@ END TYPE particle_list
 \end{boxverbatim}
 And its properties are:
 \begin{itemize}
-\item TYPE(particle), POINTER :: head - The first particle in the linked list.
-\item TYPE(particle), POINTER :: tail - The last particle in the linked
+\item #TYPE(particle), POINTER :: head# - The first particle in the linked list.
+\item #TYPE(particle), POINTER :: tail# - The last particle in the linked
   list. New particles added to the end of the list are added onto the end of
   the tail element, and the new last particle becomes the new tail element.
-\item INTEGER(KIND=8) :: count - The number of particles in this particle
-  list. Note that the \inlinecode{particle\_list} type is not directly MPI
-  aware, so this is literally the number of particles in {\it this} particle
-  list, not the number of particles of this species on all processors.
-\item LOGICAL :: safe - A particle list is {\it safe} if the particles in it
+\setlength{\emergencystretch}{3em}
+\item #INTEGER(KIND=8) :: count# - The number of particles in this particle
+  list. Note that the \inlinecode{particle\_list} type is not
+  directly MPI aware, so this is literally the number of particles in
+  {\it this} particle list, not the number of particles of this species on all
+  processors.
+\item #LOGICAL :: safe# - A particle list is {\it safe} if the particles in it
   are unambiguously linked. That is that the \inlinecode{count}th particle is
   guaranteed to have its \inlinecode{next} property be null. Most particle
   lists within {\EPOCH} are safe, but sometimes it is useful to be able to have
   particle lists which are subsets of longer particles lists, and these
   particle lists are not {\it safe}.
-\item TYPE(particle\_list), POINTER :: next, prev - At present, {\EPOCH} does
+\item #TYPE(particle_list), POINTER :: next, prev# - At present, {\EPOCH} does
   not use these pointers, which are intended to allow multiple particle lists to
   be attached together. Certain parts of {\EPOCH}, such as the I/O system are
   aware of these pointers and will automatically use them if they are ever
@@ -818,15 +824,15 @@ below.
   this will be accurate at the start of the code runtime, but will not be if
   any particles enter or leave the domain. This is mainly a debugging
   parameter.
+\setlength{\emergencystretch}{3em}
 \item #TYPE(particle_list) :: attached_list# - This is the
   \inlinecode{particle\_list} object which holds the particles assigned to this
   species on this processor. Particles are attached to this list at all
-  times EXCEPT when they are explicitly split when the code is
-  compiled with the
-  \inlinecode{PARTICLE\_CELL\_DIVISION} option. When the code is compiled with
-  \inlinecode{PARTICLE\_CELL\_DIVISION}, the particles are attached to
+  times EXCEPT when they are explicitly split when the code is compiled with
+  the \inlinecode{SPLIT\_PARTICLES\_AFTER\_PUSH} option. When the
+  code is compiled with this option, the particles are attached to
   \inlinecode{attached\_list} except between the calls to
-  \inlinecode{reorder\_particles\_to\_grid} and\linebreak
+  \inlinecode{reorder\_particles\_to\_grid} and
   \inlinecode{reattach\_particles\_to\_mainlist} in
   \inlinecode{epoch{\it n}d.F90} where the particles are instead attached to
   \inlinecode{secondary\_list}. This is explained later.
@@ -841,8 +847,8 @@ below.
   operator. When the total number of particles equals this number, further
   particle splitting is suppressed.
 \item #TYPE(particle_list), DIMENSION(:,:,:), POINTER :: secondary_list# - When
-  the code is compiled with the \inlinecode{-DPARTICLE\_CELL\_DIVISION} option,
-  the code allocates\linebreak
+  the code is compiled with the \inlinecode{-DSPLIT\_PARTICLES\_AFTER\_PUSH}
+  option, the code allocates
   \inlinecode{secondary\_list(0:nx+1,0:ny+1,0:nz+1)} and then loops over all
   particles. It calculates the cell in which each particle is and moves the
   particle from \inlinecode{attached\_list} to the correct element of
@@ -894,7 +900,7 @@ the core domain is different for each variable due to the grid stagger.
 
 The {\EPOCH} field solver is a Yee staggered 2nd order FDTD scheme, directly
 based on the scheme in the PSC by Hartmut Ruhl and is contained in the file
-\inlinecode{fields.F90}. To locate a variable on the grid there is a simple
+\inlinecode{fields.f90}. To locate a variable on the grid there is a simple
 rule.
 \begin{itemize}
 \item Start at the cell centre.
@@ -970,12 +976,14 @@ which need some clarification.
   the momentum for a single real particle of the collection of real particles
   represented by that pseudoparticle, NOT the momentum of the whole collection
   of real particles.
-\item \inlinecode{root} - The variable root which appears in various places is
-  essentially the multiplicative factor which is needed to convert the particle
-  momentum into the particle velocity. If {\EPOCH} was not relativistic then
-  this would simply be $1/part\_m$ where $part\_m$ is the particle mass.
-  Since {\EPOCH} is relativistic, root is defined as $\left(part\_m^2 +
-    \vec{p}.\vec{p}/c^2\right)^{-1/2}$.
+\item \inlinecode{gamma} - The variable gamma which appears in various places
+  is the relativistic $\gamma$ which is needed to convert the particle momentum
+  into the particle velocity using the relation $\vec{p} = \gamma m \vec{v}$.
+  Here, $\vec{p}$ is the particle momentum, $\vec{v}$ is the particle
+  velocity and $m$ is the particle rest mass.
+  If {\EPOCH} was not relativistic then this would simply be $1$. Since
+  {\EPOCH} is relativistic, gamma is defined as
+  $\left(\vec{p}.\vec{p}/m c^2 + 1\right)^{1/2}$.
 \item \inlinecode{cell\_x1=cell\_x1+1} - There are lines like this after all
   the sections of the routine where the cell a particle is in is
   calculated. This is because, for a cell centred variable, the domain runs
@@ -996,9 +1004,9 @@ in {\EPOCH} and is a good trade-off between cleanness of solution and
 speed. Higher order methods based on spline interpolation can be used and do
 produce smoother solutions, but they are significantly slower and the benefits
 of the schemes can easily be overstated. {\EPOCH} does now include an option to
-use 4th order spline interpolation in all parts of the code. This option is
-enabled with the \inlinecode{-DSPLINE\_FOUR} compile time option in the
-makefile.\\
+use 3rd order b-spline interpolation in all parts of the code. This option is
+enabled with the \inlinecode{-DPARTICLE\_SHAPE\_BSPLINE3} compile time option
+in the makefile.\\
 \[
 S(w) =
 \begin{cases}
@@ -1385,20 +1393,23 @@ the two functions have different calling conventions.
 SUBROUTINE field_zero_gradient
 \HRule
 REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: field
-LOGICAL, INTENT(IN) :: force
+INTEGER, INTENT(IN) :: stagger_type, boundary
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/boundary.F90}\\
+\inlinecode{src/boundary.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 #field_zero_gradient# is the routine which applies zero gradient
 boundary conditions to a field variable passed in the parameter
-\inlinecode{field}. It can be used as a global field boundary condition by
+\inlinecode{field}. The remaining two parameters are the stagger type and
+the boundary number. These are named constants defined in
+\inlinecode{src/shared\_data.F90}, \inlinecode{c\_stagger\_*} for the
+stagger type and \inlinecode{c\_bd\_*} for the boundary number.
+The routine can be used as a global field boundary condition by
 setting one of the field boundary conditions to c\_bc\_zero\_gradient in
 \inlinecode{setup\_particle\_boundaries}, but it is mostly used to give
-boundary conditions for the autoloader, where the \inlinecode{force} parameter
-is set to \inlinecode{.TRUE.} to override the boundary condition values.
+boundary conditions for the autoloader.
 \\[0.5cm]
 {\Large Notes\\ \\}
 
@@ -1407,25 +1418,22 @@ is set to \inlinecode{.TRUE.} to override the boundary condition values.
 SUBROUTINE field_clamp_zero
 \HRule
 REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: field
-INTEGER, DIMENSION(ndims), INTENT(IN) :: stagger
+INTEGER, INTENT(IN) :: stagger_type, boundary
 \end{codedef}
 \vspace{1cm}
 {\Large Description\\}
 \inlinecode{field\_clamp\_zero} is the routine which clamps the field given by
-the \inlinecode{field} variable to zero on the boundary. Since this routine
-explicitly sets the field to zero {\it on} the boundary it needs to know about
-the grid stagger which is provided in the parameter \inlinecode{stagger}. At
-present stagger is simply an array of 1/0 values which indicates whether a
-given field is staggered in that direction, so a cell centred field has
-stagger \inlinecode{(/0, 0, 0/)} while ex has stagger \inlinecode{(/1, 0, 0/)}
-and bx has stagger \inlinecode{(/0, 1, 1/)}.
+the \inlinecode{field} variable to zero on the boundary.
+The remaining two parameters are the stagger type and
+the boundary number. These are named constants defined in
+\inlinecode{src/shared\_data.F90}, \inlinecode{c\_stagger\_*} for the
+stagger type and \inlinecode{c\_bd\_*} for the boundary number.
 \\[0.5cm]
 {\Large Notes\\}
 \pagebreak
 
 Additional boundary conditions should follow the same basic principle as these
-routines. Note that all of the routines test for things like \inlinecode{x\_min
-.EQ. MPI\_PROC\_NULL} etc. these tests confirm that a given processor is at the
+routines. Note that all of the routines test for \inlinecode{\{x,y,z\}\_\{min,max\}\_boundary} to confirm that a given processor is at the
 edge of the real domain, and so should have a real boundary condition applied
 to it. This also explains why there are no explicit periodic boundary condition
 routines, since by connecting the processors cyclically in a periodic direction
@@ -1435,7 +1443,7 @@ the domain boundary effectively becomes another internal processor boundary.
 Setting up lasers is explained in \sect{lasers}
 and the way in which the laser specification in the input deck works is
 described later, so this section just describes how the actual laser and
-outflow routines in \inlinecode{laser.F90} work.\\
+outflow routines in \inlinecode{laser.f90} work.\\
 
 The laser boundaries in {\EPOCH} are based on a rewriting of Maxwell's
 equations in a new form which expresses the fields explicitly in terms of waves
@@ -1455,7 +1463,7 @@ travelling into the boundary, this gives a transmissive boundary, and if the
 components for waves propagating out from the boundary are set to be non-zero
 then it also introduces an EM wave propagating from the left boundary.\\
 
-This boundary condition is found in the file \inlinecode{laser.F90} which also
+This boundary condition is found in the file \inlinecode{laser.f90} which also
 includes the routines for handling the \inlinecode{laser\_block} objects which
 represent how lasers are represented in {\EPOCH}.
 
@@ -1466,12 +1474,12 @@ with the real boundary conditions. The boundary conditions for particles are in
 the routine \inlinecode{particle\_bcs} in the file \inlinecode{boundary.f90} \\
 Currently {\EPOCH} includes only three particle boundary conditions
 \begin{itemize}
+\item c\_bc\_open - Particles pass through the boundary and are destroyed. Total
+  pseudoparticle number is not conserved in this mode.
 \item c\_bc\_periodic - Particles which leave one side of the box reappear on
   the other side.
 \item c\_bc\_reflect - Particles reflect off the boundary as if it was a hard
   boundary.
-\item c\_bc\_open - Particles pass through the boundary and are destroyed. Total
-  pseudoparticle number is not conserved in this mode.
 \end{itemize}
 
 Although the routine looks rather messy, it is fairly easy to understand. The
@@ -1480,30 +1488,30 @@ sequence goes:
 \item Loop over all species.
 \item Create particle list objects for particles to be sent to and received from
   other processors.
-\item Loop over all particles.
-\item If the particle has crossed the domain boundary and that boundary has
-  reflecting boundary conditions then reflect the particle.
-\item If the particle has crossed the processor boundary then set the variables
-  \inlinecode{xbd} and \inlinecode{ybd} which are used to identify which
-  processor relative to the current processor the particle should be moved to.
-\item Check whether the particle has crossed an open domain boundary.
-\item If the particle has crossed a processor boundary or an open domain
-  boundary then remove the particle from the particle list for its species.
-\item If the particle has crossed a processor boundary but not an open domain
-  boundary then add it to the list to be sent to its new processor using
-  \inlinecode{xbd} and \inlinecode{ydb} to identify which processor it should
-  be on.
+\item Loop over all particles in the species.
+\item If the particle has crossed a local boundary then it either
+  has crossed the boundary of the problem domain and needs a boundary condition
+  to be applied or it has just crossed a processor boundary and
+  needs to be transferred to a neighbouring process. Set
+  \inlinecode{\{x,y,z\}bd} which is used to identify which processor relative
+  to the current processor the particle potentially needs to be moved to and
+  then test for the domain boundary.
 \item If the particle has crossed an open domain boundary then either add it to
   another list to be dumped to disk if the user has requested this, or
-  otherwise just deallocate the particle to reclaim memory.
+  otherwise just deallocate the particle to reclaim memory. Set
+  \inlinecode{out\_of\_bounds} to indicate that the particle has left the
+  system.
+\item If the particle has crossed the domain boundary and that boundary has
+  reflecting boundary conditions then reflect the particle.
+\item If the particle has crossed the domain boundary and that boundary has
+  periodic boundary conditions then move the particle to the opposite side
+  of the domain.
 \item End particle loop.
+\item Remove all the particles which have left the current process.
 \item Loop over all possible neighbouring processors for the current processor
   and exchange particle lists with that processor.
 \item Add any received particles onto the particle list for the current
   species.
-\item Although particles which have crossed a periodic boundary are now on the
-  correct processor, they have the wrong position in space, so subtract the
-  length of the domain from the particles position.
 \item End species loop.
 \end{itemize}
 
@@ -1528,7 +1536,7 @@ REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: field
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/boundary.F90}\\
+\inlinecode{src/boundary.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{field\_bc} exchanges the information in the ghost cells between
@@ -1544,7 +1552,7 @@ The \inlinecode{field\_bc} routine just calls the
 \inlinecode{do\_field\_mpi\_with\_lengths} routine which is a more general
 routine that allows ghost cell information to be exchanged for fields with
 an arbitrary number of cells, rather than fields which are
-(-2:nx+3,-2:ny+2,-2:nz+3). This routine is used internally in the load
+(-2:nx+3,-2:ny+3,-2:nz+3). This routine is used internally in the load
 balancing routine when fields with both the old and new sizes must be handled
 at the same time.
 
@@ -1553,10 +1561,11 @@ at the same time.
 SUBROUTINE processor_summation_bcs
 \HRule
 REAL(num), DIMENSION(-2:,-2:,-2:), INTENT(INOUT) :: field
+INTEGER, INTENT(IN), OPTIONAL :: flip_direction
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/boundary.F90}\\
+\inlinecode{src/boundary.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{processor\_summation\_bcs} is a routine which is used to deal with
@@ -1566,7 +1575,10 @@ The routine is used for the current inside the particle pusher and inside most
 of the routines for calculating derived variables. If you have a variable
 which needs to add contributions from adjacent processors then you should
 calculate the quantity on each processor, including contributions from the
-particles to the ghost cells and then call this routine.
+particles to the ghost cells and then call this routine. When reflecting
+boundary conditions are in operation, the current in the direction crossing
+the boundary needs to be flipped over. This is decided upon using the
+\inlinecode{flip\_direction} parameter.
 \\[0.5cm]
 {\Large Notes\\}
 \pagebreak
@@ -1575,14 +1587,14 @@ These routines can be used for most MPI calls required by all but the most
 extreme modifications to {\EPOCH}.
 
 \subsection{Particle List control functions}
-Collections of particles in {\EPOCH} are represented by the #particle_List#
+Collections of particles in {\EPOCH} are represented by the #particle_list#
 object. These objects abstract much of the operation of the linked lists,
 including adding and removing particles and sending particles to other
 processors. The functions are as follows:
 
 \pagebreak
 \begin{codedef}
-FUNCTION create_empty_partlist(partlist)
+SUBROUTINE create_empty_partlist(partlist)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 \end{codedef}
@@ -1591,7 +1603,7 @@ TYPE(particle_list), INTENT(INOUT) :: partlist
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{create\_empty\_partlist} is a function which takes a particle\_list
+\inlinecode{create\_empty\_partlist} is a routine which takes a particle\_list
 object and sets it up so that it points to no particles at all. It should be
 used on newly allocated particle\_list objects and when a particle\_list has
 served its purpose. It DOES NOT destroy the particles linked in the list at
@@ -1603,7 +1615,7 @@ instead.
 
 \pagebreak
 \begin{codedef}
-FUNCTION create_unsafe_partlist(partlist, a_particle, &
+SUBROUTINE create_unsafe_partlist(partlist, a_particle, &
     n_elements)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
@@ -1627,7 +1639,7 @@ on safe particle lists.
 
 \pagebreak
 \begin{codedef}
-FUNCTION create_unsafe_partlist_by_tail(partlist, head, &
+SUBROUTINE create_unsafe_partlist_by_tail(partlist, head, &
     tail)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
@@ -1646,7 +1658,7 @@ head then the routine will fail in an undefined manner.
 
 \pagebreak
 \begin{codedef}
-FUNCTION create_allocated_partlist(partlist, n_elements)
+SUBROUTINE create_allocated_partlist(partlist, n_elements)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 INTEGER(KIND=8), INTENT(IN) :: n_elements
@@ -1668,7 +1680,7 @@ be modified to reflect any changes in the underlying code.
 
 \pagebreak
 \begin{codedef}
-FUNCTION create_filled_partlist(partlist, data_in, &
+SUBROUTINE create_filled_partlist(partlist, data_in, &
     n_elements)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
@@ -1735,7 +1747,7 @@ become corrupted.
 
 \pagebreak
 \begin{codedef}
-FUNCTION destroy_partlist(partlist)
+SUBROUTINE destroy_partlist(partlist)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 \end{codedef}
@@ -1762,7 +1774,7 @@ error.
 
 \pagebreak
 \begin{codedef}
-FUNCTION copy_partlist(partlist1, partlist2)
+SUBROUTINE copy_partlist(partlist1, partlist2)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist1, partlist2
 \end{codedef}
@@ -1781,7 +1793,7 @@ not copy the particles, just sets the head and tail pointers of
 
 \pagebreak
 \begin{codedef}
-FUNCTION append_partlist(head, tail)
+SUBROUTINE append_partlist(head, tail)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: head, tail
 \end{codedef}
@@ -1801,7 +1813,7 @@ particle\_list.
 
 \pagebreak
 \begin{codedef}
-FUNCTION add_particle_to_partlist(partlist, new_particle)
+SUBROUTINE add_particle_to_partlist(partlist, new_particle)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 TYPE(particle), POINTER :: new_particle
@@ -1822,7 +1834,7 @@ always use this routine.
 
 \pagebreak
 \begin{codedef}
-FUNCTION remove_particle_from_partlist(partlist, &
+SUBROUTINE remove_particle_from_partlist(partlist, &
     a_particle)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
@@ -1872,17 +1884,17 @@ If the particle type gains additional properties as the result of preprocessor
 directives then there should be a line which increments \inlinecode{nvars} by
 the correct number when that preprocessor directive is active. For example:
 \begin{boxverbatim}
-#ifdef PER_PARTICLE_CHARGEMASS
+#ifdef PER_PARTICLE_CHARGE_MASS
   nvar = nvar+2
 #endif
 \end{boxverbatim}
 
 \pagebreak
 \begin{codedef}
-SUBROUTINE   pack_particle(data, a_particle)
-SUBROUTINE unpack_particle(data, a_particle)
+SUBROUTINE   pack_particle(array, a_particle)
+SUBROUTINE unpack_particle(array, a_particle)
 \HRule
-REAL(num), DIMENSION(:), INTENT(INOUT) :: data
+REAL(num), DIMENSION(:), INTENT(INOUT) :: array
 TYPE(particle), POINTER :: a_particle
 \end{codedef}
 \vspace{1cm}
@@ -1895,7 +1907,7 @@ which are used to copy all the information about a particle
 necessary for the particle to be transferred to another processor into a
 temporary array before sending to another processor. If a new particle property
 has been added to the particle then these routines must be modified to allow
-the copying of the new data into the array. The parameter \inlinecode{data} is
+the copying of the new data into the array. The parameter \inlinecode{array} is
 a REAL(num) array of length \inlinecode{nvars} and is the array into which the
 data either must be packed or from which it must be
 unpacked. \inlinecode{a\_particle} is the particle object which must either have
@@ -1909,7 +1921,7 @@ by another processor.
 {\Large Notes\\}
 Since it is very unlikely that {\EPOCH} will be run on anything other than a
 homogeneous cluster, it is acceptable to use the Fortran \inlinecode{TRANSFER}
-function to pack incompatible data types into the \inlinecode{data} array. Just
+function to pack incompatible data types into the \inlinecode{array} array. Just
 make sure that \inlinecode{nvars} is defined in \inlinecode{setup\_partlists}
 to be long enough to contain all the information. More documentation on the
 \inlinecode{TRANSFER} function (which is rarely used and dangerous!) can be
@@ -1927,10 +1939,12 @@ TYPE(particle), POINTER :: a_particle
 \inlinecode{src/housekeeping/partlist.F90}\\
 \\[0.5cm]
 {\Large Description\\}
+%\setlength{\emergencystretch}{3em}
 Displays the key information about a particle given by the parameter
-\inlinecode{a\_particle}. Used by\linebreak \inlinecode{compare\_particles}.
+\inlinecode{a\_particle}. Used by \inlinecode{compare\_particles}.
 \\[0.5cm]
 
+\pagebreak
 \begin{codedef}
 FUNCTION compare_particles(particle1, particle2)
 \HRule
@@ -1949,13 +1963,15 @@ this routine should also be modified to test for equivalence of the new
 properties.
 \\[0.5cm]
 
+\pagebreak
 \begin{codedef}
-SUBROUTINE test_packed_particles(partlist, data, &
+FUNCTION test_packed_particles(partlist, array, &
     npart_in_data)
 \HRule
 TYPE(particle_list), INTENT(IN) :: partlist
-REAL(num), DIMENSION(:), INTENT(IN) :: data
+REAL(num), DIMENSION(:), INTENT(IN) :: array
 INTEGER(KIND=8), INTENT(IN) :: npart_in_data
+LOGICAL :: test_packed_particles
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
@@ -1968,16 +1984,17 @@ parameters are:
 \begin{itemize}
 \item \inlinecode{partlist} - The particle\_list corresponding to the original
   unpacked particles.
-\item \inlinecode{data} - The REAL(num) array containing the packed data.
+\item \inlinecode{array} - The REAL(num) array containing the packed data.
 \item \inlinecode{npart\_in\_data} - The number of particles which were packed
-  into the \inlinecode{data} array.
+  into \inlinecode{array}.
 \end{itemize}
 The routine tests that the number of particles in the particle\_list match the
 number believed to be in the data array, that the length of the data array is
 correct and then unpacks each particle in turn from the data array and uses the
 \inlinecode{compare\_particles} function to compare the particles with the
 original versions in the particle\_list. If any particles fail the comparison
-then an error is output to stdout. The error message includes the processor
+then an error is output to stdout and the function returns a value of
+#.FALSE.#. The error message includes the processor
 rank on which the problem occurs but the routine does not specifically include
 any MPI commands, so it is possible to call the routine on a subset of
 processors.
@@ -1985,7 +2002,7 @@ processors.
 
 \pagebreak
 \begin{codedef}
-FUNCTION partlist_send(partlist, dest)
+SUBROUTINE partlist_send(partlist, dest)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 INTEGER, INTENT(IN) :: dest
@@ -2010,7 +2027,7 @@ routine has been found.
 
 \pagebreak
 \begin{codedef}
-FUNCTION partlist_recv(partlist, src)
+SUBROUTINE partlist_recv(partlist, src)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist
 INTEGER, INTENT(IN) :: src
@@ -2044,8 +2061,8 @@ an empty particle\_list to receive the data.
 
 \pagebreak
 \begin{codedef}
-FUNCTION partlist_send_recv(partlist_send, partlist_recv, &
-    dest, src)
+SUBROUTINE partlist_send_recv(partlist_send, &
+    partlist_recv, dest, src)
 \HRule
 TYPE(particle_list), INTENT(INOUT) :: partlist_send
 TYPE(particle_list), INTENT(INOUT) :: partlist_recv
@@ -2089,9 +2106,9 @@ of {\EPOCH}, there are MPI commands scattered throughout many parts of the code,
 although the MPI has been hidden as far as possible from the end user. The main
 use of MPI occurs during I/O, in the boundary conditions and during load
 balancing. The MPI setup routines are all in
-\inlinecode{src/housekeeping/mpi\_routines.f90}, and the routines which are
+\inlinecode{src/housekeeping/mpi\_routines.F90}, and the routines which are
 used to create the MPI types used by MPI-IO are in
-\inlinecode{src/housekeeping/mpi\_subtype\_control.F90}.
+\inlinecode{src/housekeeping/mpi\_subtype\_control.f90}.
 
 \subsubsection{General MPI in {\EPOCH}}
 {\EPOCH} uses Cartesian domain decomposition for parallelism and creates an MPI
@@ -2119,7 +2136,7 @@ which must be made and some variables which must be explained.
   order. This means that \inlinecode{x\_min == neighbour(-1,0,0)} and
   \inlinecode{z\_max == neighbour(0,0,1)}.
 \item The variable \inlinecode{comm} is the handle for the Cartesian
-  communicator returned from\linebreak MPI\_CART\_CREATE.
+  communicator returned from \linebreak MPI\_CART\_CREATE.
 \item The variable \inlinecode{errcode} is the standard error variable for all
   MPI communications. However, {\EPOCH} uses the standard
   MPI\_ERRORS\_ARE\_FATAL error handler so this variable is never tested.
@@ -2130,26 +2147,26 @@ which must be made and some variables which must be explained.
   \inlinecode{rank}.
 \item The number of processors is stored in \inlinecode{nproc}.
 \item The number of processors assigned to any given direction of the Cartesian
-  topology is given by \inlinecode{nproc\_\{x,y,z\}}.
+  topology is given by \inlinecode{nproc\{x,y,z\}}.
 \end{itemize}
 
 There are some other variables which are not technically part of the MPI
 implementation, but which only exist because the code is running in
 parallel. These are
 \begin{itemize}
-\item #REAL(num) :: {x,y,z}_start_local# - The location of the start of the
+\item #REAL(num) :: {x,y,z}_min_local# - The location of the start of the
   domain on the local processor in real units.
-\item #REAL(num) :: {x,y,z}_end_local# - The location of the end of the
+\item #REAL(num) :: {x,y,z}_max_local# - The location of the end of the
   domain on the local processor in real units.
-\item #INTEGER, DIMENSION(1:nproc{x,y,z}) :: cell_{x,y,z}_start# - The cell
+\item #INTEGER, DIMENSION(1:nproc{x,y,z}) :: cell_{x,y,z}_min# - The cell
   number for the start of the local part of the global array in each direction.
-\item #INTEGER, DIMENSION(1:nproc{x,y,z}) :: cell_{x,y,z}_end#
+\item #INTEGER, DIMENSION(1:nproc{x,y,z}) :: cell_{x,y,z}_max#
   - The cell number for the end of the local part of the global array in each
   direction.
 \end{itemize}
 
-\subsubsection{\inlinecode{mpi\_routines.f90}}
-\inlinecode{mpi\_routines.f90} is the file which contains all the MPI setup
+\subsubsection{\inlinecode{mpi\_routines.F90}}
+\inlinecode{mpi\_routines.F90} is the file which contains all the MPI setup
 code. It contains the following routines:
 \begin{itemize}
 \item mpi\_minimal\_init - Contains code to start MPI enough to
@@ -2171,7 +2188,7 @@ code. It contains the following routines:
   final call to \inlinecode{MPI\_FINALIZE}.
 \end{itemize}
 
-\subsubsection{\inlinecode{mpi\_subtype\_control.F90}}
+\subsubsection{\inlinecode{mpi\_subtype\_control.f90}}
 This file contains all the routines which are used to create the MPI types
 which are used in the SDF I/O system. Most of the routines in this section are
 used to create the types used for writing the default variables and,
@@ -2193,7 +2210,7 @@ INTEGER(KIND=8), INTENT(IN) :: npart_local
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/housekeeping/mpi\_subtype\_control.F90}\\
+\inlinecode{src/housekeeping/mpi\_subtype\_control.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{create\_particle\_subtype} is a routine which creates an MPI type
@@ -2203,56 +2220,51 @@ processor. \inlinecode{npart\_local} does not have to be the same number on all
 processors.
 \\[0.5cm]
 {\Large Notes\\}
-If you use this routine to write data from multiple species of particle then
-the data will be written out in a way which is unhelpful for data analysis,
-since the layout will be ``All particles on processor 1, All Particles on
-processor 2 etc.'' rather than ``All of species 1, All of species 2''. To create
-this type of layout use \inlinecode{create\_ordered\_particle\_subtype}
+Currently this is only used for reading particle data from restart snapshots.
+It is likely to go away in the near future.
 
 \pagebreak
 \begin{codedef}
-FUNCTION create_ordered_particle_subtype(n_species_dump, &
+SUBROUTINE create_ordered_particle_offsets(n_dump_species,&
     npart_local)
 \HRule
-INTEGER, INTENT(IN) :: n_species_dump
-INTEGER(KIND=8), DIMENSION(n_species_dump), &
+INTEGER, INTENT(IN) :: n_dump_species
+INTEGER(KIND=8), DIMENSION(n_dump_species), &
     INTENT(IN) :: npart_local
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/housekeeping/mpi\_subtype\_control.F90}\\
+\inlinecode{src/housekeeping/mpi\_subtype\_control.f90}\\
 \\[0.5cm]
 {\Large Description\\}
-\inlinecode{create\_ordered\_particle\_subtype} is a routine which creates an
-MPI type representing particles from \inlinecode{n\_species\_dump} which are
-spread across different processors with \inlinecode{npart\_local(ispecies)}
-particles of each species on each processor. \inlinecode{npart\_local} does not
+\inlinecode{create\_ordered\_particle\_offsets} is a routine which creates an
+array of offsets representing particles from \inlinecode{n\_dump\_species}
+which are spread across different processors with
+\inlinecode{npart\_local(ispecies)} particles of each species on each
+processor. \inlinecode{npart\_local} does not
 have to be the same number on all processors and does not have to be the same
 number for each species.
 \\[0.5cm]
 {\Large Notes\\}
-This routine causes the data to be written to disk as ``All of species 1, All of
-species 2 etc.'' as opposed to \inlinecode{create\_particle\_subtype}. It does,
-however, need rather more memory and is slower.
 
 \pagebreak
 \begin{codedef}
-FUNCTION create_field_subtype(n{x,y,z}_local, &
-    cell_start_{x,y,z}_local)
+FUNCTION create_field_subtype(n\{x,y,z\}_local, &
+    cell_start_\{x,y,z\}_local)
 \HRule
-INTEGER, INTENT(IN) :: n_x_local, n_y_local, n_z_local
+INTEGER, INTENT(IN) :: nx_local, ny_local, nz_local
 INTEGER, INTENT(IN) :: cell_start_x_local
 INTEGER, INTENT(IN) :: cell_start_y_local
 INTEGER, INTENT(IN) :: cell_start_z_local
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/housekeeping/mpi\_subtype\_control.F90}\\
+\inlinecode{src/housekeeping/mpi\_subtype\_control.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{create\_field\_subtype} is a routine which creates an MPI type
 representing a field that is defined across some or all of the processors. The
-\inlinecode{n\_\{x,y,z\}\_local} parameters are the number of points in the x,
+\inlinecode{n\{x,y,z\}\_local} parameters are the number of points in the x,
 y, z directions (if they exist in the version of the code that you are working
 on) that are on the local processor. The
 \inlinecode{cell\_start\_\{x,y,z\}\_local} parameters are the offset of the
@@ -2294,7 +2306,7 @@ sweep is illustrated in Figure~\ref{sweep}.
 The load balancer is
 implemented in the file \inlinecode{src/housekeeping/balance.F90} and is called
 by the routine \inlinecode{balance\_workload(override)}. The parameter
-\inlinecode{Override} is used to force the code to perform a load balancing
+\inlinecode{override} is used to force the code to perform a load balancing
 sweep even when it would normally determine that the imbalance is not large
 enough to force a load balancing sweep. Although the load balancer is hard
 coded to load balance in all available directions, the code is written in such
@@ -2310,15 +2322,18 @@ original authors be contacted for detailed advice on how to proceed. However,
 the general layout of the routine is as follows.
 
 \begin{itemize}
-\item Use MPI\_ALLGATHER to get the total number of particles on each processor
-  and determine the global minimum and maximum number of particles. If the
-  ratio of the minimum to the maximum is above the load balance threshold then
-  just return from the subroutine.
-\item The code uses the routines \inlinecode{get\_density\_in\_x},
-  \inlinecode{get\_density\_in\_y} and \inlinecode{get\_density\_in\_z} to
-  determine the pseudoparticle number density along each direction. Each of
-  these routines integrates in both other directions.
-\item This section of the code fills the arrays \inlinecode{starts\_\{x,y,z\}}
+\item Use MPI\_ALLREDUCE to determine the global minimum and maximum number of
+  particles. If the ratio of the minimum to the maximum is above the load
+  balance threshold then just return from the subroutine.
+\item The code uses the routines \inlinecode{get\_load\_in\_\{x,y,z\}} to
+  determine the work load along each direction of the domain. 
+  The \inlinecode{get\_load\_in\_x} routine uses the x-coordinate of every
+  particle to create a 1D particle density in the x-direction. This is then
+  combined with the total number of grid cells in the y-z plane to give
+  a 1D array of the work load in the x-direction. Similarly for
+  \inlinecode{get\_load\_in\_\{y,z\}}.
+\item Next the load array is passed to the \inlinecode{calculate\_breaks}
+  routine which fills the arrays \inlinecode{starts\_\{x,y,z\}}
   and \inlinecode{ends\_\{x,y,z\}}. These arrays contain the starting and
   ending cell numbers of the hypothetical global array in each direction for
   each processor.
@@ -2431,7 +2446,7 @@ This is the method by which {\EPOCH} allows the end user to specify whether a
 variable should be dumped, and whether it should only be dumped at
 full/partial/restart dumps. #dumpmask# is an integer array, the length of
 which is defined by the variable \inlinecode{num\_vars\_to\_dump} in
-\inlinecode{shared\_data.f90} and contains the bitmask representing all the
+\inlinecode{shared\_data.F90} and contains the bitmask representing all the
 types of output which should be written for the associated variable. The
 possible values in the bitmask are:
 
@@ -2442,10 +2457,16 @@ possible values in the bitmask are:
 \item \inlinecode{c\_io\_restartable} - Dump this variable for restart dumps.
 \item \inlinecode{c\_io\_species} - If meaningful for this variable, write
   information for each species rather than integrated over all species.
+\item \inlinecode{c\_io\_no\_sum} - If meaningful for this variable, do not
+  write information integrated over all species.
+\item \inlinecode{c\_io\_averaged} - If meaningful for this variable, write
+  this variable averaged over time.
+\item \inlinecode{c\_io\_snapshot} - If meaningful for this variable, write
+  the non-averaged value of the variable.
 \end{itemize}
 
 The \inlinecode{c\_dump\_id} entry is a constant defined in
-\inlinecode{shared\_data.f90} which identifies the variable's index within
+\inlinecode{shared\_data.F90} which identifies the variable's index within
 this dumpmask.
 
 When adding a new variable to be written to disk, the value of
@@ -2513,7 +2534,7 @@ The parameters have the following types and meanings:
   should be used here.
 \end{itemize}
 
-It's probably easiest to read the diagnostics.f90 file and see how the code
+It's probably easiest to read the diagnostics.F90 file and see how the code
 implements the output of simple variables like ex or ey for an example of how
 this works. Once the appropriate sdf\_write call has
 been added to the code, there is no further work
@@ -2549,7 +2570,7 @@ through all the particles. The iterators are stored in the file
   FUNCTION iterate_px(array, n_points, start)
 
     REAL(num) :: iterate_px
-    REAL(num), DIMENSION(:), INTENT(INOUT) :: array
+    REAL(num), DIMENSION(:), INTENT(OUT) :: array
     INTEGER, INTENT(INOUT) :: n_points
     LOGICAL, INTENT(IN) :: start
     TYPE(particle), POINTER, SAVE :: cur
@@ -2634,8 +2655,8 @@ a temporary file which is an exact copy of the source file. When it reaches a
 precompiler directive of this kind it treats the \#ifdef commands as
 if/then/else statements. If
 \inlinecode{MY\_PRECOMPILER\_DIRECTIVE} was defined in the makefile then
-\inlinecode{SOME\_Fortran\_OF\_SOME\_KIND} is pushed out to the temporary
-file. Otherwise \inlinecode{SOME\_OTHER\_Fortran} is written instead.
+\inlinecode{some\_fortran\_of\_some\_kind} is pushed out to the temporary
+file. Otherwise \inlinecode{some\_other\_fortran} is written instead.
 The precompiler directives themselves are never output to the temporary
 file. Once then preprocessor has finished, it passes this temporary file
 to the Fortran compiler which can then compile it just like any other
@@ -2673,15 +2694,15 @@ Simply add a new element to the end of the list.
 \end{boxverbatim}
 
 You will also need to add #c_def_my_precompiler_directive# to the list of
-constants in\linebreak #src/shared_data.F90#.
+constants in #src/shared_data.F90#.
 
 \subsubsection{Precompiler directives and the input deck}
 In theory, it is possible for someone to request a feature of the code in the
 input deck which this version hasn't been compiled with. In this
 case, there is a special error code \inlinecode{c\_err\_pp\_options\_wrong}
 which causes the input deck parser to give a meaningful error. You should also
-set the string\linebreak \inlinecode{extended\_error\_string} to be the define
-command for the missing preprocessor directive i.e\linebreak
+set the string \inlinecode{extended\_error\_string} to be the define
+command for the missing preprocessor directive i.e
 \inlinecode{extended\_error\_string = "-DMY\_PRECOMPILER\_DIRECTIVE"}
 
 \section{{\EPOCH} front end programming}
@@ -2710,12 +2731,12 @@ in {\EPOCH}.
 \begin{codedef}
 FUNCTION str_cmp(str_in, str_test)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in, str_test
+CHARACTER(LEN=*), INTENT(IN) :: str_in, str_test
 LOGICAL :: str_cmp
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings.F90}\\
+\inlinecode{src/deck/strings.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{str\_cmp} is the routine which does all the string comparisons in
@@ -2732,13 +2753,13 @@ base.
 \begin{codedef}
 FUNCTION as_real_simple(str_in, err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
+CHARACTER(LEN=*), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 REAL(num) :: as_real_simple
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings.F90}\\
+\inlinecode{src/deck/strings.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{as\_real\_simple} is a routine to convert a string into a real
@@ -2759,13 +2780,13 @@ simple numbers.
 \begin{codedef}
 FUNCTION as_integer_simple(str_in, err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
+CHARACTER(LEN=*), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 INTEGER :: as_integer_simple
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings.F90}\\
+\inlinecode{src/deck/strings.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{as\_integer\_simple} is a routine to convert a string into an
@@ -2787,32 +2808,32 @@ restrict the user from specifying mathematical expressions.
 \begin{codedef}
 FUNCTION as_long_integer_simple(str_in, err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
+CHARACTER(LEN=*), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 INTEGER(KIND=8) :: as_long_integer_simple
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings.F90}\\
+\inlinecode{src/deck/strings.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{as\_long\_integer\_simple} is equivalent to
-\inlinecode{as\_integer\_simple}, but returns the larger\linebreak
+\inlinecode{as\_integer\_simple}, but returns the larger
 \inlinecode{INTEGER(KIND=8)} rather than a normal \inlinecode{INTEGER(KIND=4)}.
 \\[0.5cm]
 {\Large Notes\\}
 
 \pagebreak
 \begin{codedef}
-FUNCTION as_direction(str_in, err)
+FUNCTION as_boundary(str_in, err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
+CHARACTER(LEN=*), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
-INTEGER :: as_direction
+INTEGER :: as_boundary
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings.F90}\\
+\inlinecode{src/deck/strings.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{as\_direction} is used when assigning a laser to a boundary and
@@ -2839,13 +2860,13 @@ only recognises the strings for boundaries that it actually has.
 \begin{codedef}
 FUNCTION as_logical(str_in, err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
+CHARACTER(LEN=*), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 Logical :: as_logical
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings.F90}\\
+\inlinecode{src/deck/strings.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{as\_logical} simply tests for the strings ``T'' and ``F'' to
@@ -2860,14 +2881,14 @@ consistency.
 \begin{codedef}
 SUBROUTINE split_off_int(str_in, str_out, int_out, err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
-CHARACTER(LEN=entry_length), INTENT(OUT) :: str_out
+CHARACTER(LEN=*), INTENT(IN) :: str_in
+CHARACTER(LEN=*), INTENT(OUT) :: str_out
 INTEGER, INTENT(OUT) :: int_out
 INTEGER, INTENT(INOUT) :: err
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings\_advanced.F90}\\
+\inlinecode{src/deck/strings\_advanced.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{split\_off\_int} is a routine which splits a string of the format
@@ -2886,13 +2907,13 @@ like this rather than coding a new routine.
 \begin{codedef}
 SUBROUTINE split_range(str_in, real1, real2, err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
+CHARACTER(LEN=*), INTENT(IN) :: str_in
 REAL(num), INTENT(OUT) :: real1, real2
 INTEGER, INTENT(INOUT) :: err
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings\_advanced.F90}\\
+\inlinecode{src/deck/strings\_advanced.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{split\_range} is a routine which splits a string of the format
@@ -2913,13 +2934,13 @@ and behaviour, but might have subtle differences.}
 \begin{codedef}
 FUNCTION as_integer(str_in, err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
+CHARACTER(LEN=*), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 INTEGER :: as_integer
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings\_advanced.F90}\\
+\inlinecode{src/deck/strings\_advanced.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{as\_integer} is the routine which returns integers from strings
@@ -2938,13 +2959,13 @@ varying quantity use \inlinecode{evaluate\_string\_in\_space}.
 \begin{codedef}
 FUNCTION as_long_integer(str_in, err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
+CHARACTER(LEN=*), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 INTEGER(KIND=8) :: as_long_integer
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings\_advanced.F90}\\
+\inlinecode{src/deck/strings\_advanced.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{as\_long\_integer} is the routine which returns long integers from
@@ -2960,13 +2981,13 @@ large to be stored in an INTEGER(KIND=4).
 \begin{codedef}
 FUNCTION as_real(str_in, err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
+CHARACTER(LEN=*), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
 REAL(num) :: as_real
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings\_advanced.F90}\\
+\inlinecode{src/deck/strings\_advanced.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{as\_real} is the routine which returns reals from strings using the
@@ -2982,30 +3003,29 @@ varying quantity use \inlinecode{evaluate\_string\_in\_space}.
 \pagebreak
 \begin{codedef}
 SUBROUTINE evaluate_string_in_space(str_in, data_out, &
-    xrange, {yrange}, {zrange}, err)
+    x1, x2, \{y1, y2, z1, z2,\} err)
 \HRule
-CHARACTER(LEN=entry_length), INTENT(IN) :: str_in
-REAL(num), DIMENSION(1:,{1:},{1:}), INTENT(OUT) :: data_out
-INTEGER, DIMENSION(2), INTENT(IN) :: xrange, {yrange}
-INTEGER, DIMENSION(2), INTENT(IN) :: {zrange}
+CHARACTER(*), INTENT(IN) :: str_in
 INTEGER, INTENT(INOUT) :: err
+INTEGER, INTENT(IN) :: x1, x2\{, y1, y2, z1, z2\}
+REAL(num), DIMENSION(1:,1:,1:), INTENT(OUT) :: data_out
 \end{codedef}
 \vspace{1cm}
 {\Large Location\\}
-\inlinecode{src/deck/strings\_advanced.F90}\\
+\inlinecode{src/deck/strings\_advanced.f90}\\
 \\[0.5cm]
 {\Large Description\\}
 \inlinecode{evaluate\_string\_in\_space} is a routine which is used to evaluate
 a tokenized maths expression over a region of the domain. The dimensionality of
-\inlinecode{data\_out}, and the presence or absence of \inlinecode{yrange} and
-\inlinecode{zrange} depend on the dimensionality of the code being used. The
-\inlinecode{{\it $\alpha$}range} parameters represent the indices in that
+\inlinecode{data\_out}, and the presence or absence of \inlinecode{y1, y2} and
+\inlinecode{z1, z2} depend on the dimensionality of the code being used. The
+\inlinecode{x1, x2, ...} parameters represent the indices in that
 direction over which the expression should be evaluated. For example, in 2D to
 evaluate an expression over the entire domain, the code would look like:
 \begin{boxverbatim}
 REAL(num), DIMENSION(:,:), ALLOCATABLE :: data
-ALLOCATE(data(0:nx+1,0:ny+1)
-CALL evaluate_string_in_space(string, data, (/0,nx+1/), (/0:ny+1/), err)
+ALLOCATE(data(-2:nx+3,-2:ny+3)
+CALL evaluate_string_in_space(string, data, -2, nx+3, -2, ny+3, err)
 \end{boxverbatim}
 {\Large Notes\\}
 This routine is suitable to evaluate expressions over a subsection or all of
@@ -3018,146 +3038,6 @@ different procedure should be followed using the lower level parser routines,
 which are described in \sect{maths}.
 \pagebreak
 
-\subsection{Permanently adding blocks to the input deck}
-
-While using the \inlinecode{custom\_deck} subroutine is a good way of passing
-parameters into the code or for temporary additions, it is not suitable for
-permanent additions to the code. Adding new blocks to the code permanently is
-very similar to doing it temporarily, but requires changes to some of the
-subroutines in \inlinecode{deck.F90}.\\
-
-There are four subroutines which may need to be changed to add new blocks to
-the deck. These are
-\begin{itemize}
-\item \inlinecode{start\_block(block\_name)} - Called when the deck directive
-  \inlinecode{begin:{\it block\_name}} appears in a deck file.
-\item \inlinecode{end\_block(block\_name)} - Called when the deck directive
-  \inlinecode{end:{\it block\_name}} appears in a deck file.
-\item \inlinecode{handle\_block(block\_name, block\_element, block\_value)} -
-  Called once for each element in a block.
-\item \inlinecode{check\_compulsory\_blocks(errcode\_deck)} - Called once when
-  the deck file has been read to check that all necessary blocks have been
-  populated.
-\end{itemize}
-
-There is one final variable which is important for modifying the input deck,
-\inlinecode{deck\_state}. The input deck parser routine used to read the main
-input deck uses the variable \inlinecode{deck\_state} to
-determine which stage of parsing the deck is required. The possible values of
-\inlinecode{deck\_state} are
-
-\begin{itemize}
-\item c\_ds\_deck - The main input deck.
-\item c\_ds\_ic - The initial conditions.
-\item c\_ds\_eio - The extended I/O.
-\end{itemize}
-These constants are defined in \inlinecode{shared\_data.F90} and if new files
-need to be read, then new variables should be created in the same place with
-similar names using the \inlinecode{c\_ds\_} prefix.
-
-The layout of \inlinecode{start\_block} and \inlinecode{end\_block} is very
-simple, and just tests \inlinecode{deck\_state} to make sure that the deck
-reader is reading the right file. It then uses \inlinecode{str\_cmp} to test the
-block name and if necessary calls the correct routine to deal with the
-start or finish of a block.
-
-The main routine which needs to be explained is \inlinecode{handle\_block},
-which is the function that determines which subroutine to call for parsing the
-elements of a given block. The function is very simple and has the same basic
-sequence as the \inlinecode{start\_block} and \inlinecode{end\_block}
-functions. First determine what file is being parsed by checking
-\inlinecode{deck\_state}, then use \inlinecode{str\_cmp} to compare the
-\inlinecode{block\_name} parameter with the list of known block names. What
-happens next is dependent on exactly what a developer wants their block to do.
-At the simplest level the routine simply calls another function which
-takes the element\_name and element\_value as
-parameters and returns an error code from Appendix A determining the success or
-failure of reading the element. Some blocks have slightly more sophisticated
-entries in \inlinecode{handle\_deck}, such as the \inlinecode{species} block in
-the initial conditions file reader. This strips the species number off the end
-of the block name and passes it to the handler routine. The routines that deal
-with constants are implemented before any tests to
-\inlinecode{deck\_state} since it is valid to set constants in any
-type of file.
-
-The final routine is \inlinecode{check\_compulsory\_blocks} which is used to
-check that all the needed elements of the input deck have been set. A single
-parameter \inlinecode{errcode\_deck} is passed in. Once again, the routine
-checks \inlinecode{deck\_state} to make sure that it is testing the correct
-type of input deck file. It then goes through and calls functions to check that
-all the necessary parts of a block have been set. The subroutines are contained
-in the same file as the routine which is called in \inlinecode{handle\_block} to
-handle elements of the block. The error handler functions should return an
-error code from Appendix A, usually \inlinecode{c\_err\_missing\_elements}. The
-return code from the error handler function should then be \inlinecode{IOR}ed
-with \inlinecode{errcode\_deck} to allow error codes to be returned from
-several different checks with errors occurring.
-
-\subsubsection{The element handler routines for deck elements}
-The exact form of the handler routines is up to the end user. The only {\it
-requirements} are that the routine should return an error code detailing
-whether or not there are any problems with reading the block and that the error
-code should be \inlinecode{c\_err\_none} if either the element name or element
-value are the special constant \inlinecode{blank}. The typical implementation
-of an element handler routine is shown in the file
-\inlinecode{src/deck/deck\_control\_block.f90}, and this general layout should
-be copied for compatibility if possible.\\
-
-Sometimes, it is useful to have each new block correspond to a new instance of
-an object in the code. An example of this in {\EPOCH} is in
-\inlinecode{src/deck/deck\_ic\_laser\_block.f90} where each new laser block in
-the input deck corresponds to a new laser being attached to a boundary. This is
-accomplished by implementing the lasers as a linked list on each boundary,
-with a new laser object being created when a laser block is started, the laser
-information being set during the main reader routine, and then the laser being
-attached to the linked list by a call to \inlinecode{attach\_laser} in
-\inlinecode{src/laser.f90} when the block is ended. When a new laser block is
-started the process simply repeats allowing the end user to have as many lasers
-as desired.
-
-\subsubsection{Naming new element handler files}
-While the name of the function which deals with elements of a new block is up
-to the end user, the file should try to follow the form of the existing
-names. That is, the name should have the following form, remembering that words
-should be spaced out using \_ characters.
-\begin{itemize}
-\item Begin with \inlinecode{deck\_}.
-\item If the block is associated with initial conditions or I/O then there
-  should be a code here which details
-  when this block is valid. For the existing input deck files this would be
-  \subitem \inlinecode{ic\_} for the initial conditions file.
-  \subitem \inlinecode{eio\_} for the extended I/O file.
-\item The next element should be the name of the block followed by \_.
-  i.e. \inlinecode{control\_}.
-\item The final element should just be the work \inlinecode{block}.
-\end{itemize}
-
-\subsubsection{Adding elements to existing blocks}
-The existing blocks in the code are read in the following files
-\begin{itemize}
-\item \inlinecode{deck\_boundaries\_block.f90} - Input deck boundary block.
-\item \inlinecode{deck\_constant\_block.f90} - Sets constants in all deck files.
-\item \inlinecode{deck\_control\_block.f90} - Input deck control block.
-\item \inlinecode{deck\_eio\_dist\_fn\_block.f90} - dist\_fn blocks.
-\item \inlinecode{deck\_eio\_particle\_probe\_block.F90} - probe blocks.
-\item \inlinecode{deck\_ic\_external\_block.f90} - Initial conditions deck for
-  reading species\_external and\linebreak field\_external blocks.
-\item \inlinecode{deck\_ic\_fields\_block.f90} - Initial conditions deck field
-  blocks.
-\item \inlinecode{deck\_ic\_laser\_block.f90} - Initial conditions deck laser
-  blocks.
-\item \inlinecode{deck\_ic\_species\_block.f90} - Initial conditions deck
-  species\{n\} blocks.
-\item \inlinecode{deck\_io\_block.F90} - Input deck output blocks.
-\item \inlinecode{deck\_species\_block.F90} - Input deck species blocks.
-\item \inlinecode{deck\_window\_block.f90} - Input deck window block.
-\end{itemize}
-
-The existing structure of the blocks is simple enough in most cases that it
-should be fairly easy to add new elements if needed. The most likely change
-needed is to change the list of variables to dump in the \inlinecode{output}
-block. How to do this is detailed in \sect{io}.
-
 \subsection{Adding new elements to the maths parser}
 Sometimes the complexity in changing the input.deck file is due to the fact that
 a function which must be used is fairly complex in form and is not supplied
@@ -3166,7 +3046,7 @@ parser. This can be a significant cause of complexity for some problems, and
 in this case, there are three options: Put up with it and implement in the
 deck, use the internal initial conditions rather than the deck or extend the
 maths parser to include your function. Extending the maths parser can either
-be permanent (described later in the manual) or temporary (described
+be permanent (described later in \sect{maths}) or temporary (described
 here). Temporarily adding elements to the parser is much the easier. It is
 possible to add new constants and functions to the maths parser. It is hoped
 that in a future release of {\EPOCH} this will be extended to allow custom
@@ -3416,17 +3296,17 @@ internal and manual initial conditions.
 
 Custom input deck elements are setup in the file
 \inlinecode{src/user\_interaction/custom\_deck.f90}. The function
-\inlinecode{handle\_custom\_block} is called when a new block is started which
-the core parser is not familiar with, and once for each element of a block. The
-function \inlinecode{check\_custom\_blocks} is called once the entire deck has
-been parsed and is used to check that all the elements which are required for
-the code to run have been specified.
+\inlinecode{custom\_blocks\_handle\_element} is called when a new block is
+started which the core parser is not familiar with, and once for each element
+of a block. The function \inlinecode{custom\_blocks\_check} is called once the
+entire deck has been parsed and is used to check that all the elements which
+are required for the code to run have been specified.
 
-\subsubsection{handle\_custom\_block}
-There are three parameters passed to \inlinecode{handle\_custom\_block}, which
-are:
+\subsubsection{custom\_blocks\_handle\_element}
+There are three parameters passed to
+\inlinecode{custom\_blocks\_handle\_element}, which are:
 \begin{itemize}
-\item blockname - The name of the block specified in the
+\item block\_name - The name of the block specified in the
   \inlinecode{begin:blockname} part of the input deck.
 \item element - The name of the element in an input deck
   \inlinecode{element = value} pair.
@@ -3434,7 +3314,8 @@ are:
   \inlinecode{element = value} pair.
 \end{itemize}
 
-\inlinecode{handle\_custom\_block} is first called when a new block is begun
+\inlinecode{custom\_blocks\_handle\_element} is first called when a new block
+is begun
 using \inlinecode{begin:blockname} and ``blockname'' is not recognised by the
 core input deck parser. The first thing that it does is test whether or not it
 is a valid custom block. The code does this by passing in the blockname with
@@ -3447,76 +3328,75 @@ not. If the blockname is known then the code should return the error code
 code should return \inlinecode{c\_err\_unknown\_block} and the deck parser will
 just skip the block. In operation, this looks like:
 \begin{boxverbatim}
-FUNCTION handle_custom_block(blockname, element, value)
+FUNCTION custom_blocks_handle_element(block_name, element, value) &
+    RESULT(errcode)
 
-  CHARACTER(LEN=entry_length), INTENT(IN) :: blockname, element, value
-  INTEGER :: handle_custom_block
-  TYPE(primitive_stack) :: output
-  INTEGER :: ix, iy
-  IF (str_cmp(blockname, "custom")) THEN
+  CHARACTER(LEN=string_length), INTENT(IN) :: block_name, element, value
+  INTEGER :: errcode
+
+  IF (str_cmp(block_name, "custom")) THEN
     IF (element .EQ. blank .OR. value .EQ. blank) THEN
        ! If element or value are blank then just testing block so
        ! return c_err_none
-       handle_custom_block = c_err_none
+       errcode = c_err_none
        RETURN
      ENDIF
    ENDIF
 
   ! The following line must always be present
-  handle_custom_block = c_err_unknown_block
+  errcode = c_err_unknown_block
 
-END FUNCTION handle_custom_block
+END FUNCTION custom_blocks_handle_element
 \end{boxverbatim}
 
-In order to simply Fortran's rather annoying string handling behaviour, several
-helper functions have been defined and the most used one is
+In order to simplify Fortran's rather annoying string handling behaviour,
+several helper functions have been defined and the most used one is
 \inlinecode{str\_cmp(string1, string2)}. This is a simple routine which returns
 true if string1 == string2 and false otherwise. It is case sensitive but can
 deal with differing string lengths etc. The next stage is to deal with the
 actual \inlinecode{element = value} pairs in the deck. Each time that a new pair
-is read from the deck, \inlinecode{handle\_custom\_block} is called with
-\inlinecode{element} and \inlinecode{value} having the values read from the
+is read from the deck, \inlinecode{custom\_blocks\_handle\_element} is called
+with \inlinecode{element} and \inlinecode{value} having the values read from the
 deck. To test for known elements they should just be checked against a known
 list of names using \inlinecode{str\_cmp} and return the error code
 \inlinecode{c\_err\_unknown\_element} if the element isn't a known element. This
 looks like:
 \begin{boxverbatim}
-FUNCTION handle_custom_block(blockname, element, value)
+FUNCTION custom_blocks_handle_element(block_name, element, value) &
+    RESULT(errcode)
 
-  CHARACTER(LEN=entry_length), INTENT(IN) :: blockname, element, value
-  INTEGER :: handle_custom_block
-  TYPE(primitive_stack) :: output
-  INTEGER :: ix, iy
+  CHARACTER(LEN=string_length), INTENT(IN) :: block_name, element, value
+  INTEGER :: errcode
 
-  IF (str_cmp(blockname, "custom")) THEN
+  IF (str_cmp(block_name, "custom")) THEN
     IF (element .EQ. blank .OR. value .EQ. blank) THEN
       ! If element or value are blank then just testing block so
       ! return c_err_none
-      handle_custom_block = c_err_none
+      errcode = c_err_none
       RETURN
     ENDIF
-    handle_custom_block = c_err_unknown_element
+    errcode = c_err_unknown_element
     ! Now test for the real elements
     IF (str_cmp(element, "int_element")) THEN
-      handle_custom_block = c_err_none
+      errcode = c_err_none
     ENDIF
     IF (str_cmp(element, "real_element")) THEN
-      handle_custom_block = c_err_none
+      errcode = c_err_none
     ENDIF
     IF (str_cmp(element, "logical_element")) THEN
-      handle_custom_block = c_err_none
+      errcode = c_err_none
     ENDIF
     RETURN
   ENDIF
 
   ! The following line must always be present
-  handle_custom_block = c_err_unknown_block
+  errcode = c_err_unknown_block
 
-END FUNCTION handle_custom_block
+END FUNCTION custom_blocks_handle_element
 \end{boxverbatim}
 
 This version of the code will allow you to add a new block called ``custom''
-with elements\linebreak
+with elements
 ``int\_element'', ``real\_element'' and ``logical\_element'' and the
 code will parse them successfully, while any other block or any other element
 in the block ``custom'' will throw errors. However, at this stage the code
@@ -3542,47 +3422,49 @@ They are used pretty much as expected, except that the return value is passed
 to the functions so that they can report errors while trying to parse the
 string. An example would then be:
 \begin{boxverbatim}
-FUNCTION handle_custom_block(blockname, element, value)
+FUNCTION custom_blocks_handle_element(block_name, element, value) &
+    RESULT(errcode)
 
-  CHARACTER(LEN=entry_length), INTENT(IN) :: blockname, element, value
-  INTEGER :: handle_custom_block
-  TYPE(primitive_stack) :: output
-  INTEGER :: ix, iy
-  IF (str_cmp(blockname, "custom")) THEN
+  CHARACTER(LEN=string_length), INTENT(IN) :: block_name, element, value
+  INTEGER :: errcode, int_element
+  REAL(num) :: real_element
+  LOGICAL :: logical_element
+
+  IF (str_cmp(block_name, "custom")) THEN
     IF (element .EQ. blank .OR. value .EQ. blank) THEN
       ! If element or value are blank then just testing block so
       ! return c_err_none
-      handle_custom_block = c_err_none
+      errcode = c_err_none
       RETURN
     ENDIF
-    handle_custom_block = c_err_unknown_element
+    errcode = c_err_unknown_element
     ! Now test for the real elements
     IF (str_cmp(element, "int_element")) THEN
-      handle_custom_block = c_err_none
-      int_element = as_integer(value, handle_custom_block)
+      errcode = c_err_none
+      int_element = as_integer(value, errcode)
     ENDIF
     IF (str_cmp(element, "real_element")) THEN
-      handle_custom_block = c_err_none
-      real_element = as_real(value, handle_custom_block)
+      errcode = c_err_none
+      real_element = as_real(value, errcode)
     ENDIF
     IF (str_cmp(element, "logical_element")) THEN
-      handle_custom_block = c_err_none
-      logical_element = as_logical(value, handle_custom_block)
-      ENDIF
+      errcode = c_err_none
+      logical_element = as_logical(value, errcode)
+    ENDIF
     RETURN
   ENDIF
 
   ! The following line must always be present
-  handle_custom_block = c_err_unknown_block
+  errcode = c_err_unknown_block
 
-END FUNCTION handle_custom_block
+END FUNCTION custom_blocks_handle_element
 \end{boxverbatim}
 
 It is possible to perform more advanced types of evaluation of maths
 expressions such as reading arrays etc. but this is beyond the scope of this
 manual at present.
 
-\subsubsection{check\_custom\_blocks}
+\subsubsection{custom\_blocks\_check}
 This function is called when all the blocks in the input deck have been
 evaluated and is used to check that all required parameters have been set. If
 all required elements have been set then you should just return
@@ -3592,6 +3474,110 @@ been set is up to the developer, and for testing and personal use (which is
 all that the custom deck parts of the code should be used for) it is
 acceptable to just not check and always return \inlinecode{c\_err\_none}. If
 permanently expanding the deck, error trapping should always be written.
+
+\subsection{Permanently adding blocks to the input deck}
+
+While using the \inlinecode{custom\_deck} subroutine is a good way of passing
+parameters into the code or for temporary additions, it is not suitable for
+permanent additions to the code. Adding new blocks to the code permanently is
+very similar to doing it temporarily, but requires changes to some of the
+subroutines in \inlinecode{deck.F90}.\\
+
+There are six subroutines which may need to be changed to add new blocks to
+the deck. These are
+\begin{itemize}
+\item \inlinecode{deck\_initialise} - Called before parsing of the input
+  deck is begun.
+\item \inlinecode{deck\_finalise} - Called after parsing of the input
+  deck is complete.
+\item \inlinecode{start\_block(block\_name)} - Called when the deck directive
+  \inlinecode{begin:{\it block\_name}} appears in a deck file.
+\item \inlinecode{end\_block(block\_name)} - Called when the deck directive
+  \inlinecode{end:{\it block\_name}} appears in a deck file.
+\item \inlinecode{handle\_block(block\_name, block\_element, block\_value)} -
+  Called once for each element in a block.
+\item \inlinecode{check\_compulsory\_blocks(errcode\_deck)} - Called once when
+  the deck file has been read to check that all necessary blocks have been
+  populated.
+\end{itemize}
+
+  %FUNCTION species_block_handle_element(element, value) RESULT(errcode)
+  %FUNCTION species_block_check() RESULT(errcode)
+
+
+There is one final variable which is important for modifying the input deck,
+\inlinecode{deck\_state}. The input deck parser routine used to read the main
+input deck uses the variable \inlinecode{deck\_state} to
+determine which stage of parsing the deck is required. The possible values of
+\inlinecode{deck\_state} are
+
+\begin{itemize}
+\item c\_ds\_first - The first pass through the deck, before memory has been
+  allocated.
+\item c\_ds\_last - After the initial deck pass, all arrays and lists are
+  allocated. The deck is then parsed a final time so that allocated memory
+  can be populated with initial conditions.
+\end{itemize}
+These constants are defined in \inlinecode{shared\_data.F90}.
+
+The layout of \inlinecode{deck\_initialise} and \inlinecode{deck\_finalise} is
+extremely simple. They just call \inlinecode{*\_deck\_initialise} or
+\inlinecode{*\_deck\_finalise} for each of the possible block types.
+\inlinecode{start\_block} and \inlinecode{end\_block} are also fairly
+straightforward. They examine the block name and call the
+\inlinecode{*\_block\_start} or \inlinecode{*\_block\_end} routine
+corresponding to the current block.
+
+The \inlinecode{handle\_block} routine acts in a similar manner except
+that it also does some error handling.
+At the simplest level the routine simply calls another function which
+takes the block\_element and block\_value as
+parameters and returns an error code from Appendix~\ref{sec:error}
+determining the success or failure of reading the element.
+
+The final routine is \inlinecode{check\_compulsory\_blocks} which is used to
+check that all the needed elements of the input deck have been set. A single
+parameter \inlinecode{errcode\_deck} is passed in. The routine
+checks \inlinecode{deck\_state} to make sure that it is the last pass
+through the deck. It then goes through and calls functions to check that
+all the necessary parts of a block have been set. The subroutines are contained
+in the same file as the routine which is called in \inlinecode{handle\_block} to
+handle elements of the block. The error handler functions should return an
+error code from Appendix~\ref{sec:error}, usually
+\inlinecode{c\_err\_missing\_elements}. The
+return code from the error handler function should then be \inlinecode{IOR}ed
+with \inlinecode{errcode\_deck} to allow error codes to be returned from
+several different checks with errors occurring.
+
+\subsubsection{The element handler routines for deck elements}
+The exact form of the handler routines is up to the end user. The only {\it
+requirements} are that the routine should return an error code detailing
+whether or not there are any problems with reading the block and that the error
+code should be \inlinecode{c\_err\_none} if either the element name or element
+value are the special constant \inlinecode{blank}. The typical implementation
+of an element handler routine is shown in the file
+\inlinecode{src/deck/deck\_control\_block.f90}, and this general layout should
+be copied for compatibility if possible.\\
+
+Sometimes, it is useful to have each new block correspond to a new instance of
+an object in the code. An example of this in {\EPOCH} is in
+\inlinecode{src/deck/deck\_laser\_block.f90} where each new laser block in
+the input deck corresponds to a new laser being attached to a boundary. This is
+accomplished by implementing the lasers as a linked list on each boundary,
+with a new laser object being created when a laser block is started, the laser
+information being set during the main reader routine, and then the laser being
+attached to the linked list by a call to \inlinecode{attach\_laser} in
+\inlinecode{src/laser.f90} when the block is ended. When a new laser block is
+started the process simply repeats allowing the end user to have as many lasers
+as desired.
+
+\subsubsection{Adding elements to existing blocks}
+The existing blocks in the code are read in the files listed in \sect{src_deck}
+
+The existing structure of the blocks is simple enough in most cases that it
+should be fairly easy to add new elements if needed. The most likely change
+needed is to change the list of variables to dump in the \inlinecode{output}
+block. How to do this is detailed in \sect{io}.
 
 \subsection{Permanently adding functions, constants to {\EPOCH}}
 \label{sec:maths}
@@ -3635,11 +3621,11 @@ allow the use of more values for internal constants and functions, although
 care should be taken since this could lead to performance issues.
 If \inlinecode{c\_const\_deck\_lowbound} is increased then the constant
 \inlinecode{c\_constant\_custom\_lowbound} should be increased by the same
-amount (the values between \inlinecode{c\_const\_deck\_lowbound} and\linebreak
+amount (the values between \inlinecode{c\_const\_deck\_lowbound} and
 \inlinecode{c\_constant\_custom\_lowbound-1} are used for constants specified
 inside the input deck while values greater than or equal to
 \inlinecode{c\_constant\_custom\_lowbound} are used for constants specified
-by\linebreak \inlinecode{register\_constant}.
+by \inlinecode{register\_constant}.
 
 Once the tokenizer handle is specified in \inlinecode{shared\_parser\_data}, it
 is now possible to extend the main areas of the maths parser. Note that from
@@ -3650,7 +3636,7 @@ then combining functions and constants from several sources becomes much harder.
 \subsubsection{Adding the new function or constant to the tokenizer}
 The next stage is to add the string representation of your constant or function
 to the tokenizer routines in
-\inlinecode{src/parser/tokenizer\_blocks.F90}. This is very simple to do, just
+\inlinecode{src/parser/tokenizer\_blocks.f90}. This is very simple to do, just
 find either the function \inlinecode{as\_constant} or \inlinecode{as\_function}
 and look at the existing code. These functions are just long lists of
 \inlinecode{str\_cmp} commands followed by code to deal with custom
@@ -3664,7 +3650,7 @@ functions/constants. To add the new code, create an additional line such as:
 \end{boxverbatim}
 Note that neither routine returns immediately after recognising the name of the
 function/constant. This allows users to override built in constants or
-functions with custom versions using\linebreak \inlinecode{register\_constant}
+functions with custom versions using \inlinecode{register\_constant}
 and \inlinecode{register\_function}. This is not significant, since tokenizing
 should never be used in a speed critical part of the code.
 
@@ -3672,7 +3658,7 @@ should never be used in a speed critical part of the code.
 The evaluator is the part of the code that actually takes the streams of tokens
 produced by the tokenizer and evaluates them into a number. The relevant parts
 of the evaluator for adding new constants or functions are in
-\inlinecode{src/parser/evaluator\_blocks.F90} and the functions which may need
+\inlinecode{src/parser/evaluator\_blocks.f90} and the functions which may need
 changing are \inlinecode{do\_constant} and \inlinecode{do\_functions}. These are
 both passed up to five parameters:
 \begin{itemize}
@@ -3683,7 +3669,7 @@ both passed up to five parameters:
   in space then you should use these parameters to reference the correct point
   of an array.
 \item #INTEGER :: errcode# - This should be set to an error code from
-  Appendix A, usually\linebreak \inlinecode{c\_err\_bad\_value} if for some
+  Appendix~\ref{sec:error}, usually \inlinecode{c\_err\_bad\_value} if for some
   reason it is not possible to evaluate your constant or function.
 \end{itemize}
 
@@ -3765,7 +3751,7 @@ there are a few key points at which the code significantly changes state.
   allocating all field variables, although particles may not yet have been set
   up. The grid now exists.
 \item There are now a series of \inlinecode{IF} statements which test for
-  things like\linebreak \inlinecode{IF (IOR(ictype, c\_ic\_autoload) .NE. 0)}.
+  things like \inlinecode{IF (IOR(ictype, c\_ic\_autoload) .NE. 0)}.
   These are the lines which test for all possible states of the
   initial conditions. The last test is for the manual load routine
   (\inlinecode{c\_ic\_manual}). After this test all the particles have been
@@ -3776,23 +3762,25 @@ there are a few key points at which the code significantly changes state.
   actually advance the system. Most routines which can change currents should
   take place after the particle pusher but before the final update for the $E$
   and $B$ fields. These routines are
-  \subitem \inlinecode{set\_dt} - This routine sets the timestep.
-  \subitem \inlinecode{update\_eb\_fields\_half} - Time centre the $E$ and $B$
+  \begin{itemize}
+  \item \inlinecode{set\_dt} - This routine sets the timestep.
+  \item \inlinecode{update\_eb\_fields\_half} - Time centre the $E$ and $B$
     fields.
-  \subitem \inlinecode{push\_particles} - The particle pusher.
-  \subitem \inlinecode{reorder\_particles\_to\_grid} - Groups particles into
+  \item \inlinecode{push\_particles} - The particle pusher.
+  \item \inlinecode{reorder\_particles\_to\_grid} - Groups particles into
     linked lists at each grid point. Used for the particle splitting routine,
     and would be the right place to add a collision operator. Any routine
     which needs to have nearby particles grouped together should take place
     after the call to this routine.
-  \subitem \inlinecode{split\_particles} - The particle
+  \item \inlinecode{split\_particles} - The particle
     splitting operator.
-  \subitem \inlinecode{reattach\_particles\_to\_mainlist} - Undoes the
+  \item \inlinecode{reattach\_particles\_to\_mainlist} - Undoes the
     particle grouping and rebuilds the main list of particles used by the
     particle pusher. Any routine which needs to have nearby particles grouped
     together should take place before the call to this routine.
-  \subitem \inlinecode{update\_eb\_fields\_final} - Updates the $E$ and $B$
+  \item \inlinecode{update\_eb\_fields\_final} - Updates the $E$ and $B$
     fields to the full timestep.
+  \end{itemize}
 \item After the call to \inlinecode{update\_eb\_fields\_final} the code is
   ready for another timestep. Any routines which do not change the time
   integrated properties of the code (like the moving window) should come after
@@ -3830,6 +3818,7 @@ have a significant impact on performance.
   \appendixpage
   \addappheadtotoc
 \section{Error Codes}
+\label{sec:error}
 The input deck and maths parser in {\EPOCH} use various named error codes to
 report on errors which occur during the evaluation of the input deck. These
 codes are
@@ -3837,20 +3826,21 @@ codes are
 \item c\_err\_none - No error. Set an error code to c\_err\_none to state that
   no error has occurred.
 \item c\_err\_unknown\_block - In the input deck a block has been found which is
-  not known. This should be returned in \inlinecode{handle\_custom\_block} if
-  it is passed any block that it has not been written to handle.
+  not known. This should be returned in
+  \inlinecode{custom\_blocks\_handle\_element} if it is passed any block that it has not been written to handle.
 \item c\_err\_unknown\_element - In the input deck an element of a valid block
   has been found which is not known. This should be returned in
-  \inlinecode{handle\_custom\_block} if an element is requested which is
+  \inlinecode{custom\_blocks\_handle\_element} if an element is requested which is
   unknown.
 \item c\_err\_preset\_element - An element of the input deck has already been
   set and is being set again. Usually this is an indication of a malformed input
-  deck file, so \inlinecode{handle\_custom\_block} should try to
+  deck file, so \inlinecode{custom\_blocks\_handle\_element} should try to
   identify such situations and return this error message if
   subsequent attempts to set the variable are being ignored.
 \item c\_err\_preset\_element\_use\_later - An element of the input deck has
   already been set and is being set again. Usually this is an indication of a
-  malformed input deck file, so \inlinecode{handle\_custom\_block} should try to
+\setlength{\emergencystretch}{3em}
+  malformed input deck file, so \inlinecode{custom\_blocks\_handle\_element} should try to
   identify such situations and return this error message if
   the subsequent attempts to set the variable override previous ones.
 \item {\bf c\_err\_bad\_value} - A value which is being evaluated for the right
@@ -3862,7 +3852,7 @@ codes are
 \item {\bf c\_err\_missing\_elements} - This is an error code returned when the
   code is testing to make sure that all necessary elements of an input deck
   file have been specified. It should be returned when some required parameter
-  is missing in the subroutine \inlinecode{check\_custom\_blocks}.
+  is missing in the subroutine \inlinecode{custom\_blocks\_check}.
 \item c\_err\_terminate - This error code means that the code is in a state
   where execution is impossible and the code must terminate once the input deck
   has been read. Some other error codes automatically set c\_err\_terminate,
