@@ -52,28 +52,26 @@ IDL>
   for loading and inspecting SDF files.
 
   We begin by inspecting SDF file contents and finding out what variables
-  it contains. To do this we execute the \cmd{getdata()} function call
+  it contains. To do this we execute the \cmd{list\_variables} procedure call
   which is provided by the {\EPOCH} IDL library.
 
   At each timestep for which {\EPOCH} is instructed to dump a set of variables a
   new data file is created. These files take the form \txt{0000.sdf}. For
   each new dump the number is incremented.
-  The function call accepts up to three arguments. The first argument is
+  The procedure call accepts up to two arguments. The first argument is
   mandatory and specifies the number of the SDF file to be read in.
   This argument can be any integer from 0 to 9999.
   It is padded with zeros and the
   suffix `.sdf' appended to the end to give the name of the data file.
-  eg. 99 $\Rightarrow$ `0099.sdf'. The next two arguments are optional.
+  eg. 99 $\Rightarrow$ `0099.sdf'. The next arguments is optional.
   The keyword \qtt{wkdir} specifies the directory in which the data files
-  are located. If this argument is omitted then the default value of
-  \qtt{Data} is used. The final argument specifies a variable name or class
-  to load. If the special name \qtt{/variables} is used then the library
-  prints a list of variables contained in the file.
-  If this argument is omitted entirely then all the variables found in
-  the SDF file are read and returned in the data structure.
+  are located. If this argument is omitted then the currently defined global
+  default is used. Initially, this takes the value \qtt{Data} but this can
+  be changed using the \cmd{set\_wkdir} procedure and queried using the
+  \cmd{get\_wkdir()} function.
 
 \begin{boxverbatim}
-IDL> vars = getdata(0,wkdir="Data",/variables)
+IDL> list_variables,0,"Data"
 Available elements are
 1) Point_electron (Grid) : 2D Point mesh
 2) Point_proton (Grid) : 2D Point mesh
@@ -107,14 +105,19 @@ IDL>
 
   Each variable in the SDF self-describing file format is assigned a
   name and a class as well as being defined by a given variable type.
-  The \cmd{getdata()} function prints out the variable name followed
+  The \cmd{list\_variables} procedure prints out the variable name followed
   by the variable's class in parenthesis. Following the colon is a
   description of the variable type.
 
-  Since \cmd{getdata()} is a function call, the result must be assigned to a
+  To retrieve the data, you must use the \cmd{getdata()} function call.
+  The function must be passed a snapshot number, either as the first argument
+  or as a keyword parameter \qtt{snapshot}. It also accepts the wkdir as
+  either the second argument or the keyword parameter \qtt{wkdir}. If it is
+  omitted alltogether, the current global default is used. Finally, it accepts
+  a list of variables or class of variables to load.
+  Since it is a function, the result must be assigned to a
   variable. The object returned is an IDL data structure containing a list
-  of named variables. In the special case where \qtt{/variables} is passed as
-  the last argument, this object just contains the filename.
+  of named variables.
 
   To load either a specific variable or a class of variables, specify the
   name prefixed by a forward slash. It should be noted here that the IDL

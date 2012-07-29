@@ -1,5 +1,5 @@
 \newcommand{\ver}{1}
-\newcommand{\rev}{0}
+\newcommand{\rev}{1}
 \newcommand{\sdfversion}{{{\ver}.{\rev}}}
 \ifdefined\epoch
 \newcommand{\subsec}{\subsection}
@@ -274,7 +274,11 @@ information required to allocate memory must be contained in the block header.\\
   human readable and descriptive of the variable.
   \\\midrule
 
-  68+s &
+  68+s & int 4 & block\_info\_length & The length of the block-specific
+  header information. Introduced in version 1.1.
+  \\\midrule
+
+  72+s &
 \end{tabularx}
 \end{center}\vspace{10pt}
 
@@ -356,7 +360,36 @@ as constants in the SDF Fortran module, as indicated by the ``c\_'' prefix.\\
   no interface in a mixed cell.
   \\\midrule
 
-  c\_blocktype\_particle\_species & 13 & Information about a particle species.
+  c\_blocktype\_species & 13 & Information about a particle species.
+  \\\midrule
+
+  c\_blocktype\_plain\_derived & 14 & This blocktype is never actually written
+  to an SDF file. It is used within the C-library and VisIt to represent a
+  plain variable whose content is generated dynamically based on other data in
+  the file.
+  \\\midrule
+
+  c\_blocktype\_point\_derived & 15 & As above, this blocktype is never
+  actually written to an SDF file. It serves the same purpose as
+  c\_blocktype\_plain\_derived, except the variable is defined on a point mesh.
+  \\\midrule
+
+  c\_blocktype\_multi\_tensor & 16 & This is the same as
+  c\_blocktype\_stitched\_tensor, except that all the data for the stitched
+  variables is contained in the data section of this block rather than the
+  blocks which are referenced.
+  \\\midrule
+
+  c\_blocktype\_multi\_material & 17 & Same as above, for
+  c\_blocktype\_stitched\_material
+  \\\midrule
+
+  c\_blocktype\_multi\_matvar & 18 & Same as above, for
+  c\_blocktype\_stitched\_matvar
+  \\\midrule
+
+  c\_blocktype\_multi\_species & 19 & Same as above, for
+  c\_blocktype\_stitched\_species
 \end{tabularx}
 \end{center}\vspace{10pt}
 
