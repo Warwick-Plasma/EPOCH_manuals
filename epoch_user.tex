@@ -1141,11 +1141,11 @@ the following two parameters also apply.\\
 
 {\emphtext species} - The derived variable should be output on a
 species by species basis. It is combined with a restart frequency code
-by addition as in: \inlinecode{px = always + species}.\\
+by addition as in: \inlinecode{ex = always + species}.\\
 
 {\emphtext no\_sum} - The output for this derived variable should not
 be summed over all species. It is combined with a restart frequency code
-by addition as in: \inlinecode{px = always + no\_sum}.\\
+by addition as in: \inlinecode{ex = always + no\_sum}.\\
 
 Most grid variables may be averaged over time. A more detailed description
 of this is given in \sect{average}. Data averaging is specified using
@@ -1339,13 +1339,13 @@ begin:output
    full_dump_every = 10
    dt_average = 1.0e-17
 
-   px = always + average + snapshot
-   py = full + average + snapshot
-   pz = full + average
+   ex = always + average + snapshot
+   ey = full + average + snapshot
+   ez = full + average
 end:output
 \end{boxverbatim}
 
-With this configuration, px will be written in both normal and
+With this configuration, ex will be written in both normal and
 averaged form at normal, full and restart dumps. py will be
 written in both forms at full and restart dumps. Since pz is not
 required for restart, only the average will be written at both
