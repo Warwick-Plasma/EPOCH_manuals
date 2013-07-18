@@ -138,8 +138,8 @@ version {\sdfversion} of the format is as follows:\\
   file. eg. ``Epoch2d''
   \\\midrule
 
-  48 & int 8 & first\_block\_location & The location of the first metadata
-  block relative to the start of the file. If a reader wishes to
+  48 & int 8 & first\_block\_location & The location of the first
+  block header relative to the start of the file. If a reader wishes to
   read the file by reading metadata followed by data on a block by block
   basis, then it should seek to this position to locate the first block header.
 %  \\\midrule
@@ -151,8 +151,8 @@ version {\sdfversion} of the format is as follows:\\
   (bytes) & \& size & name &
   \\\toprule
 
-  56 & int 8 & summary\_location & The location of the first metadata
-  block in the summary section relative to the start of the file. If a reader
+  56 & int 8 & summary\_location & The location of the first block header
+  in the summary section relative to the start of the file. If a reader
   wishes to scan the contents of a file before reading any data then it should
   seek to this position to locate the first block header.
   \\\midrule
@@ -238,8 +238,8 @@ information required to allocate memory must be contained in the block header.\\
   (bytes) & \& size & name &
   \\\toprule
 
-  0 & int 8 & next\_block\_location & The location of the next metadata
-  block relative to the start of the file.
+  0 & int 8 & next\_block\_location & The location of the next
+  block header relative to the start of the file.
   \\\midrule
 
   8 & int 8 & data\_location & The location of the data for the current block.
