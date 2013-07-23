@@ -473,18 +473,18 @@ at the start of the header and this common metadata is given below.\\
   after the normalisation factors have been applied.
   \\\midrule
 
-  m+52n & int 4 & geometry\_type & The geometry of the block.
+  m+72n & int 4 & geometry\_type & The geometry of the block.
   \\\midrule
 
-  m+52n+4 & real 8 * n & minval & The minimum coordinate values in each
+  m+72n+4 & real 8 * n & minval & The minimum coordinate values in each
   direction.
   \\\midrule
 
-  m+60n+4 & real 8 * n & maxval & The maximum coordinate values in each
+  m+80n+4 & real 8 * n & maxval & The maximum coordinate values in each
   direction.
   \\\midrule
 
-  m+68n+4 &
+  m+88n+4 &
 \end{tabularx}
 \end{center}\vspace{10pt}
 
@@ -522,10 +522,10 @@ the last items in the header are as follows:\\
   (bytes) & \& size & name &
   \\\toprule
 
-  m+68n+4 & int 4n & dims & The number of grid points in each dimension.
+  m+88n+4 & int 4n & dims & The number of grid points in each dimension.
   \\\midrule
 
-  m+72n+4 &
+  m+92n+4 &
 \end{tabularx}
 \end{center}\vspace{10pt}
 
@@ -555,10 +555,10 @@ are as follows:\\
   (bytes) & \& size & name &
   \\\toprule
 
-  m+68n+4 & int 8 & np & Number of particles
+  m+88n+4 & int 8 & np & Number of particles
   \\\midrule
 
-  m+68n+12 &
+  m+88n+12 &
 \end{tabularx}
 \end{center}\vspace{10pt}
 
@@ -891,14 +891,14 @@ written is as follows:\\
   its associated mesh.
   \\\midrule
 
-  8+m & char 32 & mesh\_id & The ``id'' of the mesh on which the resulting
+  4+m & char 32 & mesh\_id & The ``id'' of the mesh on which the resulting
   tensor is defined.
   \\\midrule
 
-  40+m & char 32n & variable\_ids & The ``id'' of each component in the tensor.
+  36+m & char 32n & variable\_ids & The ``id'' of each component in the tensor.
   \\\midrule
 
-  40+m+32n &
+  36+m+32n &
 \end{tabularx}
 \end{center}\vspace{10pt}
 
