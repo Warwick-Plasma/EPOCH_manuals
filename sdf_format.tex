@@ -555,7 +555,7 @@ are as follows:\\
   (bytes) & \& size & name &
   \\\toprule
 
-  m+88n+4 & int 8 & np & Number of particles
+  m+88n+4 & int 8 & np & Number of points
   \\\midrule
 
   m+88n+12 &
@@ -568,17 +568,19 @@ header and ``n'' is the number of dimensions as specified in the block header.
 The data written is the locations of each point in the first direction followed
 by the locations in the second direction and so on.
 Thus, for a 3d simulation, if we define the first point as having coordinates
-$(x1,y1,x1)$ and the second point as $(x2,y2,z2)$, etc. then the data written
-to file is a 1d array with elements $(x1,x2, ... ,xp)$, followed by the array
-$(y1,y2, ... ,yp)$ and finally the array $(z1,z2, ... ,zp)$ where
-``p'' corresponds to the number of points in the mesh. For a 1d simulation,
+$(x_1,y_1,x_1)$ and the second point as $(x_2,y_2,z_2)$, etc. then the data
+written to file is a 1d array with elements $(x_1,x_2, ... ,x_{np})$, followed
+by the array $(y_1,y_2, ... ,y_{np})$ and finally the array
+$(z_1,z_2, ... ,z_{np})$ where
+``$np$'' corresponds to the number of points in the mesh. For a 1d simulation,
 only the $x$ array is written and for a 2d simulation only the $x$ and $y$
 arrays are written.
 
 The alternative method (which is NOT used) is to write the location data
 one point at a time so that you have a single array in the form
-$(x1,y1,z1,x2,y2,z2, ... ,xp,yp,zp)$. For the time being it is thought that
-the first method will be the most convenient. At a later time, we may switch
+$(x_1,y_1,z_1,x_2,y_2,z_2, ... ,x_{np},y_{np},z_{np})$. For the time being it
+is thought that the first method will be the most convenient.
+At a later time, we may switch
 to using the second method if it proves more useful. This can easily be done
 by defining a new blocktype and incrementing the revision number.
 
@@ -727,7 +729,7 @@ header are as follows:\\
   (bytes) & \& size & name &
   \\\toprule
 
-  72+m & int 8 & np & Number of particles
+  72+m & int 8 & np & Number of points
   \\\midrule
 
   80+m &

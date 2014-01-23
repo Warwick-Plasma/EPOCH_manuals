@@ -18,17 +18,17 @@
 
 Whenever a new milestone version of {\EPOCH} is finalised, the version
 number is changed and this manual is updated accordingly. The version number
-of the manual should match that of the {\EPOCH} source code.
+of the manual should match the first two digits for that of the {\EPOCH}
+source code.
 This version number is printed to screen when you run the code. The line looks
 something like the following:
 \begin{boxverbatim}
- Welcome to EPOCH2D Version 4.0
+ Welcome to EPOCH2D Version 4.3.2   (commit v4.3.2-2-ge8f8534--clean)
 \end{boxverbatim}
+Here, only the number ``4.3'' is important.
 
-Note that as of version 3.1, the code is considered to be fairly stable and
-as such the documentation has entered a ``maintenance only'' mode. From this
-point on the body of the documentation is unchanged and any new additions
-to the input deck are documented in the appendix.
+Since version 3.1 of the manual, new additions and changes are mentioned
+in the appendix.
 
 \subsection{What is {\EPOCH}?}
 
@@ -162,9 +162,10 @@ epoch\{1,2,3\}d directory, there are 4 subdirectories:
 \item Data - This is an empty directory to use for running simulations.
 \end{itemize}
 
-there are also 4 files:
+there are also 5 files:
 
 \begin{itemize}
+\item COMMIT - Contains versioning information for the code.
 \item Changelog.txt - A brief overview of the change history for each
   released version of {\EPOCH}.
 \item Makefile - A standard makefile.
@@ -216,7 +217,7 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
- Welcome to EPOCH2D Version 4.0
+ Welcome to EPOCH2D Version 4.3.2   (commit v4.3.2-2-ge8f8534--clean)
 
  The code was compiled with the following compile time options
  *************************************************************
@@ -224,9 +225,7 @@ reads:
  Tracer particle support -DTRACER_PARTICLES
  Particle probe support -DPARTICLE_PROBES
  *************************************************************
-
  Code is running on 1 processing elements
-
 
  Specify output directory
 \end{boxverbatim}
@@ -249,14 +248,16 @@ allow the use of input pipes to mpirun. In this case, there is usually a
 documentation for more details.
 
 \subsection{Compiler flags and preprocessor defines}
+\label{sec:makefile}
 As already stated, some features of the code are controlled by compiler
 preprocessor directives. The flags for these preprocessor directives are
-specified in ``Makefile'' and are placed on the line which reads:
+specified in ``Makefile'' and are placed on lines which look like the
+following:
 \begin{boxverbatim}
-DEFINES = -DPER_PARTICLE_WEIGHT
+DEFINES += $(D)PER_PARTICLE_WEIGHT
 \end{boxverbatim}
-To turn on the effect given by a given preprocessor directive, just add the
-command \inlinecode{-D\{directive\}} to the \inlinecode{DEFINES} line. The
+To turn on the effect given by a given preprocessor directive, just uncomment
+the appropriate ``DEFINES'' line. The
 options currently controlled by the preprocessor are:\\
 \begin{itemize}
 \item PER\_PARTICLE\_WEIGHT - Instead of running the code where each
@@ -268,21 +269,13 @@ options currently controlled by the preprocessor are:\\
 \item PER\_PARTICLE\_CHARGE\_MASS - By default, the particle charge and
   mass are specified on a per-species basis. With this flag enabled, charge
   and mass become a per-particle property.
-\item SPLIT\_PARTICLES\_AFTER\_PUSH - After the code has updated the particle
-  positions, it splits the particles into separate lists for each grid
-  cell. Some features of the code (like collision operators) require this
-  feature to be on, but it is off by default.
+\item PARSER\_DEBUG - The code outputs more detailed information whilst
+  parsing the input deck. This is a debug mode for code development.
 \item PARTICLE\_DEBUG - Each particle is additionally tagged with information
   about which processor it is currently on, and which processor it starts
   on. This is a debug mode for code development.
-\item FIELD\_DEBUG - The code also outputs information about where the
-  processor boundaries are in space. This is a debug mode for code development.
-\item PARSER\_DEBUG - The code outputs more detailed information whilst
-  parsing the input deck. This is a debug mode for code development.
-\item PARTICLE\_IONISE - Activate the particle ionisation code (ALPHA). This
-  turns on an implementation of ionisation that is intended for demonstration
-  purposes only. Anyone seriously wanting to study the effects of ionisation
-  should implement their own model.
+\item MPI\_DEBUG - This option installs an error handler for MPI calls which
+  should aid tracking down some MPI related errors.
 \item PARTICLE\_COUNT\_UPDATE - Makes the code keep global particle counts for
   each species on each processor. This information isn't needed by the core
   algorithm, but can be useful for developing some types of additional physics
@@ -310,13 +303,21 @@ options currently controlled by the preprocessor are:\\
   function (0th order b-spline yielding a second order weighting).
 \item PARTICLE\_SHAPE\_BSPLINE3 - This flag changes the particle representation
   to that of a 3rd order b-spline shape function (5th order weighting).
+\item NO\_IO - This option disables all file I/O which can be useful when
+  doing benchmarking.
+\item PARTICLE\_ID - When this option is enabled, all particles are assigned
+  a unique identification number when writing particle data to file. This
+  number can then be used to track the progress of a particle during the
+  simulation.
+\item PARTICLE\_ID4 - This does the same as the previous option except it uses
+  a 4-byte integer instead of an 8-byte one. Whilst this saves storage space,
+  care must be taken that the number does not overflow.
+\item COLLISIONS\_TEST - This enables some routines for debugging the collision
+  routines. It completely alters the behaviour of the code.
+\item PHOTONS - This enables the QED routines for simulating pair production.
+\item TRIDENT\_PHOTONS - This uses the Trident process for pair production.
+\item PREFETCH - This enables an Intel-specific code optimisation.
 \end{itemize}
-
-So to turn on per particle weighting and particle debugging, the line would
-look like:
-\begin{boxverbatim}
-DEFINES = -DPER_PARTICLE_WEIGHT -DPARTICLE_DEBUG
-\end{boxverbatim}
 
 If a user requests an option which the code has not been compiled to support
 then the code will give an error message as follows:
@@ -355,37 +356,25 @@ disabled.
 When the code is run, the output is
 \begin{lboxverbatim}{Command line output}
 
-     @@@@@@@@  @@@@@@      @@@@    @@@@@@@@  @@    @@    @@@@@@    @@@@@@       
-     @@@@@@@@  @@@@@@      @@@@    @@@@@@@@  @@    @@    @@@@@@    @@@@@@       
-     @@        @@    @@  @@    @@  @@        @@    @@      @@@@    @@  @@       
-     @@        @@    @@  @@    @@  @@        @@    @@      @@@@    @@  @@       
-     @@        @@    @@  @@    @@  @@        @@    @@      @@@@    @@    @@     
-     @@        @@    @@  @@    @@  @@        @@    @@      @@@@    @@    @@     
-     @@@@@@@@  @@@@@@    @@    @@  @@        @@@@@@@@      @@@@    @@    @@     
-     @@@@@@@@  @@@@@@    @@    @@  @@        @@@@@@@@      @@@@    @@    @@     
-     @@        @@        @@    @@  @@        @@    @@      @@@@    @@    @@     
-     @@        @@        @@    @@  @@        @@    @@      @@@@    @@    @@     
-     @@        @@        @@    @@  @@        @@    @@      @@@@    @@  @@       
-     @@        @@        @@    @@  @@        @@    @@      @@@@    @@  @@       
-     @@@@@@@@  @@          @@@@    @@@@@@@@  @@    @@    @@@@@@@@  @@@@@@       
-     @@@@@@@@  @@          @@@@    @@@@@@@@  @@    @@    @@@@@@@@  @@@@@@       
-                                                                                
-                                                                                
-                                                                                
-                                                                                
- 
- Welcome to EPOCH1D Version 4.0
- 
+        d########P  d########b        .######b          d#######  d##P      d##P
+       d########P  d###########    d###########     .##########  d##P      d##P
+      ----        ----     ----  -----     ----   -----         ----      -- P
+     d########P  d####,,,####P ####.      .#### d###P          d############P
+    d########P  d#########P   ####       .###P ####.          d############P
+   d##P        d##P           ####     d####   ####.         d##P      d##P
+  d########P  d##P            ###########P     ##########P  d##P      d##P
+ d########P  d##P              d######P          #######P  d##P      d##P
+
+ Welcome to EPOCH2D Version 4.3.2   (commit v4.3.2-2-ge8f8534--clean)
+
  The code was compiled with the following compile time options
  *************************************************************
  Per particle weighting -DPER_PARTICLE_WEIGHT
  Tracer particle support -DTRACER_PARTICLES
  Particle probe support -DPARTICLE_PROBES
  *************************************************************
- 
  Code is running on 1 processing elements
- 
- 
+
  Specify output directory
 \end{lboxverbatim}
 
@@ -418,6 +407,9 @@ the parameters are always lower case.
 Parameter values are evaluated using a maths parser which is described in
 \sect{maths_parser}.\\
 
+If the deck contains a ``\textbackslash'' character then the rest of the line
+is ignored and the next line becomes a continuation of the current one.\\
+
 \noindent There are three {\it input deck directive} commands, which are:
 \begin{itemize}
 \item begin:{\it block} - Begin the block named {\it block}.
@@ -428,9 +420,9 @@ Parameter values are evaluated using a maths parser which is described in
   included file were pasted directly at the position of the include directive.
 \end{itemize}
 Each block must be surrounded by valid {\it begin:} and {\it end:} directives
-or the input deck will fail. There are currently ten valid blocks hard
+or the input deck will fail. There are currently fourteen valid blocks hard
 coded into the input deck reader, but it is possible for end users to extend
-the input deck. The ten built in blocks are:
+the input deck. The fourteen built in blocks are:
 \begin{itemize}
 \item control - Contains information about the general code setup.
 \item boundaries - Contains information about the boundary conditions for this
@@ -443,14 +435,21 @@ the input deck. The ten built in blocks are:
 \item window - Contains information about the moving window if the code is
   used in that fashion.
 \item output - Contains information about when and how to dump output files.
+\item output\_global - Contains parameters which should be applied to all
+  output blocks.
 \item dist\_fn - Contains information about distribution functions that should
   be calculated for output.
 \item probe - Contains information about particle probes used for output.
+\item collisions - Contains information about particle collisions.
+\item qed - Contains information about QED pair production.
+\item subset - Contains configuration for filters which can be used to modify
+  the data to be output.
 \item constant - Contains information about user defined constants and
   expressions. These are designed to simplify the initial condition setup.
 \end{itemize}
 
 \subsection{\cemph{control} block}
+\label{sec:control_block}
 The \cemph{control} block sets up the basic code properties for the
 domain, the end time of the code, the load balancer and the types of initial
 conditions to use.
@@ -546,10 +545,78 @@ generated using a random number generator. By default, {\EPOCH} uses a fixed
 value for the random generator seed so that results are repeatable. If this
 flag is set to ``T'' then the seed will be generated using the system clock.\\
 
+{\emphtext nproc\{x,y,z\}} - Number of processes in the \inlineemph{x,y,z}
+directions. By default, {\EPOCH} will try to pick the best method of splitting
+the domain amongst the available processors but occassionally the user may
+wish to override this choice.\\
 
-Most of the control block is self explanatory, but there is one part which
-needs further description.\\
+{\emphtext smooth\_currents} - This is a logical flag. If set to ``T'' then
+a smoothing function is applied to the current generated during the particle
+push. This can help to reduce noise and self-heating in a simulation. The
+default value is ``F''.\\
 
+{\emphtext field\_ionisation} - Logical flag which turns on field ionisation.
+  See \sect{ionisation}.\\
+
+{\emphtext use\_multiphoton} - Logical flag which turns on modelling
+  ionisation by multiple photon absorption. This should be set to ``F'' if
+  there is no laser attached to a boundary as it relies on laser frequency.
+  See \sect{ionisation}. The default is ``T''.\\
+
+{\emphtext use\_bsi} - Logical flag which turns on barrier suppression
+  ionisation correction to the tunneling ionisation model for high intensity
+  lasers. See \sect{ionisation}. The default is ``T''.\\
+
+{\emphtext particle\_tstart} - Specifies the time at which to start pushing
+particles. This allows the field to evolve using the Maxwell solver for a
+specified time before beginning to move the particles.\\
+
+{\emphtext use\_exact\_restart} - Logical flag which makes a simulation
+  restart using exactly the same configuration as the original simulation. If
+  set to ``T'' then the domain split amongst processors will be identical
+  along with the seeds for the random number generators. The default value
+  is ``F''.\\
+ 
+{\emphtext allow\_cpu\_reduce} - Logical flag which allows the number of CPUs
+  used to be reduced from the number specified. In some situations it may not
+  be possible to divide the simulation amongst all the processors requested.
+  If this flag is set to ``T'' then {\EPOCH} will continue to run and leave
+  some of the requested CPUs idle. If set to ``F'' then code will exit if all
+  CPUs cannot be utilised. The default value is ``T''.\\
+
+{\emphtext check\_stop\_file\_frequency} - Integer parameter controlling
+  automatic halting of the code. Refer to description later in this section.
+  The default value is 10.\\
+
+{\emphtext stop\_at\_walltime} - Floating point parameter controlling
+  automatic halting of the code. Refer to description later in this section.
+  The default value is -1.0.\\
+
+{\emphtext stop\_at\_walltime\_file} - String parameter controlling
+  automatic halting of the code. Refer to description later in this section.
+  The default value is an empty string.\\
+
+{\emphtext simplify\_deck} - If this logical flag is set to ``T'' then the deck
+  parser will attempt to simplify the maths expressions encountered after the
+  first pass. This can significantly improve the speed of evaluation for some
+  input deck blocks. The default value is ``F''.\\
+
+{\emphtext print\_constants} - If this logical flag is set to ``T'', deck
+  constants are printed to the ``deck.status'' file as they are parsed. The
+  default value is ``F''.\\
+
+{\emphtext use\_migration} - Logical flag which determines whether or not to
+  use particle migration. The default is ``F''. See \sect{migration}.\\
+
+{\emphtext migration\_interval} - The number of timesteps between each
+  migration event.  The default is 1 (migrate at every timestep).
+  See \sect{migration}.\\
+
+Most of the control block is self explanatory, but there are two parts which
+need further description.
+
+\subsubsection{Dynamic Load Balancing}
+The first is the {\emphtext dlb\_threshold} flag.
 ``dlb'' stands for Dynamic Load Balancing and, when turned on, it allows the
 code to rearrange the internal domain boundaries to try and balance the
 workload on each processor. This rearrangement is an expensive operation, so
@@ -564,7 +631,40 @@ the number of particles on each processor, but this will probably change in
 future. If the ``dlb\_threshold'' parameter is not specified then the code
 will only be load balanced at initialisation time.
 
+\subsubsection{Automatic halting of a simulation}
+It is sometimes useful to be able to halt an {\EPOCH} simulation midway through
+execution and generate a restart dump. Two methods have been implemented to
+enable this.
+
+The first method is to check for the existence of a ``STOP'' file. Throughout
+execution, {\EPOCH} will check for the existence of a file named either
+``STOP'' or ``STOP\_NODUMP'' in the simulation output directory. The check is
+performed at regular intervals and if such a file is found then the code
+exits immediately. If ``STOP'' is found then a restart dump is written before
+exiting. If ``STOP\_NODUMP'' is found then no I/O is performed.
+
+The interval between checks is controlled by the integer parameter
+``check\_stop\_frequency'' which can be specified in the ``control''
+block of the input deck. If it is less than or equal to zero then
+the check is never performed.
+
+The next method for automatically halting the code is to stop execution after
+a given elapsed walltime.
+If a positive value for ``stop\_at\_walltime'' is specified in the
+control block of an input deck then the code will halt once this
+time is exceeded and write a restart dump. The parameter takes a real
+argument which is the time in seconds since the start of the simulation.
+
+An alternative method of specifying this time is to write it into a separate
+text file. ``stop\_at\_walltime\_file'' is the filename from which to read the
+value for ``stop\_at\_walltime''. Since the walltime will often be
+found by querying the queuing system in a job script, it may be
+more convenient to pipe this value into a text file rather than
+modifying the input deck.
+
+
 \subsection{\inlineemph{boundaries} block}
+\label{sec:boundaries_block}
 The {\emphtext boundaries} block sets the boundary conditions of each boundary
 of the domain. Some types of boundaries allow EM wave sources (lasers) to be
 attached to a boundary. Lasers are attached at the initial conditions
@@ -580,6 +680,8 @@ begin:boundaries
    bc_y_max = periodic
 end:boundaries
 \end{lboxverbatim}
+
+The {\emphtext boundaries} accepts the following parameters:\\
 
 {\emphtext bc\_\{x,y,z\}\_min} - The condition for the lower boundary for both
 fields and particles. ``xbc\_left'', ``ybc\_down'' and ``zbc\_back'' are
@@ -599,7 +701,16 @@ boundary for \{fields,particles\}. ``xbc\_right\_\{field,particle\}'',
 ``ybc\_up\_\{field,particle\}'' and ``zbc\_front\_\{field,particle\}'' are
 accepted as a synonyms.\\
 
-There are seven boundary types in {\EPOCH} and each boundary of the domain can
+{\emphtext cpml\_thickness} - The thickness of the CPML boundary in terms
+  of the number of grid cells (see \sect{cpml}). The default value is 6.\\
+
+{\emphtext cpml\_kappa\_max} - A tunable CPML parameter (see \sect{cpml}).\\
+
+{\emphtext cpml\_a\_max} - A tunable CPML parameter (see \sect{cpml}).\\
+
+{\emphtext cpml\_sigma\_max} - A tunable CPML parameter (see \sect{cpml}).\\
+
+There are ten boundary types in {\EPOCH} and each boundary of the domain can
 have one and only one of these boundaries attached to it. These boundary types
 are:\\
 
@@ -640,15 +751,85 @@ simply removed from the simulation when they reach the boundary.\\
 propagate through the boundary. Particles are transmitted through the boundary
 and removed from the system.\\
 
-{\emphtext NOTE: If simple\_laser, simple\_outflow or open are specified on one
-or more boundaries then the code will no longer necessarily conserve mass.}\\
+{\emphtext cpml\_laser} - See \sect{cpml}.\\
+
+{\emphtext cpml\_outflow} - See \sect{cpml}.\\
+
+{\emphtext thermal} - See \sect{thermal}.\\
+
+{\emphtext NOTE: If simple\_laser, simple\_outflow, cpml\_laser,
+cpml\_outflow or open are specified on one or more boundaries then the code
+will no longer necessarily conserve mass.}\\
 
 Note also that it is possible for the user to specify contradictory,
 unphysical boundary conditions. It is the users responsibility that these
 flags are set correctly.
 
 
+\subsubsection{CPML boundary conditions}
+\label{sec:cpml}
+There are now Convolutional Perfectly Matched Layer boundary conditions
+in {\EPOCH}. The implementation closely follows that outlined in the book
+``Computational Electrodynamics. The Finite-Difference Time-Domain
+Method.'', A. Taflove and S. Hagness (2005).
+See also J. A. Roden and S. D. Gedney, ``Convolutional PML (CPML):
+an efficient FDTD implementation of the CFS-PML for arbitrary
+media'', Microwave Optical Technol. Lett., vol. 27, 2000.
+
+CPML boundaries are specified in the input deck by specifying either
+``cpml\_outflow'' or ``cpml\_laser'' in the boundaries block. ``cpml\_outflow''
+specifies an absorbing boundary condition whereas ``cpml\_laser'' is used
+to attach a laser to an otherwise absorbing boundary condition.
+
+There are also four configurable parameters:\\
+
+{\emphtext cpml\_thickness} - The thickness of the CPML boundary in terms of the
+  number of grid cells. The default value is 6.\\
+
+{\emphtext cpml\_kappa\_max}, {\emphtext cpml\_a\_max},
+{\emphtext cpml\_sigma\_max} - These are tunable parameters which affect the
+  behaviour of the absorbing media. The notation follows that used in the two
+  references quoted above. Note that the ``cpml\_sigma\_max'' parameter is
+  normalised by ``sigma\_opt = 0.8*(m+1)/dx''. These are real valued
+  parameters which take the following default values: cpml\_kappa\_max=20,
+  cpml\_a\_max=0.15, cpml\_sigma\_max=0.7\\
+
+An example usage is as follows:
+
+\begin{boxverbatim}
+   begin:boundaries
+     cpml_thickness = 16
+     cpml_kappa_max = 20
+     cpml_a_max = 0.2
+     cpml_sigma_max = 0.7
+     bc_x_min = cpml_laser
+     bc_x_max = cpml_outflow
+     bc_y_min = cpml_outflow
+     bc_y_max = cpml_outflow
+   end:boundaries
+\end{boxverbatim}
+
+\subsubsection{Thermal boundaries}
+\label{sec:thermal}
+
+Thermal boundary conditions have been added to the ``boundaries'' block.
+These simulate the existence of a ``thermal bath'' of particles in the
+domain adjacent to the boundary. When a particle leaves the simulation it is
+replace with an incoming particle sampled from a Maxwellian of a temperature
+corresponding to that of the initial conditions. It is requested using the
+keyword ``thermal''.
+For example:
+
+\begin{boxverbatim}
+   begin:boundaries
+     bc_x_min = laser
+     bc_x_max = thermal
+   end:boundaries
+\end{boxverbatim}
+
+
 \subsection{\inlineemph{species} block}
+\label{sec:species_block}
 The next section of the input deck describes the particle species used in the
 code. An example species block for any {\EPOCH} code is given below.
 \begin{lboxverbatim}{species block}
@@ -715,9 +896,22 @@ to the species.\\
 {\emphtext NOTE: frac should not be specified at the same time as npart for a
 given species.}\\
 
+{\emphtext npart\_per\_cell} - Integer parameter which specifies
+the number of particles per cell to use for the initial particle loading.
+At a later stage this may be extended to allow ``npart\_per\_cell'' to be
+a spatially varying function.
+
+If per-species weighting is used then the value of ``npart\_per\_cell'' will
+be the average number of particles per cell.  If ``npart'' or ``frac'' have
+also been specified for a species, then they will be ignored.
+
+To avoid confusion, there is no globally used ``npart\_per\_species''.  If you
+want to have a single value to change in the input deck then this can be
+achieved using a constant block.\\
+
 {\emphtext dumpmask} - Determines which output dumps will include this
 particle species. The dumpmask has the same semantics as those used
-by variables in the ``output'' block, described in \sect{output block}.
+by variables in the ``output'' block, described in \sect{output_block}.
 The actual dumpmask from the output block is applied first and then
 this one is applied afterwards. For example, if the species block contains
 ``dumpmask = full'' and the output block contains ``vx = always''
@@ -734,6 +928,13 @@ precompiler option, and when set for a given species make that species move
 correctly for its charge and mass, but contribute no current. This means that
 these particles are passive tracers in the plasma. ``tracer = F'' is the
 default value.\\
+
+{\emphtext identify} - Used to identify the type of particle. Currently this
+is used primarily by the QED routines. See \sect{qed_block} for details.\\
+
+{\emphtext immobile} - Logical flag. If this parameter is set to ``T'' then
+the species will be ignored during the particle push. The default value
+is ``F''.\\ 
 
 The species blocks are also used for specifying initial conditions for
 the particle species. The initial conditions in {\EPOCH} can be specified in
@@ -767,6 +968,9 @@ autoloader clips the density to density\_max allowing easy
 implementation of exponential rises to plateaus. If it is a negative value
 then no clipping is performed. This is the default.\\
 
+{\emphtext mass\_density} - Particle mass density in $kg m^{-3}$. The same
+as ``density'' but multiplied by the particle mass.\\
+
 {\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
 distribution in K.\\
 
@@ -783,6 +987,11 @@ electronvolts rather than Kelvin.\\
 {\emphtext drift\_\{x,y,z\}} - Specifies a momentum space offset in
 $kg\ ms^{-1}$ to the distribution function for this species. By default,
 the drift is zero.\\
+
+{\emphtext offset} - File offset. See below for details.\\
+
+% There are also 'split' and 'npart_max' entries. I don't know what they are
+% for so they are currently undocumented.
 
 It is also possible to set initial conditions for a particle species
 using an external file.  Instead of specifying the
@@ -815,8 +1024,113 @@ the same precision as \inlinecode{\_num} in the core {\EPOCH} code.\\
 files, NOT Fortran unformatted files. It is possible to read Fortran
 unformatted files using the offset element, but care must be taken!}
 
+\subsubsection{Particle migration between species}
+\label{sec:migration}
+
+It is sometimes useful to separate particle species into separate energy
+bands and to migrate particles between species when they become more or
+less energetic. A method to achieve this functionality has been implemented.
+It is specified using two parameters to the ``control'' block:\\
+
+{\emphtext use\_migration} - Logical flag which determines whether or not to
+  use particle migration. The default is ``F''.\\
+
+{\emphtext migration\_interval} - The number of timesteps between each
+  migration event.  The default is 1 (migrate at every timestep).\\
+
+The following parameters are added to the ``species'' block:\\
+
+{\emphtext migrate} - Logical flag which determines whether or not to consider
+  this species for migration. The default is ``F''.\\
+
+{\emphtext promote\_to} - The name of the species to promote particles to.\\
+
+{\emphtext demote\_to} - The name of the species to demote particles to.\\
+
+{\emphtext promote\_multiplier} - The particle is promoted when its energy is
+  greater than ``promote\_multiplier'' times the local average.  The default
+  value is 1.\\
+
+{\emphtext demote\_multiplier}  - The particle is demoted when its energy is
+  less than ``demote\_multiplier'' times the local average.  The default value
+  is 1.\\
+
+{\emphtext promote\_density} - The particle is only considered for promotion
+  when the local density is less than ``promote\_density''.  The default value
+  is HUGE.\\
+
+{\emphtext demote\_density}  - The particle is only considered for demotion
+  when the local density is greater than ``demote\_density''.  The default
+  value is 0.\\
+
+
+\subsubsection{Ionisation}
+\label{sec:ionisation}
+
+{\EPOCH} now includes field ionization which can be activated by defining
+ionisation energies and an electron for the ionising species. This is done
+via the species block using the following parameters:\\
+
+{\emphtext ionisation\_energies} - This is an array of ionisation energies
+  (in Joules) starting from the outermost shell. It expects to be given all
+  energies down to the fully ionised ion; if the user wishes to exclude some
+  inner shell ionisation for some reason they need to give this a very large
+  number. Note that the ionisation model assumes that the outermost electron
+  ionises first always, and that the orbitals are filled assuming ground
+  state. When this parameter is specified it turns on ionisation modeling.\\
+
+{\emphtext ionisation\_electron\_species} - Name of the electron species. This
+  can be specified as an array in the event that the user wishes some levels
+  to have a different electron species which can be handy for monitoring
+  ionisation at specific levels. ``electron'' and ``electron\_species'' are
+  accepted as synonyms.\\
+
+For example, ionising carbon species might appear in the input deck as:
+
+\begin{boxverbatim}
+begin:species
+  charge = 0.0
+  mass = 1837.2
+  name = carbon
+  ionisation_energies = (11.26*ev,24.38*ev,47.89*ev,64.49*ev,392.1*ev,490.0*ev)
+  ionisation_electron_species = (electron,electron,electron,fourth,electron,electron)
+  rho = den_gas
+end:species
+
+begin:species
+  charge = -1.0
+  mass = 1.0
+  name = electron
+  rho = 0.0
+end:species
+
+begin:species
+  charge = -1.0
+  mass = 1.0
+  name = fourth
+  rho = 0.0
+end:species
+\end{boxverbatim}
+
+Field ionisation consists of three distinct regimes; multiphoton in which
+ionisation is best described as absorption of multiple photons, tunneling
+in which deformation of the atomic Coulomb potential is the dominant factor,
+and barrier suppression ionisation in which the electric field is strong
+enough for an electron to escape classically. It is possible to turn off
+multiphoton or barrier suppression ionisation through the input deck
+using the following control block parameters:\\
+
+{\emphtext use\_multiphoton} - Logical flag which turns on modelling
+  ionisation by multiple photon absorption. This should be set to ``F'' if
+  there is no laser attached to a boundary as it relies on laser frequency.
+  The default is ``T''.\\
+
+{\emphtext use\_bsi} - Logical flag which turns on barrier suppression
+  ionisation correction to the tunneling ionisation model for high intensity
+  lasers. The default is ``T''.\\
+
 \subsection{\inlineemph{laser} block}
-\label{sec:lasers}
+\label{sec:laser_block}
 Laser blocks attach an EM wave source to a boundary which is set as
 \inlineemph{simple\_laser}.
 \begin{lboxverbatim}{laser block}
@@ -861,6 +1175,8 @@ conditions deck.\\
 
 {\emphtext omega} - Angular frequency (rad/s not Hz) for the laser.\\
 
+{\emphtext frequency} - Ordinary frequency (Hz not rad/s) for the laser.\\
+
 {\emphtext lambda} - Wavelength in a vacuum for the laser specified in $m$.
   If you want to specify in $\mu m$ then you can multiply by the constant
   ``micron''. One of \inlineemph{lambda} or \inlineemph{omega} is a
@@ -880,7 +1196,7 @@ conditions deck.\\
 \inlineemph{y\_min} - angle about $y$-axis, zero along $z$-axis\\
 \inlineemph{z\_min} - angle about $z$-axis, zero along $x$-axis\\
 \inlineemph{y\_max} - angle anti-clockwise about $y$-axis, zero along $z$-axis\\
-\inlineemph{z\_max} - angle anti-clockwise about $z$-axis, zero along $x$-axis
+\inlineemph{z\_max} - angle anti-clockwise about $z$-axis, zero along $x$-axis\\
 
 {\emphtext pol} - This is identical to \inlineemph{pol\_angle} with the angle
   specified in degrees rather than radians. If both are specified then the
@@ -964,6 +1280,7 @@ timestep is reduced from that for EM waves. {\EPOCH}
 includes a high order field solver to attempt to reduce this.
 
 \subsection{\inlineemph{fields} block}
+\label{sec:fields_block}
 The next type of block in the {\EPOCH} input deck is the fields block. This
 allows you to specify the electric and magnetic fields at any point in the
 domain. An example block is shown below:
@@ -989,11 +1306,16 @@ directions. The default value is zero.\\
 {\emphtext bx,\;by,\;bz} - The magnetic field vectors pointing in all three
 directions. The default value is zero.\\ 
 
+{\emphtext offset} - File offset. The field values may also be specified using
+a binary file in a similar way to that used for species variables. See
+\sect{species_block} for more details.\\
+
 Any valid maths parser expression can be used to set up the fields, and no
 check is made to ensure that the $\nabla.B = 0$ is satisfied.
 
 
 \subsection{\inlineemph{window} block}
+\label{sec:window_block}
 {\EPOCH} can include an optional block which causes the simulation domain to
 operate as a moving window. At present, it is only possible to have the window
 moving at a constant speed parallel to the x direction, although the window
@@ -1015,8 +1337,6 @@ begin:window
    bc_x_max_after_move = simple_outflow
 end:window
 \end{boxverbatim}
-
-{\emphtext include\_species} - Specifies a species which should be included.\\
 
 {\emphtext move\_window} - Logical flag determining whether or not to move the
   window. If the window block is absent then this is the same as setting
@@ -1040,12 +1360,29 @@ end:window
 
 
 \subsection{\inlineemph{output} block}
-\label{sec:output block}
+\label{sec:output_block}
 Output in {\EPOCH} is handled using the custom designed SDF file format
 (\inlineemph{Self Describing Format}) which is documented in \sect{sdf}
 of the developers manual.
 It comes with readers for ITT IDL, LLNL VisIt and Mathworks MatLab.
 The IDL reader is also compatible with the open source GDL tool.
+
+There are two styles of output block supported by {\EPOCH}. The first
+style, which will be referred to as the ``traditional'' style, is the
+method that has been supported by {\EPOCH} since its inception. With this
+method, a single output block governs all the output dumps which are to be
+performed. There are a few levels of output which give some small amount of
+flexibility over what gets dumped but these do not allow for a very
+fine-grained control.
+
+In version 4\.0 of {\EPOCH}, a new style was introduced in which multiple 
+named output blocks may be specified allowing for much greater flexibility.
+The existence of a ``name'' parameter is what determines that an output block
+is the new style rather than the traditional style.
+
+Most of the parameters are shared by both styles. The following sections
+document the traditional style of output block and any differences between
+the two styles are described in \sect{multiple_output}.
 
 What the code should output and when it should output it is
 specified in the ``output'' block of the input deck. 
@@ -1117,6 +1454,9 @@ Information will never be written into a file twice, even if two conditions for
 it being written are satisfied (i.e even if px should be dumped both because it
 is a full dump and a restart dump, px will only be written once).
 
+Note that these dump levels only really make sense for the traditional style
+of output block and are not really required when the new style is used.
+
 \subsubsection{Dumpmask}
 When specifying which type of output dump to write a variable to there are
 eight options which can be specified for each variable and can be combined by
@@ -1162,16 +1502,12 @@ When applied to a variable, these codes are referred to as a
 \inlineemph{dumpmask}.
 
 \subsubsection{Directives}
+\label{sec:output_directives}
 The first set of options control the type and frequency of output dumps. They
 are used as follows\\
 
-{\emphtext use\_offset\_grid} - When using moving windows some visualisation
-programs (notably VisIt) show the motion of the window by moving the
-visualisation window rather than by changing the x-axis. Setting this option to
-``T'' causes the code to write another grid which always gives the offset
-relative to the left hand edge of the window rather than the true origin.
-Performs no function when not using the moving window. The default value
-is ``F''.\\
+{\emphtext disabled} - Logical flag. If this is set to ``T'' then the block
+is ignored and never generates any output. The default value is ``F''.\\
 
 {\emphtext dt\_snapshot} - Sets the interval between normal output dumps in
 simulation seconds. Setting zero or negative means that the code will output
@@ -1197,11 +1533,58 @@ restart dumps. Setting to zero makes every dump a restart dump. Setting to a
 negative number stops the code from producing any restart dumps. This is the
 default.\\
 
-{\emphtext force\_final\_to\_be\_restartable} - Force the code to override
+{\emphtext force\_first\_to\_be\_restartable} - Logical flag which determines
+  whether the file written at time zero is a restart dump. The default value
+  is ``F''.\\
+
+{\emphtext force\_last\_to\_be\_restartable} - Force the code to override
 other output settings and make the last output dump it writes be a restart
 dump. Any internal condition which causes the code to terminate will make the
 code write a restart dump, but code crashes or scheduler terminations will not
-cause the code to write a restart dump. The default value is ``T''.\\
+cause the code to write a restart dump.
+``force\_final\_to\_be\_restartable'' is accepted as a synonym.
+The default value is ``T''.\\
+
+{\emphtext dump\_first} - Logical flag which determines whether to write an
+  output file immediately after initialising the simulation. The default is
+  ``F''.\\
+
+{\emphtext dump\_last} - Logical flag which determines whether to write an
+  output file just before ending the simulation. The default is ``T'' if
+  an output block exists in the input deck and ``F'' otherwise.
+  ``dump\_final'' is accepted as a synonym.\\
+
+{\emphtext time\_start} - Floating point parameter which specifies the
+  simulation time at which to start considering output for the block. Note
+  that if ``dump\_first'' or ``dump\_last'' are set to true for this block then
+  dumps will occur at the first or last timestep regardless of the value of this
+  parameter. This also applies to the three following parameters.
+  The default value is 0.\\
+
+{\emphtext time\_stop} - Floating point parameter which specifies the
+  simulation time at which to stop considering output for the block.
+  The default value is the largest possible float.\\
+
+{\emphtext nstep\_start} - Integer parameter which specifies the
+  step number at which to start considering output for the block.
+  The default value is 0.\\
+
+{\emphtext nstep\_stop} - Integer parameter which specifies the
+  step number at which to stop considering output for the block.
+  The default value is the largest possible integer.\\
+
+{\emphtext dump\_cycle} - If this is set to a positive integer then the
+  output file number will be reset to zero after the specified cycle number
+  is reached. eg. if ``dump\_cycle = 2'' then the sequence of output dumps
+  will be 0000.sdf, 0001.sdf, 0002.sdf, 0000.sdf, 0001.sdf, etc.
+  The default is 0, so dump cycling never occurs.\\
+
+{\emphtext dump\_cycle\_first\_index} - If this is set to a positive integer
+  then the value is used as the first index to use when cycling output dumps
+  due to the ``dump\_cycle'' parameter. For example, if ``dump\_cycle = 2''
+  and ``dump\_cycle\_first\_index = 1'' then the sequence of output dumps
+  will be 0000.sdf, 0001.sdf, 0002.sdf, 0001.sdf, 0002.sdf, 0001.sdf, etc.
+  The default is 0.\\
 
 {\emphtext dump\_source\_code} - {\EPOCH} has the ability to write its own
 source code into restart dumps. This is generated at compile time and embedded
@@ -1223,30 +1606,35 @@ averaging is to occur. ``averaging\_period'' is accepted as a synonym.\\
 file, this parameter specifies the number of time steps over which
 averaging is to occur. ``min\_cycles\_per\_average'' is accepted as a synonym.\\
 
-{\emphtext distribution\_functions} - Dumpmask for outputting distribution
-functions specified in the input deck. Each individual distribution function
-can have its own dumpmask and these will be applied after the value of
-``distribution\_functions'' has been considered. For example, if the
-output block contains ``distribution\_functions = full'' and the dist\_fn
-block contains ``dumpmask = always'' then the distribution function will
-only be output at full dumps.\\
+{\emphtext use\_offset\_grid} - When using moving windows some visualisation
+programs (notably VisIt) show the motion of the window by moving the
+visualisation window rather than by changing the x-axis. Setting this option to
+``T'' causes the code to write another grid which always gives the offset
+relative to the left hand edge of the window rather than the true origin.
+Performs no function when not using the moving window. The default value
+is ``F''.\\
 
-{\emphtext particle\_probes} - Dumpmask for outputting particle
-probes specified in the input deck. Each individual particle probe
-can have its own dumpmask and these will be applied after the value of
-``particle\_probes'' has been considered. For example, if the
-output block contains ``particle\_probes = always'' and the dist\_fn
-block contains ``dumpmask = full'' then the particle probe will
-only be output at full dumps.
+{\emphtext filesystem} - String parameter. Some filesystems can be unreliable
+when performing parallel I/O. Often this is fixable by prefixing the filename
+with `ufs' or `nfs'. This parameter supplies the prefix to be used. The
+default value is an empty string.\\
+
+{\emphtext file\_prefix} - Although this parameter is supported by the
+traditional style of output block, its primary purpose is for use with
+multiple output blocks so it is documented in \sect{multiple_output}.\\
+
+A few additional parameters have been added for use with the new style of
+output block. These are documented in \sect{multiple_output}.
 
 \subsubsection{Particle Variables}
 The next set are per particle properties which must be plotted at the
 individual particle positions to make sense. All entries have a default
 dumpmask of ``never''.\\
 
-{\emphtext particles} - The dumpmask for the particle positions. Restart
-variable. No particle variables can be plotted in VisIt unless this is
-dumped.\\
+{\emphtext particle\_grid} - Requests the output of particle positions. This
+is a restart variable. No particle variables can be plotted in VisIt unless
+this is dumped.
+The synonym ``particles'' may also be used.\\
 
 {\emphtext px,\;py,\;pz} - The dumpmasks for the particle momenta. Restart
 variable.\\
@@ -1259,11 +1647,58 @@ charge. See details on the \code{Makefile} later.\\
 
 {\emphtext mass} - The dumpmask for the mass of a given particles. This
 has no effect if the code is not compiled with the option for per
-particle mass.\\
+particle mass.
+The synonym ``rest\_mass'' may also be used.\\
 
 {\emphtext particle\_weight} - The dumpmask for the weighting function which
 describes how many real particles each pseudoparticle represents. Restart
-variable.
+variable.\\
+
+{\emphtext ejected\_particles} - If requested
+   then all the particles which have left the simulation domain since the last
+   output dump of this type was requested are written to file.  The parameter
+   is assigned a dumpmask in the same way as other variables in the output
+   block.  Once the data has been written, the ejected particle lists are
+   reset and will accumulate particles until the next requested output dump.\\
+
+{\emphtext particle\_energy} - The dumpmask for per-particle kinetic energy.\\
+
+{\emphtext relativistic\_mass} - The dumpmask for per-particle relativistic
+mass (ie. not rest mass).\\ 
+
+{\emphtext gamma} - The dumpmask for per-particle relativistic gamma
+(ie. $[1-(v/c)^2]^{-1/2}$).\\
+
+{\emphtext optical\_depth} - The dumpmask for per-particle optical depth.
+  Restart variable. This field is only valid when the QED model is used.\\
+
+{\emphtext trident\_optical\_depth} - The dumpmask for per-particle optical
+  depth used by the Trident model.
+  Restart variable. This field is only valid when the QED model is used.\\
+
+{\emphtext qed\_energy} - The dumpmask for per-particle QED-related particle
+  energy. Restart variable.  This field is only valid when the QED model
+  is used.\\
+
+{\emphtext id} - Global particle ID. See below for details.\\
+
+Particle IDs are useful if you want to track the progress
+of each particle throughout the simulation. Since they increase
+the size of each particle data structure, they are disabled by
+default and must be enabled using a compiler flag.
+The ``PARTICLE\_ID'' flag will use an 8-byte integer to represent the
+ID and ``PARTICLE\_ID4'' uses a 4-byte integer.
+They are written to file using the ``id'' flag.
+
+Note: In the current implementation, the particle IDs are
+passed between processors and written to file using REAL numbers.
+This means that in double precision the maximum particle ID
+is $2^{53} \sim 10^{16}$. This should be ample for the forseeable future.
+However, if the code is compiled for single precision then the
+maximum ID is $2^{24} = 16777216$. Probably not big enough.
+
+% species_id is only really used internally and therefore is currently
+% undocumented
 
 \subsubsection{Grid Variables}
 The next set of parameters specify properties which are defined on a
@@ -1272,7 +1707,8 @@ dumpmask of ``never''.\\
 
 {\emphtext grid} - The dumpmask for the Cartesian grid which defines the
 locations of the grid variables. No grid variables can be plotted in VisIt
-unless this variable is output.\\
+unless this variable is output.
+The synonym ``field\_grid'' may also be used.\\
 
 {\emphtext ex,\;ey,\;ez} - The electric field vectors pointing in all three
 directions. Restart variables.\\
@@ -1283,7 +1719,7 @@ Solenoidal condition. It is included simply for symmetry with higher dimension
 codes.\\
 
 {\emphtext jx,\;jy,\;jz} - The currents pointing in all three directions.
-Restart variables.
+Restart variables.\\
 
 \subsubsection{Derived Variables}
 The final set of parameters specify properties which are not variables used
@@ -1309,8 +1745,50 @@ dumpmask.\\
 %exact way that temperature is calculated in the code is likely to vary in the
 %near future.\\
 
-{\emphtext poynt\_flux} - Poynting flux in each direction.
+{\emphtext poynt\_flux} - Poynting flux in each direction.\\
 
+% The cpml_* variables are only really used internally and therefore
+% are currently undocumented
+
+\subsubsection{Other Variables}
+
+\hspace*{\parindent}%
+{\emphtext{distribution\_functions}} - Dumpmask for outputting distribution
+functions specified in the input deck. Each individual distribution function
+can have its own dumpmask and these will be applied after the value of
+``distribution\_functions'' has been considered. For example, if the
+output block contains ``distribution\_functions = full'' and the dist\_fn
+block contains ``dumpmask = always'' then the distribution function will
+only be output at full dumps.\\
+
+{\emphtext particle\_probes} - Dumpmask for outputting particle
+probes specified in the input deck. Each individual particle probe
+can have its own dumpmask and these will be applied after the value of
+``particle\_probes'' has been considered. For example, if the
+output block contains ``particle\_probes = always'' and the dist\_fn
+block contains ``dumpmask = full'' then the particle probe will
+only be output at full dumps.\\
+
+{\emphtext absorption} - This is a two-valued output variable. It accepts a
+  dumpmask in the same manner as other output variables. When selected, two
+  numbers will be calculated and written to file:%
+\vspace{-1.5mm}\begin{enumerate}
+  \itemsep0em
+  \item ``Absorption/Laser\_enTotal'' - The total amount of energy injected
+  into the simulation by laser boundaries.
+  \item ``Absorption/Abs\_frac'' - The fraction of this laser energy being
+  absorbed by the open boundaries.
+\end{enumerate}
+\vspace{1.5mm}
+
+{\emphtext total\_energy\_sum} - This is also a two-valued output variable. It
+  accepts a dumpmask in the same manner as other output variables. When
+  selected, the following two numbers will be calculated and written to file:%
+\vspace{-1.5mm}\begin{enumerate}
+  \itemsep0em
+  \item ``Total Particle Energy in Simulation (J)''
+  \item ``Total Field Energy in Simulation (J)''
+\end{enumerate}
 
 \subsubsection{Data Averaging}
 \label{sec:average}
@@ -1354,11 +1832,273 @@ full and restart dumps.
 Only field and derived variables can be averaged currently in EPOCH.
 Particle properties, distribution functions and particle probes cannot
 currently be averaged.
-% fix: ejected_particles
-% fix: cpml_*
 
+\subsubsection{Single-precision output}
+\label{sec:single_precision_output}
+
+By default, {\EPOCH} is compiled and run using double precision arithmetic.
+This is the only method which has been fully tested and the method that
+we recommend to other users of the code. However, this also means that
+data files can get very large.
+
+To avoid this problem, it is possible to run the code in double precision
+but convert the data to single precision when writing to disk. This is done
+by adding the ``single'' field the the dumpmask of an output variable.
+It can be specified on a per-variable basis.
+
+\begin{boxverbatim}
+   begin:output
+     dt_snapshot = 8 * femto
+
+     grid = always
+     ex = always
+     ey = always + single
+   end:output
+\end{boxverbatim}
+
+In this example, the grid variable ``ex'' will be written as a
+double precision array and ``ey'' will be converted to single
+precision.
+
+Dumping variable averages adds an extra field variable for each average
+requested. These take up memory during runtime but do not influence the
+simulation behaviour in any way. For this reason, if the average is to be
+written out in single precision then it may as well be stored in a single
+precision variable. This behaviour can be requested using the
+``average\_single'' dumpmask flag.
+
+
+\subsubsection{Multiple output blocks}
+\label{sec:multiple_output}
+
+In more recent versions of {\EPOCH}, it is now possible to have multiple
+``output'' blocks in the input deck,
+each with their own ``dt\_snapshot'' or ``nstep\_snapshot'' and their
+own set of output variables.
+
+The syntax remains the same as the original ``output'' block syntax with the
+addition of ``name'' and ``restartable'' fields.
+
+The ``name'' field specifies the file name to use for the output list. Each
+time EPOCH generates an output dump, it writes an entry into the file
+``<name>.visit''. This can be used to find all the output dumps of a specific
+output block. It is named with a ``.visit'' suffix to enable its use as
+a file grouping list in the VisIt data analysis tool, but it is just a plain
+text file so it can equally be used by any other program.
+
+If two output blocks are written at the same time, the output will be combined
+into a single file.
+
+The ``restartable'' field specifies that the output block should
+generate ouput dumps containing all the information necessary
+to restart a simulation.
+
+The following parameters are supported by the new style of output block in
+addition to those for the traditional style:
+
+{\emphtext name} - Identifies the output block with a name which is required
+  when multiple output blocks are used.\\
+
+{\emphtext restartable} - Specifies wether or not the output for this
+  block is a restartable dump.\\
+
+{\emphtext dump\_at\_times} - Floating point parameter which specifies a
+  set of simulation times at which to write the current output block. This
+  can only be used with named output blocks. The values are given as a
+  comma separated list. eg. ``dump\_at\_time = 0, 0.15, 1.1''. The name
+  ``times\_dump'' is accepted as a synonym. By default
+  the list is empty.\\
+
+{\emphtext dump\_at\_nsteps} - Integer parameter which specifies a
+  set of step numbers at which to write the current output block. This
+  can only be used with named output blocks. The values are given as a
+  comma separated list. eg. ``dump\_at\_nsteps = 5, 11, 15''. The name
+  ``nsteps\_dump'' is accepted as a synonym. By default
+  the list is empty.\\
+
+{\emphtext file\_prefix} - String parameter. It is sometimes useful to
+  distinguish between dumps generated by the different output blocks. This
+  parameter allows the user to supply a file prefix to be prepended to all
+  dumps generated by the current output block. See below for further details.
+  The default value is an empty string.\\
+
+{\emphtext rolling\_restart} - Logical flag. If set to ``T'', this sets the
+  parameters required for performing rolling restarts on the current block.
+  It is a shorthand for setting the following flags: ``dump\_cycle = 1'',
+  ``restartable = T'' and ``file\_prefix = roll''.\\
+
+The following parameters cannot be used in conjunction with the new style
+of output block:
+
+\begin{itemize}
+\item full\_dump\_every
+\item restart\_dump\_every
+\item force\_first\_to\_be\_restartable
+\item force\_last\_to\_be\_restartable
+\item use\_offset\_grid
+\end{itemize}
+
+The ``file\_prefix'' parameter warrants some further discussion. This
+parameter prepends the given prefix to all files generated by the output
+block in which it is specified.  For example, if ``file\_prefix = aa'' is
+set then files generated by the output block will be named ``aa0000.sdf'',
+etc. instead of just ``0000.sdf''.
+
+This also allows different variables to different files at the same
+time step. For example, here are two output blocks which do not use file
+prefixes:
+\begin{boxverbatim}
+begin:output
+  name = o1
+  nstep_snapshot = 1
+  charge_density = always
+end:output
+
+begin:output
+  name = o2
+  dump_at_nsteps = 10
+  restartable = T
+end:output
+\end{boxverbatim}
+
+With this input deck, we want to have the ``charge\_density''
+derived variable at every snapshot and then periodically write a
+restart dump. The problem is that the dump file ``0010.sdf''
+contains both the restart information and the ``charge\_density''
+variable. At the end of the run we can't just delete the large
+restart dumps without losing the smaller variables at that
+time step.
+
+With the new version we would add a prefix to one or both
+blocks:
+\begin{boxverbatim}
+begin:output
+  name = o1
+  file_prefix = small
+  nstep_snapshot = 1
+  charge_density = always
+end:output
+
+begin:output
+  name = o2
+  nstep_snapshot = 10
+  restartable = T
+end:output
+\end{boxverbatim}
+
+Now the ``charge\_density'' will be written to ``small0000.sdf'', etc.
+At step 10, two files will be written: ``small0010.sdf'' containing
+just the charge\_density and ``0000.sdf'' containing all the restart
+variables.
+
+Note that some care must be taken, since if the same variable is
+in the output block for multiple file prefixes then multiple
+copies will be written to file. This obviously uses more disk
+space and is more time consuming than necessary.
+
+It should also be noted that if multiple output blocks use the
+same file stem then their output will be combined. eg:
+\begin{boxverbatim}
+begin:output
+  name = o1
+  file_prefix = a
+  dump_at_nsteps = 2,4
+  ex = always
+end:output
+
+begin:output
+  name = o2
+  file_prefix = a
+  dump_at_nsteps = 3,4
+  ey = always
+end:output
+
+begin:output
+  name = o3
+  file_prefix = b
+  dump_at_nsteps = 4
+  ez = always
+end:output
+\end{boxverbatim}
+
+In this example, at step 2 a0000.sdf contains ex, step 3 a0001.sdf
+contains ey, step 4 a0002.sdf contains ex, ey and b0000.sdf
+contains ez.
+
+
+\subsection{\inlineemph{output\_global} block}
+\label{sec:output_global_block}
+
+With the introduction of multiple output blocks, there are now a few parameters
+that only make sense to be applied globally across all output blocks. To
+accomodate this, a new block named ``output\_global'' has been added.
+Most of the parameters accepted by this block have the same meaning as those
+in the ``output'' block except that they are applied to all ``output'' blocks.
+
+The parameters that can be specified in the ``output\_global'' block are
+as follows:\\
+
+{\emphtext force\_first\_to\_be\_restartable} - Logical flag which determines
+  whether the file written at time zero is a restart dump. The default value
+  is ``F''.\\
+
+{\emphtext force\_last\_to\_be\_restartable} - Force the code to override
+other output settings and make the last output dump it writes be a restart
+dump. Any internal condition which causes the code to terminate will make the
+code write a restart dump, but code crashes or scheduler terminations will not
+cause the code to write a restart dump.
+``force\_final\_to\_be\_restartable'' is accepted as a synonym.
+The default value is ``T''.\\
+
+{\emphtext dump\_first} - Logical flag which determines whether to write an
+  output file immediately after initialising the simulation. The default is
+  ``F''.\\
+
+{\emphtext dump\_last} - Logical flag which determines whether to write an
+  output file just before ending the simulation. The default is ``T'' if
+  an output block exists in the input deck and ``F'' otherwise.
+  ``dump\_final'' is accepted as a synonym.\\
+
+{\emphtext time\_start} - Floating point parameter which specifies the
+  simulation time at which to start considering output for the block. Note
+  that if ``dump\_first'' or ``dump\_last'' are set to true for this block then
+  dumps will occur at the first or last timestep regardless of the value of this
+  parameter. This also applies to the three following parameters.
+  The default value is 0.\\
+
+{\emphtext time\_stop} - Floating point parameter which specifies the
+  simulation time at which to stop considering output for the block.
+  The default value is the largest possible float.\\
+
+{\emphtext nstep\_start} - Integer parameter which specifies the
+  step number at which to start considering output for the block.
+  The default value is 0.\\
+
+{\emphtext nstep\_stop} - Integer parameter which specifies the
+  step number at which to stop considering output for the block.
+  The default value is the largest possible integer.\\
+
+{\emphtext sdf\_buffer\_size} - Integer parameter. When writing particle data
+to an SDF file, the data is first transferred into an output buffer. The
+size of this buffer can have a big impact on the overrall speed of writing
+dump files. This parameter allows the size of the buffer to be specified in
+bytes. The default value is 67108864 (64 MB).\\ 
+
+{\emphtext filesystem} - String parameter. Some filesystems can be unreliable
+when performing parallel I/O. Often this is fixable by prefixing the filename
+with `ufs' or `nfs'. This parameter supplies the prefix to be used. The
+default value is an empty string.\\
+
+{\emphtext use\_offset\_grid} - When using moving windows some visualisation
+programs (notably VisIt) show the motion of the window by moving the
+visualisation window rather than by changing the x-axis. Setting this option to
+``T'' causes the code to write another grid which always gives the offset
+relative to the left hand edge of the window rather than the true origin.
+Performs no function when not using the moving window. The default value
+is ``F''.\\
 
 \subsection{\inlineemph{dist\_fn} block}
+\label{sec:dist_fn_block}
 
 PIC codes effectively represent a Lagrangian Monte-Carlo sampling of the phase
 space of Vlasov's equation. Sometimes it is useful to reconstruct part of the
@@ -1415,7 +2155,7 @@ dimensions, this is restricted to being either 2 or 3.\\
 
 {\emphtext dumpmask} - Determines which output dumps will include this
 distribution function. The dumpmask has the same semantics as those used
-by variables in the ``output'' block, described in \sect{output block}.
+by variables in the ``output'' block, described in \sect{output_block}.
 The dumpmask from ``distribution\_functions'' in the output block is applied
 first and then this one is applied afterwards. For example, if the
 dist\_fn block contains ``dumpmask = full'' and the output block contains
@@ -1424,10 +2164,15 @@ only be dumped at full dumps. The default dumpmask is ``always''.\\
 
 {\emphtext direction\inlinecode{n}} - This is the phase space to sample
 along axis \inlinecode{n}. This can be any one of:
-dir\_x, dir\_y, dir\_z, dir\_px, dir\_py, dir\_pz, dir\_en, dir\_gamma\_m1
+dir\_x, dir\_y, dir\_z, dir\_px, dir\_py, dir\_pz, dir\_en, dir\_gamma\_m1,
+dir\_xy\_angle, dir\_yz\_angle, dir\_zx\_angle
 with spatial codes only being available in dimensionalities of the code which
 have that direction. Therefore dir\_z does not exist in EPOCH1D or EPOCH2D
-and dir\_y does not exist in EPOCH1D.\\
+and dir\_y does not exist in EPOCH1D.
+
+The flags ``dir\_xy\_angle'', ``dir\_yz\_angle'' and
+``dir\_zx\_angle'' calculate the distribution
+of particle momentum directions in the X-Y, Y-Z and Z-X planes.\\
 
 {\emphtext range\inlinecode{n}} - The range between which this axis should
 run. This is in the form of (minimum, maximum). Any particle which exceeds
@@ -1474,6 +2219,7 @@ properties from the code. This will be improved in a future release.
 
 
 \subsection{\inlineemph{probe} block}
+\label{sec:probe_block}
 Sometimes it is useful to consider all the properties of particle which pass
 through a point/line/plane (depending on dimension) in the simulation. To
 allow this, it is possible to specify one or more {\it Particle Probe} blocks
@@ -1536,6 +2282,165 @@ end:probe
   drastically if this code only dumps probe information infrequently. If this
   is set to \inlinecode{never} then the code effectively never uses the probe.\\
 
+% x1,x2,y1,y2,etc. are considered legacy and no longer documented.
+
+\subsection{\inlineemph{collisions} block}
+\label{sec:collisions_block}
+{\EPOCH} has a particle collision routine based on the model presented
+by Sentoku and Kemp.
+This adds a new output block named ``collisions'' which accepts the
+following three parameters.\\
+
+{\emphtext use\_collisions} - This is a logical flag which determines whether
+  or not to call the collision routine. If omitted, the default is ``T'' if any
+  of the frequency factors are non-zero (see below) and ``F'' otherwise.\\
+
+{\emphtext coulomb\_log} - This may either be set to a real value, specifying
+  the Coulomb logarithm to use when scattering the particles or to the special
+  value ``auto''. If ``auto'' is used then the routine will calculate a value
+  based on the properties of the two particles being scattered.  If omitted,
+  the default value is ``auto''.\\
+
+{\emphtext collide} - This sets up a symmetric square matrix of size
+  nspecies$\,\times\,$nspecies containing the collision frequency factors to
+  use between particle species. The element (s1,s2) gives the frequency factor
+  used when colliding species s1 with species s2.  If the factor is less than
+  zero, no collisions are performed.  If it is equal to one, collisions are
+  performed normally.  For any value between zero and one, the collisions are
+  performed using a frequency multiplied by the given factor.\\
+  If ``collide'' has a value of ``all'' then all elements of the matrix are
+  set to one. If it has a value of ``none'' then all elements are set to minus
+  one.\\
+  If the syntax ``species1 species2 $<$value$>$'' is used, then the
+  (species1,species2) element of the matrix is set to the factor
+  ``$<$value$>$''.  This may either be a real number, or the special value
+  ``on'' or ``off''. The ``collide'' parameter may be used multiple times.\\
+  The default value is ``all'' (ie. all elements of the matrix are set to
+  one).\\
+
+{\emphtext collisional\_ionisation} - If this logical flag is set to ``T''
+  then the collisional ionisation model is enabled. The default value
+  is ``F''.\\
+
+For example:
+
+\begin{lboxverbatim}{collisions}
+    begin:collisions
+      use_collisions = T
+      coulomb_log = auto
+      collide = all
+      collide = spec1 spec2 off
+      collide = spec2 spec3 0.1
+    end:collisions
+\end{lboxverbatim}
+
+  With this block, collisions are turned on and the Coulomb logarithm is
+  automatically calculated. All values of the frequency array are set
+  to one except (spec1,spec2) is set to minus one (and also (spec2,spec1))
+  and (spec2,spec3) is set to 0.1
+
+
+\subsection{\inlineemph{qed} block}
+\label{sec:qed_block}
+
+{\EPOCH} can model QED pair production as described in Duclous et al.
+PPCF 53 (2011).
+It is enabled using the compiler flag ``-DPHOTONS''. Additionally,
+the Trident process is enabled using ``-DTRIDENT\_PHOTONS''.
+
+A new input deck block named ``qed'' has been added which accepts the
+following parameters:\\
+
+{\emphtext use\_qed} - Logical flag which turns QED on or off. The default
+  is ``F''.\\
+
+{\emphtext qed\_start\_time} - Floating point value specifying the time after
+  which QED effects should be turned on. The default is 0.\\
+
+{\emphtext produce\_photons} - Logical flag which specifies whether to track
+  the photons generated by synchrotron emission. If this is ``F'' then the
+  radiation reaction force is calculated but the properties of the emitted
+  photons are not tracked. The default is ``F''.\\
+
+{\emphtext photon\_energy\_min} - Minimum energy of produced photons.
+  Radiation reaction is calculated for photons of all energies, but photons
+  with energy below this cutoff are not tracked.  The default is 0.\\
+
+{\emphtext photon\_dynamics} - Logical flag which specifies whether to push
+  photons.  If ``F'' then photons are generated, but their motion through the
+  domain is not simulated and they stay where they were generated. The default
+  is ``F''.\\
+
+{\emphtext produce\_pairs} - Logical flag which determines whether or not to
+  simulate the process of pair generation from gamma ray photons.  Both
+  produce\_photons and photon\_dynamics must be ``T'' for this to work. The
+  default is ``F''.\\
+
+{\emphtext qed\_table\_location} - EPOCH's QED routines use lookup tables to
+  calculate gamma ray emission and pair production. If you want to use tables
+  in a different location from the default, specify the new location using
+  this parameter.  The default is ``src/physics\_packages/TABLES''.\\
+
+{\emphtext use\_radiation\_reaction} - Logical flag which determines whether
+  or not to calculate the radiation reaction force. If set to ``F'' then
+  the force is not calculated. The default value is ``T''.\\
+
+QED also requires that the code now know which species are electrons,
+positrons and photons. The species type is specified using a single
+``identify'' tag in a species block. To specify an electron the block in the
+deck would look like
+
+\begin{boxverbatim}
+  begin:species
+    name = electron
+    frac = 0.5
+    rho = 7.7e29
+    identify:electron
+  end:species
+\end{boxverbatim}
+
+Once the identity of a species is set then the code automatically assigns
+mass and charge states for the species.
+Possible identities are:\\
+
+{\emphtext electron} - A normal electron species. All species of electrons in
+  the simulation must be identified in this way or they will not generate
+  photons.\\
+
+{\emphtext positron} - A normal positron species. All species of positron in
+  the simulation must be identified in this way or they will not generate
+  photons.\\
+
+{\emphtext photon} - A normal photon species. One species of this type is
+  needed for photon production to work. If multiple species are present then
+  generated photons will appear in the first species of this type.\\
+
+{\emphtext bw\_electron} - The electron species for pair production by the
+  Breit-Wheeler process. If a species of this type exists then electrons from
+  the pair production module will be created in this species. If no species of
+  this type is specified then pair electrons will be generated in the first
+  electron species.\\
+
+{\emphtext bw\_positron} - As above but for positrons.\\
+
+{\emphtext trident\_electron} - The electron species for pair production by
+  the Trident process. If a species of this type exists then electrons from
+  the pair production module will be created in this species. If no species
+  of this type is specified then pair electrons will be generated in the first
+  electron species.\\
+
+{\emphtext trident\_positron} - As above but for positrons.\\
+
+{\emphtext proton} - A normal proton species. This is for convenience only and
+  is not required by the pair production routines.\\
+
+A species should be identified only once, so a ``bw\_electron'' species does
+not need to also be identified as an ``electron'' species. If the code is
+running with ``produce\_photons=T'' then a photon species must be created by
+user and identified. If the code is running with ``produce\_pairs=T'' then the
+code must specify at least one electron (or bw\_electron) species and one
+positron (or bw\_positron) species. The code will fail to run if the needed
+species are not specified.
 
 The basic input deck has now been considered fully but it
  is possible for an end user to add new blocks to the input deck As a result,
@@ -1543,7 +2448,110 @@ a version of the code which you have obtained from a source other than
 CCPForge may include other input deck blocks. These should be described in
 additional documentation provided with the version of the code that you have.
 
+
+\subsection{\inlineemph{subset} block}
+\label{sec:subset_block}
+
+It is possible to restrict the number of particles written to file
+according to various criteria. For example, you can now output the
+momentum of all particles which have a gamma lower than 1.8 or the
+positions of a randomly chosen subset of a given species.
+
+A new input deck block named ``subset'' is defined which accepts the following
+parameters:\\
+
+{\emphtext name} - The name given to this subset. This is used to identify the
+  subset in the output block and is also used when labelling the data in the
+  SDF files.\\
+
+{\emphtext include\_species} - Add the given particle species to the set of
+  particles that this subset applies to. By default, no particle species
+  are included.\\
+
+{\emphtext dumpmask} - The dumpmask to use when considering this subset in
+  an output block. This takes the same form as the output block dumpmask.
+  The default value is ``always''.\\
+
+{\emphtext random\_fraction} - Select a random percentage of the particle
+  species. This is a real value between zero and one. If 0 is specified,
+  no particles are selected. If 1 is specified, all the particles are
+  selected. If 0.2 is specified, 20\% of the particles are selected.\\
+
+{\emphtext \{px,py,pz,weight,charge,mass,gamma\}\_min} - Select only the
+  particles with momentum, weight, charge, mass or gamma which is greater
+  than the given value.\\
+
+{\emphtext \{px,py,pz,weight,charge,mass,gamma\}\_max} - Select only the
+  particles with momentum, weight, charge, mass or gamma which is less
+  than the given value.\\
+
+{\emphtext \{x,y,z\}\_min} - Select only the particles whose position lies
+  above the given value.\\
+
+{\emphtext \{x,y,z\}\_max} - Select only the particles whose position lies
+  below the given value.\\
+
+{\emphtext id\_{min,max}} - Select only the particles whose ``id'' is greater
+  than or less than the given values. The ``id'' field is explained below.\\
+
+Once a subset has been defined, the subset name can then be used in place of
+(or in addition to) the dumpmask in an ``output'' block. For example:\\
+
+\begin{boxverbatim}
+   begin:subset
+     name = background
+     random_fraction = 0.1
+     include_species:electron
+     include_species:proton
+   end:subset
+
+   begin:subset
+     name = high_gamma
+     gamma_min = 1.3
+     include_species:electron
+   end:subset
+
+   begin:output
+     particles = background + high_gamma + always
+     px = background + high_gamma
+     py = background
+     pz = always
+   end:output
+\end{boxverbatim}
+
+In this example, three ``px'' blocks will be written:
+``Particles/background/electron/Px'', ``Particles/background/proton/Px''
+and ``Particles/high\_gamma/electron/Px''.
+The ``background'' blocks will contain 10\% of the each species, randomly
+selected.
+The ``high\_gamma'' block will contain all the electrons with a gamma
+greater than 1.3.
+
+There will also be ``Particles/background/electron/Py'' and
+``Particles/background/proton/Py'' block containing y-momentum for the same
+10\% random subset of particles.
+Finally, the ``Particles/All/electron/Pz'' and ``Particles/All/proton/Pz'' will
+contain the z-momentum for all particles.
+
+The final selection criteria given in the list above is ``id\_min'' and
+``id\_max''. As of {\EPOCH} version 4.0, the code can now assign a unique
+ID field to every particle in the simulation. This can be useful for
+tracking specific particles as they move through a simulation. As this
+field adds extra memory requirements to the particles, it is disabled by
+default and must be compiled in using the ``-DPARTICLE\_ID'' compiler flag.
+
+Particle IDs can be written to file using the ``id'' variable name in
+the ``output'' block.  Eg.
+\begin{boxverbatim}
+   begin:output
+     particles = always
+     id = always
+   end:output
+\end{boxverbatim}
+
+
 \subsection{\inlineemph{constant} block}
+\label{sec:constant_block}
 
 The \inlineemph{constant} block type helps to make the input deck more flexible
 and maintainable. It allows you to define constants and maths parser
@@ -1644,6 +2652,9 @@ The maths parser in {\EPOCH}  has the following constants
 \item \{x,y,z\}\_max - Grid coordinate of the maximum x,y,z boundary.
 \item length\_\{x,y,z\} - The length of the simulation box in the x,y,z
   direction.
+\item nproc\_\{x,y,z\} - The number of processes in the x,y,z directions.
+\item nsteps - The number of timesteps requested.
+\item t\_end - The end time of the simulation.
 \end{itemize}
 
 It is also possible for an end user to specify custom constants both within
@@ -1752,6 +2763,7 @@ The maths parser in {\EPOCH} allows the following operators
 It is not possible at this time to specify custom operators without major
 changes to the code. An example of using an operator would be:\\
 \indent\inlinecode{length\_x = 10.0 + 12.0}
+
 
 \section{{\EPOCH} use in practice}
 \label{sec:usage}
@@ -2129,7 +3141,7 @@ anywhere initial conditions are specified.
 
 When running {\EPOCH} in 2D or 3D, the laser can be modified spatially
 via the \inlineemph{profile} and \inlineemph{phase} parameters. These
-are briefly outlined in \sect{lasers} but in this section we will describe
+are briefly outlined in \sect{laser_block} but in this section we will describe
 them in a little more depth.\\
 
 {\emphtext profile} - The spatial profile for the laser. This is
@@ -2701,530 +3713,169 @@ view the results you will have to jump forward to \sectit{idl}.
 \include{idl_visit}
 
 \appendix
-\section{Changes for version 4.0}
-
-\subsection{Collisions}
-Added Sentoku and Kemp collision routine.
-This adds a new output block named ``collisions'' which accepts the
-following three parameters.\\
-
-{\emphtext use\_collisions} - This is a logical flag which determines whether
-  or not to call the collision routine. If omitted, the default is ``T'' if any
-  of the frequency factors are non-zero (see below) and ``F'' otherwise.\\
-
-{\emphtext coulomb\_log} - This may either be set to a real value, specifying
-  the Coulomb logarithm to use when scattering the particles or to the special
-  value ``auto''. If ``auto'' is used then the routine will calculate a value
-  based on the properties of the two particles being scattered.  If omitted,
-  the default value is ``auto''.\\
-
-{\emphtext collide} - This sets up a symmetric square matrix of size
-  nspecies$\,\times\,$nspecies containing the collision frequency factors to
-  use between particle species. The element (s1,s2) gives the frequency factor
-  used when colliding species s1 with species s2.  If the factor is less than
-  zero, no collisions are performed.  If it is equal to one, collisions are
-  performed normally.  For any value between zero and one, the collisions are
-  performed using a frequency multiplied by the given factor.\\
-  If ``collide'' has a value of ``all'' then all elements of the matrix are
-  set to one. If it has a value of ``none'' then all elements are set to minus
-  one.\\
-  If the syntax ``species1 species2 $<$value$>$'' is used, then the
-  (species1,species2) element of the matrix is set to the factor
-  ``$<$value$>$''.  This may either be a real number, or the special value
-  ``on'' or ``off''. The ``collide'' parameter may be used multiple times.\\
-  The default value is ``all'' (ie. all elements of the matrix are set to
-  one).\\
-
-For example:
-
-\begin{lboxverbatim}{collisions}
-    begin:collisions
-      use_collisions = T
-      coulomb_log = auto
-      collide = all
-      collide = spec1 spec2 off
-      collide = spec2 spec3 0.1
-    end:collisions
-\end{lboxverbatim}
-
-  With this block, collisions are turned on and the Coulomb logarithm is
-  automatically calculated. All values of the frequency array are set
-  to one except (spec1,spec2) is set to minus one (and also (spec2,spec1))
-  and (spec2,spec3) is set to 0.1
-
-\subsection{QED}
-
-Added QED pair production as described in Duclous et al. PPCF 53 (2011)
-It is enabled using the compiler flag ``-DPHOTONS''. Additionally,
-the Trident process is enabled using ``-DTRIDENT\_PHOTONS''.
-
-A new input deck block named ``qed'' has been added which accepts the
-following parameters:\\
-
-
-{\emphtext use\_qed} - Logical flag which turns QED on or off. The default
-  is ``F''.\\
-
-{\emphtext qed\_start\_time} - Floating point value specifying the time after
-  which QED effects should be turned on. The default is 0.\\
-
-{\emphtext produce\_photons} - Logical flag which specifies whether to track
-  the photons generated by synchrotron emission. If this is ``F'' then the
-  radiation reaction force is calculated but the properties of the emitted
-  photons are not tracked. The default is ``F''.\\
-
-{\emphtext photon\_energy\_min} - Minimum energy of produced photons.
-  Radiation reaction is calculated for photons of all energies, but photons
-  with energy below this cutoff are not tracked.  The default is 0.\\
-
-{\emphtext photon\_dynamics} - Logical flag which specifies whether to push
-  photons.  If ``F'' then photons are generated, but their motion through the
-  domain is not simulated and they stay where they were generated. The default
-  is ``F''.\\
-
-{\emphtext produce\_pairs} - Logical flag which determines whether or not to
-  simulate the process of pair generation from gamma ray photons.  Both
-  produce\_photons and photon\_dynamics must be ``T'' for this to work. The
-  default is ``F''.\\
-
-{\emphtext qed\_table\_location} - EPOCH's QED routines use lookup tables to
-  calculate gamma ray emission and pair production. If you want to use tables
-  in a different location from the default, specify the new location using
-  this parameter.  The default is ``src/physics\_packages/TABLES''.\\
-
-QED also requires that the code now know which species are electrons,
-positrons and photons. The species type is specified using a single
-``identify'' tag in a species block. To specify an electron the block in the
-deck would look like
-
-\begin{boxverbatim}
-  begin:species
-    name = electron
-    frac = 0.5
-    rho = 7.7e29
-    identify:electron
-  end:species
-\end{boxverbatim}
-
-Once the identity of a species is set then the code automatically assigns
-mass and charge states for the species.
-Possible identities are:\\
-
-{\emphtext electron} - A normal electron species. All species of electrons in
-  the simulation must be identified in this way or they will not generate
-  photons.\\
-
-{\emphtext positron} - A normal positron species. All species of positron in
-  the simulation must be identified in this way or they will not generate
-  photons.\\
-
-{\emphtext photon} - A normal photon species. One species of this type is
-  needed for photon production to work. If multiple species are present then
-  generated photons will appear in the first species of this type.\\
-
-{\emphtext bw\_electron} - The electron species for pair production by the
-  Breit-Wheeler process. If a species of this type exists then electrons from
-  the pair production module will be created in this species. If no species of
-  this type is specified then pair electrons will be generated in the first
-  electron species.\\
-
-{\emphtext bw\_positron} - As above but for positrons.\\
-
-{\emphtext trident\_electron} - The electron species for pair production by
-  the Trident process. If a species of this type exists then electrons from
-  the pair production module will be created in this species. If no species
-  of this type is specified then pair electrons will be generated in the first
-  electron species.\\
-
-{\emphtext trident\_positron} - As above but for positrons.\\
-
-{\emphtext proton} - A normal proton species. This is for convenience only and
-  is not required by the pair production routines.\\
-
-A species should be identified only once, so a ``bw\_electron'' species does
-not need to also be identified as an ``electron'' species. If the code is
-running with ``produce\_photons=T'' then a photon species must be created by
-user and identified. If the code is running with ``produce\_pairs=T'' then the
-code must specify at least one electron (or bw\_electron) species and one
-positron (or bw\_positron) species. The code will fail to run if the needed
-species are not specified.
-
-\subsection{Ionisation}
-
-{\EPOCH} now includes field ionization which can be activated by defining
-ionisation energies and an electron for the ionising species. This is done
-via the species block using the following parameters:\\
-
-{\emphtext ionisation\_energies} - This is an array of ionisation energies
-  (in Joules) starting from the outermost shell. It expects to be given all
-  energies down to the fully ionised ion; if the user wishes to exclude some
-  inner shell ionisation for some reason they need to give this a very large
-  number. Note that the ionisation model assumes that the outermost electron
-  ionises first always, and that the orbitals are filled assuming ground
-  state. When this parameter is specified it turns on ionisation modeling.\\
-
-{\emphtext electron\_species} - Name of the electron species. This can be
-  specified as an array in the event that the user wishes some levels to have
-  a different electron species which can be handy for monitoring ionisation at
-  specific levels.\\
-
-For example, ionising carbon species might appear in the input deck as:
-
-\begin{boxverbatim}
-begin:species
-  charge = 0.0
-  mass = 1837.2
-  name = carbon
-  ionisation_energies = (11.26*ev,24.38*ev,47.89*ev,64.49*ev,392.1*ev,490.0*ev)
-  electron = (electron,electron,electron,fourth,electron,electron)
-  rho = den_gas
-end:species
-
-begin:species
-  charge = -1.0
-  mass = 1.0
-  name = electron
-  rho = 0.0
-end:species
-
-begin:species
-  charge = -1.0
-  mass = 1.0
-  name = fourth
-  rho = 0.0
-end:species
-\end{boxverbatim}
-
-Field ionisation consists of three distinct regimes; multiphoton in which
-ionisation is best described as absorption of multiple photons, tunneling
-in which deformation of the atomic Coulomb potential is the dominant factor,
-and barrier suppression ionisation in which the electric field is strong
-enough for an electron to escape classically. It is possible to turn off
-multiphoton or barrier suppression ionisation through the input deck
-using the following control block parameters:\\
-
-{\emphtext use\_multiphoton} - Logical flag which turns on modelling
-  ionisation by multiple photon absorption. This should be set to ``F'' if
-  there is no laser attached to a boundary as it relies on laser frequency.
-  The default is ``T''.\\
-
-{\emphtext use\_bsi} - Logical flag which turns on barrier suppression
-  ionisation correction to the tunneling ionisation model for high intensity
-  lasers. The default is ``T''.\\
-
-
-\subsection{CPML boundary conditions}
-There are now Convolutional Perfectly Matched Layer boundary conditions
-in {\EPOCH}. The implementation closely follows that outlined in the book
-``Computational Electrodynamics. The Finite-Difference Time-Domain
-Method.'', A. Taflove and S. Hagness (2005).
-See also J. A. Roden and S. D. Gedney, ``Convolutional PML (CPML):
-an efficient FDTD implementation of the CFS-PML for arbitrary
-media'', Microwave Optical Technol. Lett., vol. 27, 2000.
-
-CPML boundaries are specified in the input deck by specifying either
-``cpml\_outflow'' or ``cpml\_laser'' in the boundaries block. ``cpml\_outflow''
-specifies an absorbing boundary condition whereas ``cpml\_laser'' is used
-to attach a laser to an otherwise absorbing boundary condition.
-
-There are also four configurable parameters:\\
-
-{\emphtext cpml\_thickness} - The thickness of the CPML boundary in terms of the
-  number of grid cells. The default value is 6.\\
-
-{\emphtext cpml\_kappa\_max}, {\emphtext cpml\_a\_max},
-{\emphtext cpml\_sigma\_max} - These are tunable parameters which affect the
-  behaviour of the absorbing media. The notation follows that used in the two
-  references quoted above. Note that the ``cpml\_sigma\_max'' parameter is
-  normalised by ``sigma\_opt = 0.8*(m+1)/dx''. These are real valued
-  parameters which take the following default values: cpml\_kappa\_max=20,
-  cpml\_a\_max=0.15, cpml\_sigma\_max=0.7\\
-
-An example usage is as follows:
-
-\begin{boxverbatim}
-   begin:boundaries
-     cpml_thickness = 16
-     cpml_kappa_max = 20
-     cpml_a_max = 0.2
-     cpml_sigma_max = 0.7
-     bc_x_min = cpml_laser
-     bc_x_max = cpml_outflow
-     bc_y_min = cpml_outflow
-     bc_y_max = cpml_outflow
-   end:boundaries
-\end{boxverbatim}
-
-\subsection{Thermal boundaries}
-
-Thermal boundary conditions have been added to the ``boundaries'' block.
-These simulate the existence of a ``thermal bath'' of particles in the
-domain adjacent to the boundary. When a particle leaves the simulation it is
-replace with an incoming particle sampled from a Maxwellian of a temperature
-corresponding to that of the initial conditions. It is requested using the
-keyword ``thermal''.
-For example:
-
-\begin{boxverbatim}
-   begin:boundaries
-     bc_x_min = laser
-     bc_x_max = thermal
-   end:boundaries
-\end{boxverbatim}
-
-\subsection{Particle migration between species}
-
-It is sometimes useful to separate particle species into separate energy
-bands and to migrate particles between species when they become more or
-less energetic. A method to achieve this functionality has been implemented.
-It adds two new parameters to the ``control'' block:\\
-
-{\emphtext use\_migration} - Logical flag which determines whether or not to
-  use particle migration. The default is ``F''.\\
-
-{\emphtext migration\_interval} - The number of timesteps between each
-  migration event.  The default is 1 (migrate at every timestep).\\
-
-The following parameters are added to the ``species'' block:\\
-
-{\emphtext migrate} - Logical flag which determines whether or not to consider
-  this species for migration. The default is ``F''.\\
-
-{\emphtext promote\_to} - The name of the species to promote particles to.\\
-
-{\emphtext demote\_to} - The name of the species to demote particles to.\\
-
-{\emphtext promote\_multiplier} - The particle is promoted when its energy is
-  greater than ``promote\_multiplier'' times the local average.  The default
-  value is 1.\\
-
-{\emphtext demote\_multiplier}  - The particle is demoted when its energy is
-  less than ``demote\_multiplier'' times the local average.  The default value
-  is 1.\\
-
-{\emphtext promote\_density} - The particle is only considered for promotion
-  when the local density is less than ``promote\_density''.  The default value
-  is HUGE.\\
-
-{\emphtext demote\_density}  - The particle is only considered for demotion
-  when the local density is greater than ``demote\_density''.  The default
-  value is 0.\\
-
-
-\subsection{Outputing a subset of the particles}
-
-It is now possible to restrict the number of particles written to file
-according to various criteria. For example, you can now output the
-momentum of all particles which have a gamma lower than 1.8 or the
-positions of a randomly chosen subset of a given species.
-
-A new input deck block named ``subset'' is defined which accepts the following
-parameters:\\
-
-{\emphtext name} - The name given to this subset. This is used to identify the
-  subset in the output block and is also used when labelling the data in the
-  SDF files.\\
-
-{\emphtext include\_species} - Add the given particle species to the set of
-  particles that this subset applies to. By default, no particle species
-  are included.\\
-
-{\emphtext dumpmask} - The dumpmask to use when considering this subset in
-  an output block. This takes the same form as the output block dumpmask.
-  The default value is ``always''.\\
-
-{\emphtext random\_fraction} - Select a random percentage of the particle
-  species. This is a real value between zero and one. If 0 is specified,
-  no particles are selected. If 1 is specified, all the particles are
-  selected. If 0.2 is specified, 20\% of the particles are selected.\\
-
-{\emphtext \{px,py,pz,weight,charge,mass,gamma\}\_min} - Select only the
-  particles with momentum, weight, charge, mass or gamma which is greater
-  than the given value.\\
-
-{\emphtext \{px,py,pz,weight,charge,mass,gamma\}\_max} - Select only the
-  particles with momentum, weight, charge, mass or gamma which is less
-  than the given value.\\
-
-{\emphtext \{x,y,z\}\_min} - Select only the particles whose position lies
-  above the given value.\\
-
-{\emphtext \{x,y,z\}\_max} - Select only the particles whose position lies
-  below the given value.\\
-
-{\emphtext id\_{min,max}} - Select only the particles whose ``id'' is greater
-  than or less than the given values. The ``id'' field is explained below.\\
-
-Once a subset has been defined, the subset name can then be used in place of
-(or in addition to) the dumpmask in an ``output'' block. For example:\\
-
-\begin{boxverbatim}
-   begin:subset
-     name = background
-     random_fraction = 0.1
-     include_species:electron
-     include_species:proton
-   end:subset
-
-   begin:subset
-     name = high_gamma
-     gamma_min = 1.3
-     include_species:electron
-   end:subset
-
-   begin:output
-     particles = background + high_gamma + always
-     px = background + high_gamma
-     py = background
-     pz = always
-   end:output
-\end{boxverbatim}
-
-In this example, three ``px'' blocks will be written:
-``Particles/background/electron/Px'', ``Particles/background/proton/Px''
-and ``Particles/high\_gamma/electron/Px''.
-The ``background'' blocks will contain 10\% of the each species, randomly
-selected.
-The ``high\_gamma'' block will contain all the electrons with a gamma
-greater than 1.3.
-
-There will also be ``Particles/background/electron/Py'' and
-``Particles/background/proton/Py'' block containing y-momentum for the same
-10\% random subset of particles.
-Finally, the ``Particles/All/electron/Pz'' and ``Particles/All/proton/Pz'' will
-contain the z-momentum for all particles.
-
-The final selection criteria given in the list above is ``id\_min'' and
-``id\_max''. As of {\EPOCH} version 4.0, the code can now assign a unique
-ID field to every particle in the simulation. This can be useful for
-tracking specific particles as they move through a simulation. As this
-field adds extra memory requirements to the particles, it is disabled by
-default and must be compiled in using the ``-DPARTICLE\_ID'' compiler flag.
-
-Particle IDs can be written to file using the ``id'' variable name in
-the ``output'' block.  Eg.
-\begin{boxverbatim}
-   begin:output
-     particles = always
-     id = always
-   end:output
-\end{boxverbatim}
-
-\subsection{Single-precision output}
-
-By default, {\EPOCH} is compiled and run using double precision arithmetic.
-This is the only method which has been fully tested and the method that
-we recommend to other users of the code. However, this also means that
-data files can get very large.
-
-To avoid this problem, it is now possible to run the code in double precision
-but convert the data to single precision when writing to disk. This is done
-by adding the ``single'' field the the dumpmask of an output variable.
-It can be specified on a per-variable basis.
-
-\begin{boxverbatim}
-   begin:output
-     dt_snapshot = 8 * femto
-
-     grid = always
-     ex = always
-     ey = always + single
-   end:output
-\end{boxverbatim}
-
-In this example, the grid variable ``ex'' will be written as a
-double precision array and ``ey'' will be converted to single
-precision.
-
-Dumping variable averages adds an extra field variable for each average
-requested. These take up memory during runtime but do not influence the
-simulation behaviour in any way. For this reason, if the average is to be
-written out in single precision then it may as well be stored in a single
-precision variable. This behaviour can be requested using the
-``average\_single'' dumpmask flag.
-
-\subsection{Multiple output blocks}
-
-It is now possible to have multiple ``output'' blocks in the input deck,
-each with their own ``dt\_snapshot'' or ``nstep\_snapshot'' and their
-own set of output variables.
-
-The syntax remains the same as the original ``output'' block syntax with the
-addition of ``name'' and ``restartable'' fields.
-
-The ``name'' field specifies the file name to use for the output list. Each
-time EPOCH generates an output dump, it writes an entry into the file
-``<name>.visit''. This can be used to find all the output dumps of a specific
-output block. It is named with a ``.visit'' suffix to enable its use as
-a file grouping list in the VisIt data analysis tool, but it is just a plain
-text file so it can equally be used by any other program.
-
-If two output blocks are written at the same time, the output will be combined
-into a single file.
-
-The ``restartable'' field specifies that the output block should
-generate ouput dumps containing all the information necessary
-to restart a simulation.
+\section{Changes between version 3.1 and 4.0}
+
+\subsection{Changes to the Makefile}
+
+Some changes have been made to the Makefile. These are documented in
+\sect{makefile}.\\
+
+\noindent The following compile-time defines have been added to the Makefile:
+\begin{itemize}
+\item NO\_IO
+\item PARTICLE\_ID
+\item PARTICLE\_ID4
+\item COLLISIONS\_TEST
+\item PHOTONS
+\item TRIDENT\_PHOTONS
+\item PREFETCH
+\end{itemize}
+\bigskip
+
+\noindent The following compile-time defines have been removed from the Makefile:
+\begin{itemize}
+\item COLLISIONS
+\item SPLIT\_PARTICLES\_AFTER\_PUSH
+\item PARTICLE\_IONISE
+\end{itemize}
+
+\subsection{Major features and new blocks added to the input deck}
+
+\begin{itemize}
+\item CPML boundary conditions - See \sect{cpml}
+\item Thermal boundary conditions - See \sect{thermal}
+\item Collisions - See \sect{collisions_block}
+\item QED - See \sect{qed_block}
+\item Subsets - See \sect{subset_block}
+\item Ionisation - See \sect{ionisation}
+\item Single-precision output - See \sect{single_precision_output}
+\item Multiple output blocks - See \sect{multiple_output}
+\item Particle migration - See \sect{migration}
+\end{itemize}
+%dumpmask - single, average_single
 
 \subsection{Additional output block parameters}
 
-The following parameters have also been added to the ``output'' block:\\
+The following parameters have also been added to the ``output'' block
+(see \sect{output_directives}):
 
-{\emphtext dump\_first} - Logical flag which determines whether to write an
-  output file immediately after initialising the simulation. The default is
-  ``F''.\\
-
-{\emphtext dump\_last} - Logical flag which determines whether to write an
-  output file just before ending the simulation. The default is ``T'' if
-  an output block exists in the input deck and ``F;; otherwise.\\
-
-{\emphtext force\_first\_to\_be\_restartable} - Logical flag which determines
-  whether the file written at time zero is a restart dump. The default value
-  is ``F''.\\
-
-{\emphtext ejected\_particles} - This is particle output variable. If requested
-   then all the particles which have left the simulation domain since the last
-   output dump of this type was requested are written to file.  The parameter
-   is assigned a dumpmask in the same way as other variables in the output
-   block.  Once the data has been written, the ejected particle lists are
-   reset and will accumulate particles until the next requested output dump.\\
-
-{\emphtext absorption} - This is a two-valued output variable. It accepts a
-   dumpmask in the same manner as other output variables. When selected, two
-   numbers will be calculated and written to file:\\
-     ``Absorption/Laser\_enTotal'' - The total amount of energy injected into
-     the simulation by laser boundaries.\\
-     ``Absorption/Abs\_frac'' - The fraction of this laser energy being absorbed
-     by the open boundaries.
+\begin{itemize}
+\item dump\_first
+\item dump\_last
+\item force\_first\_to\_be\_restartable
+\item ejected\_particles
+\item absorption
+\item id
+\item name
+\item restartable
+\end{itemize}
 
 \subsection{Other additions to the input deck}
 
-The parameter ``npart\_per\_cell'' was added to the ``species'' blocks.
-This adds the ability to specify the number of particles per cell to use for
-the initial particle loading.  In the current implementation,
-``npart\_per\_cell'' is a simple integer constant. At a later stage this may
-be extended to allow ``npart\_per\_cell'' to be a spatially varying function.
-
-If per-species weighting is used then the value of ``npart\_per\_cell'' will
-be the average number of particles per cell.  If ``npart'' or ``frac'' have
-also been specified for a species, then they will be ignored.
-
-To avoid confusion, there is no globally used ``npart\_per\_species''.  If you
-want to have a single value to change in the input deck then this can be
-achieved using a constant block.\\
-
-Distribution functions have been added for the angle of particle momentum.
-This adds the flags ``dir\_xy\_angle'', ``dir\_yz\_angle'' and
-``dir\_zx\_angle'' to the ``dist\_fn'' block. These calculate the distribution
-of particle momentum directions in the X-Y, Y-Z and Z-X planes.\\
-
-The parameter ``particle\_tstart'' was added to the ``control'' block which
-specifies the time at which to start pushing particles. This allows the field
-to evolve using the Maxwell solver for a specified time before beginning to
-move the particles.\\
+\begin{itemize}
+\item npart\_per\_cell - See \sect{species_block}
+\item dir\_\{xy,yz,zx\}\_angle - See \sect{dist_fn_block}
+\item particle\_tstart - See \sect{control_block}
+\item identify - See \sect{species_block}
+\end{itemize}
 
 Finally, the input deck now has a method for writing continuation lines.
 If the deck contains a ``\textbackslash'' character then the rest of the line
 is ignored and the next line becomes a continuation of the current one.
+
+
+\section{Changes between version 4.0 and 4.3}
+
+\subsection{Changes to the Makefile}
+
+Some changes have been made to the Makefile. These are documented in
+\sect{makefile}.\\
+
+\noindent The following compile-time define has been added to the Makefile:
+\begin{itemize}
+\item MPI\_DEBUG
+\end{itemize}
+\bigskip
+
+\noindent The following compile-time define has been removed from the Makefile:
+\begin{itemize}
+\item FIELD\_DEBUG
+\end{itemize}
+
+
+\subsection{Additions to the input deck}
+The following parameters have been added to the ``control'' block of
+the input deck (see \sect{control_block}):
+\begin{itemize}
+\item nproc\{x,y,z\}
+\item smooth\_currents
+\item field\_ionisation
+\item use\_exact\_restart
+\item allow\_cpu\_reduce
+\item check\_stop\_file\_frequency
+\item stop\_at\_walltime
+\item stop\_at\_walltime\_file
+\item simplify\_deck
+\item print\_constants
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the ``output'' block of
+the input deck (see \sect{output_block}):
+\begin{itemize}
+\item disabled
+\item time\_start
+\item time\_stop
+\item nstep\_start
+\item nstep\_stop
+\item dump\_at\_times
+\item dump\_at\_nsteps
+\item dump\_cycle
+\item dump\_cycle\_first\_index
+\item filesystem
+\item file\_prefix
+\item rolling\_restart
+\item particle\_energy
+\item relativistic\_mass
+\item gamma
+\item total\_energy\_sum
+\item optical\_depth
+\item qed\_energy
+\item trident\_optical\_depth
+\end{itemize}
+\bigskip
+
+\noindent The following parameter has been added to the ``collisions'' block of
+the input deck (see \sect{collisions_block}):
+\begin{itemize}
+\item collisional\_ionisation
+\end{itemize}
+\bigskip
+
+\noindent The following parameter has been added to the ``qed'' block of
+the input deck (see \sect{qed_block}):
+\begin{itemize}
+\item use\_radiation\_reaction
+\end{itemize}
+\bigskip
+
+\noindent The following parameter has been added to the ``species'' block of
+the input deck (see \sect{species_block}):
+\begin{itemize}
+\item immobile
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the list of pre-defined
+constants (see \sect{constants}).
+\begin{itemize}
+\item nproc\_\{x,y,z\}
+\item nsteps
+\item t\_end
+\end{itemize}
+\bigskip
+
+\noindent There has also been a new ``output\_global'' block added to the
+input deck. This is documented in \sect{output_global_block}.
 
 \end{document}
