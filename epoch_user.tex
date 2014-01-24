@@ -45,39 +45,41 @@ particles.
 
 \subsubsection{Features of {\EPOCH}}
 \begin{itemize}
-  \item MPI parallelised explicit 2nd order relativistic PIC code.
-  \item Dynamic MPI load balancing option.
-  \item MPI-IO based output, allowing restart on arbitrary number of processors.
+  \item MPI parallelised, explicit, second-order, relativistic PIC code.
+  \item Dynamic load balancing option for making optimal use of all processors
+    when run in parallel.
+  \item MPI-IO based output, allowing restart on an arbitrary number of
+    processors.
   \item Data analysis and visualisation options include ITT IDL, LLNL VisIt
     and Mathworks MatLab.
   \item Control of setup and runs of {\EPOCH} through a customisable input deck.
 \end{itemize}
 
 \subsection{The origins of the code}
-The {\EPOCH} family of PIC codes is based on the older code PSC by Hartmut Ruhl,
-and retains almost the same core algorithm for the field updates and particle
-advance routines. {\EPOCH} was written to add more modern features, and to
-structure the code in such a way that future expansion of the code is made as
-easy as possible.
+The {\EPOCH} family of PIC codes is based on the older PSC code written by
+Hartmut Ruhl and retains almost the same core algorithm for the field updates
+and particle push routines. {\EPOCH} was written to add more modern features
+and to structure the code in such a way that future expansion of the code is
+made as easy as possible.
 
 \subsection{What normalisations are used in {\EPOCH}?}
 Since the idea from the start was that {\EPOCH} would be used by a large number
-of different users, and that it should be as easy as possible to ``plug in''
+of different users and that it should be as easy as possible to ``plug in''
 different modules from different people into a given copy of the code, it was
 decided to write {\EPOCH} in SI units. There are a few places in the code where
 some quantities are given in other units for convenience (for example charges
-are specified in multiples of the electron charge), but the entire of the core
+are specified in multiples of the electron charge), but the entire core of the
 code is written in SI units.
 
 \subsection{What are those \code{\_num} things doing everywhere?}
 Historically using the compiler auto-promotion of \code{REAL} to
-\code{DOUBLE PRECISION} was unreliable, so {\EPOCH} uses kind tags to specify
-the precision of the code. The \code{\_num} suffixes and the associated
-definition of \code{REAL}s as \code{REAL(num)} are these kind tags in
+\code{DOUBLE PRECISION} was unreliable, so {\EPOCH} uses ``kind'' tags to
+specify the precision of the code. The \code{\_num} suffixes and the associated
+definition of \code{REAL}s as \code{REAL(num)} are these ``kind'' tags in
 operation. The \code{\_num} tags force numerical constants to match the
-precision of the code preventing errors due to precision conversion. The
+precision of the code, preventing errors due to precision conversion. The
 important thing is that all numerical constants should be tagged with an
-\code{\_num} tag, and all \code{REAL}s should be defined as \code{REAL(num)}.
+\code{\_num} tag and all \code{REAL}s should be defined as \code{REAL(num)}.
 
 \subsection{What is an input deck?}
 An input deck is text file which can be used to set simulation parameters
@@ -89,27 +91,27 @@ an equals sign. Most aspects of a simulation can be controlled using an
 input deck, such as the number of grid points in the simulation domain,
 the initial distribution of particles and initial electromagnetic field
 configuration. It is designed to be relatively easy to read and edit. For
-most simulations it should be possible to set up a simulation without
+most projects it should be possible to set up a simulation without
 editing the source code at all.
 For more details, read \sectit{input}.
 
 \subsection{I just want to use the code as a black box, or I'm just
   starting. How do I do that?}
-Begin by reading \sectit{examples}. There's quite a lot to learn to get started
-so you should plan to read through all of this section. You will also need
-to refer to \sectit{input}. Next, look at the code and have
+Begin by reading \sectit{examples}. There's quite a lot to learn in order to
+get started, so you should plan to read through all of this section. You will
+also need to refer to \sectit{input}. Next, look at the code and have
 a play with some test problems. After that re-read this section. This should be
 enough for testing simple problems.
 
 
-\subsection{What is the autoloader?}
-Throughout this document we will often refer to the ``autoloader'' when
+\subsection{What is the auto-loader?}
+Throughout this document we will often refer to the ``auto-loader'' when
 setting up the initial particle distribution. In the input deck it is
 possible to specify a functional form for the density and temperature 
 of a particle species. {\EPOCH} will then place the particles to match
 the density function and set the velocities of the particles so that they
 match the Maxwellian thermal distribution for the temperature.
-The code which performs this particle set up is called the ``autoloader''.
+The code which performs this particle set up is called the ``auto-loader''.
 
 At present, there is no way to specify a non-Maxwellian particle distribution
 from within the input deck. In such cases, it is necessary to edit and
@@ -133,9 +135,9 @@ Further information about this facility can be found in
 See \sectit{customising}.
 
 \subsection{I want to develop an addition to {\EPOCH}. How do I do that?}
-Basically read the entire of this manual. The second part of the manual details
-the internals of the code but it expects you to already be familiar with all
-the material in the first part of the manual.
+Basically read the whole of both this manual and the developers manual. The
+developers manual details the internals of the code but it expects you to
+already be familiar with all the material in the user manual.
 
 \subsection{I want to have a full understanding of how {\EPOCH} works. How do I
   do that?}
@@ -151,7 +153,7 @@ compile and run the code.
 
 \subsection{Structure of the {\EPOCH} codes}
 When obtained, the {\EPOCH} codes all have a similar structure. Inside the
-epoch\{1,2,3\}d directory, there are 4 subdirectories:
+epoch\{1,2,3\}d directory, there are 4 sub-directories:
 
 \begin{itemize}
 \item src - The {\EPOCH} source code.
@@ -180,7 +182,7 @@ there are also 5 files:
 There are also two directories in the parent directory of epoch\{1,2,3\}d:
 
 \begin{itemize}
-\item Matlab - The files for creating a plug-in for the Mathworks MatLab
+\item MatLab - The files for creating a plug-in for the Mathworks MatLab
   visualisation tool for reading SDF files generated by an {\EPOCH} run.
 \item VisIt - The files for creating a plug-in for the LLNL VisIt parallel
   visualisation tool for reading SDF files generated by an {\EPOCH} run.
@@ -197,7 +199,7 @@ support soon.
 There are no plans to write a version of {\EPOCH} which does not require
 the MPI libraries.
 
-The code is supplied with a standard GNU make makefile, which is also
+The code is supplied with a standard GNU make Makefile, which is also
 compatible with most other forms of the {\bf make} utility. In theory it is
 possible to compile the code without a {\bf make} utility, but it is much
 easier to compile the code using the supplied makefile.
@@ -207,7 +209,7 @@ easier to compile the code using the supplied makefile.
 To compile {\EPOCH} in the supplied state, just type\\
 \indent\inlinecode{make}\\
 and the code will compile. There are certain options within the code which are
-controlled by compiler preprocessors which are described in the next
+controlled by compiler preprocessors and are described in the next
 section. When the code is compiled, it creates a new directory called ``bin''
 containing the compiled binary which will be called \inlinecode{epoch1d},
 \inlinecode{epoch2d} or \inlinecode{epoch3d}. To run the code, just execute the
@@ -244,8 +246,31 @@ Some cluster setups accept the following instead:\\
 where ``deck.file'' is a file containing the name of the output directory.
 Some cluster queueing systems do not
 allow the use of input pipes to mpirun. In this case, there is usually a
-``-stdin'' command line option to specify an input file, see your cluster
+``-stdin'' command line option to specify an input file. See your cluster
 documentation for more details.
+
+As of version 4.2.12, {\EPOCH} now checks for the existence of a file named
+``USE\_DATA\_DIRECTORY'' in the current working directory before it prompts
+the user for a Data directory. If such a file exists, it reads it to obtain the name of the data
+directory to use and does not prompt the user. If no such file exists, it
+prompts for a data directory name as before.
+This is useful for cluster setups in which it is difficult or
+impossible to pipe in the directory name using a job script.
+
+The ``Makefile'' supplied with {\EPOCH} is setup to use the Intel compiler
+by default. However, it also contains configurations for gfortran, pgi, g95,
+hector and ibm (the compiler suite used on IBM's BlueGene machines).
+In order to compile using one of the listed configurations, add the
+``\verb|COMPILER=|'' option to the ``\verb|make|'' command. For example\\
+\indent\inlinecode{make COMPILER=gfortran}\\
+will compile the code using the gfortran compiler and appropriate compiler
+flags.
+You can also compile the code with debugging flags by adding
+``\verb|MODE=debug|'' and can compile using more than one processor by
+using ``\verb|-j<n>|'', where ``\verb|<n>|''
+is the number of processors to use. Note that this is just to speed up the
+compilation process; the resulting binary can be run on any number of
+processors.
 
 \subsection{Compiler flags and preprocessor defines}
 \label{sec:makefile}
@@ -256,6 +281,9 @@ following:
 \begin{boxverbatim}
 DEFINES += $(D)PER_PARTICLE_WEIGHT
 \end{boxverbatim}
+On most machines ``\texttt{\$(D)}'' just means ``\texttt{-D}'' but the variable
+is required to accommodate more exotic setups.
+
 To turn on the effect given by a given preprocessor directive, just uncomment
 the appropriate ``DEFINES'' line. The
 options currently controlled by the preprocessor are:\\
@@ -328,12 +356,11 @@ then the code will give an error message as follows:
  Code will continue, but to use selected features, please recompile with the
  -DPARTICLE_PROBES option
 \end{boxverbatim}
-
 It is also possible to pass other flags to the compiler. In ``Makefile'' there
 is a line which reads\\
 \indent\inlinecode{FFLAGS = -O3 -fast}\\
-the two commands to the right are compiler flags and are passed unaltered to
-the Fortran compiler. Change this line to add any additional flags required by
+The two commands to the right are compiler flags and are passed unaltered to
+the FORTRAN compiler. Change this line to add any additional flags required by
 your compiler.
 
 By default, {\EPOCH} will write a copy of the source code and input decks
@@ -354,6 +381,7 @@ disabled.
 
 \subsection{Running {\EPOCH} and basic control of EPOCH1D}
 When the code is run, the output is
+{\samepage
 \begin{lboxverbatim}{Command line output}
 
         d########P  d########b        .######b          d#######  d##P      d##P
@@ -377,6 +405,7 @@ When the code is run, the output is
 
  Specify output directory
 \end{lboxverbatim}
+}
 
 At which point the end user should simply type in the name of the directory
 where the code output is to be placed. This directory must also include the
@@ -407,8 +436,10 @@ the parameters are always lower case.
 Parameter values are evaluated using a maths parser which is described in
 \sect{maths_parser}.\\
 
-If the deck contains a ``\textbackslash'' character then the rest of the line
-is ignored and the next line becomes a continuation of the current one.\\
+If the deck contains a ``\verb|\|'' character then the rest of the line
+is ignored and the next line becomes a continuation of the current one. Also,
+the comment character is ``\verb|#|''; if the ``\verb|#|'' character is used
+anywhere on a line then the remainder of that line is ignored.\\
 
 \noindent There are three {\it input deck directive} commands, which are:
 \begin{itemize}
@@ -505,7 +536,7 @@ code terminates. Negative numbers instruct the code to only terminate at
 \inlineemph{t\_end} must be given.\\
 
 {\emphtext t\_end} - The final simulation time in simulation seconds before the
-code terminates. If \inlineemph{t\_end} is not specified the
+code terminates. If \inlineemph{t\_end} is not specified then
 \inlineemph{nsteps} must be given. If they are both specified then
 the first time restriction to be satisfied takes precedence.\\
 
@@ -530,7 +561,14 @@ specified then the code will only be load balanced at initialisation time.\\
 
 {\emphtext restart\_snapshot} - The number of a previously written restart
 dump to restart the code from. If not specified then the initial conditions
-from the input deck are used.\\
+from the input deck are used.
+
+Note that as of version 4.2.5, this parameter can now also accept a filename
+in place of a number.
+If you want to restart from ``0012.sdf'' then it can either be
+specified using ``restart\_snapshot = 12'', or alternatively it can be
+specified using ``restart\_snapshot = 0012.sdf''. This syntax is required
+if output file prefixes have been used (see \sect{output_block}).\\
 
 {\emphtext field\_order} - Order of the finite difference scheme used for
 solving Maxwell's equations. Can be 2, 4 or 6. If not specified, the default
@@ -547,7 +585,7 @@ flag is set to ``T'' then the seed will be generated using the system clock.\\
 
 {\emphtext nproc\{x,y,z\}} - Number of processes in the \inlineemph{x,y,z}
 directions. By default, {\EPOCH} will try to pick the best method of splitting
-the domain amongst the available processors but occassionally the user may
+the domain amongst the available processors but occasionally the user may
 wish to override this choice.\\
 
 {\emphtext smooth\_currents} - This is a logical flag. If set to ``T'' then
@@ -564,7 +602,7 @@ default value is ``F''.\\
   See \sect{ionisation}. The default is ``T''.\\
 
 {\emphtext use\_bsi} - Logical flag which turns on barrier suppression
-  ionisation correction to the tunneling ionisation model for high intensity
+  ionisation correction to the tunnelling ionisation model for high intensity
   lasers. See \sect{ionisation}. The default is ``T''.\\
 
 {\emphtext particle\_tstart} - Specifies the time at which to start pushing
@@ -574,8 +612,9 @@ specified time before beginning to move the particles.\\
 {\emphtext use\_exact\_restart} - Logical flag which makes a simulation
   restart using exactly the same configuration as the original simulation. If
   set to ``T'' then the domain split amongst processors will be identical
-  along with the seeds for the random number generators. The default value
-  is ``F''.\\
+  along with the seeds for the random number generators. Note that the flag
+  will be ignored if the number of processors does not match that used in the
+  original run. The default value is ``F''.\\
  
 {\emphtext allow\_cpu\_reduce} - Logical flag which allows the number of CPUs
   used to be reduced from the number specified. In some situations it may not
@@ -796,6 +835,7 @@ There are also four configurable parameters:\\
 
 An example usage is as follows:
 
+{\samepage
 \begin{boxverbatim}
    begin:boundaries
      cpml_thickness = 16
@@ -808,6 +848,7 @@ An example usage is as follows:
      bc_y_max = cpml_outflow
    end:boundaries
 \end{boxverbatim}
+}
 
 \subsubsection{Thermal boundaries}
 \label{sec:thermal}
@@ -869,7 +910,7 @@ Each species block accepts the following parameters:\\
 {\emphtext name} - This specifies the name of the particle species defined
 in the current block. This name can include any alphanumeric characters in
 the basic ASCII set. The name is used to identify the species in any
-consequent input block and is also used for labeling species data in any
+consequent input block and is also used for labelling species data in any
 output dumps. It is a mandatory parameter.\\
 
 {\emphtext NOTE: IT IS IMPOSSIBLE TO SET TWO SPECIES WITH THE SAME NAME!} \\
@@ -1021,7 +1062,7 @@ The file should be a simple binary file consisting of floating point numbers of
 the same precision as \inlinecode{\_num} in the core {\EPOCH} code.\\
 
 {\emphtext NOTE: The files that are expected by this block are SIMPLE BINARY
-files, NOT Fortran unformatted files. It is possible to read Fortran
+files, NOT FORTRAN unformatted files. It is possible to read FORTRAN
 unformatted files using the offset element, but care must be taken!}
 
 \subsubsection{Particle migration between species}
@@ -1067,7 +1108,7 @@ The following parameters are added to the ``species'' block:\\
 \subsubsection{Ionisation}
 \label{sec:ionisation}
 
-{\EPOCH} now includes field ionization which can be activated by defining
+{\EPOCH} now includes field ionisation which can be activated by defining
 ionisation energies and an electron for the ionising species. This is done
 via the species block using the following parameters:\\
 
@@ -1077,7 +1118,7 @@ via the species block using the following parameters:\\
   inner shell ionisation for some reason they need to give this a very large
   number. Note that the ionisation model assumes that the outermost electron
   ionises first always, and that the orbitals are filled assuming ground
-  state. When this parameter is specified it turns on ionisation modeling.\\
+  state. When this parameter is specified it turns on ionisation modelling.\\
 
 {\emphtext ionisation\_electron\_species} - Name of the electron species. This
   can be specified as an array in the event that the user wishes some levels
@@ -1112,8 +1153,32 @@ begin:species
 end:species
 \end{boxverbatim}
 
+If ``ionisation\_electron\_species'' is not specified then the electron species
+are created automatically and are named according to the ionising species name
+with a number appended. For example
+\begin{boxverbatim}
+begin:species
+  name = Helium
+  ionisation_energies = (24.6*ev,54.4*ev)
+  dump = F
+end:species
+\end{boxverbatim}
+With this species block, the electron species named ``Helium1'' and ``Helium2''
+are automatically created. These species will also inherit the ``dump''
+parameter from their parent species, so in this example they will both have
+``dump = F'' set. This behaviour can be overridden by explicitly
+adding a species block of the same name with a differing dumpmask.
+eg.
+\begin{boxverbatim}
+begin:species
+  name = Helium1
+  dump = T
+end:species
+\end{boxverbatim}
+
+
 Field ionisation consists of three distinct regimes; multiphoton in which
-ionisation is best described as absorption of multiple photons, tunneling
+ionisation is best described as absorption of multiple photons, tunnelling
 in which deformation of the atomic Coulomb potential is the dominant factor,
 and barrier suppression ionisation in which the electric field is strong
 enough for an electron to escape classically. It is possible to turn off
@@ -1126,7 +1191,7 @@ using the following control block parameters:\\
   The default is ``T''.\\
 
 {\emphtext use\_bsi} - Logical flag which turns on barrier suppression
-  ionisation correction to the tunneling ionisation model for high intensity
+  ionisation correction to the tunnelling ionisation model for high intensity
   lasers. The default is ``T''.\\
 
 \subsection{\inlineemph{laser} block}
@@ -1162,6 +1227,8 @@ conditions deck.\\
 {\emphtext intensity} - The intensity of the laser in $W/m^2$.
   There is no need to specify both intensity and amp and the last specified
   in the block is the value used. It is mandatory to specify at least one.
+  The amplitude of the laser is calculated from intensity using the formula
+  \verb|amp = sqrt(2*intensity/c/epsilon0)|.
   ``irradiance'' is accepted as a synonym.\\
 
 {\emphtext intensity\_w\_cm2} - This is identical to the 
@@ -1203,14 +1270,14 @@ conditions deck.\\
   last one is used.\\
 
 {\emphtext phase} - The phase profile of the laser wavefront given in radians.
-  Once again this is calculated at t = 0, so no time dependant part may be
-  used. There is zero phase shift applied by default.\\
+  Phase may be a function of both space and time.
+  There is zero phase shift applied by default.\\
 
 {\emphtext profile} - The spatial profile of the laser. This should be a
   spatial function not including any values in the direction normal to the
   boundary on which the laser is attached, and the expression will be
-  evaluated at the boundary. This is calculated at t = 0, so no time dependant
-  part may be used.  The laser field is multiplied by this parameter to give
+  evaluated at the boundary. It may also be time-dependant.
+  The laser field is multiplied by the profile to give
   its final amplitude so the intention is to use a value between zero and one.
   By default it is a unit constant and therefore has no affect on the laser
   amplitude. This parameter is a little redundant in 1D and is
@@ -1218,11 +1285,18 @@ conditions deck.\\
 
 {\emphtext t\_profile} - Used to specify the time profile for the laser
   amplitude. Like \inlineemph{profile} the laser field is multiplied by
-  this parameter but it is a function of time rather than space. In a similar
-  manner, it is best to use a value between zero and one.
-  Setting values greater than one is possible but will cause the maximum laser
-  intensity to grow beyond \inlineemph{amp}. The default is to leave the
-  laser unchanged over time.\\
+  this parameter but it is only a function of time and not space.
+  In a similar manner to \inlineemph{profile}, it is best to use a value
+  between zero and one.  Setting values greater than one is possible but will
+  cause the maximum laser intensity to grow beyond \inlineemph{amp}.
+  In previous
+  versions of {\EPOCH}, the \inlineemph{profile} parameter was only a function
+  of space and this parameter was used to impose time-dependance. Since
+  \inlineemph{profile} can now vary in time, \inlineemph{t\_profile} is no
+  longer needed but it has been kept to facilitate backwards compatibility. It
+  can also make input decks clearer if the time dependance is given separately.
+  The default value of \inlineemph{t\_profile} is just the real constant
+  value of 1.0.\\
 %  each timestep, but you cannot specify spatial information. If this is not
 %  specified then the code will attempt to get a temporal profile using the
 %  \inlinecode{custom\_laser\_time\_profile} subroutine inside the code.
@@ -1253,9 +1327,9 @@ had a finite phase shift so that the amplitude did not start at zero, a
 similar effect would be observed on the front of the pulse.
 
 \captionedimage{./images/pulse2}{badpulse}{A laser pulse with a sharp
-  cutoff shows numerical artifacts behind the pulse.}
+  cutoff shows numerical artefacts behind the pulse.}
 \captionedimage{./images/pulse1}{smoothpulse}{A laser pulse with a smooth
-  temporal profile shows no artifacts.}
+  temporal profile shows no artefacts.}
 
 Figure~\ref{smoothpulse} instead used a Gaussian window function with a
 characteristic width of 8fs as well as using \inlineemph{t\_end} to introduce
@@ -1547,7 +1621,7 @@ The default value is ``T''.\\
 
 {\emphtext dump\_first} - Logical flag which determines whether to write an
   output file immediately after initialising the simulation. The default is
-  ``F''.\\
+  ``T''.\\
 
 {\emphtext dump\_last} - Logical flag which determines whether to write an
   output file just before ending the simulation. The default is ``T'' if
@@ -1633,7 +1707,9 @@ dumpmask of ``never''.\\
 
 {\emphtext particle\_grid} - Requests the output of particle positions. This
 is a restart variable. No particle variables can be plotted in VisIt unless
-this is dumped.
+this is dumped. If any particle variables are written then the
+``particle\_grid'' is automatically written unless ``particle\_grid = never''
+is specified.
 The synonym ``particles'' may also be used.\\
 
 {\emphtext px,\;py,\;pz} - The dumpmasks for the particle momenta. Restart
@@ -1693,7 +1769,7 @@ They are written to file using the ``id'' flag.
 Note: In the current implementation, the particle IDs are
 passed between processors and written to file using REAL numbers.
 This means that in double precision the maximum particle ID
-is $2^{53} \sim 10^{16}$. This should be ample for the forseeable future.
+is $2^{53} \sim 10^{16}$. This should be ample for the foreseeable future.
 However, if the code is compiled for single precision then the
 maximum ID is $2^{24} = 16777216$. Probably not big enough.
 
@@ -1708,6 +1784,9 @@ dumpmask of ``never''.\\
 {\emphtext grid} - The dumpmask for the Cartesian grid which defines the
 locations of the grid variables. No grid variables can be plotted in VisIt
 unless this variable is output.
+If any grid variables are written then the
+``grid'' is automatically written unless ``grid = never''
+is specified.
 The synonym ``field\_grid'' may also be used.\\
 
 {\emphtext ex,\;ey,\;ez} - The electric field vectors pointing in all three
@@ -1829,7 +1908,7 @@ written in both forms at full and restart dumps. Since pz is not
 required for restart, only the average will be written at both
 full and restart dumps.
 
-Only field and derived variables can be averaged currently in EPOCH.
+Only field and derived variables can be averaged currently in {\EPOCH}.
 Particle properties, distribution functions and particle probes cannot
 currently be averaged.
 
@@ -1880,7 +1959,7 @@ The syntax remains the same as the original ``output'' block syntax with the
 addition of ``name'' and ``restartable'' fields.
 
 The ``name'' field specifies the file name to use for the output list. Each
-time EPOCH generates an output dump, it writes an entry into the file
+time {\EPOCH} generates an output dump, it writes an entry into the file
 ``<name>.visit''. This can be used to find all the output dumps of a specific
 output block. It is named with a ``.visit'' suffix to enable its use as
 a file grouping list in the VisIt data analysis tool, but it is just a plain
@@ -1890,7 +1969,7 @@ If two output blocks are written at the same time, the output will be combined
 into a single file.
 
 The ``restartable'' field specifies that the output block should
-generate ouput dumps containing all the information necessary
+generate output dumps containing all the information necessary
 to restart a simulation.
 
 The following parameters are supported by the new style of output block in
@@ -1899,7 +1978,7 @@ addition to those for the traditional style:
 {\emphtext name} - Identifies the output block with a name which is required
   when multiple output blocks are used.\\
 
-{\emphtext restartable} - Specifies wether or not the output for this
+{\emphtext restartable} - Specifies whether or not the output for this
   block is a restartable dump.\\
 
 {\emphtext dump\_at\_times} - Floating point parameter which specifies a
@@ -2031,7 +2110,7 @@ contains ez.
 
 With the introduction of multiple output blocks, there are now a few parameters
 that only make sense to be applied globally across all output blocks. To
-accomodate this, a new block named ``output\_global'' has been added.
+accommodate this, a new block named ``output\_global'' has been added.
 Most of the parameters accepted by this block have the same meaning as those
 in the ``output'' block except that they are applied to all ``output'' blocks.
 
@@ -2080,7 +2159,7 @@ The default value is ``T''.\\
 
 {\emphtext sdf\_buffer\_size} - Integer parameter. When writing particle data
 to an SDF file, the data is first transferred into an output buffer. The
-size of this buffer can have a big impact on the overrall speed of writing
+size of this buffer can have a big impact on the overall speed of writing
 dump files. This parameter allows the size of the buffer to be specified in
 bytes. The default value is 67108864 (64 MB).\\ 
 
@@ -2114,7 +2193,7 @@ at every point of the distribution function is the number of particles within
 that cell of the distribution function, ignoring all phase space directions
 which are not considered as an axis of the distribution function. Summing the
 distribution function should give the total number of real particles
-(as opposed to computational pseudo-particles) in the
+(as opposed to computational pseudoparticles) in the
 simulation.
 
 An example \inlineemph{dist\_fn} block is given below:
@@ -2376,7 +2455,7 @@ following parameters:\\
   produce\_photons and photon\_dynamics must be ``T'' for this to work. The
   default is ``F''.\\
 
-{\emphtext qed\_table\_location} - EPOCH's QED routines use lookup tables to
+{\emphtext qed\_table\_location} - {\EPOCH}'s QED routines use lookup tables to
   calculate gamma ray emission and pair production. If you want to use tables
   in a different location from the default, specify the new location using
   this parameter.  The default is ``src/physics\_packages/TABLES''.\\
@@ -2564,7 +2643,7 @@ it is replaced by the expression it was assigned with. This expression may
 be a simple numerical constant, a mathematical expression or a function.
 Constants may contain spatially varying information without having to
 pre-calculate them at every location in the domain.
-To those familiar with old Fortran codes, constants are essentially just
+To those familiar with old FORTRAN codes, constants are essentially just
 statement functions.\\
 
 If a constant name is reused in a constant block then the old constant is
@@ -2592,7 +2671,7 @@ end:constant
 
 Using constants can be very helpful when dealing with long,
 complicated expressions since they allow the expression to be broken down into
-much simpler parts. They can also be used to get around the Fortran string
+much simpler parts. They can also be used to get around the FORTRAN string
 length limitation built into many compilers which prevents deck lines being
 longer then 512 characters long. As a general rule, it is a good idea to break
 down complicated expressions using constants or by other means, in order to
@@ -3029,7 +3108,7 @@ This will take the particles which have been placed at random positions
 by the autoloader and repositions them in a uniform manner. In order to
 adjust the particle positions, you need to know about the grid used in
 {\EPOCH}. In this example we only required the length of the domain,
-``length\_x'' and the minimum value of x, ``x\_min''. A more exaustive
+``length\_x'' and the minimum value of x, ``x\_min''. A more exhaustive
 list is given in the following section. Note that
 I completely ignored the question of domain decomposition when setting up the
 particles. The code automatically moves the particles onto the correct
@@ -3188,7 +3267,7 @@ is given in the direction perpendicular to the boundary. The new
 wavelength to use will be $\lambda\cos\theta$. Figure~\ref{angle} shows
 the resulting $E_y$ field for a laser driven at an angle of $\pi / 8$. Note
 that since the boundary conditions in the code are derived for propagation
-perpendicular to the boundary, there will be artifacts on the scale of the
+perpendicular to the boundary, there will be artefacts on the scale of the
 grid for lasers driven at an angle.
 
 Using this technique it is also possible to focus a laser. This is done by
@@ -3817,6 +3896,7 @@ the input deck (see \sect{control_block}):
 \item stop\_at\_walltime\_file
 \item simplify\_deck
 \item print\_constants
+\item The ``restart\_snapshot'' parameter now accepts filenames
 \end{itemize}
 \bigskip
 
@@ -3842,6 +3922,7 @@ the input deck (see \sect{output_block}):
 \item optical\_depth
 \item qed\_energy
 \item trident\_optical\_depth
+\item The default value of ``dump\_first'' is now ``T''
 \end{itemize}
 \bigskip
 
@@ -3866,6 +3947,14 @@ the input deck (see \sect{species_block}):
 \end{itemize}
 \bigskip
 
+\noindent The following parameters were changed in the ``laser'' block of
+the input deck (see \sect{laser_block}):
+\begin{itemize}
+\item The ``phase'' parameter can now be time varying
+\item The ``profile'' parameter can now be time varying
+\end{itemize}
+\bigskip
+
 \noindent The following parameters have been added to the list of pre-defined
 constants (see \sect{constants}).
 \begin{itemize}
@@ -3878,4 +3967,33 @@ constants (see \sect{constants}).
 \noindent There has also been a new ``output\_global'' block added to the
 input deck. This is documented in \sect{output_global_block}.
 
+\subsection{Changes in behaviour which are not due to changes in the input deck}
+\begin{itemize}
+\item The species ``drift'' property is now applied to particles whilst the
+  moving window model is active. In previous versions of the code, this
+  property was ignored once the moving window began.
+\item Ionisation species now inherit their ``dumpmask''. See \sect{ionisation}
+  for details.
+\item Default values for ignorable directions were added.
+   This change allows submitting 3D or 2D input decks to a 1D
+   version of {\EPOCH} and 3D input decks to a 2D version of {\EPOCH}.
+   Any references to y/z will be set equal to zero unless overridden
+   by a deck constant. Other y/z values also assume sensible
+   defaults, eg. 1 grid cell, 1 metre thick, etc.
+\item Automatic byte swapping is carried out by the SDF library.
+   The library now checks the endianness of the SDF file and
+   byte-swaps the data if required.
+\item ``qed'' blocks may now be present even if the code was not compiled
+   using the ``-DPHOTONS'' flag.
+   The code will only halt if ``use\_qed=T'' inside the ``qed'' block.
+\item The code now checks for the Data directory in a file named
+   ``USE\_DATA\_DIRECTORY'' before prompting at the command-line. This allows
+   the code to be run without waiting for input at the command-line.
+\item The field and particle grids are now automatically written to SDF output
+   files if they are needed.
+\item The Data directory may now contain a `\verb|/|' character.
+\end{itemize}
+
 \end{document}
+
+% Added collisional ionisation

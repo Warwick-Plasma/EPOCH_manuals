@@ -19,13 +19,9 @@ IDL Version 7.1.1, Mac OS X (darwin x86_64 m64). (c) 2009, ITT Visual Informat..
 Installation number: .
 Licensed for use by: STAR404570-32University of Warwick
 
-% Compiled module: SWAPCHR.
-% Compiled module: CHECKNAME.
-% Compiled module: RETURNIDLUSABLE.
-% Compiled module: RETURNFRIENDLYTYPENAME.
-% Compiled module: $MAIN$.
-% Compiled module: SDFCHECKNAME.
-% Compiled module: $MAIN$.
+% Compiled module: PARTICLEPHASEPLANE.
+% Compiled module: TRACKEX_EVENT.
+% Compiled module: ISOPLOT.
 % Compiled module: READVAR.
 % Compiled module: LOADCFDFILE.
 % Compiled module: HANDLEBLOCK.
@@ -36,14 +32,45 @@ Licensed for use by: STAR404570-32University of Warwick
 % Compiled module: LOADSDFFILE.
 % Compiled module: SDFHANDLEBLOCK.
 % Compiled module: SDFGETPLAINMESH.
+% Compiled module: SDFGETLAGRANMESH.
 % Compiled module: SDFGETPOINTMESH.
 % Compiled module: SDFGETPLAINVAR.
 % Compiled module: SDFGETPOINTVAR.
-% Compiled module: PARTICLEPHASEPLANE.
+% Compiled module: SDFGETCONSTANT.
+% Compiled module: SDFCHECKNAME.
+% Compiled module: INIT_SDFHELP.
+% Compiled module: GETDATA.
+% Compiled module: GETSTRUCT.
+% Compiled module: EXPLORE_DATA.
+% Compiled module: EXPLORE_STRUCT.
+% Compiled module: LIST_VARIABLES.
+% Compiled module: QUICK_VIEW.
+% Compiled module: GET_WKDIR.
+% Compiled module: SET_WKDIR.
+% Compiled module: INIT_STARTPIC.
+% Compiled module: SWAPCHR.
+% Compiled module: CHECKNAME.
+% Compiled module: RETURNIDLUSABLE.
+% Compiled module: RETURNFRIENDLYTYPENAME.
+% Compiled module: INIT_CFDHELP.
+% Compiled module: INIT_WIDGET.
+% Compiled module: GENERATE_FILENAME.
+% Compiled module: COUNT_FILES.
+% Compiled module: LOAD_RAW.
+% Compiled module: GET_SDF_METATEXT.
+% Compiled module: VIEWER_EVENT_HANDLER.
+% Compiled module: EXPLORER_EVENT_HANDLER.
+% Compiled module: XLOADCT_CALLBACK.
+% Compiled module: LOAD_DATA.
+% Compiled module: DRAW_IMAGE.
+% Compiled module: LOAD_META_AND_POPULATE_SDF.
+% Compiled module: CLEAR_DRAW_SURFACE.
+% Compiled module: SDF_EXPLORER.
+% Compiled module: EXPLORER_LOAD_NEW_FILE.
+% Compiled module: CREATE_SDF_VISUALIZER.
+% Compiled module: VIEWER_LOAD_NEW_FILE.
 % Compiled module: LOADCT.
 % Compiled module: FILEPATH.
-% LOADCT: Loading table RED TEMPERATURE
-% Compiled module: GETDATA.
 % LOADCT: Loading table RED TEMPERATURE
 IDL> 
 \end{boxverbatim}
@@ -73,33 +100,35 @@ IDL>
 \begin{boxverbatim}
 IDL> list_variables,0,"Data"
 Available elements are
-1) Point_electron (Grid) : 2D Point mesh
-2) Point_proton (Grid) : 2D Point mesh
-3) Grid (Grid) : 2D Plain mesh
-4) electron_Weight (Particles) : 1D Point variable
-5) proton_Weight (Particles) : 1D Point variable
-6) electron_Px (Particles) : 1D Point variable
-7) proton_Px (Particles) : 1D Point variable
-8) Ex (Electric Field) : 2D Plain variable
-9) Ey (Electric Field) : 2D Plain variable
-10) Ez (Electric Field) : 2D Plain variable
-11) Bx (Magnetic Field) : 2D Plain variable
-12) By (Magnetic Field) : 2D Plain variable
-13) Bz (Magnetic Field) : 2D Plain variable
-14) Jx (Current) : 2D Plain variable
-15) Jy (Current) : 2D Plain variable
-16) Jz (Current) : 2D Plain variable
-17) EkBar (Derived) : 2D Plain variable
-18) EkBar_electron (Derived) : 2D Plain variable
-19) EkBar_proton (Derived) : 2D Plain variable
-20) Number_Density (Derived) : 2D Plain variable
-21) en_electron (Grid) : 1D Plain mesh
-22) en_electron (dist_fn) : 3D Plain variable
-23) Probe_electron_probe (Grid) : 2D Point mesh
-24) Px (electron_probe) : 1D Point variable
-25) Py (electron_probe) : 1D Point variable
-26) Pz (electron_probe) : 1D Point variable
-27) weight (electron_probe) : 1D Point variable
+1) EX (ELECTRIC_FIELD) : 2D Plain variable
+2) EY (ELECTRIC_FIELD) : 2D Plain variable
+3) EZ (ELECTRIC_FIELD) : 2D Plain variable
+4) BX (MAGNETIC_FIELD) : 2D Plain variable
+5) BY (MAGNETIC_FIELD) : 2D Plain variable
+6) BZ (MAGNETIC_FIELD) : 2D Plain variable
+7) JX (CURRENT) : 2D Plain variable
+8) JY (CURRENT) : 2D Plain variable
+9) JZ (CURRENT) : 2D Plain variable
+10) WEIGHT_ELECTRON (PARTICLES) : 1D Point variable
+11) WEIGHT_PROTON (PARTICLES) : 1D Point variable
+12) PX_ELECTRON (PARTICLES) : 1D Point variable
+13) PX_PROTON (PARTICLES) : 1D Point variable
+14) GRID_ELECTRON (GRID) : 2D Point mesh
+15) GRID_PROTON (GRID) : 2D Point mesh
+16) EKBAR (DERIVED) : 2D Plain variable
+17) EKBAR_ELECTRON (DERIVED) : 2D Plain variable
+18) EKBAR_PROTON (DERIVED) : 2D Plain variable
+19) CHARGE_DENSITY (DERIVED) : 2D Plain variable
+20) NUMBER_DENSITY (DERIVED) : 2D Plain variable
+21) NUMBER_DENSITY_ELECTRON (DERIVED) : 2D Plain variable
+22) NUMBER_DENSITY_PROTON (DERIVED) : 2D Plain variable
+23) GRID (GRID) : 2D Plain mesh
+24) GRID_EN_ELECTRON (GRID) : 1D Plain mesh
+25) EN_ELECTRON (DIST_FN) : 3D Plain variable
+26) GRID_X_EN_ELECTRON (GRID) : 2D Plain mesh
+27) X_EN_ELECTRON (DIST_FN) : 3D Plain variable
+28) GRID_X_PX_ELECTRON (GRID) : 2D Plain mesh
+29) X_PX_ELECTRON (DIST_FN) : 3D Plain variable
 IDL>
 \end{boxverbatim}
 
@@ -136,10 +165,10 @@ IDL>
 IDL> gridclass = getdata(1,/grid)
 
 IDL> help,gridclass,/structures
-** Structure <1a800008>, 10 tags, length=268513928, data length=268513920, refs=1:
+** Structure <22806408>, 11 tags, length=536825024, data length=536825016, refs=1:
    FILENAME        STRING    'Data/0001.sdf'
-   TIMESTEP        LONG                42
-   TIME            DOUBLE       5.0109036e-15
+   TIMESTEP        LONG                43
+   TIME            DOUBLE       5.0705572e-15
    GRID_ELECTRON   STRUCT    -> <Anonymous> Array[1]
    GRID_PROTON     STRUCT    -> <Anonymous> Array[1]
    GRID            STRUCT    -> <Anonymous> Array[1]
@@ -147,10 +176,12 @@ IDL> help,gridclass,/structures
    Y               DOUBLE    Array[512]
    GRID_EN_ELECTRON
                    STRUCT    -> <Anonymous> Array[1]
-   ELECTRON_PROBE  STRUCT    -> <Anonymous> Array[1]
-
+   GRID_X_EN_ELECTRON
+                   STRUCT    -> <Anonymous> Array[1]
+   GRID_X_PX_ELECTRON
+                   STRUCT    -> <Anonymous> Array[1]
 IDL> help,gridclass.grid,/structures
-** Structure <1529cf8>, 5 tags, length=12376, data length=12376, refs=2:
+** Structure <1701168>, 5 tags, length=12376, data length=12376, refs=2:
    X               DOUBLE    Array[1025]
    Y               DOUBLE    Array[513]
    LABELS          STRING    Array[2]
@@ -459,7 +490,7 @@ in the VisIt subdirectory, called \inlinecode{SDF2.xml}.
   {\tt https://wci.llnl.gov/codes/visit/executables.html} which closely
   matches your machine and download it. This can be unpacked into your
   home directory with the command
-  \cmd{tar xzf visit2\_2\_2.linux-x86\_64.tar.gz}. The actual name of
+  \cmd{tar xzf visit2\_7\_1.linux-x86\_64.tar.gz}. The actual name of
   the file will vary depending on which version you downloaded. This
   will unpack the VisIt binary into a subdirectory named \txt{visit/}.
   Now all that is necessary is to add this to your search path.
@@ -532,12 +563,13 @@ in the VisIt subdirectory, called \inlinecode{SDF2.xml}.
   will be grouped together in a virtual database.
 
   Yet another method for selecting the dataset to use is by opening a
-  previously saved session file. Will discuss this further in a later section
+  previously saved session file. We will discuss this further in a later
+  section.
 
   \begin{center}
     \includegraphics[height=0.7\textheight]{images/visit_select_var}
   \end{center}
-  Once a SDF file has been successfully loaded the \qm{Add} menu item
+  Once an SDF file has been successfully loaded the \qm{Add} menu item
   will become un-greyed and the cycle numbers for each file in the virtual
   database will be displayed. If we navigate to one of the plot types we
   are able to select the variable to plot from a drop-down list.
@@ -621,9 +653,11 @@ in the VisIt subdirectory, called \inlinecode{SDF2.xml}.
   flexibility.
 
   The first step is to do a \qm{Pseudocolor} plot of \qm{Number\_Density} as
-  we did before. Next select the \qm{OpAtts $\Rightarrow$ Elevate} menu item.
+  we did before. Next select the
+  \qm{Operator Attributes $\Rightarrow$ Transforms $\Rightarrow$ Elevate}
+  menu item.
   In the pop up dialogue click on the \qm{Elevation height relative to XY
-  limits} and then \qm{Apply}. Click \qm{Yes} when the warning dialogue pops
+  limits?} and then \qm{Apply}. Click \qm{Yes} when the warning dialogue pops
   up.
   \begin{center}
     \includegraphics[width=0.8\linewidth]{images/visit_shade_surf}
@@ -730,8 +764,8 @@ in the VisIt subdirectory, called \inlinecode{SDF2.xml}.
   to a machine on which the reader is already installed.
 
   In order to use the remote visualisation facility, you must first
-  set up a \qm{Host Profile} for the remote machine using the \qm{Options
-  $\Rightarrow$ Host Profiles} menu item. The pre-compiled binaries are
+  set up a \qm{Host profile} for the remote machine using the \qm{Options
+  $\Rightarrow$ Host profiles} menu item. The pre-compiled binaries are
   shipped with a long list of pre-defined host profiles. These are unnecessary
   for anyone not affiliated and can safely be removed by deleting the
   directory \txt{\$HOME/visit/current/.visit/} (assuming you have unpacked
@@ -741,14 +775,15 @@ in the VisIt subdirectory, called \inlinecode{SDF2.xml}.
     \includegraphics[width=0.8\linewidth]{images/visit_host_profile}
   \end{center}
 
-  Create a new profile by clicking on the \qm{New profile} button and filling
-  out some of the form fields. The important ones to change are \qm{Profile
-  name}, \qm{Remote host name}, \qm{Host name aliases} and \qm{Username}.
+  Create a new profile by clicking on the \qm{New Host} button and filling
+  out some of the form fields. The important ones to change are \qm{Host
+  nickname}, \qm{Remote host name}, \qm{Host name aliases} and \qm{Username}.
   If the visit binary is not in your default search path on the remote
-  machine then you must specify its location by passing \qm{-dir
-  /base/installpath/visit} to \qm{Additional options}.
+  machine then you must specify its location by filling in the
+  \qm{Path to VisIt installation} field.
 
-  Now select the \qm{Options $\Rightarrow$ Save Settings} menu item to
+  Now click \qm{Apply} and \qm{Dismiss} followed by
+  the \qm{Options $\Rightarrow$ Save Settings} menu item to
   ensure that the profile is saved for future sessions.
 
   Data on the remote machine can now be loaded by selecting \qm{File
@@ -765,17 +800,15 @@ in the VisIt subdirectory, called \inlinecode{SDF2.xml}.
   \end{center}
 
 \subsection{Parallel Visualisation}
-  Before reading this section be warned that the current version of
-  the SDF reader is not capable of reading data in parallel! However,
-  this is high on the list of issues to be addressed so a parallel
-  version ought to be released some time in the near future.
-
   Parallel visualisation is performed in almost exactly the same manner
   as remote visualisation. Again, you must create a host profile for the
-  purpose except this time you need to check the \qm{Parallel computation
-  engine} radio button. This will activate a \qm{Parallel options} tab
-  which must be filled in to match the cluster on which the job will
-  be launched.
+  purpose except this time you need to set up a parallel launch profile in
+  the \qm{Launch Profiles} tab pane.
+  Click the \qm{New Profile} button, give the profile a name and then set the
+  required options in the \qm{Parallel} tab on the bottom section of the page.
+  Selecting the \qm{Launch parallel engine} radio button will allow you to
+  set the various launch options which relate to the cluster on which the job
+  will run.
 
   The major difference now is due to the fact that VisIt must be launched
   by an external job script which fits in with the queueing system used
@@ -783,10 +816,12 @@ in the VisIt subdirectory, called \inlinecode{SDF2.xml}.
   system administrator of the cluster to confirm which launch method and
   arguments to use.
 
-  The details of job launch can be better understood by reading through
-  the file\linebreak \txt{\$HOME/visit/current/bin/internallauncher}. This is
-  a bash script which parses the arguments and executes the specified
-  launch method.
+  The details of job launch can be better understood by reading through the
+  ``User documentation'' section provided at
+  \inlinecode{http://www.visitusers.org/}. 
+  Of particular help here is the ``Getting VisIt to run in parallel'' section
+  and the ``How VisIt Launching works'' entry in the
+  ``Developer documentation'' section.
 %\subsection{Examples}
 %  \begin{itemize}
 %  \item
