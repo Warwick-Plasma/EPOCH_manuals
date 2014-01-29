@@ -28,9 +28,11 @@ $(latexfile1).dvi : $(latexfile1).tex $(latexfile2).tex epoch_dev_title.tex \
     epoch_head.tex epoch_user_title.tex sdf_format.tex $(EPS)
 	while ($(TEX) $(latexfile1) ; \
 	grep -q "Rerun to get cross" $(latexfile1).log ) do true; \
+	bibtex $(latexfile1) ; \
 	done; \
 	while ($(TEX) $(latexfile2) ; \
 	grep -q "Rerun to get cross" $(latexfile2).log ) do true; \
+	bibtex $(latexfile2) ; \
 	done; \
 	$(TEX) $(latexfile1)
 
@@ -38,9 +40,11 @@ $(latexfile1).pdf : $(latexfile1).tex $(latexfile2).tex epoch_dev_title.tex \
     epoch_head.tex epoch_user_title.tex sdf_format.tex
 	while ($(PDFTEX) $(latexfile1) ; \
 	grep -q "Rerun to get cross" $(latexfile1).log ) do true; \
+	bibtex $(latexfile1) ; \
 	done; \
 	while ($(PDFTEX) $(latexfile2) ; \
 	grep -q "Rerun to get cross" $(latexfile2).log ) do true; \
+	bibtex $(latexfile2) ; \
 	done; \
 	$(PDFTEX) $(latexfile1)
 
@@ -57,4 +61,4 @@ distclean: clean
 	    $(latexfile1).ps $(latexfile2).ps
 
 clean:
-	rm -f *.aux *.dvi *.log *.toc
+	rm -f *.aux *.dvi *.log *.toc *.bbl *.blg

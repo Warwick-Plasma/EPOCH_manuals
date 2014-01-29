@@ -2,6 +2,8 @@
 *.dvi
 *.log
 *.toc
+*.bbl
+*.blg
 epoch_dev.ps
 epoch_dev.pdf
 epoch_user.ps

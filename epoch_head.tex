@@ -2,11 +2,14 @@
 \newcommand{\version}{4.3}
 
 \usepackage{pdfpages}
+\usepackage[nottoc,numbib]{tocbibind}
 \usepackage{url,graphicx,tabularx,array,titleref,booktabs}
 \usepackage[hmargin=.47in,vmargin=0.6in,nohead]{geometry}
 \usepackage{color,verbatim,framed}
 %\usepackage{moreverb}
 \usepackage{xr}
+%\usepackage{cite}
+\usepackage[square,numbers,sort&compress]{natbib}
 %\usepackage{upgreek}
 \usepackage{fancyvrb}
 %\usepackage{fancyhdr}
@@ -108,5 +111,6 @@
 %\newcommand{\cmd}[1]{{\color{green}{\tt #1}}}
 \newcommand{\qtt}[1]{``{\tt #1}"}
 \newcommand{\qm}[1]{{\em ``#1"}}
+\newcommand{\mycite}[1]{{\citeauthor{#1} [\citenum{#1}]}}
 
 \setlength{\emergencystretch}{3em}
