@@ -4,11 +4,9 @@ latexfile2 = epoch_dev
 TEX = latex
 PDFTEX = pdflatex
 
-IMAGES = 2dcone.pdf 3dcone.pdf coreblock1.pdf coreblock2.pdf coreblock.pdf \
-  EPOCHLogo.pdf gaussic.pdf invgaussic.pdf late.pdf profile_angle.pdf \
-  profile_flat.pdf profile_flat.ps profile_gauss.pdf pulse1.pdf pulse2.pdf \
-  shape.pdf shapetest.pdf stagger.pdf sweep.pdf title_page_dev.pdf \
-  title_page_user.pdf wave.pdf
+IMAGES = EPOCHLogo.pdf coreblock.pdf idl_ps_plot.pdf profile_angle.pdf \
+  profile_flat.pdf profile_gauss.pdf pulse1.pdf pulse2.pdf shape.pdf \
+  stagger.pdf sweep.pdf title_page_dev.pdf title_page_user.pdf wave.pdf
 
 EPS := $(IMAGES:.pdf=.eps)
 
