@@ -502,10 +502,10 @@ anywhere on a line then the remainder of that line is ignored.\\
 \begin{itemize}
 \item begin:{\it block} - Begin the block named {\it block}.
 \item end:{\it block} - Ends the block named {\it block}.
-\item include:{\it filename} - Includes another file (called {\it filename})
+\item import:{\it filename} - Includes another file (called {\it filename})
   into the input deck at the point where the directive is encountered. The
   input deck parser reads the included file exactly as if the contents of the
-  included file were pasted directly at the position of the include directive.
+  included file were pasted directly at the position of the import directive.
 \end{itemize}
 Each block must be surrounded by valid {\it begin:} and {\it end:} directives
 or the input deck will fail. There are currently fourteen valid blocks hard
@@ -3717,7 +3717,7 @@ the two drifting Maxwellian distributions and the constant density profile.
 Note that we have written this example as two separate files simply
 to demonstrate how this is done. The
 same result would be obtained by appending the contents of ``ic.deck'' to
-the end of ``input.deck'' and removing the ``include'' line.
+the end of ``input.deck'' and removing the ``import'' line.
 The final output from this simulation is shown in Figure~\ref{tsilate}.
 
 \subsection{Structured density profile in EPOCH2D}
