@@ -3,8 +3,11 @@
 *.log
 *.toc
 *.bbl
+*.bib
 *.blg
+*.out
 epoch_dev.ps
 epoch_dev.pdf
 epoch_user.ps
 epoch_user.pdf
+obtaining_epoch.pdf
