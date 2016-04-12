@@ -1,5 +1,5 @@
 \documentclass[12pt,a4paper]{article}
-\newcommand{\version}{4.3.4}
+\newcommand{\version}{4.7.6}
 
 \usepackage{pdfpages}
 \usepackage[nottoc,numbib]{tocbibind}
@@ -21,10 +21,12 @@
 %\usepackage{fullpage}
 \usepackage{enumerate}
 \usepackage{bold-extra}
-\usepackage{hyperref}
+\usepackage[colorlinks=true,linkcolor=blue,
+            urlcolor=blue,citecolor=blue]{hyperref}
+\usepackage{hologo}
 %\usepackage{fix-cm}
-\definecolor{txt}{rgb}{0,0,1}
-\definecolor{cmd}{rgb}{0,1,0}
+\definecolor{txt}{rgb}{0.7,0,0.7}
+\definecolor{cmd}{rgb}{0,0.7,0}
 \newcommand{\txt}[1]{{\color{txt}{\tt #1}}}
 \newcommand{\cmd}[1]{{\color{cmd}{\tt #1}}}
 \definecolor{warwickdark}{cmyk}{1.0,0.6,0.0,0.06}
