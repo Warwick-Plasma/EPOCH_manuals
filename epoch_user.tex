@@ -429,13 +429,11 @@ symbol. The options currently controlled by the preprocessor are:\\
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
-then the code will give an error message as follows:
+then the code will give an error or warning message as follows:
 \begin{boxverbatim}
- *** WARNING ***
- The element "particle_probes" of block "output" cannot be set
- because the code has not been compiled with the correct preprocessor options.
- Code will continue, but to use selected features, please recompile with the
- -DPARTICLE_PROBES option
+ *** ERROR ***
+ Unable to set "use_qed=T" in the "qed" block.
+ Please recompile with the -DPHOTONS preprocessor flag.
 \end{boxverbatim}
 It is also possible to pass other flags to the compiler. In ``Makefile'' there
 is a line which reads\\
@@ -454,7 +452,7 @@ However, the functionality is difficult to build on some platforms so
 the Makefile contains a line for bypassing this section of the build
 process. Just below all the DEFINE flags there is the following line:
 \begin{boxverbatim}
-# ENCODED_SOURCE = dummy_encoded_source.o
+#ENCODED_SOURCE = epoch_source_info_dummy.o
 \end{boxverbatim}
 Just uncomment this line and source code in restart dumps will be permanently
 disabled.
@@ -3124,22 +3122,25 @@ Inside the code, particles are represented by a Fortran90 TYPE called
   TYPE particle
     REAL(num), DIMENSION(3) :: part_p
     REAL(num), DIMENSION(c_ndims) :: part_pos
-#ifdef PER_PARTICLE_WEIGHT
     REAL(num) :: weight
-#endif
-#ifdef PER_PARTICLE_CHARGE_MASS
     REAL(num) :: charge
     REAL(num) :: mass
-#endif
     TYPE(particle), POINTER :: next, prev
 #ifdef PARTICLE_DEBUG
     INTEGER :: processor
     INTEGER :: processor_at_t0
 #endif
+    INTEGER(i8) :: id
+    INTEGER :: coll_count
+    REAL(num) :: optical_depth
+    REAL(num) :: particle_energy
+    REAL(num) :: optical_depth_tri
   END TYPE particle
 \end{boxverbatim}
-Note the presence of the preprocessor directives, meaning that charge and mass
-only exist if the \inlinecode{-DPER\_PARTICLE\_CHARGE\_MASS} define was put in
+Here, most of the preprocessing directives have been stripped out for clarity.
+We have left \inlinecode{\#ifdef PARTICLE\_DEBUG} as an example.
+Here, the ``processor'' and ``processor\_at\_t0'' variables only exist if the
+\inlinecode{-DPARTICLE\_DEBUG} define was put in
 the makefile. If you want to access a property that does not seem to be
 present, check the preprocessor defines.
 
@@ -3164,6 +3165,12 @@ The ``particle'' properties can be explained as follows:
   particle.
 \item processor\_at\_t0 - The rank of the processor on which the particle
   started.
+\item id - Unique particle ID.
+\item coll\_count - Used for debugging the collision routines.
+\item optical\_depth - Optical depth used in the QED routines.
+\item particle\_energy - Particle energy used in the QED routines.
+\item optical\_depth\_tri - Optical depth for the trident process in the QED
+                            routines.
 \end{itemize}
 
 Collections of particles are represented by another Fortran TYPE, called
@@ -3174,7 +3181,8 @@ inter-processor communication of particles. The definition of the type is:
   TYPE particle_list
     TYPE(particle), POINTER :: head
     TYPE(particle), POINTER :: tail
-    INTEGER(KIND=8) :: count
+    INTEGER(i8) :: count
+    INTEGER :: id_update
     ! Pointer is safe if the particles in it are all unambiguously linked
     LOGICAL :: safe
 
@@ -3196,9 +3204,8 @@ inter-processor communication of particles. The definition of the type is:
 
 An entire species of particles is represented by another Fortran TYPE, this
 time called \inlinecode{particle\_species}. This represents all the
-properties which are common to all particles in a species. There are lots
-of entries which are only compiled in when compile-time flags are specified.
-The definition without any such flags is:
+properties which are common to all particles in a species.
+The current definition is:
 \begin{boxverbatim}
   TYPE particle_species
     ! Core properties
@@ -3206,23 +3213,64 @@ The definition without any such flags is:
     TYPE(particle_species), POINTER :: next, prev
     INTEGER :: id
     INTEGER :: dumpmask
+    INTEGER :: count_update_step
 
     REAL(num) :: charge
     REAL(num) :: mass
     REAL(num) :: weight
-    INTEGER(KIND=8) :: count
+    INTEGER(i8) :: count
     TYPE(particle_list) :: attached_list
+    LOGICAL :: immobile
+
+#ifndef NO_TRACER_PARTICLES
+    LOGICAL :: tracer
+#endif
+
+    ! ID code which identifies if a species is of a special type
+    INTEGER :: species_type
+
+    ! particle cell division
+    INTEGER(i8) :: global_count
+    LOGICAL :: split
+    INTEGER(i8) :: npart_max
+    ! Secondary list
+    TYPE(particle_list), DIMENSION(:,:), POINTER :: secondary_list
 
     ! Injection of particles
-    INTEGER(KIND=8) :: npart_per_cell
-    REAL(num), DIMENSION(:), POINTER :: density
-    REAL(num), DIMENSION(:,:), POINTER :: temperature
+    REAL(num) :: npart_per_cell
+    TYPE(primitive_stack) :: density_function, temperature_function(3)
+    TYPE(primitive_stack) :: drift_function(3)
+
+    ! Thermal boundaries
+    REAL(num), DIMENSION(:,:), POINTER :: ext_temp_x_min, ext_temp_x_max
+    REAL(num), DIMENSION(:,:), POINTER :: ext_temp_y_min, ext_temp_y_max
+
+    ! Species_ionisation
+    LOGICAL :: electron
+    LOGICAL :: ionise
+    INTEGER :: ionise_to_species
+    INTEGER :: release_species
+    INTEGER :: n
+    INTEGER :: l
+    REAL(num) :: ionisation_energy
+
+    ! Attached probes for this species
+#ifndef NO_PARTICLE_PROBES
+    TYPE(particle_probe), POINTER :: attached_probes
+#endif
+
+    ! Particle migration
+    TYPE(particle_species_migration) :: migrate
+
   END TYPE particle_species
 \end{boxverbatim}
 
 This definition is for the 2D version of the code. The only difference for
-the other two versions is the number of dimensions in the density and
+the other two versions is the number of dimensions in the arrays
+``secondary\_list'' and ``ext\_temp\_*''.
 temperature arrays.
+There are quite a lot of fields here, so we will just document some of the
+most important ones.
 
 \begin{itemize}
 \item name - The name of the particle species, used in the output dumps etc.
@@ -3245,9 +3293,12 @@ temperature arrays.
   accurate for the rest of the code if the code is compiled with the correct
   preprocessor options.
 \item attached\_list - The list of particles which belong to this species.
+\item immobile - If set to \verb|.TRUE.| then the species is ignored during
+  the particle push.
+\item tracer - If set to \verb|.TRUE.| then the current is not updated for this
+  particle species.
 \end{itemize}
 
-The last three entries are only used by the particle injection model.
 
 \subsubsection{Setting the particle properties}
 The details of exactly what a linked list means in {\EPOCH} requires
