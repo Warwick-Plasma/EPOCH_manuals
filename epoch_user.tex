@@ -50,8 +50,8 @@ particles.
     when run in parallel.
   \item MPI-IO based output, allowing restart on an arbitrary number of
     processors.
-  \item Data analysis and visualisation options include ITT IDL, LLNL VisIt
-    and Mathworks MatLab.
+  \item Data analysis and visualisation options include ITT IDL, LLNL VisIt,
+    Mathworks MatLab and Matplotlib in Python.
   \item Control of setup and runs of {\EPOCH} through a customisable input deck.
 \end{itemize}
 
@@ -1549,7 +1549,8 @@ Output in {\EPOCH} is handled using the custom designed SDF file format
 (\inlineemph{Self Describing Format}). A detailed specification of this
 format is available elsewhere, although this is only of interest to
 developers wishing to write new libraries.
-{\EPOCH} comes with readers for ITT IDL, LLNL VisIt and Mathworks MatLab.
+{\EPOCH} comes with readers for ITT IDL, LLNL VisIt, Mathworks MatLab and
+Python.
 The IDL reader is also compatible with the open source GDL tool.
 
 There are two styles of output block supported by {\EPOCH}. The first
