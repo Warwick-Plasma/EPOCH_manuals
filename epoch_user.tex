@@ -340,27 +340,32 @@ To turn on the effect controlled by a given preprocessor directive, just
 uncomment the appropriate ``DEFINES'' line by deleting this ``\verb|#|''
 symbol. The options currently controlled by the preprocessor are:\\
 \begin{itemize}
-\item PER\_PARTICLE\_WEIGHT - Instead of running the code where each
-  pseudoparticle represents the same number of real particles, each
-  pseudoparticle can represent a different number of real particles. Many of
-  the codes more advanced features require this and it is turned on by
-  default. It can be turned off to save on memory, but this is recommended
-  only for advanced users.
-\item TRACER\_PARTICLES - Gives the option to specify one or more species as
+\item PER\_SPECIES\_WEIGHT - By default, each pseudoparticle in the code can
+  represent a different number of real particles. Memory can be saved by
+  disabling this feature and have all of the pseudoparticles in a species
+  use the same particle weight. Many of the codes more advanced features
+  require per-particle weighting so it is enabled by default.
+  Use this flag to disable per-particle weighting if you need to save on
+  memory, but it this option is recommended only for advanced users.
+\item NO\_TRACER\_PARTICLES - This flag will disable the option to specify one
+  or more species as
   tracer particles. Tracer particles are specified like normal particles, and
   move about as would a normal particle with the same charge and mass, but
   tracer particles do not generate any current and are therefore passive
   elements in the simulation. Any attempt to add particle collision effects
   should remember that tracer species should not interact through collisions.
   The implementation of tracer particles requires an additional ``IF'' clause
-  in the particle push, so it is not activated by default.
-\item PARTICLE\_PROBES - For laser plasma interaction studies it can sometimes
+  in the particle push, so it has a slight performance impact. If you do not
+  require the feature then setting this flag will give a slight performance
+  improvement.
+\item NO\_PARTICLE\_PROBES - For laser plasma interaction studies it can
+  sometimes
   be useful to be able to record information about particles which cross a
   plane in the simulation. Since this requires the code to check whether each
   particles has crossed the plane in the particles pusher and also to store
   copies of particles until the next output dump, it is a heavyweight
-  diagnostic. Therefore, this diagnostic is only enabled when the code is
-  compiled with this directive.
+  diagnostic. If you don't require the diagnostic you can set this flag to
+  disable it.
 \item PARTICLE\_SHAPE\_TOPHAT - By default, the code uses a first order
   b-spline (triangle) shape function to represent particles giving
   third order particle weighting.
@@ -375,16 +380,16 @@ symbol. The options currently controlled by the preprocessor are:\\
 \item PARTICLE\_ID4 - This does the same as the previous option except it uses
   a 4-byte integer instead of an 8-byte one. Whilst this saves storage space,
   care must be taken that the number does not overflow.
-\item PHOTONS - This enables support for photon particle types in the code.
-  These are a pre-requisite for modelling synchrotron emission, radiation
-  reaction and pair production (see \sect{qed_block}).
-\item TRIDENT\_PHOTONS - This enables support for virtual photons which are
-  used by the Trident process for pair production.
 \item PARTICLE\_COUNT\_UPDATE - Makes the code keep global particle counts for
   each species on each processor. This information isn't needed by the core
   algorithm, but can be useful for developing some types of additional physics
   packages. It does require one additional MPI\_ALL\_REDUCE per species per
   timestep, so it is not activated by default.
+\item PHOTONS - This enables support for photon particle types in the code.
+  These are a pre-requisite for modelling synchrotron emission, radiation
+  reaction and pair production (see \sect{qed_block}).
+\item TRIDENT\_PHOTONS - This enables support for virtual photons which are
+  used by the Trident process for pair production.
 \item PREFETCH - This enables an Intel-specific code optimisation.
 \item PARSER\_DEBUG - The code outputs more detailed information whilst
   parsing the input deck. This is a debug mode for code development.
@@ -393,15 +398,21 @@ symbol. The options currently controlled by the preprocessor are:\\
   on. This is a debug mode for code development.
 \item MPI\_DEBUG - This option installs an error handler for MPI calls which
   should aid tracking down some MPI related errors.
+\item SIMPLIFY\_DEBUG - This option enables debugging code related to the
+  deck parser simplification routine.
 \item NO\_IO - This option disables all file I/O which can be useful when
   doing benchmarking.
+\item COLLISIONS\_TEST - This enables some routines for debugging the collision
+  routines. It completely alters the behaviour of the code. This flag should
+  never be enabled by the end user.
 \item PER\_PARTICLE\_CHARGE\_MASS - By default, the particle charge and
   mass are specified on a per-species basis. With this flag enabled, charge
   and mass become a per-particle property. This is a legacy flag which will
   be removed soon.
-%\item COLLISIONS\_TEST - This enables some routines for debugging the collision
-%  routines. It completely alters the behaviour of the code. This flag should
-%  never be enabled by the end user.
+\item PARSER\_CHECKING - Setting this flag adds code which checks for valid
+  values on evaluated deck expressions.
+  This slows down the code but may be required if floating point exceptions
+  are enabled.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
@@ -4118,6 +4129,28 @@ input deck. This is documented in \sect{output_global_block}.
 
 
 \section{Changes between version 4.3 and 4.6}
+
+\subsection{Changes to the Makefile}
+
+Some changes have been made to the Makefile. These are documented in
+\sect{makefile}.\\
+
+\noindent The following compile-time define has been added to the Makefile:
+\begin{itemize}
+\item PER\_SPECIES\_WEIGHT
+\item NO\_TRACER\_PARTICLES
+\item NO\_PARTICLE\_PROBES
+\item PARSER\_CHECKING
+\end{itemize}
+\bigskip
+
+\noindent The following compile-time define has been removed from the Makefile:
+\begin{itemize}
+\item PER\_PARTICLE\_WEIGHT
+\item TRACER\_PARTICLES
+\item PARTICLE\_PROBES
+\end{itemize}
+
 
 \subsection{Additions to the input deck}
 The following parameters have been added to the ``control'' block of
