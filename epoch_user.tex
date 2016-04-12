@@ -719,8 +719,29 @@ specified time before beginning to move the particles.\\
   migration event.  The default is 1 (migrate at every timestep).
   See \sect{migration}.\\
 
-Most of the control block is self explanatory, but there are two parts which
-need further description.
+{\emphtext allow\_missing\_restart} - Logical flag to allow code to run when
+  a restart dump is absent.
+  When ``restart\_snapshot'' is specified then the simulation first
+  checks that the specified restart dump is valid. If the restart dump
+  exists and is valid then it is used to provide initial conditions
+  for the simulation.
+  However, if the restart dump does not exist or is not usable for
+  some reason then by default the simulation will abort.
+  If ``allow\_missing\_restart'' is set to ``T'' then the simulation will
+  not abort but will continue to run and use the initial conditions
+  contained in the input deck to initialise the simulation.
+  The default value is ``F''.\\
+
+{\emphtext print\_eta\_string} - If this logical flag is set to ``T'' then the
+  current estimated time to completion will be appended to the status
+  updates. The default value is ``F''.\\
+
+{\emphtext n\_zeros} - Integer flag which specifies the number of digits to
+  use for the output file numbers.
+  (eg. ``0012.sdf''). By default, the code tries to calculate the number of
+  digits required by dividing t\_end by dt\_snapshot. Note that the minimum
+  number of digits is 4.\\
+
 
 \subsubsection{Dynamic Load Balancing}
 The first is the {\emphtext dlb\_threshold} flag.
@@ -1819,7 +1840,8 @@ The synonym ``rest\_mass'' may also be used.\\
 
 {\emphtext particle\_weight} - The dumpmask for the weighting function which
 describes how many real particles each pseudoparticle represents. Restart
-variable.\\
+variable.
+The synonym ``weight'' may also be used.\\
 
 {\emphtext ejected\_particles} - If requested then all the particles which
   have left the simulation domain since the last output dump of this type are
@@ -2276,6 +2298,16 @@ relative to the left hand edge of the window rather than the true origin.
 Performs no function when not using the moving window. The default value
 is ``F''.\\
 
+{\emphtext dump\_first\_after\_restart} - Logical flag to enable a dump to
+occur immediately after restart.
+In the past, a ``dump\_first'' flag in the output block would cause
+an output dump immediately after restarting. Since this is rarely
+the desired behaviour, the flag is now ignored when restarting.
+To force a dump to occur immediately after restart, set
+``dump\_first\_after\_restart = T'' in the output block. The default value
+is ``F''.
+
+
 \subsection{\inlineemph{dist\_fn} block}
 \label{sec:dist_fn_block}
 
@@ -2683,6 +2715,15 @@ parameters:\\
 
 {\emphtext id\_{min,max}} - Select only the particles whose ``id'' is greater
   than or less than the given values. The ``id'' field is explained below.\\
+
+{\emphtext skip,skip\_{x,y,z}} - Integer parameter for subsampling the particle
+  list. If set to a positive integer then all grid-based variables using the
+  subset restriction will be reduced when being written to file. This is
+  achieved by skipping by the specified number of cells in each of the
+  specified directions. The ``skip'' parameter provides a quick method for
+  setting the same number of cells to skip in all directions.
+  This currently only applies to grid-based variables and is ignored for
+  data averages. The default value is ``0''.
 
 Once a subset has been defined, the subset name can then be used in place of
 (or in addition to) the dumpmask in an ``output'' block. For example:
@@ -4074,6 +4115,40 @@ input deck. This is documented in \sect{output_global_block}.
    files if they are needed.
 \item The Data directory may now contain a `\verb|/|' character.
 \end{itemize}
+
+
+\section{Changes between version 4.3 and 4.6}
+
+\subsection{Additions to the input deck}
+The following parameters have been added to the ``control'' block of
+the input deck (see \sect{control_block}):
+\begin{itemize}
+\item allow\_missing\_restart
+\item print\_eta\_string
+\item n\_zeros
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the ``output'' block of
+the input deck (see \sect{output_block}):
+\begin{itemize}
+\item weight (synonym for particle\_weight)
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the ``output\_global''
+block of the input deck (see \sect{output_global_block}):
+\begin{itemize}
+\item dump\_first\_after\_restart
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the ``subset'' block of
+the input deck (see \sect{subset_block}):
+\begin{itemize}
+\item skip, skip\_{x,y,z}
+\end{itemize}
+\bigskip
 
 %\addcontentsline{toc}{section}{References}
 \bibliography{epoch_refs}{}
