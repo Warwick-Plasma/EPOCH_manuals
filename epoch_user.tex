@@ -351,7 +351,7 @@ preprocessor directives. The flags for these preprocessor directives are
 specified in ``Makefile'' and are placed on lines which look like the
 following:
 \begin{boxverbatim}
-DEFINES += $(D)PER_PARTICLE_WEIGHT
+DEFINES += $(D)PER_SPECIES_WEIGHT
 \end{boxverbatim}
 On most machines ``\texttt{\$(D)}'' just means ``\texttt{-D}'' but the variable
 is required to accommodate more exotic setups.
@@ -2468,8 +2468,9 @@ in the input deck. These record copies of all particles which cross a
 point/line/plane in a given direction which meet minimum and maximum kinetic
 energy criteria and output the particle properties into the normal output
 files. Particle probes record the positions, momenta and weight of all
-particles passing through the plane. To use particle probes, the code must be
-compiled with the \inlinecode{-DPARTICLE\_PROBES} compiler option. This is
+particles passing through the plane. To use particle probes, the code must
+not have been
+compiled with the \inlinecode{-DNO\_PARTICLE\_PROBES} compiler option. This is
 a fairly heavyweight diagnostic since each particle position must be tested
 from within the particle push. The code will run faster if it is not compiled
 in.\\
