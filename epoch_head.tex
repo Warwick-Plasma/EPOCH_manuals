@@ -1,9 +1,9 @@
 \documentclass[12pt,a4paper]{article}
-\newcommand{\version}{4.7.6}
+\newcommand{\version}{4.8.0}
 
 \usepackage{pdfpages}
 \usepackage[nottoc,numbib]{tocbibind}
-\usepackage{url,graphicx,tabularx,array,titleref,booktabs}
+\usepackage{url,graphicx,tabularx,array,booktabs}
 \usepackage[hmargin=.47in,vmargin=0.6in,nohead]{geometry}
 \usepackage{color,verbatim,framed}
 %\usepackage{moreverb}
@@ -21,8 +21,9 @@
 %\usepackage{fullpage}
 \usepackage{enumerate}
 \usepackage{bold-extra}
-\usepackage[colorlinks=true,linkcolor=blue,
-            urlcolor=blue,citecolor=blue]{hyperref}
+\usepackage[colorlinks=true,linkcolor=black,anchorcolor=blue,
+            citecolor=blue,filecolor=blue,menucolor=blue,runcolor=blue,
+            urlcolor=blue]{hyperref}
 \usepackage{hologo}
 %\usepackage{fix-cm}
 \definecolor{txt}{rgb}{0.7,0,0.7}
@@ -37,7 +38,7 @@
 \newcommand{\emphtext}{\color{warwickdark} \fontfamily{phv}\selectfont\large\bf}
 \newcommand{\inlinecode}[1]{{\color{warwickred} \bf\texttt{#1}}}
 \newcommand{\sect}[1]{Section~\ref{sec:#1}}
-\newcommand{\sectit}[1]{``{\bf\titleref{sec:#1}}'' (\sect{#1})}
+\newcommand{\sectit}[1]{``{\bf\nameref{sec:#1}}'' (\sect{#1})}
 \newcommand{\code}[1]{{\texttt{#1}}}
 %\newcommand{\qtt}[1]{``{\code{#1}}''}
 \newcommand{\inlineemph}[1]{{\color{warwicklight} \bf{#1}}}
