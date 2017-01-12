@@ -1471,10 +1471,17 @@ example usage of the block is shown below
 \begin{lboxverbatim}{particles\_from\_file block}
 begin:particles_from_file
    species = "electron"
+
+   # Load mandatory data for 3D simulation
    x_data = "xdata.dat"
    y_data = "ydata.dat"
-   offset = 8
-   id4_data = "iddata.dat"
+   z_data = "ydata.dat"
+   w_data = "ydata.dat"
+
+   # Load particle ids in 4 byte int format,
+   # ignoring first 8 bytes of file
+   # offset = 8
+   # id4_data = "iddata.dat"
 end:particles_from_file
 \end{lboxverbatim}
 
