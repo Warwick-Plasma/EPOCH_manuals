@@ -585,6 +585,8 @@ begin:control
    # restart_snapshot = 98
 
    # field_order = 2
+   # maxwell_solver = yee
+
    # stdout_frequency = 10
 end:control
 \end{lboxverbatim}
@@ -631,7 +633,8 @@ metres. These are required parameters. Must be greater than
 {\emphtext dt\_multiplier} - Factor by which the timestep is multiplied before
 it is applied in the code, i.e. a multiplying factor applied to the CFL
 condition on the timestep. Must be less than one. If no value is given then
-the default of 0.95 is used.\\
+the default of 0.95 is used. If \inlineemph{maxwell\_solver} is different from
+``yee'' (the default) this parameter becomes increasingly relevant.\\
 
 {\emphtext dlb\_threshold} - The minimum ratio of the
 load on the least loaded processor to that on the most loaded processor allowed
@@ -653,6 +656,12 @@ if output file prefixes have been used (see \sect{output_block}).\\
 {\emphtext field\_order} - Order of the finite difference scheme used for
 solving Maxwell's equations. Can be 2, 4 or 6. If not specified, the default
 is to use a second order scheme.\\
+
+{\emphtext maxwell\_solver} - Choose a Maxwell solver scheme with an extended
+stencil. This option is only active if \inlineemph{field\_order} is set to 2.
+Possible options are ``yee'', ``lehe'', ``pukhov'' and ``cowan''. Note that
+not all options are available in 1d and 2d. The default is ``yee'' which is the
+default second order scheme.\\
 
 {\emphtext stdout\_frequency} - If specified then the code will print a one
 line status message to stdout after every given number or timesteps. The
@@ -760,6 +769,39 @@ specified time before beginning to move the particles.\\
   digits required by dividing t\_end by dt\_snapshot. Note that the minimum
   number of digits is 4.\\
 
+\subsubsection{Maxwell Solvers}
+With the default settings ``\inlineemph{field\_order}=2'',
+``\inlineemph{maxwell\_solver}=yee'' EPOCH will use the standard second order
+Yee scheme for solving Maxwell's equations. In this case, when particles are
+present, it is necessary to choose a \inlineemph{dt\_multiplier} smaller than
+unity, the default value is ``\inlineemph{dt\_multiplier}=0.95''.
+This scheme has a grid dispersion relation with phase velocities smaller than
+$c$, especially for large spatial frequencies.
+It is possible to introduce extended stencils into the update step of the
+Maxwell-Faraday equation which will help improving the dispersion relation.
+All of the following extended stencil are only available when
+``\inlineemph{field\_order}=2''. Please note that you will also need to choose
+a \inlineemph{dt\_multiplier} according to the selected scheme.
+Different options are available as follows:\\
+
+{\emphtext maxwell\_solver = lehe} - This setting will enable an extended
+stencil proposed by \citet{Lehe2013}. This stencil focusses on improving the
+dispersion relation on the $x$-axis, please take this into account when defining
+your laser input. It is available in EPOCH1D, EPOCH2D and EPOCH3D. While it
+is not technically required to use a \inlineemph{dt\_multiplier} smaller than
+unity, the value proposed by \citet{Lehe2013} is
+``\inlineemph{dt\_multiplier}=0.96''. \\
+
+{\emphtext maxwell\_solver = pukhov} - This setting will enable en extended
+stencil proposed by \citet{Pukhov1999} under the name of NDFX. It is available
+in EPOCH2D and EPOCH3D. This scheme aims at improving the numerical dispersion
+relation by allowing to choose ``\inlineemph{dt\_multiplier} = 1.0''. \\
+
+{\emphtext maxwell\_solver = cowan} - This setting will enable en extended
+stencil proposed by \citet{Cowan2013}. It is available only in EPOCH3D.
+\citet{Cowan2013} proposes to numerically calculate a time step that is only
+slightly below the CFL condition, e.\,g.
+``\inlineemph{dt\_multiplier} = 0.999''. \\
 
 \subsubsection{Dynamic Load Balancing}
 The first is the {\emphtext dlb\_threshold} flag.
