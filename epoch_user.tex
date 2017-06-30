@@ -1704,8 +1704,8 @@ are used as follows\\
 is ignored and never generates any output. The default value is ``F''.\\
 
 {\emphtext dt\_snapshot} - Sets the interval between normal output dumps in
-simulation seconds. Setting zero or negative means that the code will output
-every step of the core solver. The code does NOT guarantee that outputs will be
+simulation seconds. Setting zero or negative means that the code not output
+based on this condition. The code does NOT guarantee that outputs will be
 exactly \inlineemph{dt\_snapshot} apart, what is guaranteed is that the next
 output will be after the first iteration which takes the simulation to a time
 $\ge$ \inlineemph{dt\_snapshot} from the last output.
@@ -1716,8 +1716,8 @@ it to be 5 femtoseconds.
 The default value is a large number which will never trigger an output.\\
 
 {\emphtext nstep\_snapshot} - Sets the number of timesteps between normal
-output dumps. Setting zero or negative means that the code will output
-every step of the core solver. If \inlineemph{dt\_snapshot} is also specified
+output dumps. Setting zero or negative means that the code will not output
+based on this condition. If \inlineemph{dt\_snapshot} is also specified
 then both conditions are considered and output will be generated when either
 condition is met. The default value is a large integer
 which will never trigger an output.\\
