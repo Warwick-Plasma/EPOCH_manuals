@@ -365,9 +365,9 @@ symbol. The options currently controlled by the preprocessor are:\\
   tracer particles. Tracer particles are specified like normal particles, and
   move about as would a normal particle with the same charge and mass, but
   tracer particles do not generate any current and are therefore passive
-  elements in the simulation. Any attempt to add particle collision effects
-  should remember that tracer species should not interact through collisions.
-  The implementation of tracer particles requires an additional ``IF'' clause
+  elements in the simulation. Tracers should be included in collisions to
+  ensure they move identically to non-tracers. The implementation of tracer
+  particles requires an additional ``IF'' clause
   in the particle push, so it has a slight performance impact. If you do not
   require the feature then setting this flag will give a slight performance
   improvement.
@@ -1071,8 +1071,10 @@ If set to ``F'' it has the same meaning as ``dumpmask = never''. If set to
 into tracer particles. Tracer particles are enabled with the correct
 precompiler option, and when set for a given species make that species move
 correctly for its charge and mass, but contribute no current. This means that
-these particles are passive tracers in the plasma. ``tracer = F'' is the
-default value.\\
+these particles are passive tracers in the plasma. In all other respects they
+are designed to behave identically to non-tracers, so they do take part in
+collisions by default. This can be prevented using the collision matrices in
+\sectit{collisions_block}. ``tracer = F'' is the default value.\\
 
 {\emphtext identify} - Used to identify the type of particle. Currently this
 is used primarily by the QED routines. See \sect{qed_block} for details.\\
