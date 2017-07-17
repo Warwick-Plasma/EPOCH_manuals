@@ -1173,7 +1173,17 @@ FORTRAN array ordering rules (ie. column-major order).\\
 
 {\emphtext NOTE: The files that are expected by this block are SIMPLE BINARY
 files, NOT FORTRAN unformatted files. It is possible to read FORTRAN
-unformatted files using the offset element, but care must be taken!}
+unformatted files using the offset element, but care must be taken!}\\
+
+The following entries are used for configuring the Delta-f method
+(see \sect{deltaf}).\\
+
+{\emphtext density\_back, drift\_\{x,y,z\}\_back, temp\_\{x,y,z\}\_back,
+\par temp\_\{x,y,z\}\_back\_ev, temp\_back, temp\_back\_ev}
+ - These all have the same
+meanings as the parameters listed above that don't include the ``\_back'' text,
+except that they specify the values to use for the background distribution
+function.\\
 
 \subsubsection{Particle migration between species}
 \label{sec:migration}
@@ -2428,6 +2438,10 @@ only electrons or ions are considered. It is possible to have two dist\_fn
 blocks with the same name but different momentum ranges and different
 include\_species settings produce the effect of a single diagnostic for
 all species in the output file.\\
+
+{\emphtext output\_deltaf} - If set to ``T'', the particle weights used in
+  calculating the distribution function is adjusted by subtracting the Delta-f
+  distribution function for the particle species. The default value is ``F''.\\
 
 {\emphtext restrict\_\{x,y,z,px,py,pz\}} - Restrictions are specified in the
   same way as ranges, but have a subtly different behaviour. Ranges specify
@@ -3726,6 +3740,7 @@ function. Again, this can be extended as far as required.
 %
 
 \subsection{Delta-f method in EPOCH}
+\label{sec:deltaf}
 
 To help reduce the impact of numerical noise in certain simulations, the
 delta-f method may be used in {\EPOCH} for specified particle species. The
