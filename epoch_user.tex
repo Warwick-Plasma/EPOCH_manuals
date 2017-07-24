@@ -773,16 +773,23 @@ specified time before beginning to move the particles.\\
 With the default settings ``\inlineemph{field\_order}=2'',
 ``\inlineemph{maxwell\_solver}=yee'' EPOCH will use the standard second order
 Yee scheme for solving Maxwell's equations.
-In this case, when particles are present, it is necessary to choose a
-\inlineemph{dt\_multiplier} smaller than unity, the default value is
-``\inlineemph{dt\_multiplier}=0.95''.
 This scheme has a grid dispersion relation with phase velocities smaller than
 $c$, especially for large spatial frequencies.
 It is possible to introduce extended stencils into the update step of the
 Maxwell-Faraday equation which will help improving the dispersion relation.
 All of the following extended stencils are only available when
-``\inlineemph{field\_order}=2''. Please note that you will also need to choose
-a \inlineemph{dt\_multiplier} according to the selected scheme.
+``\inlineemph{field\_order}=2''.
+Please note that you will also need to choose an appropriate
+\inlineemph{dt\_multiplier}, according to the selected scheme.
+A \inlineemph{dt\_multiplier} equal to unity would result in using the largest
+time-step allowed by the CFL condition for any of the implemented schemes.
+This time-step is said to be marginally stable.
+While, in general, the marginally stable time-step has the best dispersion
+properties, simulations may suffer from numerical problems such as
+exponentially growing noise.
+Choosing smaller values for the \inlineemph{dt\_multiplier} tend to improve on
+this, while adversely affecting the dispersion relation.
+The implemented solvers behave differently in this regard.
 Different options are available as follows:\\
 
 {\emphtext maxwell\_solver = lehe} - This setting will enable an extended
@@ -802,7 +809,7 @@ numerical dispersion relation by allowing to choose
 
 {\emphtext maxwell\_solver = cowan} - This setting will enable en extended
 stencil proposed by \citet{Cowan2013}. It is available only in EPOCH3D.
-\citet{Cowan2013} proposes to numerically calculate a time step that has the
+\citet{Cowan2013} propose to numerically calculate a time step that has the
 correct group velocity for the input laser. Typically these time
 steps are only slightly below the CFL condition, e.\,g.
 ``\inlineemph{dt\_multiplier} = 0.999''.
