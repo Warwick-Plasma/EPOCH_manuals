@@ -803,18 +803,26 @@ smaller than unity, the value proposed by \citet{Lehe2013} is
 
 {\emphtext maxwell\_solver = pukhov} - This setting will enable en extended
 stencil proposed by \citet{Pukhov1999} under the name of NDFX.
-It is available in EPOCH2D and EPOCH3D. This scheme aims at improving the
+It is available in EPOCH2D and EPOCH3D. In EPOCH1D, setting
+``\inlineemph{maxwell\_solver} = pukhov'' will make the code fall back silently
+to Yee's scheme. Pukhov's NDFX scheme aims at improving the
 numerical dispersion relation by allowing to choose
-``\inlineemph{dt\_multiplier} = 1.0'', while smaller values are also valid. \\
+``\inlineemph{dt\_multiplier} = 1.0'', while smaller values are also valid.
+The resulting dispersion relation is best along the axis with the smallest grid
+spacing.\\
 
 {\emphtext maxwell\_solver = cowan} - This setting will enable en extended
-stencil proposed by \citet{Cowan2013}. It is available only in EPOCH3D.
+stencil proposed by \citet{Cowan2013}. It is available only in EPOCH3D. In
+EPOCH1D and EPOCH2D, setting ``\inlineemph{maxwell\_solver} = cowan'' will make
+the code fall back silently to Yee's scheme.
 \citet{Cowan2013} propose to numerically calculate a time step that has the
 correct group velocity for the input laser. Typically these time
 steps are only slightly below the CFL condition, e.\,g.
 ``\inlineemph{dt\_multiplier} = 0.999''.
 When Cowan's scheme is reduced to 2D it is the same as Pokhov's scheme with
-$\inlineemph{dt\_multiplier}<1.0$. \\
+$\inlineemph{dt\_multiplier}<1.0$.
+The resulting dispersion relation is best along the axis with the smallest grid
+spacing.\\
 
 
 \subsubsection{Dynamic Load Balancing}
