@@ -314,9 +314,9 @@ documentation for more details.
 
 As of version 4.2.12, {\EPOCH} now checks for the existence of a file named
 ``USE\_DATA\_DIRECTORY'' in the current working directory before it prompts
-the user for a Data directory. If such a file exists, it reads it to obtain the name of the data
-directory to use and does not prompt the user. If no such file exists, it
-prompts for a data directory name as before.
+the user for a Data directory. If such a file exists, it reads it to obtain the
+name of the data directory to use and does not prompt the user. If no such file
+exists, it prompts for a data directory name as before.
 This is useful for cluster setups in which it is difficult or
 impossible to pipe in the directory name using a job script.
 
@@ -2482,8 +2482,7 @@ of particle momentum directions in the X-Y, Y-Z and Z-X planes.\\
 
 {\emphtext range\inlinecode{n}} - The range between which this axis should
 run. This is in the form of (minimum, maximum). Any particle which exceeds
-the range is ignored. In the current version of {\EPOCH}, the ``range{\it n}''
-parameter is ignored when applied to a spatial direction.
+the range is ignored.
 For momentum directions this parameter is specified in
 $kg\ ms^{-1}$. If the range of a momentum direction is set so that the maximum
 and the minimum are equal then the code will automatically set the range to
@@ -2493,14 +2492,14 @@ exactly span the range of particle momenta at the point of writing the dump.\\
 point numbers and NOT maths parser expressions.}\\
 
 {\emphtext resolution\inlinecode{n}} - The number of gridpoints in a given
-direction. Once again this is ignored for spatial dimensions where the
+direction. This is ignored for spatial dimensions where the
 resolution is always the same as the resolution of the underlying simulation.\\
 
 {\emphtext include\_species} - Specifies a species which should be included
 in the output. This is useful since it is rare that momentum limits are
 appropriate for both electrons and ions, so usually for a given dist\_fn block
 only electrons or ions are considered. It is possible to have two dist\_fn
-blocks with the same name but different momentum ranges and different
+blocks with the same name but different ranges and different
 include\_species settings produce the effect of a single diagnostic for
 all species in the output file.\\
 
@@ -2880,6 +2879,30 @@ begin:output
 end:output
 \end{boxverbatim}
 
+Subset blocks can be applied to per-species variables such as current and
+temperature. Only particles within the given momentum ranges and of the selected
+species are included in the calculations. In addition, subset blocks can now
+be applied to field or grid variables. This allows
+you to output spatial sections using the {\emphtext \{x,y,z\}\_max,min}
+restrictions.
+The output data will be trimmed to the selected ranges and a corresponding
+restricted grid included in the output. Note that specifying an empty range
+will lead to output of the entire domain. For example, the following snippet
+will output an ex\_c\_centre variable restricted to the centre 1/3rd of the
+domain with a corresponding grid grid\_centre:
+
+\begin{boxverbatim}
+begin:subset
+   name = centre
+   x_min = x_min + (x_max - x_min)/3.0
+   x_max = x_min + 2.0*(x_max - x_min)/3.0
+end:subset
+
+begin:output
+   ...
+   ex = always + centre
+end:output
+\end{boxverbatim}
 
 \subsection{\inlineemph{constant} block}
 \label{sec:constant_block}
@@ -3530,7 +3553,8 @@ anywhere initial conditions are specified.
 \label{sec:multilaser}
 
 \scaledcapimage{./images/profile_flat}{flatlaser}{Constant laser profile}{0.36}
-\scaledcapimage{./images/profile_gauss}{gausslaser}{Gaussian laser profile}{0.36}
+\scaledcapimage{./images/profile_gauss}{gausslaser}
+    {Gaussian laser profile}{0.36}
 
 When running {\EPOCH} in 2D or 3D, the laser can be modified spatially
 via the \inlineemph{profile} and \inlineemph{phase} parameters. These
@@ -4153,7 +4177,8 @@ Some changes have been made to the Makefile. These are documented in
 \end{itemize}
 \bigskip
 
-\noindent The following compile-time defines have been removed from the Makefile:
+\noindent The following compile-time defines have been removed from the
+   Makefile:
 \begin{itemize}
 \item COLLISIONS
 \item SPLIT\_PARTICLES\_AFTER\_PUSH
