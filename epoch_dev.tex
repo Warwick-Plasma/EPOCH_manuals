@@ -1307,7 +1307,7 @@ correct places.
 \subsection{The timestep}
 
 The timestep is calculated in the subroutine \inlinecode{set\_dt} in the file
-\inlinecode{src/io/diagnostics.F90}. All that the subroutine has to do is set
+\inlinecode{src/housekeeping/setup.F90}. All that the subroutine has to do is set
 the variable \inlinecode{dt} to set the timestep for the whole code. Any
 additional timestep constraints should be coded into this subroutine. This
 should be implemented after the existing \inlinecode{dt=} lines but before the
@@ -2326,7 +2326,7 @@ the general layout of the routine is as follows.
   particles. If the ratio of the minimum to the maximum is above the load
   balance threshold then just return from the subroutine.
 \item The code uses the routines \inlinecode{get\_load\_in\_\{x,y,z\}} to
-  determine the work load along each direction of the domain. 
+  determine the work load along each direction of the domain.
   The \inlinecode{get\_load\_in\_x} routine uses the x-coordinate of every
   particle to create a 1D particle density in the x-direction. This is then
   combined with the total number of grid cells in the y-z plane to give
