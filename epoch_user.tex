@@ -23,9 +23,9 @@ source code.
 This version number is printed to screen when you run the code. The line looks
 something like the following:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.8.0   (commit v4.8.0-0-g3819056-clean)
+ Welcome to EPOCH2D version 4.9.0   (commit v4.9.0-0-g2163b62e-clean)
 \end{boxverbatim}
-Here, only the number ``4.8'' is important.
+Here, only the number ``4.9'' is important.
 
 Since version 3.1 of the manual, new additions and changes are mentioned
 in the appendix.
@@ -189,8 +189,8 @@ are given assuming that you are typing commands at a UNIX terminal.
 When obtained, the {\EPOCH} codes all have a similar structure. If the tarred
 and gzipped archive (commonly referred to as a tarball) is downloaded and
 unpacked into the user's \verb|$HOME| directory, then the extracted contents
-will consist of a directory named ``\verb|$HOME/epoch-4.8.0|''
-(with ``4.8.0'' substituted by the current version number) and the
+will consist of a directory named ``\verb|$HOME/epoch-4.9.0|''
+(with ``4.9.0'' substituted by the current version number) and the
 subdirectories and files listed below.
 
 Alternatively, if the code is checked out from the GitLab git
@@ -286,10 +286,11 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
+ Welcome to EPOCH2D version 4.9.0   (commit v4.9.0-0-g2163b62e-clean)
+
+ *************************************************************
  The code was compiled with no compile time options
-
- Welcome to EPOCH2D version 4.8.0   (commit v4.8.0-0-g3819056-clean)
-
+ *************************************************************
  Code is running on 1 processing elements
 
  Specify output directory
@@ -314,9 +315,9 @@ documentation for more details.
 
 As of version 4.2.12, {\EPOCH} now checks for the existence of a file named
 ``USE\_DATA\_DIRECTORY'' in the current working directory before it prompts
-the user for a Data directory. If such a file exists, it reads it to obtain the name of the data
-directory to use and does not prompt the user. If no such file exists, it
-prompts for a data directory name as before.
+the user for a Data directory. If such a file exists, it reads it to obtain the
+name of the data directory to use and does not prompt the user. If no such file
+exists, it prompts for a data directory name as before.
 This is useful for cluster setups in which it is difficult or
 impossible to pipe in the directory name using a job script.
 
@@ -365,9 +366,9 @@ symbol. The options currently controlled by the preprocessor are:\\
   tracer particles. Tracer particles are specified like normal particles, and
   move about as would a normal particle with the same charge and mass, but
   tracer particles do not generate any current and are therefore passive
-  elements in the simulation. Any attempt to add particle collision effects
-  should remember that tracer species should not interact through collisions.
-  The implementation of tracer particles requires an additional ``IF'' clause
+  elements in the simulation. Tracers should be included in collisions to
+  ensure they move identically to non-tracers. The implementation of tracer
+  particles requires an additional ``IF'' clause
   in the particle push, so it has a slight performance impact. If you do not
   require the feature then setting this flag will give a slight performance
   improvement.
@@ -472,10 +473,11 @@ When the code is run, the output is
   d########P  d##P            ###########P     ##########P  d##P      d##P
  d########P  d##P              d######P          #######P  d##P      d##P
 
+ Welcome to EPOCH2D version 4.9.0   (commit v4.9.0-0-g2163b62e-clean)
+
+ *************************************************************
  The code was compiled with no compile time options
-
- Welcome to EPOCH2D version 4.8.0   (commit v4.8.0-0-g3819056-clean)
-
+ *************************************************************
  Code is running on 1 processing elements
 
  Specify output directory
@@ -585,6 +587,8 @@ begin:control
    # restart_snapshot = 98
 
    # field_order = 2
+   # maxwell_solver = yee
+
    # stdout_frequency = 10
 end:control
 \end{lboxverbatim}
@@ -631,7 +635,8 @@ metres. These are required parameters. Must be greater than
 {\emphtext dt\_multiplier} - Factor by which the timestep is multiplied before
 it is applied in the code, i.e. a multiplying factor applied to the CFL
 condition on the timestep. Must be less than one. If no value is given then
-the default of 0.95 is used.\\
+the default of 0.95 is used. If \inlineemph{maxwell\_solver} is different from
+``yee'' (the default) this parameter becomes increasingly relevant.\\
 
 {\emphtext dlb\_threshold} - The minimum ratio of the
 load on the least loaded processor to that on the most loaded processor allowed
@@ -653,6 +658,12 @@ if output file prefixes have been used (see \sect{output_block}).\\
 {\emphtext field\_order} - Order of the finite difference scheme used for
 solving Maxwell's equations. Can be 2, 4 or 6. If not specified, the default
 is to use a second order scheme.\\
+
+{\emphtext maxwell\_solver} - Choose a Maxwell solver scheme with an extended
+stencil. This option is only active if \inlineemph{field\_order} is set to 2.
+Possible options are ``yee'', ``lehe'', ``pukhov'' and ``cowan''. Note that
+not all options are available in 1d and 2d. The default is ``yee'' which is the
+default second order scheme.\\
 
 {\emphtext stdout\_frequency} - If specified then the code will print a one
 line status message to stdout after every given number or timesteps. The
@@ -759,6 +770,62 @@ specified time before beginning to move the particles.\\
   (eg. ``0012.sdf''). By default, the code tries to calculate the number of
   digits required by dividing t\_end by dt\_snapshot. Note that the minimum
   number of digits is 4.\\
+
+\subsubsection{Maxwell Solvers}
+\label{sec:maxwell_solvers}
+With the default settings ``\inlineemph{field\_order}=2'',
+``\inlineemph{maxwell\_solver}=yee'' EPOCH will use the standard second order
+Yee scheme for solving Maxwell's equations.
+This scheme has a grid dispersion relation with phase velocities smaller than
+$c$, especially for large spatial frequencies.
+It is possible to introduce extended stencils into the update step of the
+Maxwell-Faraday equation which will help improving the dispersion relation.
+All of the following extended stencils are only available when
+``\inlineemph{field\_order}=2''.
+Please note that you will also need to choose an appropriate
+\inlineemph{dt\_multiplier}, according to the selected scheme.
+A \inlineemph{dt\_multiplier} equal to unity would result in using the largest
+time-step allowed by the CFL condition for any of the implemented schemes.
+This time-step is said to be marginally stable.
+While, in general, the marginally stable time-step has the best dispersion
+properties, simulations may suffer from numerical problems such as
+exponentially growing noise.
+Choosing smaller values for the \inlineemph{dt\_multiplier} tend to improve on
+this, while adversely affecting the dispersion relation.
+The implemented solvers behave differently in this regard.
+Different options are available as follows:\\
+
+{\emphtext maxwell\_solver = lehe} - This setting will enable an extended
+stencil proposed by \citet{Lehe2013}.
+This stencil focusses on improving the dispersion relation along the $x$-axis,
+please take this into account when defining your laser input.
+It is available in EPOCH1D, EPOCH2D and EPOCH3D.
+While it is not technically required to use a \inlineemph{dt\_multiplier}
+smaller than unity, the value proposed by \citet{Lehe2013} is
+``\inlineemph{dt\_multiplier}=0.96''. \\
+
+{\emphtext maxwell\_solver = pukhov} - This setting will enable en extended
+stencil proposed by \citet{Pukhov1999} under the name of NDFX.
+It is available in EPOCH2D and EPOCH3D. In EPOCH1D, setting
+``\inlineemph{maxwell\_solver} = pukhov'' will make the code fall back silently
+to Yee's scheme. Pukhov's NDFX scheme aims at improving the
+numerical dispersion relation by allowing to choose
+``\inlineemph{dt\_multiplier} = 1.0'', while smaller values are also valid.
+The resulting dispersion relation is best along the axis with the smallest grid
+spacing.\\
+
+{\emphtext maxwell\_solver = cowan} - This setting will enable en extended
+stencil proposed by \citet{Cowan2013}. It is available only in EPOCH3D. In
+EPOCH1D and EPOCH2D, setting ``\inlineemph{maxwell\_solver} = cowan'' will make
+the code fall back silently to Yee's scheme.
+\citet{Cowan2013} propose to numerically calculate a time step that has the
+correct group velocity for the input laser. Typically these time
+steps are only slightly below the CFL condition, e.\,g.
+``\inlineemph{dt\_multiplier} = 0.999''.
+When Cowan's scheme is reduced to 2D it is the same as Pokhov's scheme with
+$\inlineemph{dt\_multiplier}<1.0$.
+The resulting dispersion relation is best along the axis with the smallest grid
+spacing.\\
 
 
 \subsubsection{Dynamic Load Balancing}
@@ -1071,8 +1138,10 @@ If set to ``F'' it has the same meaning as ``dumpmask = never''. If set to
 into tracer particles. Tracer particles are enabled with the correct
 precompiler option, and when set for a given species make that species move
 correctly for its charge and mass, but contribute no current. This means that
-these particles are passive tracers in the plasma. ``tracer = F'' is the
-default value.\\
+these particles are passive tracers in the plasma. In all other respects they
+are designed to behave identically to non-tracers, so they do take part in
+collisions by default. This can be prevented using the collision matrices in
+\sectit{collisions_block}. ``tracer = F'' is the default value.\\
 
 {\emphtext identify} - Used to identify the type of particle. Currently this
 is used primarily by the QED routines. See \sect{qed_block} for details.\\
@@ -1173,7 +1242,17 @@ FORTRAN array ordering rules (ie. column-major order).\\
 
 {\emphtext NOTE: The files that are expected by this block are SIMPLE BINARY
 files, NOT FORTRAN unformatted files. It is possible to read FORTRAN
-unformatted files using the offset element, but care must be taken!}
+unformatted files using the offset element, but care must be taken!}\\
+
+The following entries are used for configuring the Delta-f method
+(see \sect{deltaf}).\\
+
+{\emphtext density\_back, drift\_\{x,y,z\}\_back, temp\_\{x,y,z\}\_back,
+\par temp\_\{x,y,z\}\_back\_ev, temp\_back, temp\_back\_ev}
+ - These all have the same
+meanings as the parameters listed above that don't include the ``\_back'' text,
+except that they specify the values to use for the background distribution
+function.\\
 
 \subsubsection{Particle migration between species}
 \label{sec:migration}
@@ -1502,6 +1581,69 @@ Any valid maths parser expression can be used to set up the fields, and no
 check is made to ensure that the $\nabla.B = 0$ is satisfied.
 
 
+\subsection{\inlineemph{particles\_from\_file} block}
+\label{sec:particles_from_file}
+The \cemph{particles\_from\_file block} is similar in function to the
+\cemph{fields} block. It allows the loading of custom particle data from raw
+binary data files. An example usage of the block is shown below
+\begin{lboxverbatim}{particles\_from\_file block}
+begin:particles_from_file
+   species = "electron"
+
+   # Load mandatory data for 3D simulation
+   x_data = "xdata.dat"
+   y_data = "ydata.dat"
+   z_data = "ydata.dat"
+   w_data = "ydata.dat"
+
+   # Load particle ids in 4 byte int format,
+   # ignoring first 8 bytes of file
+   # offset = 8
+   # id4_data = "iddata.dat"
+end:particles_from_file
+\end{lboxverbatim}
+
+Specifying a \cemph{particles\_from\_file} block for a species causes {\EPOCH}
+to load the per-particle data from the specified files. Data files are assumed
+to be in order such that the first variable in each file will be attributed to
+one particle, the second variable in each file to a second electron, and so on.
+A target species to load to, as well as particle position and weight data
+(unless \inlinecode{-DPER\_SPECIES\_WEIGHT} has been set) must be supplied.
+With the exception of particle ID, any optional parameters which are left
+unspecified will be initialised to zero.\\
+
+If the code has been compiled with \inlinecode{-DPARTICLE\_ID} or
+\inlinecode{-DPARTICLE\_ID4} then particle IDs may be loaded from a raw binary
+file of integers of either size 4 or size 8 regardless of the compile time flag
+choice.  If no particle ID data is supplied, IDs will be generated sequentially
+from 1.\\
+
+All other data should be in the form of floating point numbers of the same
+precision as \inlinecode{\_num} in the core {\EPOCH} code.\\
+
+A \cemph{particles\_from\_file} block accepts the following parameters:\\
+
+{\emphtext species} - Name of the species to which the particles
+will be loaded.  This is a mandatory parameter and the corresponding species
+block must be defined.\\
+
+{\emphtext \{x,y,z\}\_data} - File containing particle position data in $m$.
+This data must be supplied, up to the dimensionality of the simulation.\\
+
+{\emphtext w\_data} - File containing pseudoparticle weight, this is the number
+of real particles the pseudoparticle represents. This data must be supplied.\\
+
+{\emphtext \{px,py,pz\}\_data} - File containing particle momentum data
+in $kg\,ms^{-1}$. The default value is zero.\\
+
+{\emphtext id\{4,8\}\_data} - File containing particle IDs in either 4 or 8
+byte unsigned integer representation.\\
+
+{\emphtext offset} - File offset. Number of bytes at the head of the file to be
+ignored, may be specified multiple times. see \sect{species_block} for more
+details of behaviour.\\
+
+
 \subsection{\inlineemph{window} block}
 \label{sec:window_block}
 {\EPOCH} can include an optional block which causes the simulation domain to
@@ -1704,8 +1846,8 @@ are used as follows\\
 is ignored and never generates any output. The default value is ``F''.\\
 
 {\emphtext dt\_snapshot} - Sets the interval between normal output dumps in
-simulation seconds. Setting zero or negative means that the code will output
-every step of the core solver. The code does NOT guarantee that outputs will be
+simulation seconds. Setting zero or negative means that the code will not output
+based on this condition. The code does NOT guarantee that outputs will be
 exactly \inlineemph{dt\_snapshot} apart, what is guaranteed is that the next
 output will be after the first iteration which takes the simulation to a time
 $\ge$ \inlineemph{dt\_snapshot} from the last output.
@@ -1716,8 +1858,8 @@ it to be 5 femtoseconds.
 The default value is a large number which will never trigger an output.\\
 
 {\emphtext nstep\_snapshot} - Sets the number of timesteps between normal
-output dumps. Setting zero or negative means that the code will output
-every step of the core solver. If \inlineemph{dt\_snapshot} is also specified
+output dumps. Setting zero or negative means that the code will not output
+based on this condition. If \inlineemph{dt\_snapshot} is also specified
 then both conditions are considered and output will be generated when either
 condition is met. The default value is a large integer
 which will never trigger an output.\\
@@ -2407,8 +2549,7 @@ of particle momentum directions in the X-Y, Y-Z and Z-X planes.\\
 
 {\emphtext range\inlinecode{n}} - The range between which this axis should
 run. This is in the form of (minimum, maximum). Any particle which exceeds
-the range is ignored. In the current version of {\EPOCH}, the ``range{\it n}''
-parameter is ignored when applied to a spatial direction.
+the range is ignored.
 For momentum directions this parameter is specified in
 $kg\ ms^{-1}$. If the range of a momentum direction is set so that the maximum
 and the minimum are equal then the code will automatically set the range to
@@ -2418,16 +2559,20 @@ exactly span the range of particle momenta at the point of writing the dump.\\
 point numbers and NOT maths parser expressions.}\\
 
 {\emphtext resolution\inlinecode{n}} - The number of gridpoints in a given
-direction. Once again this is ignored for spatial dimensions where the
+direction. This is ignored for spatial dimensions where the
 resolution is always the same as the resolution of the underlying simulation.\\
 
 {\emphtext include\_species} - Specifies a species which should be included
 in the output. This is useful since it is rare that momentum limits are
 appropriate for both electrons and ions, so usually for a given dist\_fn block
 only electrons or ions are considered. It is possible to have two dist\_fn
-blocks with the same name but different momentum ranges and different
+blocks with the same name but different ranges and different
 include\_species settings produce the effect of a single diagnostic for
 all species in the output file.\\
+
+{\emphtext output\_deltaf} - If set to ``T'', the particle weights used in
+  calculating the distribution function is adjusted by subtracting the Delta-f
+  distribution function for the particle species. The default value is ``F''.\\
 
 {\emphtext restrict\_\{x,y,z,px,py,pz\}} - Restrictions are specified in the
   same way as ranges, but have a subtly different behaviour. Ranges specify
@@ -2801,6 +2946,30 @@ begin:output
 end:output
 \end{boxverbatim}
 
+Subset blocks can be applied to per-species variables such as current and
+temperature. Only particles within the given momentum ranges and of the selected
+species are included in the calculations. In addition, subset blocks can now
+be applied to field or grid variables. This allows
+you to output spatial sections using the {\emphtext \{x,y,z\}\_max,min}
+restrictions.
+The output data will be trimmed to the selected ranges and a corresponding
+restricted grid included in the output. Note that specifying an empty range
+will lead to output of the entire domain. For example, the following snippet
+will output an ex\_c\_centre variable restricted to the centre 1/3rd of the
+domain with a corresponding grid grid\_centre:
+
+\begin{boxverbatim}
+begin:subset
+   name = centre
+   x_min = x_min + (x_max - x_min)/3.0
+   x_max = x_min + 2.0*(x_max - x_min)/3.0
+end:subset
+
+begin:output
+   ...
+   ex = always + centre
+end:output
+\end{boxverbatim}
 
 \subsection{\inlineemph{constant} block}
 \label{sec:constant_block}
@@ -3451,7 +3620,8 @@ anywhere initial conditions are specified.
 \label{sec:multilaser}
 
 \scaledcapimage{./images/profile_flat}{flatlaser}{Constant laser profile}{0.36}
-\scaledcapimage{./images/profile_gauss}{gausslaser}{Gaussian laser profile}{0.36}
+\scaledcapimage{./images/profile_gauss}{gausslaser}
+    {Gaussian laser profile}{0.36}
 
 When running {\EPOCH} in 2D or 3D, the laser can be modified spatially
 via the \inlineemph{profile} and \inlineemph{phase} parameters. These
@@ -3724,6 +3894,75 @@ end:species
 This changes the code to run with a Gaussian density profile rather then a step
 function. Again, this can be extended as far as required.
 %
+
+\subsection{Delta-f method in EPOCH}
+\label{sec:deltaf}
+
+To help reduce the impact of numerical noise in certain simulations, the
+delta-f method may be used in {\EPOCH} for specified particle species. The
+delta-f method effectively subtracts a background distribution $f_0$ when
+calculating currents due to the motion of markers; when the particle
+distribution function $f$ is close to $f_0$, this substantially reduces the
+statistical noise in the currents. Only current deposition is implemented
+differently, and the equations of motion of the markers are not modified in
+this delta-f approach.
+
+The component of the currents associated with the background $f_0$ may be in
+principle be calculated analytically, but the delta-f implementation in EPOCH
+assumes (but does not check) that the total background current is zero.
+
+In order to use the delta-f method {\EPOCH} must be compiled with the
+\#DELTAF\_METHOD precompiler flag enabled. Standard {\EPOCH} input simulations
+are not affected by switching on this flag, but the user may then choose to
+treat certain species in the plasma using the delta-f method. To enable
+delta-f calculation for a species the background distribution function $f_0$
+must be defined in the input block. $f_0$ is specified using variables similar
+to those used to specify $f$.  The current implementation of delta-f allows
+only a spatially uniform drifting Maxwellian $f_0$, with temperatures $T_x$,
+$T_y$ and $T_z$ allowed to differ from each other. In 3D, for the case where
+the temperature in each direction is equal, we have
+\begin{equation*}
+  f_0 = n_0 (2 \pi T)^{-3/2}
+    \exp\left( \frac{m (\mathbf{v} - \mathbf{v_d})^2}{2 k_B T} \right).
+\end{equation*}
+
+The parameters density\_back, temp(x,y,z)\_back and drift(x,y,z)\_back in each
+species specification in the input deck set $f_0$. density\_back $=0$ is the
+default and is equivalent to not using the delta-f method.
+
+For example, the electron species component of an input deck solved using
+delta-f might be written:
+
+\begin{lboxverbatim}{section of input.deck}
+begin:species
+   name = electron
+   charge = -1.0
+   mass  = 1.0
+   frac = 0.3
+   temp = 1e8
+   temp_back = 1e8
+   density = 1e20
+   density_back = 1e20
+end:species
+\end{lboxverbatim}
+
+Additional distribution function diagnostic options are supplied for the
+Delta-f version. Standard diagnostics work as usual based on the total
+distribution function $f$ but is is also possible to output the Delta-f
+component of the distribution functions by adding ``output\_deltaf=T'' in
+``dist\_fn'' components of the input deck.
+
+An example input deck is supplied in the 1D {\EPOCH} version as
+twostream\_deltaf.deck. This uses the delta-f method to solve the weak-beam
+two stream instability. The bulk plasma species is solved using the delta-f
+method, since this evolve very little, and mostly supports the Lagnmuir waves
+that the weak beam interacts with. The relative change to the beam species is
+large, and the standard PIC method, rather than delta-f is used to model this
+species. A comparison of the electric field diagnostics between standard and
+delta-f simulations shows a substantial decrease in noise.
+
+Further details of the method are provided in a set of slides included in the
+appendix of this document. See \sectit{deltaf_slides}.
 
 \section{Basic examples of using {\EPOCH}}
 \label{sec:examples}
@@ -4005,7 +4244,8 @@ Some changes have been made to the Makefile. These are documented in
 \end{itemize}
 \bigskip
 
-\noindent The following compile-time defines have been removed from the Makefile:
+\noindent The following compile-time defines have been removed from the
+   Makefile:
 \begin{itemize}
 \item COLLISIONS
 \item SPLIT\_PARTICLES\_AFTER\_PUSH
@@ -4244,6 +4484,105 @@ the input deck (see \sect{subset_block}):
 \item skip, skip\_{x,y,z}
 \end{itemize}
 \bigskip
+
+\section{Changes between version 4.8 and 4.9}
+
+\subsection{New capabilities}
+Version 4.9 adds significant new capabilities as follows:
+
+\begin{itemize}
+\item delta-f version: particle distributions can be expressed as
+   $f_0 + f_1$ where $f_0$ is a specified background plasma and all simulation
+   particles are used to describe the $f_1$ component, documented in
+   \sect{deltaf}.
+\item selectable field solvers: 3 new solvers have been added for fields, fully
+   documented in \sect{maxwell_solvers}.
+\end{itemize}
+\bigskip
+
+\subsection{Changes to the Makefile}
+
+Some changes have been made to the Makefile. These are documented in
+\sect{makefile}.\\
+
+\noindent The following compile-time define has been added to the Makefile:
+\begin{itemize}
+\item DELTAF\_METHOD
+\end{itemize}
+\bigskip
+
+\subsection{Additions to the input deck}
+
+The following alterations were made to the input deck:
+\begin{itemize}
+\item ioniz* (with a ``z'') aliases have been added for ionis* keywords.
+\item y and z parameters can now appear in the input deck in EPOCH 1D and 2D.
+\end{itemize}
+\bigskip
+
+A new deck block has been added. The particles\_from\_file block allows loading
+of custom particle data from raw binary data files. See
+\sect{particles_from_file} for details.
+This block accepts the following parameters:
+\begin{itemize}
+\item species
+\item \{xyz\}\_data
+\item w\_data
+\item \{xyz\}\_data
+\item id\{4,8\}\_data
+\item offset
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the ``control'' block of
+the input deck (see \sect{control_block}):
+\begin{itemize}
+\item maxwell\_solver
+\item use\_current\_correction
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the ``species'' block of
+the input deck (see \sect{species_block}):
+\begin{itemize}
+\item maxwell\_solver
+\item density\_back
+\item drift\_\{x,y,z\}\_back
+\item temp\_\{x,y,z\}\_back
+\item temp\_\{x,y,z\}\_back\_ev
+\item temp\_back
+\item temp\_back\_ev
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the ``dist\_fn' block of
+the input deck (see \sect{dist_fn_block}):
+\begin{itemize}
+\item dir may now take the value mod\_p
+\item restrict\_mod\_p
+\end{itemize}
+
+\subsection{Changes not resulting from changes to the deck}
+\begin{itemize}
+\item Lasers can be specified with time-varying frequency profile.
+\item The existing subset blocks can now be applied to field and derived grid
+  variables. If spatial restrictions are used, subsections will be output,
+  along with a corresponding grid.
+  Note that these are not compatible with the ``skip'' parameter to subset
+  blocks.
+\item The dist\_fn block ``range'' keyword is now respected for spatial
+  directions, allowing a spatial subset of the distribution function to be
+  output directly.
+\item Some corrections were applied to calculation of thermal boundary
+  conditions for particles.
+\item The load balancer may now be disabled by setting a 0 or negative
+  threshold.
+\end{itemize}
+\bigskip
+
+\section{Slides from Delta-f Talk}
+\label{sec:deltaf_slides}
+\includepdf[pages=-]{talk_deltaf.pdf}
 
 %\addcontentsline{toc}{section}{References}
 \bibliography{epoch_refs}{}
