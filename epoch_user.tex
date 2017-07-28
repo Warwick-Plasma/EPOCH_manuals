@@ -770,6 +770,7 @@ specified time before beginning to move the particles.\\
   number of digits is 4.\\
 
 \subsubsection{Maxwell Solvers}
+\label{sec:maxwell_solvers}
 With the default settings ``\inlineemph{field\_order}=2'',
 ``\inlineemph{maxwell\_solver}=yee'' EPOCH will use the standard second order
 Yee scheme for solving Maxwell's equations.
@@ -4479,6 +4480,92 @@ block of the input deck (see \sect{output_global_block}):
 the input deck (see \sect{subset_block}):
 \begin{itemize}
 \item skip, skip\_{x,y,z}
+\end{itemize}
+\bigskip
+
+\section{Changes between version 4.8 and 4.9}
+
+\subsection{New capabilities}
+Version 4.9 adds significant new capabilities as follows:
+
+\begin{itemize}
+\item delta-f version: particle distributions can be expressed as $f_0 + f_1$ where $f_0$ is a specified background plasma and all simulation particles are used to describe the $f_1$ component, documented in \sect{deltaf}.
+\item selectable field solvers: 3 new solvers have been added for fields, fully documented in \sect{maxwell_solvers}.
+\end{itemize}
+\bigskip
+
+\subsection{Changes to the Makefile}
+
+Some changes have been made to the Makefile. These are documented in
+\sect{makefile}.\\
+
+\noindent The following compile-time define has been added to the Makefile:
+\begin{itemize}
+\item DELTAF\_METHOD
+\end{itemize}
+\bigskip
+
+\subsection{Additions to the input deck}
+
+The following alterations were made to the input deck:
+\begin{itemize}
+\item ioniz* (with a ``z'') aliases have been added for ionis* keywords.
+\item y and z parameters can now appear in the input deck in EPOCH 1D and 2D.
+\end{itemize}
+\bigskip
+
+A new deck block has been added. The particles\_from\_file block allows loading of custom particle 
+data from raw binary data files. See \sect{particles_from_file} for details. 
+This block accepts the following parameters:
+\begin{itemize}
+\item species
+\item \{xyz\}\_data
+\item w\_data
+\item \{xyz\}\_data
+\item id\{4,8\}\_data
+\item offset
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the ``control'' block of
+the input deck (see \sect{control_block}):
+\begin{itemize}
+\item maxwell\_solver
+\item use\_current\_correction
+\end{itemize}
+\bigskip
+
+
+\noindent The following parameters have been added to the ``species'' block of
+the input deck (see \sect{species_block}):
+\begin{itemize}
+\item maxwell\_solver
+\item density\_back
+\item drift\_\{x,y,z\}\_back
+\item temp\_\{x,y,z\}\_back
+\item temp\_\{x,y,z\}\_back\_ev
+\item temp\_back
+\item temp\_back\_ev
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the ``dist\_fn' block of
+the input deck (see \sect{dist_fn_block}):
+\begin{itemize}
+\item dir may now take the value mod\_p
+\item restrict\_mod\_p
+\end{itemize}
+
+\subsection{Changes not resulting from changes to the deck}
+\begin{itemize}
+\item Lasers can be specified with time-varying frequency profile.
+\item The existing subset blocks can now be applied to field and derived grid variables. 
+If spatial restrictions are used, subsections will be output, along with a corresponding grid. 
+Note that these are not compatible with the ``skip'' parameter to subset blocks.
+\item The dist\_fn block ``range'' keyword is now respected for spatial directions, 
+allowing a spatial subset of the distribution function to be output directly.
+\item Some corrections were applied to calculation of thermal boundary conditions for particles.
+\item The load balancer may now be disabled by setting a 0 or negative threshold.
 \end{itemize}
 \bigskip
 
