@@ -2835,6 +2835,59 @@ a version of the code which you have obtained from a source other than
 CCPForge may include other input deck blocks. These should be described in
 additional documentation provided with the version of the code that you have.
 
+\subsection{\inlineemph{injector} block}
+\label{sec:injector_block}
+
+{\emphtext Everything in this Subsection requires {\EPOCH} Version 4.10 or later.}
+
+The \inlineemph{injector} block specifies a particle source to be introduced through a simulation boundary. Each injector block specifies a source of a single species of particle defined by a density, centre of mass drift momentum, temperature and number of simulation particles per cell. The current version of the injectors is incompatible with the \inlineemph{PER\_SPECIES\_WEIGHT} compiler flag, and attempting to use an injector with a version of {\EPOCH} compiled with this flag will fail.
+
+The ``injector'' block accepts the following keys:\\
+
+{\emphtext boundary} - specifies which boundary to attach the particle source too. Same specification as \sect{laser_block}, so permitted values are x\_min, x\_max, y\_min, y\_max, z\_min and z\_max.\\
+
+{\emphtext species} - specifies which species should be injected through the boundary. Just specify the name of the species required.\\
+
+{\emphtext t\_start} - Time at which to start the injector.\\
+
+{\emphtext t\_end} - Time at which to end the injector.\\
+
+{\emphtext npart\_per\_cell} - target pseudo-particle density for the injector. Average number of particles injected will be this value or slightly higher if very few particles are specified.\\
+
+{\emphtext density} - Number density of the particle source in m$^{-3}$. Can be space varying along the boundary to which the injector is attached and time varying.\\
+
+{\emphtext density\_min} - Minimum density in m$^{-3}$ below which pseudo particles are not loaded. Use if the density has a profile to avoid injecting low weight particles in low density regions.\\
+
+{\emphtext temp\_x} - Temperature in x direction (K)\\
+
+{\emphtext temp\_y} - Temperature in y direction (K)\\
+
+{\emphtext temp\_z} - Temperature in z direction (K)\\
+
+{\emphtext temp} - Temperature in all directions (K)\\
+
+{\emphtext drift\_x} - Momentum drift in x direction in kg m/s\\
+
+{\emphtext drift\_y} - Momentum drift in x direction in kg m/s\\
+
+{\emphtext drift\_z} - Momentum drift in x direction in kgm/s\\
+
+An example input deck might look as follows:\\
+
+\begin{boxverbatim}
+begin:injector
+
+  boundary = x_min
+  species = Electron
+  density = dens
+  temp_x = temp
+  drift_x = drift_p
+  npart_per_cell = 32
+
+end:injector
+\end{boxverbatim}
+
+{\emphtext Injectors are a new feature so please be wary of unusual behaviour, and contact the {\EPOCH} development team if unexpected results occur}
 
 \subsection{\inlineemph{subset} block}
 \label{sec:subset_block}
