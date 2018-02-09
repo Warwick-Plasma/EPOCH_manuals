@@ -1386,6 +1386,42 @@ using the following control block parameters:\\
   ionisation correction to the tunnelling ionisation model for high intensity
   lasers. The default is ``T''.\\
 
+\subsubsection{Species Boundaries}
+\noindent{\emphtext Everything in this subsection needs {\EPOCH} version 4.10 or above}
+
+
+{\emphtext bc\_x\_min} - Boundary condition to be applied to this species only
+on the lower x boundary. Can be any normal boundary condition apart
+from periodic. If not specified then the global boundary condition is applied.\\
+
+{\emphtext bc\_x\_max} - Boundary condition to be applied to this species only
+on the upper x boundary. Can be any normal boundary condition apart
+from periodic. If not specified then the global boundary condition is applied.\\
+
+{\emphtext bc\_y\_min} - Boundary condition to be applied to this species only
+on the lower y boundary. Can be any normal boundary condition apart
+from periodic. If not specified then the global boundary condition is applied.\\
+
+{\emphtext bc\_y\_max} - Boundary condition to be applied to this species only
+on the upper y boundary. Can be any normal boundary condition apart
+from periodic. If not specified then the global boundary condition is applied.\\
+
+{\emphtext bc\_z\_min} - Boundary condition to be applied to this species only
+on the lower z boundary. Can be any normal boundary condition apart
+from periodic. If not specified then the global boundary condition is applied.\\
+
+{\emphtext bc\_z\_max} - Boundary condition to be applied to this species only
+on the upper z boundary. Can be any normal boundary condition apart
+from periodic. If not specified then the global boundary condition is applied.\\
+
+{\emphtext meet\_injectors} - Logical flag determining whether the background plasma
+should be extended to meet the point where particle injectors operate from.
+This means that plasma is loaded one particle shape function length outside the
+boundary. This means that it is possible to use an injector to ``continue'' an
+existing drifting plasma. \inlineemph{NOT COMPATIBLE WITH PERIODIC
+BOUNDARY CONDITIONS!}
+
+
 \subsection{\inlineemph{laser} block}
 \label{sec:laser_block}
 Laser blocks attach an EM wave source to a boundary which is set as
