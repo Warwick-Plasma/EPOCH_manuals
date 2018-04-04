@@ -1720,6 +1720,30 @@ end:window
   to the right boundary after the window has started moving.
   ``xbc\_right\_after\_move'' is accepted as a synonym.
 
+Because of how the moving window must work, there are some compatibility issues
+with certain features. In particular:
+\begin{itemize}
+\item Lasers attached to an X boundary which remain in place after the window
+moves, or attached to Y or Z boundaries:
+\subitem The laser will behave as though it is attached to the window itself:
+for Y or Z boundaries with spatial variations this may not give the expected
+result.
+\subitem For X boundaries, the moving emitter will result in a form of
+numerical Doppler shifting.
+\item Injectors attached to an X boundary will not work. Those on a Y
+or Z boundary may appear to work, but the rates will be incorrect.
+\item CPML boundary conditions:
+\subitem In X these cannot work as they rely on time-history which is
+simply missing.
+\subitem On Y or Z boundaries they will approximately work, but the history
+will be truncated and so they will generally require more tuning.
+We can't help with this in general.
+\item Load of particles from file is not supported since it can't be made to
+work in general.
+\item As of now(04/2018, v4.10) fractional numbers of particles-per-cell lead
+to odd behaviour and incorrect densities, because the window does not
+handle these.
+\end{itemize}
 
 \subsection{\inlineemph{output} block}
 \label{sec:output_block}
