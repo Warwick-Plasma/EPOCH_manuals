@@ -1224,6 +1224,10 @@ begin:species
 end:species
 \end{lboxverbatim}
 
+The sizes of the variables to be filled do not need to be provided: the
+code will continue reading until the given variable is filled. 
+Note that ghost or guard cells should not be included in the file as
+they cannot be set this way. 
 
 An additional element is also introduced, the offset element. This
 is the offset in bytes from the start of the file to where the data should
@@ -1234,6 +1238,10 @@ changed between data reading lines the same data will be read into all the
 variables. The data is read in as soon as a line is executed, and so it is
 perfectly possible to load data from a file and then modify the data using
 a mathematical expression.\\
+
+The example block above is for 10,000 values at double precision, i.e. 8-bytes 
+each. The density data is the first 80,000 bytes of ``ic.dat''. Bytes 80,000
+to 160,000 are the temp\_x data.
 
 The file should be a simple binary file consisting of floating point numbers of
 the same precision as \inlinecode{\_num} in the core {\EPOCH} code. For
