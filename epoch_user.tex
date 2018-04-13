@@ -23,9 +23,9 @@ source code.
 This version number is printed to screen when you run the code. The line looks
 something like the following:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.9.0   (commit v4.9.0-0-g2163b62e-clean)
+ Welcome to EPOCH2D version 4.10.0   (commit v4.10.0-0-g70a74a12-clean)
 \end{boxverbatim}
-Here, only the number ``4.9'' is important.
+Here, only the number ``4.10'' is important.
 
 Since version 3.1 of the manual, new additions and changes are mentioned
 in the appendix.
@@ -189,8 +189,8 @@ are given assuming that you are typing commands at a UNIX terminal.
 When obtained, the {\EPOCH} codes all have a similar structure. If the tarred
 and gzipped archive (commonly referred to as a tarball) is downloaded and
 unpacked into the user's \verb|$HOME| directory, then the extracted contents
-will consist of a directory named ``\verb|$HOME/epoch-4.9.0|''
-(with ``4.9.0'' substituted by the current version number) and the
+will consist of a directory named ``\verb|$HOME/epoch-4.10.0|''
+(with ``4.10.0'' substituted by the current version number) and the
 subdirectories and files listed below.
 
 Alternatively, if the code is checked out from the GitLab git
@@ -286,7 +286,7 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.9.0   (commit v4.9.0-0-g2163b62e-clean)
+ Welcome to EPOCH2D version 4.10.0   (commit v4.10.0-0-g70a74a12-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -473,7 +473,7 @@ When the code is run, the output is
   d########P  d##P            ###########P     ##########P  d##P      d##P
  d########P  d##P              d######P          #######P  d##P      d##P
 
- Welcome to EPOCH2D version 4.9.0   (commit v4.9.0-0-g2163b62e-clean)
+ Welcome to EPOCH2D version 4.10.0   (commit v4.10.0-0-g70a74a12-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -1397,7 +1397,9 @@ using the following control block parameters:\\
   lasers. The default is ``T''.\\
 
 \subsubsection{Species Boundaries}
-\noindent{\emphtext Everything in this subsection needs {\EPOCH} version 4.10 or above}
+\label{sec:per_species_bcs}
+\noindent{\emphtext Everything in this subsection needs {\EPOCH} version 4.10
+or above}
 
 
 {\emphtext bc\_x\_min} - Boundary condition to be applied to this species only
@@ -1424,7 +1426,8 @@ from periodic. If not specified then the global boundary condition is applied.\\
 on the upper z boundary. Can be any normal boundary condition apart
 from periodic. If not specified then the global boundary condition is applied.\\
 
-{\emphtext meet\_injectors} - Logical flag determining whether the background plasma
+{\emphtext meet\_injectors} - Logical flag determining whether the background
+plasma
 should be extended to meet the point where particle injectors operate from.
 This means that plasma is loaded one particle shape function length outside the
 boundary. This means that it is possible to use an injector to ``continue'' an
@@ -2167,6 +2170,9 @@ dumpmask.\\
 
 {\emphtext number\_density} - Number density on grid. Can have species
 dumpmask.\\
+
+{\emphtext particles\_per\_cell} - Number of particles per cell. Can have
+species dumpmask.  The synonym ``ppc'' may also be used.\\
 
 {\emphtext temperature} - Isotropic temperature on grid. Can have species
 dumpmask.\\
@@ -4703,6 +4709,23 @@ the input deck (see \sect{dist_fn_block}):
 \end{itemize}
 \bigskip
 
+
+\section{Changes between version 4.9 and 4.10}
+
+\subsection{New capabilities}
+Version 4.10 adds the following new capabilities:
+
+\begin{itemize}
+\item Time varying particle injectors. See \sect{injector_block}
+\item Per-species particle boundaries. You can now specify bc\_x\_min and
+   bc\_x\_max to a species block. This overrides the global boundaries for that
+   species. See \sect{per_species_bcs}
+\item Added ``particles\_per\_cell'' output diagnostic.
+   See \sect{output_directives}
+\end{itemize}
+\bigskip
+
+
 \section{Simple binary files}
 \label{sec:binaryfile}
 There are several input deck blocks which can read conditions directly from
@@ -4770,6 +4793,7 @@ It is possible to write multiple arrays into the same binary file and use
 the ``offset'' comand in the input deck to specify where the next array in
 the file is to be located. This can be tricky to work with and it is therefore
 recommended to write each separate array to its own file.
+
 
 \section{Slides from Delta-f Talk}
 \label{sec:deltaf_slides}
