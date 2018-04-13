@@ -1387,7 +1387,9 @@ using the following control block parameters:\\
   lasers. The default is ``T''.\\
 
 \subsubsection{Species Boundaries}
-\noindent{\emphtext Everything in this subsection needs {\EPOCH} version 4.10 or above}
+\label{sec:per_species_bcs}
+\noindent{\emphtext Everything in this subsection needs {\EPOCH} version 4.10
+or above}
 
 
 {\emphtext bc\_x\_min} - Boundary condition to be applied to this species only
@@ -1414,7 +1416,8 @@ from periodic. If not specified then the global boundary condition is applied.\\
 on the upper z boundary. Can be any normal boundary condition apart
 from periodic. If not specified then the global boundary condition is applied.\\
 
-{\emphtext meet\_injectors} - Logical flag determining whether the background plasma
+{\emphtext meet\_injectors} - Logical flag determining whether the background
+plasma
 should be extended to meet the point where particle injectors operate from.
 This means that plasma is loaded one particle shape function length outside the
 boundary. This means that it is possible to use an injector to ``continue'' an
@@ -2133,6 +2136,9 @@ dumpmask.\\
 
 {\emphtext number\_density} - Number density on grid. Can have species
 dumpmask.\\
+
+{\emphtext particles\_per\_cell} - Number of particles per cell. Can have
+species dumpmask.  The synonym ``ppc'' may also be used.\\
 
 {\emphtext temperature} - Isotropic temperature on grid. Can have species
 dumpmask.\\
@@ -4666,6 +4672,22 @@ the input deck (see \sect{dist_fn_block}):
   conditions for particles.
 \item The load balancer may now be disabled by setting a 0 or negative
   threshold.
+\end{itemize}
+\bigskip
+
+
+\section{Changes between version 4.9 and 4.10}
+
+\subsection{New capabilities}
+Version 4.10 adds the following new capabilities:
+
+\begin{itemize}
+\item Time varying particle injectors. See \sect{injector_block}
+\item Per-species particle boundaries. You can now specify bc\_x\_min and
+   bc\_x\_max to a species block. This overrides the global boundaries for that
+   species. See \sect{per_species_bcs}
+\item Added ``particles\_per\_cell'' output diagnostic.
+   See \sect{output_directives}
 \end{itemize}
 \bigskip
 
