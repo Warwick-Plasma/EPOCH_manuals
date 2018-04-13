@@ -323,12 +323,18 @@ impossible to pipe in the directory name using a job script.
 
 The ``Makefile'' supplied with {\EPOCH} is setup to use the Intel compiler
 by default. However, it also contains configurations for gfortran, pgi, g95,
-hector and ibm (the compiler suite used on IBM's BlueGene machines).
+archer and ibm (the compiler suite used on IBM's BlueGene machines).
 In order to compile using one of the listed configurations, add the
 ``\verb|COMPILER=|'' option to the ``\verb|make|'' command. For example\\
 \indent\inlinecode{make COMPILER=gfortran}\\
 will compile the code using the gfortran compiler and appropriate compiler
 flags.
+As of version 4.11, it is now possible for the build system to automatically
+detect the correct compiler to use. Typing
+\indent\inlinecode{make COMPILER=auto}\\
+will cause the build system to guess which compiler is in use. Note that this
+might not always work, so it is better to use the correct value for
+``\verb|COMPILER|'' if it is already known.
 You can also compile the code with debugging flags by adding
 ``\verb|MODE=debug|'' and can compile using more than one processor by
 using ``\verb|-j<n>|'', where ``\verb|<n>|''
@@ -738,8 +744,8 @@ specified time before beginning to move the particles.\\
   input deck blocks. The default value is ``F''.\\
 
 {\emphtext print\_constants} - If this logical flag is set to ``T'', deck
-  constants are printed to the ``deck.status'' file as they are parsed. The
-  default value is ``F''.\\
+  constants are printed to the ``deck.status'' and ``const.status'' files
+  as they are parsed. The default value is ``F''.\\
 
 {\emphtext use\_migration} - Logical flag which determines whether or not to
   use particle migration. The default is ``F''. See \sect{migration}.\\
@@ -4722,6 +4728,24 @@ Version 4.10 adds the following new capabilities:
    species. See \sect{per_species_bcs}
 \item Added ``particles\_per\_cell'' output diagnostic.
    See \sect{output_directives}
+\end{itemize}
+\bigskip
+
+
+\section{Changes between version 4.10 and 4.11}
+
+\subsection{New capabilities}
+Version 4.11 adds the following new capabilities:
+
+\begin{itemize}
+\item Added time dependent moving window. No new input deck parameters have
+    been added, but it is now possible to specify ``window\_v\_x'' to be a
+    function that varies in time. See \sect{window_block}
+\item If ``print\_constants=T'' in the control block (see \sect{control_block})
+    deck constants are now output to a separate file named ``const.status''.
+    This allows for easier post-processing.
+\item Added COMPILER=auto option to automatically detect compiler. See
+    \sect{makefile}
 \end{itemize}
 \bigskip
 
