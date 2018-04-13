@@ -23,9 +23,9 @@ source code.
 This version number is printed to screen when you run the code. The line looks
 something like the following:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.10.0   (commit v4.10.0-0-g70a74a12-clean)
+ Welcome to EPOCH2D version 4.11.0   (commit v4.11.0-0-g6ebd53cc-clean)
 \end{boxverbatim}
-Here, only the number ``4.10'' is important.
+Here, only the number ``4.11'' is important.
 
 Since version 3.1 of the manual, new additions and changes are mentioned
 in the appendix.
@@ -189,8 +189,8 @@ are given assuming that you are typing commands at a UNIX terminal.
 When obtained, the {\EPOCH} codes all have a similar structure. If the tarred
 and gzipped archive (commonly referred to as a tarball) is downloaded and
 unpacked into the user's \verb|$HOME| directory, then the extracted contents
-will consist of a directory named ``\verb|$HOME/epoch-4.10.0|''
-(with ``4.10.0'' substituted by the current version number) and the
+will consist of a directory named ``\verb|$HOME/epoch-4.11.0|''
+(with ``4.11.0'' substituted by the current version number) and the
 subdirectories and files listed below.
 
 Alternatively, if the code is checked out from the GitLab git
@@ -286,7 +286,7 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.10.0   (commit v4.10.0-0-g70a74a12-clean)
+ Welcome to EPOCH2D version 4.11.0   (commit v4.11.0-0-g6ebd53cc-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -323,12 +323,18 @@ impossible to pipe in the directory name using a job script.
 
 The ``Makefile'' supplied with {\EPOCH} is setup to use the Intel compiler
 by default. However, it also contains configurations for gfortran, pgi, g95,
-hector and ibm (the compiler suite used on IBM's BlueGene machines).
+archer and ibm (the compiler suite used on IBM's BlueGene machines).
 In order to compile using one of the listed configurations, add the
 ``\verb|COMPILER=|'' option to the ``\verb|make|'' command. For example\\
 \indent\inlinecode{make COMPILER=gfortran}\\
 will compile the code using the gfortran compiler and appropriate compiler
 flags.
+As of version 4.11, it is now possible for the build system to automatically
+detect the correct compiler to use. Typing
+\indent\inlinecode{make COMPILER=auto}\\
+will cause the build system to guess which compiler is in use. Note that this
+might not always work, so it is better to use the correct value for
+``\verb|COMPILER|'' if it is already known.
 You can also compile the code with debugging flags by adding
 ``\verb|MODE=debug|'' and can compile using more than one processor by
 using ``\verb|-j<n>|'', where ``\verb|<n>|''
@@ -473,7 +479,7 @@ When the code is run, the output is
   d########P  d##P            ###########P     ##########P  d##P      d##P
  d########P  d##P              d######P          #######P  d##P      d##P
 
- Welcome to EPOCH2D version 4.10.0   (commit v4.10.0-0-g70a74a12-clean)
+ Welcome to EPOCH2D version 4.11.0   (commit v4.11.0-0-g6ebd53cc-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -738,8 +744,8 @@ specified time before beginning to move the particles.\\
   input deck blocks. The default value is ``F''.\\
 
 {\emphtext print\_constants} - If this logical flag is set to ``T'', deck
-  constants are printed to the ``deck.status'' file as they are parsed. The
-  default value is ``F''.\\
+  constants are printed to the ``deck.status'' and ``const.status'' files
+  as they are parsed. The default value is ``F''.\\
 
 {\emphtext use\_migration} - Logical flag which determines whether or not to
   use particle migration. The default is ``F''. See \sect{migration}.\\
@@ -1215,6 +1221,8 @@ It is also possible to set initial conditions for a particle species
 using an external file.  Instead of specifying the
 initial conditions mathematically in the input deck, you specify in quotation
 marks the filename of a simple binary file containing the information required.
+For more information on what is meant by a ``simple binary file'', see
+\sectit{binaryfile}.
 \begin{lboxverbatim}{external initial conditions}
 begin:species
    name = Electron
@@ -1224,6 +1232,10 @@ begin:species
 end:species
 \end{lboxverbatim}
 
+The sizes of the variables to be filled do not need to be provided: the
+code will continue reading until the given variable is filled. 
+Note that ghost or guard cells should not be included in the file as
+they cannot be set this way. 
 
 An additional element is also introduced, the offset element. This
 is the offset in bytes from the start of the file to where the data should
@@ -1234,6 +1246,10 @@ changed between data reading lines the same data will be read into all the
 variables. The data is read in as soon as a line is executed, and so it is
 perfectly possible to load data from a file and then modify the data using
 a mathematical expression.\\
+
+The example block above is for 10,000 values at double precision, i.e. 8-bytes 
+each. The density data is the first 80,000 bytes of ``ic.dat''. Bytes 80,000
+to 160,000 are the temp\_x data.
 
 The file should be a simple binary file consisting of floating point numbers of
 the same precision as \inlinecode{\_num} in the core {\EPOCH} code. For
@@ -1723,6 +1739,30 @@ end:window
   to the right boundary after the window has started moving.
   ``xbc\_right\_after\_move'' is accepted as a synonym.
 
+Because of how the moving window must work, there are some compatibility issues
+with certain features. In particular:
+\begin{itemize}
+\item Lasers attached to an X boundary which remain in place after the window
+moves, or attached to Y or Z boundaries:
+\subitem The laser will behave as though it is attached to the window itself:
+for Y or Z boundaries with spatial variations this may not give the expected
+result.
+\subitem For X boundaries, the moving emitter will result in a form of
+numerical Doppler shifting.
+\item Injectors attached to an X boundary will not work. Those on a Y
+or Z boundary may appear to work, but the rates will be incorrect.
+\item CPML boundary conditions:
+\subitem In X these cannot work as they rely on time-history which is
+simply missing.
+\subitem On Y or Z boundaries they will approximately work, but the history
+will be truncated and so they will generally require more tuning.
+We can't help with this in general.
+\item Load of particles from file is not supported since it can't be made to
+work in general.
+\item As of now(04/2018, v4.10) fractional numbers of particles-per-cell lead
+to odd behaviour and incorrect densities, because the window does not
+handle these.
+\end{itemize}
 
 \subsection{\inlineemph{output} block}
 \label{sec:output_block}
@@ -4690,6 +4730,94 @@ Version 4.10 adds the following new capabilities:
    See \sect{output_directives}
 \end{itemize}
 \bigskip
+
+
+\section{Changes between version 4.10 and 4.11}
+
+\subsection{New capabilities}
+Version 4.11 adds the following new capabilities:
+
+\begin{itemize}
+\item Added time dependent moving window. No new input deck parameters have
+    been added, but it is now possible to specify ``window\_v\_x'' to be a
+    function that varies in time. See \sect{window_block}
+\item If ``print\_constants=T'' in the control block (see \sect{control_block})
+    deck constants are now output to a separate file named ``const.status''.
+    This allows for easier post-processing.
+\item Added COMPILER=auto option to automatically detect compiler. See
+    \sect{makefile}
+\end{itemize}
+\bigskip
+
+
+\section{Simple binary files}
+\label{sec:binaryfile}
+There are several input deck blocks which can read conditions directly from
+a user-specified file. These include the \sectit{fields_block},
+\sectit{species_block} and \sectit{particles_from_file}. In all such cases,
+the files specified must be in a simple binary format, often referred to
+as ``raw'' binary files.
+
+Binary files are machine readable, but not human readable. If you try opening
+a binary file in a text editor then you will see incomprehensible characters
+and some text editors might even crash. Most languages can write binary files,
+see ``writeu'' (in IDL/GDL), ``fwrite'' in MatLab, the ``b'' parameter to
+``open'' in Python and ``form='UNFORMATTED' '' in Fortran, so please see the
+documentation for those languages. Note that standard unformatted output in
+Fortran also writes some additional hidden output to the file that alters the
+offset of the actual binary array data within the file. It is therefore
+recommended that you always use the ``access='STREAM' '' modifier whenever
+writing such files from Fortran programs.
+
+For illustration purposes, here is a simple example of writing a 2D array
+to file using Fortran:
+\begin{boxverbatim}
+PROGRAM output_array
+
+  INTEGER :: iu, istat
+  INTEGER, PARAMETER :: nx = 10, ny = 20
+  DOUBLE PRECISION :: array(nx,ny)
+  CHARACTER(LEN=*), PARAMETER :: filename = 'array.dat'
+
+  array = 2.0d0
+
+  OPEN(newunit=iu, file=filename, status='NEW', form='UNFORMATTED', &
+       access='STREAM', iostat=istat)
+
+  IF (istat == 0) THEN
+    WRITE(iu) array
+    CLOSE(iu, iostat=istat)
+  ELSE
+    PRINT*, 'ERROR: failed to open file ', '"' // filename // '"', &
+            ' for writing'
+  END IF
+
+END PROGRAM output_array
+\end{boxverbatim}
+
+In this example, there are 200 array elements written to file (10 * 20). Each
+element is a double-precision number which is 8 bytes. Therefore, the total
+file size will be 1600 bytes. Note that for Fortran, arrays are indexed using
+``column-major order''. This means that in the file, the first array element
+``array(1,1)'' will be followed by ``array(2,1)'' and so on up
+to ``array(10,1)''. After this, the second index will be incremented and the
+array element ``array(1,2)'' will be output, followed by ``array(2,2)'', etc.
+In contrast, languages such as C and C++ use row-major order. For these
+languages the array output is transposed, so the array elements are output
+in the order: ``array[0][0], array[0][1], .. array[0][19], array[1][0], ..''
+
+Simple binary files merely contain a long sequence of real numbers and do not
+contain any information about the shape of the arrays that have been written.
+This information must be supplied using the input deck. These should correspond
+to the values of ``nx'', ``ny'', etc. For example, to use the array generated
+by the Fortran code shown above, the input deck must specify ``nx = 10'' and
+``ny = 20''.
+
+It is possible to write multiple arrays into the same binary file and use
+the ``offset'' comand in the input deck to specify where the next array in
+the file is to be located. This can be tricky to work with and it is therefore
+recommended to write each separate array to its own file.
+
 
 \section{Slides from Delta-f Talk}
 \label{sec:deltaf_slides}
