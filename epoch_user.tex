@@ -2180,6 +2180,9 @@ dumpmask.\\
 {\emphtext particles\_per\_cell} - Number of particles per cell. Can have
 species dumpmask.  The synonym ``ppc'' may also be used.\\
 
+{\emphtext average\_weight} - Average of weight of the particles in each cell.
+Can have species dumpmask.\\
+
 {\emphtext temperature} - Isotropic temperature on grid. Can have species
 dumpmask.\\
 %exact way that temperature is calculated in the code is likely to vary in the
@@ -4746,6 +4749,18 @@ Version 4.11 adds the following new capabilities:
     This allows for easier post-processing.
 \item Added COMPILER=auto option to automatically detect compiler. See
     \sect{makefile}
+\end{itemize}
+\bigskip
+
+
+\section{Changes between version 4.11 and 4.12}
+
+\subsection{New capabilities}
+Version 4.12 adds the following new capabilities:
+
+\begin{itemize}
+\item Added ``average\_weight'' output diagnostic.
+   See \sect{output_directives}
 \end{itemize}
 \bigskip
 
