@@ -400,11 +400,6 @@ symbol. The options currently controlled by the preprocessor are:\\
 \item PARTICLE\_ID4 - This does the same as the previous option except it uses
   a 4-byte integer instead of an 8-byte one. Whilst this saves storage space,
   care must be taken that the number does not overflow.
-\item PARTICLE\_COUNT\_UPDATE - Makes the code keep global particle counts for
-  each species on each processor. This information isn't needed by the core
-  algorithm, but can be useful for developing some types of additional physics
-  packages. It does require one additional MPI\_ALL\_REDUCE per species per
-  timestep, so it is not activated by default.
 \item PHOTONS - This enables support for photon particle types in the code.
   These are a pre-requisite for modelling synchrotron emission, radiation
   reaction and pair production (see \sect{qed_block}).
@@ -776,6 +771,14 @@ specified time before beginning to move the particles.\\
   (eg. ``0012.sdf''). By default, the code tries to calculate the number of
   digits required by dividing t\_end by dt\_snapshot. Note that the minimum
   number of digits is 4.\\
+
+{\emphtext use\_particle\_count\_update} - If this logical flag is set to
+  ``T'' then the code keeps global particle counts for each species on each
+  processor. This information isn't needed by the core
+  algorithm, but can be useful for developing some types of additional physics
+  packages. It does require one additional MPI\_ALL\_REDUCE per species per
+  timestep, so it is not activated by default.
+  The default value is ``F''.\\
 
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
@@ -4760,7 +4763,10 @@ Version 4.12 adds the following new capabilities:
 
 \begin{itemize}
 \item Added ``average\_weight'' output diagnostic.
-   See \sect{output_directives}
+    See \sect{output_directives}
+\item Removed the ``PARTICLE\_COUNT\_UPDATE'' Makefile flag and replaced
+    it with a ``use\_particle\_count\_update'' parameter in the control
+    block. (see \sect{control_block})
 \end{itemize}
 \bigskip
 
