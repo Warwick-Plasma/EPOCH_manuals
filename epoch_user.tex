@@ -3819,7 +3819,7 @@ grid for lasers driven at an angle.
 Using this technique it is also possible to focus a laser. This is done by
 using the same technique as above but making the angle of propagation,
 $\theta$, a function of $y$ such that the laser is focused to a point along
-the $x$-axis.
+the $x$-axis. A simple example of this is given in \sectit{focus_eg}.
 
 % laser from corner?
 
@@ -4096,7 +4096,7 @@ component of the distribution functions by adding ``output\_deltaf=T'' in
 An example input deck is supplied in the 1D {\EPOCH} version as
 twostream\_deltaf.deck. This uses the delta-f method to solve the weak-beam
 two stream instability. The bulk plasma species is solved using the delta-f
-method, since this evolve very little, and mostly supports the Lagnmuir waves
+method, since this evolve very little, and mostly supports the Langmuir waves
 that the weak beam interacts with. The relative change to the beam species is
 large, and the standard PIC method, rather than delta-f is used to model this
 species. A comparison of the electric field diagnostics between standard and
@@ -4358,6 +4358,73 @@ specific function:
 
 This deck produces and initial condition which looks like Figure~\ref{3dcone}
 and Figure~\ref{2dcone} in 3D and 2D respectively.
+
+\subsection{Focussing a Gaussian Beam}\label{sec:focus_eg}
+A laser can be driven on the boundary so that it focusses on a given spot. Basic details of how to do this are available on wikipedia under ``Gaussian Beam''. The following deck gives an example for a laser attached to x\_min. The important parameters are the waist size (the size of the spot at the focus point) and the distance from the attached boundary to the focus. In this case the waist size is 0.9 micron, and the distance is 15 micron, meaning the focus is at x = + 5 micron.
+
+\scaledcapimage{./images/focus}{focus}{Plot of Ey for a laser focussed to a spot size of 0.9 micron at x=5 micron.}{0.36}
+
+\begin{lboxverbatim}{input.deck}
+begin:control
+  nx = 500
+  ny = nx
+
+  # final time of simulation
+  t_end = 100 * femto
+
+  # size of domain
+  x_min = -10 * micron
+  x_max = -x_min
+  y_min = x_min
+  y_max = x_max
+
+  stdout_frequency = 10
+end:control
+
+begin:boundaries
+  bc_x_min = simple_laser
+  bc_x_max = open
+  bc_y_min = periodic
+  bc_y_max = periodic
+end:boundaries
+
+begin:constant
+  lambda0 = 1.0 * micron
+
+  #These two set the beam focus
+  w_0 = 0.9 * micron #Beam waist size
+  x_spot = 15 * micron #Distance from x_min to spot
+
+  #These are the parameters calculated for driving the laser
+  #These should not need to be modified
+  x_R = pi * w_0^2 / lambda0 #Rayleigh range
+  RC = x_spot * (1.0 + (x_R/x_spot)^2) #Radius of curvature on x_min
+  w_bnd = w_0 * sqrt( 1.0 + (x_spot/x_R)^2) #Spot size at x_min
+  gouy = atan(x_spot/x_R) #Gouy phase shift at x_min
+
+end:constant
+
+begin:laser
+  boundary = x_min
+  intensity_w_cm2 = 1.0e15
+  lambda = lambda0
+
+  phase = 2.0 * pi/ lambda0 * y^2 / (2.0 * RC) - gouy
+  profile = gauss(y,0,w_bnd)
+end:laser
+
+begin:output
+  # number of timesteps between output dumps
+  dt_snapshot = 25 * femto
+
+  # Properties on grid
+  grid = always
+  ey = always
+  bz = always
+end:output
+\end{lboxverbatim}
+
+The deck is based on the laser test deck supplied with Epoch, with a modified laser and longer runtime. Other classes of beam (Bessel etc) can be created similarly. The results from this deck once the laser is well into the domain are in Figure~\ref{focus} 
 
 The details presented above are a first rough guide to using {\EPOCH}. To
 clearly understand {\EPOCH} it is best to now try some simple examples. To
