@@ -1751,7 +1751,9 @@ moves, or attached to Y or Z boundaries:
 for Y or Z boundaries with spatial variations this may not give the expected
 result.
 \subitem For X boundaries, the moving emitter will result in a form of
-numerical Doppler shifting.
+numerical Doppler shifting. In addition to this the boundary used to drive
+the field will shift discontinuously, yielding noisy and erratic changes
+in the electromagnetic field.
 \item Injectors attached to an X boundary will not work. Those on a Y
 or Z boundary may appear to work, but the rates will be incorrect.
 \item CPML boundary conditions:
@@ -1762,9 +1764,6 @@ will be truncated and so they will generally require more tuning.
 We can't help with this in general.
 \item Load of particles from file is not supported since it can't be made to
 work in general.
-\item As of now(04/2018, v4.10) fractional numbers of particles-per-cell lead
-to odd behaviour and incorrect densities, because the window does not
-handle these.
 \end{itemize}
 
 \subsection{\inlineemph{output} block}
@@ -4819,6 +4818,12 @@ Version 4.11 adds the following new capabilities:
     This allows for easier post-processing.
 \item Added COMPILER=auto option to automatically detect compiler. See
     \sect{makefile}
+\end{itemize}
+
+The following correction has been made:
+\begin{itemize}
+\item Fractional numbers of particles-per-cell now function as expected when
+used in conjunction with the moving window.
 \end{itemize}
 \bigskip
 
