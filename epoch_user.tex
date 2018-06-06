@@ -662,7 +662,8 @@ is to use a second order scheme.\\
 
 {\emphtext maxwell\_solver} - Choose a Maxwell solver scheme with an extended
 stencil. This option is only active if \inlineemph{field\_order} is set to 2.
-Possible options are ``yee'', ``lehe'', ``pukhov'' and ``cowan''. Note that
+Possible options are ``yee'', ``lehe\_\{x,y,z\}'', ``pukhov'' and ``cowan''.
+Note that
 not all options are available in 1d and 2d. The default is ``yee'' which is the
 default second order scheme.\\
 
@@ -804,9 +805,12 @@ this, while adversely affecting the dispersion relation.
 The implemented solvers behave differently in this regard.
 Different options are available as follows:\\
 
-{\emphtext maxwell\_solver = lehe} - This setting will enable an extended
+{\emphtext maxwell\_solver = lehe\_\{x,y,z\}} - This setting will enable an
+extended
 stencil proposed by \citet{Lehe2013}.
-This stencil focusses on improving the dispersion relation along the $x$-axis,
+This stencil focusses on improving the dispersion relation along a specific
+direction. The ``lehe\_x'' stencil optimises for waves travelling along the
+$x$-axis. Similarly ``lehe\_\{y,z\}'' are tuned for the $y$ and $z$ axis.
 please take this into account when defining your laser input.
 It is available in EPOCH1D, EPOCH2D and EPOCH3D.
 While it is not technically required to use a \inlineemph{dt\_multiplier}
@@ -4925,6 +4929,8 @@ Version 4.12 adds the following new capabilities:
     block. See \sect{control_block}
 \item Added ``use\_flux\_maxwellian'' option to the ``injector'' block.
     See \sect{injector_block}
+\item Added ``lehe\_\{x,y,z\}'' flags to the ``maxwell\_solver'' option in
+    the control block. See \sect{control_block}
 \end{itemize}
 \bigskip
 
