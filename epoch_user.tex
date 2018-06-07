@@ -662,7 +662,8 @@ is to use a second order scheme.\\
 
 {\emphtext maxwell\_solver} - Choose a Maxwell solver scheme with an extended
 stencil. This option is only active if \inlineemph{field\_order} is set to 2.
-Possible options are ``yee'', ``lehe\_\{x,y,z\}'', ``pukhov'' and ``cowan''.
+Possible options are ``yee'', ``lehe\_\{x,y,z\}'', ``pukhov'', ``cowan''
+and ``custom''.
 Note that
 not all options are available in 1d and 2d. The default is ``yee'' which is the
 default second order scheme.\\
@@ -827,7 +828,7 @@ numerical dispersion relation by allowing to choose
 The resulting dispersion relation is best along the axis with the smallest grid
 spacing.\\
 
-{\emphtext maxwell\_solver = cowan} - This setting will enable en extended
+{\emphtext maxwell\_solver = cowan} - This setting will enable an extended
 stencil proposed by \citet{Cowan2013}. It is available only in EPOCH3D. In
 EPOCH1D and EPOCH2D, setting ``\inlineemph{maxwell\_solver} = cowan'' will make
 the code fall back silently to Yee's scheme.
@@ -839,6 +840,48 @@ When Cowan's scheme is reduced to 2D it is the same as Pokhov's scheme with
 $\inlineemph{dt\_multiplier}<1.0$.
 The resulting dispersion relation is best along the axis with the smallest grid
 spacing.\\
+
+{\emphtext maxwell\_solver = custom} - This setting will enable full user
+control over the extended stencil coefficients. This allows for the
+specification of optimised coefficients as outlined in \citet{Blinne2017}.
+This option must be accompanied by a ``stencil'' block.
+See~\sect{stencil_block}\\
+
+
+\subsection{\inlineemph{stencil} block}
+\label{sec:stencil_block}
+\scaledcapimage{./images/stencil}{stencil}{Coefficient locations
+  for the $B_z$ field computational stencil in 2D.}{0.6}
+
+The extended stencil Maxwell solvers described above all operate by
+including points in neighbouring cells with a carefully chosen weighting.
+These weightings are determined by adjusting the coefficients shown in
+Figure~\ref{stencil}. Full control over these coefficients can be
+achieved by specifying ``custom'' for the ``maxwell\_solver'' parameter
+in the control block and then supplying a ``stencil'' block to provide
+the desired coefficient values.
+
+This option allows the user to specify an extended stencil scheme that
+has been specifically optimised for the simulation grid spacing and timestep.
+See \citet{Blinne2017} for further details.\\
+
+Note that there is no option for changing the value of $\alpha_{x,y,z}$ since
+these are calculated using the following  equations:
+\begin{align*}
+  \alpha_x &= 1 - 2\beta_{xy} - 2\beta{xz} - 3\delta_x\,, \\
+  \alpha_y &= 1 - 2\beta_{yx} - 2\beta{yz} - 3\delta_y\,, \\
+  \alpha_z &= 1 - 2\beta_{zx} - 2\beta{zy} - 3\delta_z\,.
+\end{align*}
+
+{\emphtext delta\{x,y,z\}, gamma\{x,y,z\}, beta\{xy,xz,yx,yz,zx,zy\}} -
+  The coefficients to use for the extended stencil points as shown in
+  Figure~\ref{stencil}. See \citet{Blinne2017} for further details. These
+  coefficients are specified as floating point numbers. The default values
+  are to set all coefficients to zero which results in
+  $\inlineemph{\alpha_{x,y,z}}$ having values of unity. This corresponds to
+  the standard Yee scheme.\\
+
+{\emphtext dt} - The timestep restriction to use for the field solver\\
 
 
 \subsubsection{Dynamic Load Balancing}
@@ -4925,12 +4968,14 @@ Version 4.12 adds the following new capabilities:
 \item Added ``average\_weight'' output diagnostic.
     See \sect{output_directives}
 \item Removed the ``PARTICLE\_COUNT\_UPDATE'' Makefile flag and replaced
-    it with a ``use\_particle\_count\_update'' parameter in the control
-    block. See \sect{control_block}
+    it with a\linebreak ``use\_particle\_count\_update'' parameter in the
+    control block. See \sect{control_block}
 \item Added ``use\_flux\_maxwellian'' option to the ``injector'' block.
     See \sect{injector_block}
 \item Added ``lehe\_\{x,y,z\}'' flags to the ``maxwell\_solver'' option in
     the control block. See \sect{control_block}
+\item Added ``custom'' flag to the ``maxwell\_solver'' option in
+    the control block. See \sect{control_block} and \sect{stencil_block}
 \end{itemize}
 \bigskip
 
