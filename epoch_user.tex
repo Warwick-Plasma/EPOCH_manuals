@@ -1381,7 +1381,8 @@ via the species block using the following parameters:\\
   can be specified as an array in the event that the user wishes some levels
   to have a different electron species which can be handy for monitoring
   ionisation at specific levels. ``electron'' and ``electron\_species'' are
-  accepted as synonyms.\\
+  accepted as synonyms. Either one species for \emph{all} levels, or one species
+  for \emph{each} species should be specified. \\
 
 For example, ionising carbon species might appear in the input deck as:
 
@@ -1411,8 +1412,8 @@ begin:species
 end:species
 \end{boxverbatim}
 
-If ``ionisation\_electron\_species'' is not specified then the electron species
-are created automatically and are named according to the ionising species name
+%If ``ionisation\_electron\_species'' is not specified then the electron species
+Ionised states are created automatically and are named according to the ionising species name
 with a number appended. For example
 \begin{boxverbatim}
 begin:species
@@ -1421,7 +1422,7 @@ begin:species
    dump = F
 end:species
 \end{boxverbatim}
-With this species block, the electron species named ``Helium1'' and ``Helium2''
+With this species block, the species named ``Helium1'' and ``Helium2''
 are automatically created. These species will also inherit the ``dump''
 parameter from their parent species, so in this example they will both have
 ``dump = F'' set. This behaviour can be overridden by explicitly
