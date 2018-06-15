@@ -2115,17 +2115,17 @@ mass (ie. not rest mass).\\
   energy.
   Restart variable. This option is only supplied for debugging purposes and
   should not be required by most users.\\
-  
-{\emphtext work_x,\;work_y,\;work_z} - The dumpmask for the work exerted by the
+
+{\emphtext work\_\{x,y,z\}} - The dumpmask for the work exerted by the
   fields on each particle during the last time step. The work is divided into
   its three spatial components. The output is in numbers of $mc^2$ corresponding
-  to the particle's $\gamma$-factor. Requires compiler flag 
-  'Work_Done_Integrated'.
-  
-{\emphtext work_time_int_x,\;work_time_int_y,\;work_time_int_z} - Same as above,
+  to the particle's $\gamma$-factor. Requires compiler flag
+  ``WORK\_DONE\_INTEGRATED''.\\
+
+{\emphtext work\_\{x,y,z\}\_total} - Same as above,
   but the work is integrated over the entire simulation duration. The sum of all
-  three components equals the particle's $\gamma$-factor. Requires compiler 
-  flag 'Work_Done_Integrated'.
+  three components equals the particle's $\gamma$-factor. Requires compiler
+  flag ``WORK\_DONE\_INTEGRATED''.\\
 
 {\emphtext id} - Global particle ID. See below for details.\\
 
