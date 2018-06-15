@@ -428,6 +428,11 @@ symbol. The options currently controlled by the preprocessor are:\\
   values on evaluated deck expressions.
   This slows down the code but may be required if floating point exceptions
   are enabled.
+\item WORK\_DONE\_INTEGRATED - This enables support for tracking the work done
+  on each particle by the electric field. Note that this increases the size
+  of each particle by 48 bytes. The information gathered can be output to
+  file using the ``work\_\{x,y,z\}'' and ``work\_\{x,y,z\}\_total'' dumpmasks.
+  See \sect{output_directives}.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
@@ -2162,6 +2167,17 @@ mass (ie. not rest mass).\\
   energy.
   Restart variable. This option is only supplied for debugging purposes and
   should not be required by most users.\\
+
+{\emphtext work\_\{x,y,z\}} - The dumpmask for the work exerted by the
+  fields on each particle during the last time step. The work is divided into
+  its three spatial components. The output is in numbers of $mc^2$ corresponding
+  to the particle's $\gamma$-factor. Requires compiler flag
+  ``WORK\_DONE\_INTEGRATED''.\\
+
+{\emphtext work\_\{x,y,z\}\_total} - Same as above,
+  but the work is integrated over the entire simulation duration. The sum of all
+  three components equals the particle's $\gamma$-factor. Requires compiler
+  flag ``WORK\_DONE\_INTEGRATED''.\\
 
 {\emphtext id} - Global particle ID. See below for details.\\
 
@@ -4977,6 +4993,10 @@ Version 4.12 adds the following new capabilities:
     the control block. See \sect{control_block}
 \item Added ``custom'' flag to the ``maxwell\_solver'' option in
     the control block. See \sect{control_block} and \sect{stencil_block}
+\item Added the ``WORK\_DONE\_INTEGRATED'' Makefile flag and corresponding
+    dumpmask directives ``work\_\{x,y,z\}'' and ``work\_\{x,y,z\}\_total''.
+    These add a diagnostic for the work done on a particle by the electric
+    field. See \sect{makefile} and \sect{output_directives}.
 \end{itemize}
 \bigskip
 
