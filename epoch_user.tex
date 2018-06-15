@@ -428,6 +428,11 @@ symbol. The options currently controlled by the preprocessor are:\\
   values on evaluated deck expressions.
   This slows down the code but may be required if floating point exceptions
   are enabled.
+\item WORK\_DONE\_INTEGRATED - This enables support for tracking the work done
+  on each particle by the electric field. Note that this increases the size
+  of each particle by 48 bytes. The information gathered can be output to
+  file using the ``work\_\{x,y,z\}'' and ``work\_\{x,y,z\}\_total'' dumpmasks.
+  See \sect{output_directives}.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
