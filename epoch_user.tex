@@ -787,6 +787,15 @@ specified time before beginning to move the particles.\\
   timestep, so it is not activated by default.
   The default value is ``F''.\\
 
+{\emphtext use\_accurate\_n\_zeros} - If this logical flag is set to
+  ``T'' then the code performs a thorough calculation for the number of
+  expected output files that the simulation will generate. This number
+  then determines how many digits to use for the output dump names. Since the
+  process can be time consuming and is overkill for most cases, it is disabled
+  by default.
+  The default value is ``F''.\\
+
+
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
 With the default settings ``\inlineemph{field\_order}=2'',
@@ -4997,6 +5006,8 @@ Version 4.12 adds the following new capabilities:
     dumpmask directives ``work\_\{x,y,z\}'' and ``work\_\{x,y,z\}\_total''.
     These add a diagnostic for the work done on a particle by the electric
     field. See \sect{makefile} and \sect{output_directives}.
+\item Added the ``use\_accurate\_n\_zeros'' flag to the control block.
+    See \sect{control_block}
 \end{itemize}
 \bigskip
 
