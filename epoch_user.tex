@@ -791,7 +791,12 @@ specified time before beginning to move the particles.\\
   processor. This information isn't needed by the core
   algorithm, but can be useful for developing some types of additional physics
   packages. It does require one additional MPI\_ALL\_REDUCE per species per
-  timestep, so it is not activated by default.
+  timestep, so it is not activated by default.\\
+
+{\emphtext reset\_walltime} - When restarting from a dump file, the current
+  walltime displayed will include the elapsed walltime recorded in the
+  restart dump. The user can request that this time is ignored by setting
+  the \inlineemph{reset\_walltime} flag to ``T''.
   The default value is ``F''.\\
 
 
@@ -5001,6 +5006,18 @@ Version 4.12 adds the following new capabilities:
     These add a diagnostic for the work done on a particle by the electric
     field. See \sect{makefile} and \sect{output_directives}.
 \item Added the ``use\_accurate\_n\_zeros'' flag to the control block.
+    See \sect{control_block}
+\end{itemize}
+\bigskip
+
+
+\section{Changes between version 4.12 and 4.14}
+
+\subsection{New capabilities}
+Version 4.14 adds the following new capabilities:
+
+\begin{itemize}
+\item Added the ``reset\_walltime'' flag to the control block.
     See \sect{control_block}
 \end{itemize}
 \bigskip
