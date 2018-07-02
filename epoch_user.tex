@@ -1782,7 +1782,7 @@ details of behaviour.\\
 \label{sec:window_block}
 {\EPOCH} can include an optional block which causes the simulation domain to
 operate as a moving window. At present, it is only possible to have the window
-moving at a constant speed parallel to the x direction, although the window
+moving at a speed parallel to the x direction, although the window
 does not have to start moving at t = 0. When the window moves, the code removes
 particles from the left hand edge of the domain and introduces new particles
 at the right hand edge. The new particles are placed by re-evaluating the
@@ -1802,10 +1802,14 @@ end:window
   window. If the window block is absent then this is the same as setting
   move\_window to ``F''.\\
 
-{\emphtext window\_v\_x} - The speed in m/s of the window.\\
+{\emphtext window\_v\_x} - The speed in m/s of the window. This may be a
+  function of time.\\
 
 {\emphtext window\_start\_time} - The time in seconds at which the window should
   start moving.\\
+
+{\emphtext window\_stop\_time} - The time in seconds at which the window should
+  stop moving.\\
 
 {\emphtext bc\_x\_min\_after\_move} - The boundary condition which should apply
   to the left boundary after the window has started moving. This is to allow
@@ -5033,6 +5037,8 @@ Version 4.14 adds the following new capabilities:
     control block.
 \item Added the ability to request an output dump at run time.
     See \sect{dump_request}
+\item Added the ``window\_stop\_time'' parameter to the window block.
+    See \sect{window_block}
 \end{itemize}
 \bigskip
 
