@@ -433,6 +433,11 @@ symbol. The options currently controlled by the preprocessor are:\\
   of each particle by 48 bytes. The information gathered can be output to
   file using the ``work\_\{x,y,z\}'' and ``work\_\{x,y,z\}\_total'' dumpmasks.
   See \sect{output_directives}.
+\item HC\_PUSH - Use the push from \citet{Higuera_Cary_2017}
+  rather than the Boris push.
+  This is slightly slower than the Boris push but gives the correct $E\times B$
+  velocity, improving performance for highly relativistic simulations.
+
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
