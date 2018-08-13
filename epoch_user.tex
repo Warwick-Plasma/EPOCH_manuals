@@ -804,6 +804,18 @@ specified time before beginning to move the particles.\\
   the \inlineemph{reset\_walltime} flag to ``T''.
   The default value is ``F''.\\
 
+{\emphtext dlb\_maximum\_interval} - This integer parameter determines the
+  maximum number of timesteps to allow between load balancing checks.
+  Each time that the load balancing sweep is unable to improve the load
+  balance of the simulation, it doubles the number of steps before the
+  next check will occur. It will keep increasing the check interval until
+  it reaches the value given by \inlineemph{dlb\_maximum\_interval}. If the
+  value of \inlineemph{dlb\_maximum\_interval} is negative then the check
+  interval will increase
+  indefinitely. When the load balancing sweep finds an improvement to the
+  load balance of the simulation, the check interval is reset to one.
+  The default value is 500.\\
+
 
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
@@ -5049,6 +5061,8 @@ Version 4.14 adds the following new capabilities:
     See \sect{window_block}
 \item Added the ``atan2'' function to the maths parser.
     See \sect{functions}
+\item Added ``dlb\_maximum\_interval'' parameter to the control block.
+    See \sect{control_block}
 \end{itemize}
 \bigskip
 
