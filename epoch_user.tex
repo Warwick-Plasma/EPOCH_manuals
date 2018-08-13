@@ -828,6 +828,17 @@ specified time before beginning to move the particles.\\
   only be redistributed if this would result in an improved load balance.
   The default value is 2000.\\
 
+{\emphtext balance\_first} - This logical flag determines whether a load balance
+  will be attempted on the first call of the load balancer.
+  The load balancer performs to functions: first it attempts to find a
+  domain decomposition that balances the load evenly amongst processors.
+  Next, it redistributes the domain and particles onto the new layout (if
+  requred). This latter step is always required when setting up the
+  simulation, so the load balancer is always called once during set-up.
+  This flag controls whether or not a load balance is attempted during
+  this call, regardless of the value of \inlineemph{dlb\_threshold}.
+  The default value is ``T''.\\
+
 
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
@@ -5076,6 +5087,8 @@ Version 4.14 adds the following new capabilities:
 \item Added ``dlb\_maximum\_interval'' parameter to the control block.
     See \sect{control_block}
 \item Added ``dlb\_force\_interval'' parameter to the control block.
+    See \sect{control_block}
+\item Added ``balance\_first'' parameter to the control block.
     See \sect{control_block}
 \end{itemize}
 \bigskip
