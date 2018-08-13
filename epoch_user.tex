@@ -2485,7 +2485,7 @@ addition to those for the traditional style:
 {\emphtext dump\_at\_times} - Floating point parameter which specifies a
   set of simulation times at which to write the current output block. This
   can only be used with named output blocks. The values are given as a
-  comma separated list. eg. ``dump\_at\_time = 0, 0.15, 1.1''. The name
+  comma separated list. eg. ``dump\_at\_times = 0, 0.15, 1.1''. The name
   ``times\_dump'' is accepted as a synonym. By default
   the list is empty.\\
 
@@ -2494,6 +2494,18 @@ addition to those for the traditional style:
   can only be used with named output blocks. The values are given as a
   comma separated list. eg. ``dump\_at\_nsteps = 5, 11, 15''. The name
   ``nsteps\_dump'' is accepted as a synonym. By default
+  the list is empty.\\
+
+{\emphtext dump\_at\_walltimes} - Floating point parameter which specifies a
+  set of elapsed walltimes at which to write the current output block. This
+  can only be used with named output blocks. The values are given as a
+  comma separated list. eg. ``dump\_at\_walltimes = 10, 100.1, 250.5''.
+  These times are the total elapsed time in seconds since the start of the
+  simulation. Note that if the
+  simulation has been restarted then the total elapsed time will
+  include the accumulated walltime of all previous runs that were
+  used to produce the restart dump.
+  The name ``walltimes\_dump'' is accepted as a synonym. By default
   the list is empty.\\
 
 {\emphtext file\_prefix} - String parameter. It is sometimes useful to
@@ -5099,6 +5111,8 @@ Version 4.14 adds the following new capabilities:
 \item Added y and z versions of the ``bc\_x\_min\_after\_move'' and
     ``bc\_x\_max\_after\_move'' parameters to the window block.
     See \sect{window_block}
+\item Added a ``dump\_at\_walltimes'' parameter to the output block.
+    See \sect{multiple_output}
 \end{itemize}
 \bigskip
 
