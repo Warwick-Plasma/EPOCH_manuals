@@ -816,6 +816,18 @@ specified time before beginning to move the particles.\\
   load balance of the simulation, the check interval is reset to one.
   The default value is 500.\\
 
+{\emphtext dlb\_force\_interval} - This integer parameter determines the
+  maximum number of timesteps
+  to allow between forcing a full load balance sweep.
+  If the current load balance is greater than the value of
+  \inlineemph{dlb\_threshold}
+  then the load balancer exits before attempting to improve the loading.
+  If \inlineemph{dlb\_force\_interval} is greater than zero, then the full load
+  balancer will be run at the requested interval of timesteps, regardless
+  of the value of \inlineemph{dlb\_threshold}. Note that the simulation will
+  only be redistributed if this would result in an improved load balance.
+  The default value is 2000.\\
+
 
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
@@ -5062,6 +5074,8 @@ Version 4.14 adds the following new capabilities:
 \item Added the ``atan2'' function to the maths parser.
     See \sect{functions}
 \item Added ``dlb\_maximum\_interval'' parameter to the control block.
+    See \sect{control_block}
+\item Added ``dlb\_force\_interval'' parameter to the control block.
     See \sect{control_block}
 \end{itemize}
 \bigskip
