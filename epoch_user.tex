@@ -23,9 +23,9 @@ source code.
 This version number is printed to screen when you run the code. The line looks
 something like the following:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.12.0   (commit v4.12.0-0-gfd74a464-clean)
+ Welcome to EPOCH2D version 4.14.0   (commit v4.14.0-0-g6da09889-clean)
 \end{boxverbatim}
-Here, only the number ``4.12'' is important.
+Here, only the number ``4.14'' is important.
 
 Since version 3.1 of the manual, new additions and changes are mentioned
 in the appendix.
@@ -189,8 +189,8 @@ are given assuming that you are typing commands at a UNIX terminal.
 When obtained, the {\EPOCH} codes all have a similar structure. If the tarred
 and gzipped archive (commonly referred to as a tarball) is downloaded and
 unpacked into the user's \verb|$HOME| directory, then the extracted contents
-will consist of a directory named ``\verb|$HOME/epoch-4.12.0|''
-(with ``4.12.0'' substituted by the current version number) and the
+will consist of a directory named ``\verb|$HOME/epoch-4.14.0|''
+(with ``4.14.0'' substituted by the current version number) and the
 subdirectories and files listed below.
 
 Alternatively, if the code is checked out from the GitLab git
@@ -286,7 +286,7 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.12.0   (commit v4.12.0-0-gfd74a464-clean)
+ Welcome to EPOCH2D version 4.14.0   (commit v4.14.0-0-g6da09889-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -433,6 +433,10 @@ symbol. The options currently controlled by the preprocessor are:\\
   of each particle by 48 bytes. The information gathered can be output to
   file using the ``work\_\{x,y,z\}'' and ``work\_\{x,y,z\}\_total'' dumpmasks.
   See \sect{output_directives}.
+\item HC\_PUSH - Use the push from \citet{Higuera_Cary_2017}
+  rather than the Boris push.
+  This is slower than the Boris push but gives the correct $E\times B$
+  velocity, which can be important for highly relativistic simulations.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
@@ -479,7 +483,7 @@ When the code is run, the output is
   d########P  d##P            ###########P     ##########P  d##P      d##P
  d########P  d##P              d######P          #######P  d##P      d##P
 
- Welcome to EPOCH2D version 4.12.0   (commit v4.12.0-0-gfd74a464-clean)
+ Welcome to EPOCH2D version 4.14.0   (commit v4.14.0-0-g6da09889-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -771,7 +775,7 @@ specified time before beginning to move the particles.\\
 
 {\emphtext print\_eta\_string} - If this logical flag is set to ``T'' then the
   current estimated time to completion will be appended to the status
-  updates. The default value is ``F''.\\
+  updates. The default value is ``T''.\\
 
 {\emphtext n\_zeros} - Integer flag which specifies the number of digits to
   use for the output file numbers.
@@ -793,6 +797,47 @@ specified time before beginning to move the particles.\\
   packages. It does require one additional MPI\_ALL\_REDUCE per species per
   timestep, so it is not activated by default.
   The default value is ``F''.\\
+
+{\emphtext reset\_walltime} - When restarting from a dump file, the current
+  walltime displayed will include the elapsed walltime recorded in the
+  restart dump. The user can request that this time is ignored by setting
+  the \inlineemph{reset\_walltime} flag to ``T''.
+  The default value is ``F''.\\
+
+{\emphtext dlb\_maximum\_interval} - This integer parameter determines the
+  maximum number of timesteps to allow between load balancing checks.
+  Each time that the load balancing sweep is unable to improve the load
+  balance of the simulation, it doubles the number of steps before the
+  next check will occur. It will keep increasing the check interval until
+  it reaches the value given by \inlineemph{dlb\_maximum\_interval}. If the
+  value of \inlineemph{dlb\_maximum\_interval} is negative then the check
+  interval will increase
+  indefinitely. When the load balancing sweep finds an improvement to the
+  load balance of the simulation, the check interval is reset to one.
+  The default value is 500.\\
+
+{\emphtext dlb\_force\_interval} - This integer parameter determines the
+  maximum number of timesteps
+  to allow between forcing a full load balance sweep.
+  If the current load balance is greater than the value of
+  \inlineemph{dlb\_threshold}
+  then the load balancer exits before attempting to improve the loading.
+  If \inlineemph{dlb\_force\_interval} is greater than zero, then the full load
+  balancer will be run at the requested interval of timesteps, regardless
+  of the value of \inlineemph{dlb\_threshold}. Note that the simulation will
+  only be redistributed if this would result in an improved load balance.
+  The default value is 2000.\\
+
+{\emphtext balance\_first} - This logical flag determines whether a load balance
+  will be attempted on the first call of the load balancer.
+  The load balancer performs to functions: first it attempts to find a
+  domain decomposition that balances the load evenly amongst processors.
+  Next, it redistributes the domain and particles onto the new layout (if
+  requred). This latter step is always required when setting up the
+  simulation, so the load balancer is always called once during set-up.
+  This flag controls whether or not a load balance is attempted during
+  this call, regardless of the value of \inlineemph{dlb\_threshold}.
+  The default value is ``T''.\\
 
 
 \subsubsection{Maxwell Solvers}
@@ -943,6 +988,15 @@ value for ``stop\_at\_walltime''. Since the walltime will often be
 found by querying the queueing system in a job script, it may be
 more convenient to pipe this value into a text file rather than
 modifying the input deck.
+
+\subsubsection{Requesting output dumps at run time}
+\label{sec:dump_request}
+In addition to polling for the existence of a ``STOP'' file, {\EPOCH} also
+periodically checks the output directory for a file named ``DUMP''. If such
+a file is found then {\EPOCH} will immediately create an output dump and
+remove the ``DUMP'' file. By default, the file written will be a restart
+dump but if the ``DUMP'' file contains the name of an output block then this
+will be used instead.
 
 
 \subsection{\inlineemph{boundaries} block}
@@ -1767,7 +1821,7 @@ details of behaviour.\\
 \label{sec:window_block}
 {\EPOCH} can include an optional block which causes the simulation domain to
 operate as a moving window. At present, it is only possible to have the window
-moving at a constant speed parallel to the x direction, although the window
+moving at a speed parallel to the x direction, although the window
 does not have to start moving at t = 0. When the window moves, the code removes
 particles from the left hand edge of the domain and introduces new particles
 at the right hand edge. The new particles are placed by re-evaluating the
@@ -1787,10 +1841,14 @@ end:window
   window. If the window block is absent then this is the same as setting
   move\_window to ``F''.\\
 
-{\emphtext window\_v\_x} - The speed in m/s of the window.\\
+{\emphtext window\_v\_x} - The speed in m/s of the window. This may be a
+  function of time.\\
 
 {\emphtext window\_start\_time} - The time in seconds at which the window should
   start moving.\\
+
+{\emphtext window\_stop\_time} - The time in seconds at which the window should
+  stop moving.\\
 
 {\emphtext bc\_x\_min\_after\_move} - The boundary condition which should apply
   to the left boundary after the window has started moving. This is to allow
@@ -1801,7 +1859,13 @@ end:window
 
 {\emphtext bc\_x\_max\_after\_move} - The boundary condition which should apply
   to the right boundary after the window has started moving.
-  ``xbc\_right\_after\_move'' is accepted as a synonym.
+  ``xbc\_right\_after\_move'' is accepted as a synonym.\\
+
+{\emphtext bc\_\{y,z\}\_\{min,max\}\_after\_move} - ``y'' and ``z'' versions of
+  the previous two parameters.
+  ``ybc\_down\_after\_move'', ``ybc\_up\_after\_move'',
+  ``zbc\_back\_after\_move'' and ``zbc\_front\_after\_move'' are accepted as
+  synonyms.\\
 
 Because of how the moving window must work, there are some compatibility issues
 with certain features. In particular:
@@ -2056,6 +2120,19 @@ The default value is ``T''.\\
 {\emphtext nstep\_stop} - Integer parameter which specifies the
   step number at which to stop considering output for the block.
   The default value is the largest possible integer.\\
+
+{\emphtext walltime\_start} - Floating point parameter which specifies the
+  elapsed walltime in seconds at which to start considering output for the
+  block. Note
+  that if ``dump\_first'' or ``dump\_last'' are set to true for this block then
+  dumps will occur at the first or last timestep regardless of the value of
+  the \inlineemph{walltime\_start}
+  parameter.
+  The default value is 0.\\
+
+{\emphtext walltime\_stop} - Floating point parameter which specifies the
+  elapsed walltime in seconds at which to stop considering output for the
+  block. The default value is the largest possible float.\\
 
 {\emphtext dump\_cycle} - If this is set to a positive integer then the
   output file number will be reset to zero after the specified cycle number
@@ -2421,7 +2498,7 @@ addition to those for the traditional style:
 {\emphtext dump\_at\_times} - Floating point parameter which specifies a
   set of simulation times at which to write the current output block. This
   can only be used with named output blocks. The values are given as a
-  comma separated list. eg. ``dump\_at\_time = 0, 0.15, 1.1''. The name
+  comma separated list. eg. ``dump\_at\_times = 0, 0.15, 1.1''. The name
   ``times\_dump'' is accepted as a synonym. By default
   the list is empty.\\
 
@@ -2431,6 +2508,23 @@ addition to those for the traditional style:
   comma separated list. eg. ``dump\_at\_nsteps = 5, 11, 15''. The name
   ``nsteps\_dump'' is accepted as a synonym. By default
   the list is empty.\\
+
+{\emphtext dump\_at\_walltimes} - Floating point parameter which specifies a
+  set of elapsed walltimes at which to write the current output block. This
+  can only be used with named output blocks. The values are given as a
+  comma separated list. eg. ``dump\_at\_walltimes = 10, 100.1, 250.5''.
+  These times are the total elapsed time in seconds since the start of the
+  simulation. Note that if the
+  simulation has been restarted then the total elapsed time will
+  include the accumulated walltime of all previous runs that were
+  used to produce the restart dump.
+  The name ``walltimes\_dump'' is accepted as a synonym. By default
+  the list is empty.\\
+
+{\emphtext walltime\_interval} - Floating point parameter which specifies the
+  interval between output dumps in elapsed walltime seconds. Setting zero or
+  negative means that the code will not output based on this condition.
+  The default value is -1.0.\\
 
 {\emphtext file\_prefix} - String parameter. It is sometimes useful to
   distinguish between dumps generated by the different output blocks. This
@@ -2581,14 +2675,15 @@ The default value is ``T''.\\
   ``dump\_final'' is accepted as a synonym.\\
 
 {\emphtext time\_start} - Floating point parameter which specifies the
-  simulation time at which to start considering output for the block. Note
-  that if ``dump\_first'' or ``dump\_last'' are set to true for this block then
+  simulation time at which to start considering output for all output
+  blocks. Note
+  that if ``dump\_first'' or ``dump\_last'' are set to true for any block then
   dumps will occur at the first or last timestep regardless of the value of this
   parameter. This also applies to the three following parameters.
   The default value is 0.\\
 
 {\emphtext time\_stop} - Floating point parameter which specifies the
-  simulation time at which to stop considering output for the block.
+  simulation time at which to stop considering output for all output blocks.
   The default value is the largest possible float.\\
 
 {\emphtext nstep\_start} - Integer parameter which specifies the
@@ -2598,6 +2693,19 @@ The default value is ``T''.\\
 {\emphtext nstep\_stop} - Integer parameter which specifies the
   step number at which to stop considering output for the block.
   The default value is the largest possible integer.\\
+
+{\emphtext walltime\_start} - Floating point parameter which specifies the
+  elapsed walltime in seconds at which to start considering output for all
+  output blocks. Note
+  that if ``dump\_first'' or ``dump\_last'' are set to true for any blocks then
+  dumps will occur at the first or last timestep regardless of the value of
+  the \inlineemph{walltime\_start}
+  parameter.
+  The default value is 0.\\
+
+{\emphtext walltime\_stop} - Floating point parameter which specifies the
+  elapsed walltime in seconds at which to stop considering output all
+  output blocks. The default value is the largest possible float.\\
 
 {\emphtext sdf\_buffer\_size} - Integer parameter. When writing particle data
 to an SDF file, the data is first transferred into an output buffer. The
@@ -3385,6 +3493,10 @@ The maths parser in {\EPOCH} has the following functions
 \item asin(a) - Arcsine.
 \item acos(a) - Arccosine.
 \item atan(a) - Arctangent.
+\item atan2(Y,X) - Arctangent using the Fortran ATAN2 function. This computes
+    the principal value of the argument function of the complex number
+    $X + i Y$. This function can be used to transform from Cartesian into polar
+    coordinates and allows to determine the angle in the correct quadrant.
 \item sinh(a) - Hyperbolic sine.
 \item cosh(a) - Hyperbolic cosine.
 \item tanh(a) - Hyperbolic tangent.
@@ -5002,6 +5114,42 @@ Version 4.12 adds the following new capabilities:
     field. See \sect{makefile} and \sect{output_directives}.
 \item Added the ``use\_accurate\_n\_zeros'' flag to the control block.
     See \sect{control_block}
+\end{itemize}
+\bigskip
+
+
+\section{Changes between version 4.12 and 4.14}
+
+\subsection{New capabilities}
+Version 4.14 adds the following new capabilities:
+
+\begin{itemize}
+\item Added the ``reset\_walltime'' flag to the control block.
+    See \sect{control_block}
+\item Changed the default value of ``print\_eta\_string'' to ``T'' in the
+    control block.
+\item Added the ability to request an output dump at run time.
+    See \sect{dump_request}
+\item Added the ``window\_stop\_time'' parameter to the window block.
+    See \sect{window_block}
+\item Added the ``atan2'' function to the maths parser.
+    See \sect{functions}
+\item Added ``dlb\_maximum\_interval'' parameter to the control block.
+    See \sect{control_block}
+\item Added ``dlb\_force\_interval'' parameter to the control block.
+    See \sect{control_block}
+\item Added ``balance\_first'' parameter to the control block.
+    See \sect{control_block}
+\item Added y and z versions of the ``bc\_x\_min\_after\_move'' and
+    ``bc\_x\_max\_after\_move'' parameters to the window block.
+    See \sect{window_block}
+\item Added a ``dump\_at\_walltimes'' parameter to the output block.
+    See \sect{multiple_output}
+\item Added ``walltime\_start'' and ``walltime\_stop'' parameters to the output
+    block and output\_global block.
+    See \sect{output_directives} and \sect{output_global_block}
+\item Added ``walltime\_interval'' parameter to the output block.
+    See \sect{multiple_output}
 \end{itemize}
 \bigskip
 
