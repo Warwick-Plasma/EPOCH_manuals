@@ -804,6 +804,41 @@ specified time before beginning to move the particles.\\
   the \inlineemph{reset\_walltime} flag to ``T''.
   The default value is ``F''.\\
 
+{\emphtext dlb\_maximum\_interval} - This integer parameter determines the
+  maximum number of timesteps to allow between load balancing checks.
+  Each time that the load balancing sweep is unable to improve the load
+  balance of the simulation, it doubles the number of steps before the
+  next check will occur. It will keep increasing the check interval until
+  it reaches the value given by \inlineemph{dlb\_maximum\_interval}. If the
+  value of \inlineemph{dlb\_maximum\_interval} is negative then the check
+  interval will increase
+  indefinitely. When the load balancing sweep finds an improvement to the
+  load balance of the simulation, the check interval is reset to one.
+  The default value is 500.\\
+
+{\emphtext dlb\_force\_interval} - This integer parameter determines the
+  maximum number of timesteps
+  to allow between forcing a full load balance sweep.
+  If the current load balance is greater than the value of
+  \inlineemph{dlb\_threshold}
+  then the load balancer exits before attempting to improve the loading.
+  If \inlineemph{dlb\_force\_interval} is greater than zero, then the full load
+  balancer will be run at the requested interval of timesteps, regardless
+  of the value of \inlineemph{dlb\_threshold}. Note that the simulation will
+  only be redistributed if this would result in an improved load balance.
+  The default value is 2000.\\
+
+{\emphtext balance\_first} - This logical flag determines whether a load balance
+  will be attempted on the first call of the load balancer.
+  The load balancer performs to functions: first it attempts to find a
+  domain decomposition that balances the load evenly amongst processors.
+  Next, it redistributes the domain and particles onto the new layout (if
+  requred). This latter step is always required when setting up the
+  simulation, so the load balancer is always called once during set-up.
+  This flag controls whether or not a load balance is attempted during
+  this call, regardless of the value of \inlineemph{dlb\_threshold}.
+  The default value is ``T''.\\
+
 
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
@@ -3408,6 +3443,10 @@ The maths parser in {\EPOCH} has the following functions
 \item asin(a) - Arcsine.
 \item acos(a) - Arccosine.
 \item atan(a) - Arctangent.
+\item atan2(Y,X) - Arctangent using the Fortran ATAN2 function. This computes
+    the principal value of the argument function of the complex number
+    $X + i Y$. This function can be used to transform from Cartesian into polar
+    coordinates and allows to determine the angle in the correct quadrant.
 \item sinh(a) - Hyperbolic sine.
 \item cosh(a) - Hyperbolic cosine.
 \item tanh(a) - Hyperbolic tangent.
@@ -5043,6 +5082,14 @@ Version 4.14 adds the following new capabilities:
     See \sect{dump_request}
 \item Added the ``window\_stop\_time'' parameter to the window block.
     See \sect{window_block}
+\item Added the ``atan2'' function to the maths parser.
+    See \sect{functions}
+\item Added ``dlb\_maximum\_interval'' parameter to the control block.
+    See \sect{control_block}
+\item Added ``dlb\_force\_interval'' parameter to the control block.
+    See \sect{control_block}
+\item Added ``balance\_first'' parameter to the control block.
+    See \sect{control_block}
 \end{itemize}
 \bigskip
 
