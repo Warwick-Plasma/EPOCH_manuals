@@ -1859,7 +1859,13 @@ end:window
 
 {\emphtext bc\_x\_max\_after\_move} - The boundary condition which should apply
   to the right boundary after the window has started moving.
-  ``xbc\_right\_after\_move'' is accepted as a synonym.
+  ``xbc\_right\_after\_move'' is accepted as a synonym.\\
+
+{\emphtext bc\_\{y,z\}\_\{min,max\}\_after\_move} - ``y'' and ``z'' versions of
+  the previous two parameters.
+  ``ybc\_down\_after\_move'', ``ybc\_up\_after\_move'',
+  ``zbc\_back\_after\_move'' and ``zbc\_front\_after\_move'' are accepted as
+  synonyms.\\
 
 Because of how the moving window must work, there are some compatibility issues
 with certain features. In particular:
@@ -5090,6 +5096,9 @@ Version 4.14 adds the following new capabilities:
     See \sect{control_block}
 \item Added ``balance\_first'' parameter to the control block.
     See \sect{control_block}
+\item Added y and z versions of the ``bc\_x\_min\_after\_move'' and
+    ``bc\_x\_max\_after\_move'' parameters to the window block.
+    See \sect{window_block}
 \end{itemize}
 \bigskip
 
