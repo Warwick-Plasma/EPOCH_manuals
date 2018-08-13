@@ -3408,6 +3408,10 @@ The maths parser in {\EPOCH} has the following functions
 \item asin(a) - Arcsine.
 \item acos(a) - Arccosine.
 \item atan(a) - Arctangent.
+\item atan2(Y,X) - Arctangent using the Fortran ATAN2 function. This computes
+    the principal value of the argument function of the complex number
+    $X + i Y$. This function can be used to transform from Cartesian into polar
+    coordinates and allows to determine the angle in the correct quadrant.
 \item sinh(a) - Hyperbolic sine.
 \item cosh(a) - Hyperbolic cosine.
 \item tanh(a) - Hyperbolic tangent.
@@ -5043,6 +5047,8 @@ Version 4.14 adds the following new capabilities:
     See \sect{dump_request}
 \item Added the ``window\_stop\_time'' parameter to the window block.
     See \sect{window_block}
+\item Added the ``atan2'' function to the maths parser.
+    See \sect{functions}
 \end{itemize}
 \bigskip
 
