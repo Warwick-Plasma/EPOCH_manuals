@@ -3302,21 +3302,19 @@ integral. So the sinusoid that is applied to the current is
 $\sin\Bigl(\int_0^t\omega(t')dt'\Bigr)$. For constant $\omega$ this reduces to
 $\sin(\omega t)$. This gives the correct behaviour for chirped antennae.\\
 
-An example input deck might look as follows:\\
+An example input deck might look as follows:
 
 \begin{boxverbatim}
 begin:antenna
-
   jx = if (r_xy lt micron, 1.0e-5, 0.0)
   jy = if (r_xy lt micron, 1.0e-5, 0.0)
   jz = if (r_xy lt micron, 1.0e-5, 0.0)
-  ranges = ((-micron, micron),(-micron,micron))
+  ranges = ((-micron, micron), (-micron, micron))
 
   omega = 1.0e15
 
   start_time = start
   stop_time = end
-
 end:antenna
 \end{boxverbatim}
 
