@@ -3255,7 +3255,7 @@ in contact with open boundaries might cause changes in reflectivity.
 
 The antennae will work correctly with the moving window. If you wish an antenna
 to move with the window then you will have to specify it's position relative to
-the \inlineemph{x\_min} boundary
+the \inlineemph{x\_min} boundary.
 
 \subsubsection{Keys}
 
@@ -3281,26 +3281,26 @@ The ``antenna'' block accepts the following keys:\\
   then the current will vary sinusoidally with the specified frequency. This is
   faster to run than specifying a sinusoidal profile in the jx, jy or jz keys
   but performs the same (for a frequency that doesn't change in time, see
-  \sectit{time_variability}). Can be time varying, but not space varying\\
+  \sectit{time_variability}). Can be time varying, but not space varying.\\
 
 {\emphtext start\_time} -  Time after which to start applying the antenna
-  currents. Can be "start" to apply from the start of the simulation. If key is
-  not present antenna runs from the start of the simulation.\\
+  currents. Can be ``start'' to apply from the start of the simulation. If key
+  is not present antenna runs from the start of the simulation.\\
 
 {\emphtext stop\_time} - Time after which to cease applying the antenna
-  currents. Can be "end" to apply until the end of the simulation. If key is not
-  present antenna runs until the end of the simulation.\\
+  currents. Can be ``end'' to apply until the end of the simulation. If key is
+  not present antenna runs until the end of the simulation.\\
 
 \subsubsection{Time variability}
 \label{sec:time_variability}
 When you specify time variation for the jx, jy or jz keys this specifies the
-\inlineemph{instantaneous} current to be applied at each moment in time. \\
+\inlineemph{instantaneous} current to be applied at each moment in time.\\
 
 When you specify time variation in the omega key this specifies the frequency
 at this time, but this is applied to the phase state of the antenna as an
 integral. So the sinusoid that is applied to the current is
 $\sin\Bigl(\int_0^t\omega(t')dt'\Bigr)$. For constant $\omega$ this reduces to
-$\sin(\omega t)$. This gives the correct behaviour for chirped antennae\\
+$\sin(\omega t)$. This gives the correct behaviour for chirped antennae.\\
 
 An example input deck might look as follows:\\
 
@@ -3322,7 +3322,7 @@ end:antenna
 
 {\emphtext
   Antennae are a new feature so please be wary of unusual behaviour, and
-  contact the {\EPOCH} development team if unexpected results occur}
+  contact the {\EPOCH} development team if unexpected results occur.}
 
 \subsection{\inlineemph{subset} block}
 \label{sec:subset_block}
