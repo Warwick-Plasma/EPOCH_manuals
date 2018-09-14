@@ -3261,20 +3261,11 @@ the \inlineemph{x\_min} boundary
 
 The ``antenna'' block accepts the following keys:\\
 
-{\emphtext jx} -  Profile for current in x direction. If you do not specify the
-  omega key then you should include any time dependence manually. If the omega
-  key is specified any time variation in jx will be multiplicatively combined
-  with the sinusoidal variation from omega. Can be time and space varying.\\
-
-{\emphtext jy} -  Profile for current in y direction. If you do not specify the
-  omega key then you should include any time dependence manually. If the omega
-  key is specified any time variation in jy will be multiplicatively combined
-  with the sinusoidal variation from omega. Can be time and space varying.\\
-
-{\emphtext jz} -  Profile for current in z direction. If you do not specify the
-  omega key then you should include any time dependence manually. If the omega
-  key is specified any time variation in jz will be multiplicatively combined
-  with the sinusoidal variation from omega. Can be time and space varying.\\
+{\emphtext j\{x,y,z\}} -  Profile for current in the \{x,y,z\} directions,
+  respectively. If you do not specify the omega key then you should include any
+  time dependence manually. If the omega key is specified any time variation in
+  current will be multiplicatively combined with the sinusoidal variation from
+  omega. Can be time and space varying.\\
 
 {\emphtext ranges} - Array of (min,max) pairs for each dimension of your
   simulation (1 pair for EPOCH1D, 2 pairs for EPOCH2D and 3 pairs for EPOCH3D)
