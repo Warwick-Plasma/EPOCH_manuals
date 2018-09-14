@@ -1364,7 +1364,7 @@ variables. The data is read in as soon as a line is executed, and so it is
 perfectly possible to load data from a file and then modify the data using
 a mathematical expression.\\
 
-The example block above is for 10,000 values at double precision, i.e. 8-bytes 
+The example block above is for 10,000 values at double precision, i.e. 8-bytes
 each. The density data is the first 80,000 bytes of ``ic.dat''. Bytes 80,000
 to 160,000 are the temp\_x data.
 
@@ -1480,8 +1480,8 @@ end:species
 \end{boxverbatim}
 
 %If ``ionisation\_electron\_species'' is not specified then the electron species
-Ionised states are created automatically and are named according to the ionising species name
-with a number appended. For example
+Ionised states are created automatically and are named according to the
+ionising species name with a number appended. For example
 \begin{boxverbatim}
 begin:species
    name = Helium
@@ -4695,9 +4695,11 @@ view the results you will have to jump forward to \sectit{idl}.
 \include{idl_visit}
 
 \appendix
-\section{Changes between version 3.1 and 4.0}
+\section{Changes between versions}
 
-\subsection{Changes to the Makefile}
+\subsection{Changes between version 3.1 and 4.0}
+
+\subsubsection{Changes to the Makefile}
 
 Some changes have been made to the Makefile. These are documented in
 \sect{makefile}.\\
@@ -4722,7 +4724,7 @@ Some changes have been made to the Makefile. These are documented in
 \item PARTICLE\_IONISE
 \end{itemize}
 
-\subsection{Major features and new blocks added to the input deck}
+\subsubsection{Major features and new blocks added to the input deck}
 
 \begin{itemize}
 \item CPML boundary conditions - See \sect{cpml}
@@ -4737,7 +4739,7 @@ Some changes have been made to the Makefile. These are documented in
 \end{itemize}
 %dumpmask - single, average_single
 
-\subsection{Additional output block parameters}
+\subsubsection{Additional output block parameters}
 
 The following parameters have also been added to the ``output'' block
 (see \sect{output_directives}):
@@ -4753,7 +4755,7 @@ The following parameters have also been added to the ``output'' block
 \item restartable
 \end{itemize}
 
-\subsection{Other additions to the input deck}
+\subsubsection{Other additions to the input deck}
 
 \begin{itemize}
 \item npart\_per\_cell - See \sect{species_block}
@@ -4767,9 +4769,9 @@ If the deck contains a ``\textbackslash'' character then the rest of the line
 is ignored and the next line becomes a continuation of the current one.
 
 
-\section{Changes between version 4.0 and 4.3}
+\subsection{Changes between version 4.0 and 4.3}
 
-\subsection{Changes to the Makefile}
+\subsubsection{Changes to the Makefile}
 
 Some changes have been made to the Makefile. These are documented in
 \sect{makefile}.\\
@@ -4786,7 +4788,7 @@ Some changes have been made to the Makefile. These are documented in
 \end{itemize}
 
 
-\subsection{Additions to the input deck}
+\subsubsection{Additions to the input deck}
 The following parameters have been added to the ``control'' block of
 the input deck (see \sect{control_block}):
 \begin{itemize}
@@ -4872,7 +4874,8 @@ constants (see \sect{constants}).
 \noindent There has also been a new ``output\_global'' block added to the
 input deck. This is documented in \sect{output_global_block}.
 
-\subsection{Changes in behaviour which are not due to changes in the input deck}
+\subsubsection{Changes in behaviour which are not due to changes in the
+               input deck}
 \begin{itemize}
 \item The species ``drift'' property is now applied to particles whilst the
   moving window model is active. In previous versions of the code, this
@@ -4900,9 +4903,9 @@ input deck. This is documented in \sect{output_global_block}.
 \end{itemize}
 
 
-\section{Changes between version 4.3 and 4.8}
+\subsection{Changes between version 4.3 and 4.8}
 
-\subsection{Changes to the Makefile}
+\subsubsection{Changes to the Makefile}
 
 Some changes have been made to the Makefile. These are documented in
 \sect{makefile}.\\
@@ -4924,7 +4927,7 @@ Some changes have been made to the Makefile. These are documented in
 \end{itemize}
 
 
-\subsection{Additions to the input deck}
+\subsubsection{Additions to the input deck}
 The following parameters have been added to the ``control'' block of
 the input deck (see \sect{control_block}):
 \begin{itemize}
@@ -4955,9 +4958,9 @@ the input deck (see \sect{subset_block}):
 \end{itemize}
 \bigskip
 
-\section{Changes between version 4.8 and 4.9}
+\subsection{Changes between version 4.8 and 4.9}
 
-\subsection{New capabilities}
+\subsubsection{New capabilities}
 Version 4.9 adds significant new capabilities as follows:
 
 \begin{itemize}
@@ -4970,7 +4973,7 @@ Version 4.9 adds significant new capabilities as follows:
 \end{itemize}
 \bigskip
 
-\subsection{Changes to the Makefile}
+\subsubsection{Changes to the Makefile}
 
 Some changes have been made to the Makefile. These are documented in
 \sect{makefile}.\\
@@ -4981,7 +4984,7 @@ Some changes have been made to the Makefile. These are documented in
 \end{itemize}
 \bigskip
 
-\subsection{Additions to the input deck}
+\subsubsection{Additions to the input deck}
 
 The following alterations were made to the input deck:
 \begin{itemize}
@@ -5032,7 +5035,7 @@ the input deck (see \sect{dist_fn_block}):
 \item restrict\_mod\_p
 \end{itemize}
 
-\subsection{Changes not resulting from changes to the deck}
+\subsubsection{Changes not resulting from changes to the deck}
 \begin{itemize}
 \item Lasers can be specified with time-varying frequency profile.
 \item The existing subset blocks can now be applied to field and derived grid
@@ -5051,10 +5054,7 @@ the input deck (see \sect{dist_fn_block}):
 \bigskip
 
 
-\section{Changes between version 4.9 and 4.10}
-
-\subsection{New capabilities}
-Version 4.10 adds the following new capabilities:
+\subsection{Changes between version 4.9 and 4.10}
 
 \begin{itemize}
 \item Time varying particle injectors. See \sect{injector_block}
@@ -5067,9 +5067,9 @@ Version 4.10 adds the following new capabilities:
 \bigskip
 
 
-\section{Changes between version 4.10 and 4.11}
+\subsection{Changes between version 4.10 and 4.11}
 
-\subsection{New capabilities}
+\subsubsection{New capabilities}
 Version 4.11 adds the following new capabilities:
 
 \begin{itemize}
@@ -5083,6 +5083,8 @@ Version 4.11 adds the following new capabilities:
     \sect{makefile}
 \end{itemize}
 
+\subsubsection{Corrections}
+
 The following correction has been made:
 \begin{itemize}
 \item Fractional numbers of particles-per-cell now function as expected when
@@ -5091,10 +5093,7 @@ used in conjunction with the moving window.
 \bigskip
 
 
-\section{Changes between version 4.11 and 4.12}
-
-\subsection{New capabilities}
-Version 4.12 adds the following new capabilities:
+\subsection{Changes between version 4.11 and 4.12}
 
 \begin{itemize}
 \item Added ``average\_weight'' output diagnostic.
@@ -5118,10 +5117,7 @@ Version 4.12 adds the following new capabilities:
 \bigskip
 
 
-\section{Changes between version 4.12 and 4.14}
-
-\subsection{New capabilities}
-Version 4.14 adds the following new capabilities:
+\subsection{Changes between version 4.12 and 4.14}
 
 \begin{itemize}
 \item Added the ``reset\_walltime'' flag to the control block.
