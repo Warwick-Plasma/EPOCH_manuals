@@ -51,7 +51,7 @@ particles.
   \item MPI-IO based output, allowing restart on an arbitrary number of
     processors.
   \item Data analysis and visualisation options include ITT IDL, LLNL VisIt,
-    Mathworks MatLab and Matplotlib in Python.
+    Mathworks MatLab and matplotlib in Python.
   \item Control of setup and runs of {\EPOCH} through a customisable input deck.
 \end{itemize}
 
@@ -135,7 +135,7 @@ Further information about this facility can be found in
 See \sectit{customising}.
 
 \subsection{I want to develop an addition to {\EPOCH}. How do I do that?}
-A slightly outdate developers manual exists which should be sufficient to
+A slightly outdated developers manual exists which should be sufficient to
 cover most aspects of the code functionality. However, the code is written
 in a fairly modular and consistent manner, so reading through that
 is the best source of information. If you get stuck then you can post
@@ -177,7 +177,7 @@ EP/G054950/1, EP/G056803/1, EP/G055165/1 and EP/ M022463/1.''
 \section{{\EPOCH} for end users}
 \label{sec:endusers}
 This manual aims to give a complete description of how to set up and run
-{\EPOCH} as an end user. Further details on the design and implemetation of
+{\EPOCH} as an end user. Further details on the design and implementation of
 the code may be found in \citet{Arber} and \citet{Ridgers}.
 
 We begin by giving a brief overview of the {\EPOCH} code-base, how to
@@ -235,7 +235,7 @@ of the epoch\{1,2,3\}d directories, there are 3 sub-directories:
 \item Data - This is an empty directory to use for running simulations.
 \end{itemize}
 
-there are also 3 files:
+There are also 3 files:
 
 \begin{itemize}
 \item Makefile - A standard makefile.
@@ -830,10 +830,10 @@ specified time before beginning to move the particles.\\
 
 {\emphtext balance\_first} - This logical flag determines whether a load balance
   will be attempted on the first call of the load balancer.
-  The load balancer performs to functions: first it attempts to find a
+  The load balancer performs two functions: first it attempts to find a
   domain decomposition that balances the load evenly amongst processors.
   Next, it redistributes the domain and particles onto the new layout (if
-  requred). This latter step is always required when setting up the
+  required). This latter step is always required when setting up the
   simulation, so the load balancer is always called once during set-up.
   This flag controls whether or not a load balance is attempted during
   this call, regardless of the value of \inlineemph{dlb\_threshold}.
