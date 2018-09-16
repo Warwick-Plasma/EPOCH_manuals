@@ -839,6 +839,22 @@ specified time before beginning to move the particles.\\
   this call, regardless of the value of \inlineemph{dlb\_threshold}.
   The default value is ``T''.\\
 
+{\emphtext use\_pre\_balance} - This logical flag determines whether a load
+  balance will be attempted before the particle load occurs. If this flag is
+  set to ``T'' then the particle auto-loader will be called at setup time, but
+  instead of creating particles it will just populate a particle-per-cell field
+  array. This will then be used to calculate the optimal domain decomposition
+  and all field arrays will be redistributed to use the new layout. Finally,
+  after all of this has been done, the auto-loader will be called again and
+  create just the particles that are present on their optimally load-balanced
+  domains. In contrast, if the flag is set to ``F'' then the domain is just
+  divided evenly amongst processors and the particles are loaded on this domain
+  decomposition. Balancing is then carried out on to redistribute the work load.
+  For heavily imbalanced problems, this can lead to situations in which there is
+  insufficient memory to setup a simulation, despite there being sufficient
+  resources for the final load-balanced conditions. The default value is
+  ``T''.\\
+
 
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
@@ -5146,6 +5162,20 @@ used in conjunction with the moving window.
     See \sect{output_directives} and \sect{output_global_block}
 \item Added ``walltime\_interval'' parameter to the output block.
     See \sect{multiple_output}
+\end{itemize}
+\bigskip
+
+
+\subsection{Changes between version 4.14 and 4.15}
+
+\begin{itemize}
+\item The initial problem setup can now be load-balanced before any particles
+    are loaded. This enables some heavily imbalanced setups to be run that were
+    not previously possible.
+\begin{itemize}
+\item Added the ``use\_pre\_balance'' flag to the control block.
+    See \sect{control_block}
+\end{itemize}
 \end{itemize}
 \bigskip
 
