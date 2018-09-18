@@ -855,6 +855,22 @@ specified time before beginning to move the particles.\\
   resources for the final load-balanced conditions. The default value is
   ``T''.\\
 
+{\emphtext use\_optimal\_layout} - This logical flag determines whether the
+  load balancer attempts to find an optimal processor split before loading
+  the particles. The initial domain split is chosen in such a way as to
+  minimize the total surface area of the resulting domains in 3D, or edge
+  lengths in 2D. For example, if a 2D square domain is run on 16 CPUs then the
+  domain will be divided by 4 in the x-direction and 4 in the y-direction. The
+  other possible splits (1x16, 2x8, 8x2, 16x1) are rejected because they all
+  yield rectangular subdomains whose total edge length is greater than the
+  4x4 edge length. For some problems (eg. a density ramp or thin foil) this is
+  a poor choice and a better load balance would be obtained by a less even
+  split. It is always possible to specify such a split by using
+  \inlineemph{nproc\{x,y,z\}} flags but enabling the
+  \inlineemph{use\_optimal\_layout} flag will automatically determine the best
+  split for you. Future versions of the code will also allow the split to be
+  changed dynamically at run time.  The default value is ``T''.\\
+
 
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
@@ -5267,6 +5283,11 @@ used in conjunction with the moving window.
     not previously possible.
 \begin{itemize}
 \item Added the ``use\_pre\_balance'' flag to the control block.
+    See \sect{control_block}
+\end{itemize}
+\item Allow the load balancer to adjust the processor topology
+\begin{itemize}
+\item Added the ``use\_optimal\_layout'' flag to the control block.
     See \sect{control_block}
 \end{itemize}
 \end{itemize}
