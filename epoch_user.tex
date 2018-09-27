@@ -499,7 +499,10 @@ where the code output is to be placed. This directory must also include the
 file \qtt{input.deck} which controls the code setup, specifies how to set the
 initial conditions and controls the I/O. Writing an input deck for {\EPOCH} is
 fairly time consuming and so the code is supplied with some example input decks
-which include all the necessary sections for the code to run.
+which include all the necessary sections for the code to run. Alternately, the
+code checks for the Data directory in a file named ``USE\_DATA\_DIRECTORY''
+before prompting at the command-line. This allows the code to be run without
+waiting for input at the command-line.
 
 \section{The {\EPOCH} input deck}
 \label{sec:input}
