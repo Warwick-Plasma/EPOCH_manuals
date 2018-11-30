@@ -30,7 +30,9 @@ Here, only the number ``4.14'' is important.
 Since version 3.1 of the manual, new additions and changes are mentioned
 in the appendix.
 
-\subsection{What is {\EPOCH}?}
+\subsection{\texorpdfstring
+  {What is {\EPOCH}?}
+  {What is {EPOCH}?}}
 
 {\EPOCH} is a plasma physics simulation code which uses the Particle in Cell
 (PIC) method. In this method, collections of physical particles are represented
@@ -43,7 +45,9 @@ pseudoparticle positions. This leads to a scheme which can reproduce the full
 range of classical micro-scale behaviour of a collection of charged
 particles.
 
-\subsubsection{Features of {\EPOCH}}
+\subsubsection{\texorpdfstring
+  {Features of {\EPOCH}}
+  {Features of {EPOCH}}}
 \begin{itemize}
   \item MPI parallelised, explicit, second-order, relativistic PIC code.
   \item Dynamic load balancing option for making optimal use of all processors
@@ -62,7 +66,9 @@ and particle push routines. {\EPOCH} was written to add more modern features
 and to structure the code in such a way that future expansion of the code is
 made as easy as possible.
 
-\subsection{What normalisations are used in {\EPOCH}?}
+\subsection{\texorpdfstring
+  {What normalisations are used in {\EPOCH}?}
+  {What normalisations are used in {EPOCH}?}}
 Since the idea from the start was that {\EPOCH} would be used by a large number
 of different users and that it should be as easy as possible to ``plug in''
 different modules from different people into a given copy of the code, it was
@@ -134,15 +140,18 @@ Further information about this facility can be found in
   experienced users can use it. How do I do that?}
 See \sectit{customising}.
 
-\subsection{I want to develop an addition to {\EPOCH}. How do I do that?}
+\subsection{\texorpdfstring
+  {I want to develop an addition to {\EPOCH}. How do I do that?}
+  {I want to develop an addition to {EPOCH}. How do I do that?}}
 A slightly outdated developers manual exists which should be sufficient to
 cover most aspects of the code functionality. However, the code is written
 in a fairly modular and consistent manner, so reading through that
 is the best source of information. If you get stuck then you can post
 questions on the CCPForge forums.
 
-\subsection{I want to have a full understanding of how {\EPOCH} works. How do I
-  do that?}
+\subsection{\texorpdfstring
+  {I want to have a full understanding of how {\EPOCH} works. How do I do that?}
+  {I want to have a full understanding of how {EPOCH} works. How do I do that?}}
 If you really want to understand {\EPOCH}
 in full, the only way is to read all of
 this manual and then read through the code. Most of it is commented.
@@ -174,7 +183,9 @@ Acknowledgement: ``This work was in part funded by the UK EPSRC grants
 EP/G054950/1, EP/G056803/1, EP/G055165/1 and EP/ M022463/1.''
 
 \newpage
-\section{{\EPOCH} for end users}
+\section{\texorpdfstring
+  {{\EPOCH} for end users}
+  {{EPOCH} for end users}}
 \label{sec:endusers}
 This manual aims to give a complete description of how to set up and run
 {\EPOCH} as an end user. Further details on the design and implementation of
@@ -184,7 +195,9 @@ We begin by giving a brief overview of the {\EPOCH} code-base, how to
 compile and run the code. Note that throughout this user manual, instructions
 are given assuming that you are typing commands at a UNIX terminal.
 
-\subsection{Structure of the {\EPOCH} codes}
+\subsection{\texorpdfstring
+  {Structure of the {\EPOCH} codes}
+  {Structure of the {EPOCH} codes}}
 \label{sec:directory_structure}
 When obtained, the {\EPOCH} codes all have a similar structure. If the tarred
 and gzipped archive (commonly referred to as a tarball) is downloaded and
@@ -264,7 +277,9 @@ compatible with most other forms of the {\bf make} utility. In theory it is
 possible to compile the code without a {\bf make} utility, but it is much
 easier to compile the code using the supplied makefile.
 
-\subsection{Compiling and running {\EPOCH}}
+\subsection{\texorpdfstring
+  {Compiling and running {\EPOCH}}
+  {Compiling and running {EPOCH}}}
 
 To compile {\EPOCH} in the supplied state, you must first change to the
 correct working directory. As explained in \sect{directory_structure}, the
@@ -469,7 +484,9 @@ Just uncomment this line and source code in restart dumps will be permanently
 disabled.
 
 
-\subsection{Running {\EPOCH} and basic control of EPOCH1D}
+\subsection{\texorpdfstring
+  {Running {\EPOCH} and basic control of EPOCH1D}
+  {Running {EPOCH} and basic control of EPOCH1D}}
 When the code is run, the output is
 {\samepage
 \begin{lboxverbatim}{Command line output}
@@ -504,7 +521,9 @@ code checks for the Data directory in a file named ``USE\_DATA\_DIRECTORY''
 before prompting at the command-line. This allows the code to be run without
 waiting for input at the command-line.
 
-\section{The {\EPOCH} input deck}
+\section{\texorpdfstring
+  {The {\EPOCH} input deck}
+  {The {EPOCH} input deck}}
 \label{sec:input}
 Most of the control of {\EPOCH} is through a text file called \code{input.deck}.
 The input deck file must be in the output directory which is passed to the
@@ -569,7 +588,9 @@ the input deck. The fourteen built in blocks are:
   expressions. These are designed to simplify the initial condition setup.
 \end{itemize}
 
-\subsection{\cemph{control} block}
+\subsection{\texorpdfstring
+  {\inlineemph{control} block}
+  {           {control} block}}
 \label{sec:control_block}
 The \cemph{control} block sets up the basic code properties for the
 domain, the end time of the code, the load balancer and the types of initial
@@ -941,7 +962,9 @@ This option must be accompanied by a ``stencil'' block.
 See~\sect{stencil_block}\\
 
 
-\subsection{\inlineemph{stencil} block}
+\subsection{\texorpdfstring
+  {\inlineemph{stencil} block}
+  {           {stencil} block}}
 \label{sec:stencil_block}
 \scaledcapimage{./images/stencil}{stencil}{Coefficient locations
   for the $B_z$ field computational stencil in 2D.}{0.6}
@@ -1034,7 +1057,9 @@ dump but if the ``DUMP'' file contains the name of an output block then this
 will be used instead.
 
 
-\subsection{\inlineemph{boundaries} block}
+\subsection{\texorpdfstring
+  {\inlineemph{boundaries} block}
+  {           {boundaries} block}}
 \label{sec:boundaries_block}
 The {\emphtext boundaries} block sets the boundary conditions of each boundary
 of the domain. Some types of boundaries allow EM wave sources (lasers) to be
@@ -1197,7 +1222,9 @@ end:boundaries
 \end{boxverbatim}
 
 
-\subsection{\inlineemph{species} block}
+\subsection{\texorpdfstring
+  {\inlineemph{species} block}
+  {           {species} block}}
 \label{sec:species_block}
 The next section of the input deck describes the particle species used in the
 code. An example species block for any {\EPOCH} code is given below.
@@ -1594,7 +1621,9 @@ existing drifting plasma. \inlineemph{NOT COMPATIBLE WITH PERIODIC
 BOUNDARY CONDITIONS!}
 
 
-\subsection{\inlineemph{laser} block}
+\subsection{\texorpdfstring
+  {\inlineemph{laser} block}
+  {           {laser} block}}
 \label{sec:laser_block}
 Laser blocks attach an EM wave source to a boundary which is set as
 \inlineemph{simple\_laser}.
@@ -1754,7 +1783,9 @@ is an inferior solution since the FDTD scheme has increased error as the
 timestep is reduced from that for EM waves. {\EPOCH}
 includes a high order field solver to attempt to reduce this.
 
-\subsection{\inlineemph{fields} block}
+\subsection{\texorpdfstring
+  {\inlineemph{fields} block}
+  {           {fields} block}}
 \label{sec:fields_block}
 The next type of block in the {\EPOCH} input deck is the fields block. This
 allows you to specify the electric and magnetic fields at any point in the
@@ -1789,7 +1820,9 @@ Any valid maths parser expression can be used to set up the fields, and no
 check is made to ensure that the $\nabla.B = 0$ is satisfied.
 
 
-\subsection{\inlineemph{particles\_from\_file} block}
+\subsection{\texorpdfstring
+  {\inlineemph{particles\_from\_file} block}
+  {           {particles\_from\_file} block}}
 \label{sec:particles_from_file}
 The \cemph{particles\_from\_file block} is similar in function to the
 \cemph{fields} block. It allows the loading of custom particle data from raw
@@ -1852,7 +1885,9 @@ ignored, may be specified multiple times. see \sect{species_block} for more
 details of behaviour.\\
 
 
-\subsection{\inlineemph{window} block}
+\subsection{\texorpdfstring
+  {\inlineemph{window} block}
+  {           {window} block}}
 \label{sec:window_block}
 {\EPOCH} can include an optional block which causes the simulation domain to
 operate as a moving window. At present, it is only possible to have the window
@@ -1926,7 +1961,9 @@ We can't help with this in general.
 work in general.
 \end{itemize}
 
-\subsection{\inlineemph{output} block}
+\subsection{\texorpdfstring
+  {\inlineemph{output} block}
+  {           {output} block}}
 \label{sec:output_block}
 Output in {\EPOCH} is handled using the custom designed SDF file format
 (\inlineemph{Self Describing Format}). A detailed specification of this
@@ -2676,7 +2713,9 @@ contains ey, step 4 a0002.sdf contains ex, ey and b0000.sdf
 contains ez.
 
 
-\subsection{\inlineemph{output\_global} block}
+\subsection{\texorpdfstring
+  {\inlineemph{output\_global} block}
+  {           {output\_global} block}}
 \label{sec:output_global_block}
 
 With the introduction of multiple output blocks, there are now a few parameters
@@ -2771,7 +2810,9 @@ To force a dump to occur immediately after restart, set
 is ``F''.
 
 
-\subsection{\inlineemph{dist\_fn} block}
+\subsection{\texorpdfstring
+  {\inlineemph{dist\_fn} block}
+  {           {dist\_fn} block}}
 \label{sec:dist_fn_block}
 
 Sometimes it is useful to reconstruct part of the
@@ -2896,7 +2937,9 @@ on the spatial axis, meaning that the result is less smooth than normal
 properties from the code.
 
 
-\subsection{\inlineemph{probe} block}
+\subsection{\texorpdfstring
+  {\inlineemph{probe} block}
+  {           {probe} block}}
 \label{sec:probe_block}
 Sometimes it is useful to consider all the properties of particle which pass
 through a point/line/plane (depending on dimension) in the simulation. To
@@ -2964,7 +3007,9 @@ end:probe
 
 % x1,x2,y1,y2,etc. are considered legacy and no longer documented.
 
-\subsection{\inlineemph{collisions} block}
+\subsection{\texorpdfstring
+  {\inlineemph{collisions} block}
+  {           {collisions} block}}
 \label{sec:collisions_block}
 {\EPOCH} has a particle collision routine based on the model presented
 by \citet{Sentoku}.
@@ -3025,7 +3070,9 @@ end:collisions
   and (spec2,spec3) is set to 0.1
 
 
-\subsection{\inlineemph{qed} block}
+\subsection{\texorpdfstring
+  {\inlineemph{qed} block}
+  {           {qed} block}}
 \label{sec:qed_block}
 
 {\EPOCH} can model QED pair production, synchrotron emission and
@@ -3137,7 +3184,9 @@ a version of the code which you have obtained from a source other than
 CCPForge may include other input deck blocks. These should be described in
 additional documentation provided with the version of the code that you have.
 
-\subsection{\inlineemph{injector} block}
+\subsection{\texorpdfstring
+  {\inlineemph{injector} block}
+  {           {injector} block}}
 \label{sec:injector_block}
 
 {\emphtext
@@ -3264,7 +3313,9 @@ end:injector
 Injectors are a new feature so please be wary of unusual behaviour, and
 contact the {\EPOCH} development team if unexpected results occur}
 
-\subsection{\inlineemph{subset} block}
+\subsection{\texorpdfstring
+  {\inlineemph{subset} block}
+  {           {subset} block}}
 \label{sec:subset_block}
 
 It is possible to restrict the number of particles written to file
@@ -3399,7 +3450,9 @@ begin:output
 end:output
 \end{boxverbatim}
 
-\subsection{\inlineemph{constant} block}
+\subsection{\texorpdfstring
+  {\inlineemph{constant} block}
+  {           {constant} block}}
 \label{sec:constant_block}
 
 The \inlineemph{constant} block type helps to make the input deck more flexible
@@ -3623,7 +3676,9 @@ changes to the code. An example of using an operator would be:\\
 \indent\inlinecode{length\_x = 10.0 + 12.0}
 
 
-\section{{\EPOCH} use in practice}
+\section{\texorpdfstring
+  {{\EPOCH} use in practice}
+  {{EPOCH} use in practice}}
 \label{sec:usage}
 
 \subsection{Specifying initial conditions for particles using the input deck}
@@ -3713,7 +3768,9 @@ file user\_interaction/ic\_module.f90. Manual loading takes place after
 all the autoloader phase, to allow manual tweaking of autoloader specified
 initial conditions.
 
-\subsubsection{{\EPOCH} internal representation of particles}
+\subsubsection{\texorpdfstring
+  {{\EPOCH} internal representation of particles}
+  {{EPOCH} internal representation of particles}}
 \label{sec:partrep}
 Before we can go about manipulating particle properties in
 \inlinecode{manual\_load}, we first need an overview of how the particles
@@ -3957,7 +4014,9 @@ This can be quite tricky to get right, so in more complicated
 cases it is probably better to use the autoloader than to manually set up the
 number density distribution.
 
-\subsubsection{Grid coordinates used in {\EPOCH}.}
+\subsubsection{\texorpdfstring
+  {Grid coordinates used in {\EPOCH}.}
+  {Grid coordinates used in {EPOCH}.}}
 
 When setting up initial conditions within the {\EPOCH} source (rather than
 using the input deck)
@@ -4048,7 +4107,9 @@ wish to have a laser on to be of type \inlinecode{simple\_laser} and then
 specify one or more lasers attached to that boundary. Lasers may be specified
 anywhere initial conditions are specified.
 
-\subsection{\inlineemph{laser} blocks in multiple dimensions.}
+\subsection{\texorpdfstring
+  {\inlineemph{laser} blocks in multiple dimensions.}
+  {           {laser} blocks in multiple dimensions.}}
 \label{sec:multilaser}
 
 \scaledcapimage{./images/profile_flat}{flatlaser}{Constant laser profile}{0.36}
@@ -4115,7 +4176,9 @@ the $x$-axis. A simple example of this is given in \sectit{focus_eg}.
 % laser from corner?
 
 
-\subsection{Restarting {\EPOCH} from previous output dumps}
+\subsection{\texorpdfstring
+  {Restarting {\EPOCH} from previous output dumps}
+  {Restarting {EPOCH} from previous output dumps}}
 Another possible way of setting up initial conditions in {\EPOCH} is to load in
 a previous output dump and use it to specify initial conditions for the
 code. The effect of this is to restart the code from the state that it was in
@@ -4327,7 +4390,9 @@ This changes the code to run with a Gaussian density profile rather then a step
 function. Again, this can be extended as far as required.
 %
 
-\subsection{Delta-f method in EPOCH}
+\subsection{\texorpdfstring
+  {Delta-f method in {\EPOCH}}
+  {Delta-f method in {EPOCH}}}
 \label{sec:deltaf}
 
 To help reduce the impact of numerical noise in certain simulations, the
@@ -4396,7 +4461,9 @@ delta-f simulations shows a substantial decrease in noise.
 Further details of the method are provided in a set of slides included in the
 appendix of this document. See \sectit{deltaf_slides}.
 
-\section{Basic examples of using {\EPOCH}}
+\section{\texorpdfstring
+  {Basic examples of using {\EPOCH}}
+  {Basic examples of using {EPOCH}}}
 \label{sec:examples}
 
 In this section we outline a few worked examples of setting up problems
