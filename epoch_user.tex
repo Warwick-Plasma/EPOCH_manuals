@@ -896,6 +896,7 @@ specified time before beginning to move the particles.\\
   changed dynamically at run time.  The default value is ``T''.\\
 
 
+
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
 With the default settings ``\inlineemph{field\_order}=2'',
@@ -962,6 +963,66 @@ This option must be accompanied by a ``stencil'' block.
 See~\sect{stencil_block}\\
 
 
+\subsubsection{Dynamic Load Balancing}
+{\EPOCH} can be configured to balance the workload across processors at
+run-time via the {\emphtext dlb\_threshold} flag.
+``dlb'' stands for Dynamic Load Balancing and, when turned on, it allows the
+code to rearrange the internal domain boundaries to try and balance the
+workload on each processor. This rearrangement is an expensive operation, so
+it is only performed when the maximum load imbalance reaches a given critical
+point. This critical point is given by the parameter ``dlb\_threshold'' which
+is the ratio of the workload on the least loaded processor to the most loaded
+processor. When the calculated load imbalance is less than ``dlb\_threshold''
+the code performs a re-balancing sweep, so if ``dlb\_threshold = 1.0'' is set
+then the code will keep trying to re-balance the workload at almost every
+timestep. At present the workload on each processor is simply calculated from
+the number of particles on each processor, but this will probably change in
+future. If the ``dlb\_threshold'' parameter is not specified then the code
+will only be load balanced at initialisation time.
+
+
+\subsubsection{Automatic halting of a simulation}
+It is sometimes useful to be able to halt an {\EPOCH} simulation midway through
+execution and generate a restart dump. Two methods have been implemented to
+enable this.
+
+The first method is to check for the existence of a ``STOP'' file. Throughout
+execution, {\EPOCH} will check for the existence of a file named either
+``STOP'' or ``STOP\_NODUMP'' in the simulation output directory. The check is
+performed at regular intervals and if such a file is found then the code
+exits immediately. If ``STOP'' is found then a restart dump is written before
+exiting. If ``STOP\_NODUMP'' is found then no I/O is performed.
+
+The interval between checks is controlled by the integer parameter
+``check\_stop\_frequency'' which can be specified in the ``control''
+block of the input deck. If it is less than or equal to zero then
+the check is never performed.
+
+The next method for automatically halting the code is to stop execution after
+a given elapsed walltime.
+If a positive value for ``stop\_at\_walltime'' is specified in the
+control block of an input deck then the code will halt once this
+time is exceeded and write a restart dump. The parameter takes a real
+argument which is the time in seconds since the start of the simulation.
+
+An alternative method of specifying this time is to write it into a separate
+text file. ``stop\_at\_walltime\_file'' is the filename from which to read the
+value for ``stop\_at\_walltime''. Since the walltime will often be
+found by querying the queueing system in a job script, it may be
+more convenient to pipe this value into a text file rather than
+modifying the input deck.
+
+
+\subsubsection{Requesting output dumps at run time}
+\label{sec:dump_request}
+In addition to polling for the existence of a ``STOP'' file, {\EPOCH} also
+periodically checks the output directory for a file named ``DUMP''. If such
+a file is found then {\EPOCH} will immediately create an output dump and
+remove the ``DUMP'' file. By default, the file written will be a restart
+dump but if the ``DUMP'' file contains the name of an output block then this
+will be used instead.
+
+
 \subsection{\texorpdfstring
   {\inlineemph{stencil} block}
   {           {stencil} block}}
@@ -998,63 +1059,6 @@ these are calculated using the following  equations:
   the standard Yee scheme.\\
 
 {\emphtext dt} - The timestep restriction to use for the field solver\\
-
-
-\subsubsection{Dynamic Load Balancing}
-The first is the {\emphtext dlb\_threshold} flag.
-``dlb'' stands for Dynamic Load Balancing and, when turned on, it allows the
-code to rearrange the internal domain boundaries to try and balance the
-workload on each processor. This rearrangement is an expensive operation, so
-it is only performed when the maximum load imbalance reaches a given critical
-point. This critical point is given by the parameter ``dlb\_threshold'' which
-is the ratio of the workload on the least loaded processor to the most loaded
-processor. When the calculated load imbalance is less than ``dlb\_threshold''
-the code performs a re-balancing sweep, so if ``dlb\_threshold = 1.0'' is set
-then the code will keep trying to re-balance the workload at almost every
-timestep. At present the workload on each processor is simply calculated from
-the number of particles on each processor, but this will probably change in
-future. If the ``dlb\_threshold'' parameter is not specified then the code
-will only be load balanced at initialisation time.
-
-\subsubsection{Automatic halting of a simulation}
-It is sometimes useful to be able to halt an {\EPOCH} simulation midway through
-execution and generate a restart dump. Two methods have been implemented to
-enable this.
-
-The first method is to check for the existence of a ``STOP'' file. Throughout
-execution, {\EPOCH} will check for the existence of a file named either
-``STOP'' or ``STOP\_NODUMP'' in the simulation output directory. The check is
-performed at regular intervals and if such a file is found then the code
-exits immediately. If ``STOP'' is found then a restart dump is written before
-exiting. If ``STOP\_NODUMP'' is found then no I/O is performed.
-
-The interval between checks is controlled by the integer parameter
-``check\_stop\_frequency'' which can be specified in the ``control''
-block of the input deck. If it is less than or equal to zero then
-the check is never performed.
-
-The next method for automatically halting the code is to stop execution after
-a given elapsed walltime.
-If a positive value for ``stop\_at\_walltime'' is specified in the
-control block of an input deck then the code will halt once this
-time is exceeded and write a restart dump. The parameter takes a real
-argument which is the time in seconds since the start of the simulation.
-
-An alternative method of specifying this time is to write it into a separate
-text file. ``stop\_at\_walltime\_file'' is the filename from which to read the
-value for ``stop\_at\_walltime''. Since the walltime will often be
-found by querying the queueing system in a job script, it may be
-more convenient to pipe this value into a text file rather than
-modifying the input deck.
-
-\subsubsection{Requesting output dumps at run time}
-\label{sec:dump_request}
-In addition to polling for the existence of a ``STOP'' file, {\EPOCH} also
-periodically checks the output directory for a file named ``DUMP''. If such
-a file is found then {\EPOCH} will immediately create an output dump and
-remove the ``DUMP'' file. By default, the file written will be a restart
-dump but if the ``DUMP'' file contains the name of an output block then this
-will be used instead.
 
 
 \subsection{\texorpdfstring
