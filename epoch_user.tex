@@ -963,6 +963,38 @@ This option must be accompanied by a ``stencil'' block.
 See~\sect{stencil_block}\\
 
 
+\subsubsection{Strided Current Filtering}
+\label{sec:strided_filtering}
+{\EPOCH} can perform strided multipass digital current filtering as described
+and benchmarked in the review by \citet{Vay2014}. This can be tuned to
+substantially damp high frequencies in the currents and can be used to reduce
+the effect of numerical Cherenkov radiation. Once you turn on current
+filtering by specifying \inlineemph{smooth\_currents=T} you can then set the
+following keys.\\
+
+{\emphtext smooth\_iterations} - Integer number of iterations of the smoothing
+  function to be performed. If not present defaults to one iteration. More
+  iterations will produce smoother results but will be slower.\\
+
+{\emphtext smooth\_compensation} - Logical flag. If this flag is set to true
+  then perform a compensation step (see \citet{Vay2014}) after the smoothing
+  steps are performed. The default value is false.\\
+
+{\emphtext smooth\_strides} - Either a comma separated list of integers or
+  ``auto'' (without quote marks). This specifies the strides (in number of grid
+  cells) to use when performing strided filtering. Specifying ``1, 3'' will
+  smooth each point with the points immediately adjacent and with the points
+  3 cells away on each side of the current cell. Setting this key to
+  ``auto'' uses a ``1, 2, 3, 4'' set of strides as a ``good'' starting point
+  for strided filtering.\\
+
+It should be stressed that there is no set of values that is guaranteed to
+give any given result from filtering while not affecting the physical
+correctness of your simulation. Current filtering should be tuned to match the
+problem that you want to work on and should always be carefully tested to
+ensure that it doesn't produce unphysical results.
+
+
 \subsubsection{Dynamic Load Balancing}
 {\EPOCH} can be configured to balance the workload across processors at
 run-time via the {\emphtext dlb\_threshold} flag.
@@ -5270,6 +5302,14 @@ used in conjunction with the moving window.
 \begin{itemize}
 \item Added the ``use\_optimal\_layout'' flag to the control block.
     See \sect{control_block}
+\end{itemize}
+\item Added strided multipass digital current filtering
+   (See \sect{strided_filtering}). This adds the following flags to the
+   control block.
+\begin{itemize}
+\item smooth\_iterations
+\item smooth\_compensation
+\item smooth\_strides
 \end{itemize}
 \end{itemize}
 \bigskip
