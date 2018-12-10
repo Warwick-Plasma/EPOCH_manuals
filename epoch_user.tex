@@ -895,6 +895,14 @@ specified time before beginning to move the particles.\\
   split for you. Future versions of the code will also allow the split to be
   changed dynamically at run time.  The default value is ``T''.\\
 
+{\emphtext use\_more\_setup\_memory} - This logical flag determines whether the
+  extra memory will be used during the initial setup of particle species.
+  If set to false then
+  only one set of arrays will be used for storing temperature, density and
+  drift during species loading. This can be a significant memory saving but
+  omes at the expense of recalculating grid quantities multiple times.
+  Setting the flag to true enables one set of arrays per species.
+  The default value is ``F''.\\
 
 
 \subsubsection{Maxwell Solvers}
@@ -5303,6 +5311,8 @@ used in conjunction with the moving window.
 \item Added the ``use\_optimal\_layout'' flag to the control block.
     See \sect{control_block}
 \end{itemize}
+\item Added control block option ``use\_more\_setup\_memory'' for controlling
+   the way that species are setup. See \sect{control_block}
 \item Added strided multipass digital current filtering
    (See \sect{strided_filtering}). This adds the following flags to the
    control block.
