@@ -895,6 +895,14 @@ specified time before beginning to move the particles.\\
   split for you. Future versions of the code will also allow the split to be
   changed dynamically at run time.  The default value is ``T''.\\
 
+{\emphtext use\_more\_setup\_memory} - This logical flag determines whether the
+  extra memory will be used during the initial setup of particle species.
+  If set to false then
+  only one set of arrays will be used for storing temperature, density and
+  drift during species loading. This can be a significant memory saving but
+  omes at the expense of recalculating grid quantities multiple times.
+  Setting the flag to true enables one set of arrays per species.
+  The default value is ``F''.\\
 
 
 \subsubsection{Maxwell Solvers}
@@ -3461,6 +3469,9 @@ begin:output
 end:output
 \end{boxverbatim}
 
+
+\subsubsection{Subsets of fields}
+
 Subset blocks can be applied to per-species variables such as current and
 temperature. Only particles within the given momentum ranges and of the selected
 species are included in the calculations. In addition, subset blocks can now
@@ -3485,6 +3496,28 @@ begin:output
    ex = always + centre
 end:output
 \end{boxverbatim}
+
+\subsubsection{Persistent subsets}
+Persistent subsets are subsets that capture a set of particles once, given a
+specified set of parameters, and then track those particles permanently.
+Persistent subsets use the same blocks as normal subsets and take the same
+parameters as normal subsets (except the skip parameters which only apply to
+fields). Subsets are marked as persistent by setting either
+
+{\emphtext persist\_start\_time} - Time at which to record the list of
+  particles to be tracked. Throughout the rest of the simulation this recorded
+  list will be used whenever requesting output for this subset.
+  ``persist\_after\_time'' is accepted as an alias. Set to 0 to record from the
+  start of the simulation.\\
+
+{\emphtext persist\_start\_step} - Similar to ``persist\_start\_time'' except
+  this specifies a simulation step number to use instead of time.
+  ``persist\_after\_step'' is accepted as an alias.\\
+
+If the input deck is edited on restart to add a new persistent subset then it
+must be added after existing persistent subsets or problems may occur on
+restart.
+
 
 \subsection{\texorpdfstring
   {\inlineemph{constant} block}
@@ -5291,6 +5324,7 @@ used in conjunction with the moving window.
 \subsection{Changes between version 4.14 and 4.15}
 
 \begin{itemize}
+\item Added averaging of ``poynt\_flux'' and ``ekflux'' variables.
 \item The initial problem setup can now be load-balanced before any particles
     are loaded. This enables some heavily imbalanced setups to be run that were
     not previously possible.
@@ -5303,13 +5337,21 @@ used in conjunction with the moving window.
 \item Added the ``use\_optimal\_layout'' flag to the control block.
     See \sect{control_block}
 \end{itemize}
+\item Added control block option ``use\_more\_setup\_memory'' for controlling
+    the way that species are setup. See \sect{control_block}
 \item Added strided multipass digital current filtering
-   (See \sect{strided_filtering}). This adds the following flags to the
-   control block.
+    (See \sect{strided_filtering}). This adds the following flags to the
+    control block.
 \begin{itemize}
 \item smooth\_iterations
 \item smooth\_compensation
 \item smooth\_strides
+\end{itemize}
+\item Added persistent subsets. See \sect{subset_block}. This adds the
+    following flags to the subset block
+\begin{itemize}
+\item persist\_start\_time
+\item persist\_start\_step
 \end{itemize}
 \end{itemize}
 \bigskip
