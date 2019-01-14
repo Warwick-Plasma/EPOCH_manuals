@@ -5437,6 +5437,20 @@ used in conjunction with the moving window.
 \item persist\_start\_time
 \item persist\_start\_step
 \end{itemize}
+\item Added loading of relativistic particle species using the
+    Maxwell-J\"uttner distribution. See \sect{maxwell_juttner}. This adds the
+    following flags to the species block
+\begin{itemize}
+\item use\_maxwell\_juttner
+\item fractional\_tail\_cutoff
+\end{itemize}
+\item Added loading of particle species using an arbitrary distribution
+    function for sampling the momentum components. See
+    \sect{arbitrary_dist_fn}. This adds the following flags to the species block
+\begin{itemize}
+\item dist\_fn
+\item dist\_fn\_p\{x,y,z\}\_range
+\end{itemize}
 \end{itemize}
 \bigskip
 
