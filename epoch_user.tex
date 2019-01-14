@@ -1628,9 +1628,6 @@ using the following control block parameters:\\
 
 \subsubsection{Species Boundaries}
 \label{sec:per_species_bcs}
-\noindent{\emphtext Everything in this subsection needs {\EPOCH} version 4.10
-or above}
-
 
 {\emphtext bc\_x\_min} - Boundary condition to be applied to this species only
 on the lower x boundary. Can be any normal boundary condition apart
@@ -1663,6 +1660,30 @@ This means that plasma is loaded one particle shape function length outside the
 boundary. This means that it is possible to use an injector to ``continue'' an
 existing drifting plasma. \inlineemph{NOT COMPATIBLE WITH PERIODIC
 BOUNDARY CONDITIONS!}
+
+\subsubsection{Maxwell-J\"uttner distribution function}
+\label{sec:maxwell_juttner}
+
+As of version 4.15, \EPOCH allows the user to request a Maxwell-J\"uttner
+distribution rather than a Maxwellian distribution when sampling the particle
+momentum for a species.\\
+
+{\emphtext use\_maxwell\_juttner} - Logical flag determining whether to sample
+  from the Maxwell-J\"uttner distribution when loading the particle species.
+  If ``T'' then Maxwell-J\"uttner is used and if ``F'' Maxwellian is used.
+  The default value is ``F''.\\
+
+{\emphtext fractional\_tail\_cutoff} - The sampling is carried out using a
+  rejection method with an arbitrary cut-off. This parameter takes a
+  floating-point argument which specifies the fraction of maximum value at
+  which the sampling should be cut off. Smaller values lead to distortion
+  nearer the peak of the distribution but are faster to sample. Larger values
+  lead to a better approximation of the distribution function but are slower
+  to sample. The default value is $0.0001$.\\
+
+If drifts are specified with the Maxwell-J\"uttner distribution then the
+distribution is calculated in the rest frame and then Lorentz transformed to
+the specified drifting frame.
 
 
 \subsection{\texorpdfstring
