@@ -1628,9 +1628,6 @@ using the following control block parameters:\\
 
 \subsubsection{Species Boundaries}
 \label{sec:per_species_bcs}
-\noindent{\emphtext Everything in this subsection needs {\EPOCH} version 4.10
-or above}
-
 
 {\emphtext bc\_x\_min} - Boundary condition to be applied to this species only
 on the lower x boundary. Can be any normal boundary condition apart
@@ -1663,6 +1660,87 @@ This means that plasma is loaded one particle shape function length outside the
 boundary. This means that it is possible to use an injector to ``continue'' an
 existing drifting plasma. \inlineemph{NOT COMPATIBLE WITH PERIODIC
 BOUNDARY CONDITIONS!}
+
+\subsubsection{Maxwell-J\"uttner distribution function}
+\label{sec:maxwell_juttner}
+
+As of version 4.15, \EPOCH allows the user to request a Maxwell-J\"uttner
+distribution rather than a Maxwellian distribution when sampling the particle
+momentum for a species.\\
+
+{\emphtext use\_maxwell\_juttner} - Logical flag determining whether to sample
+  from the Maxwell-J\"uttner distribution when loading the particle species.
+  If ``T'' then Maxwell-J\"uttner is used and if ``F'' Maxwellian is used.
+  The default value is ``F''.\\
+
+{\emphtext fractional\_tail\_cutoff} - The sampling is carried out using a
+  rejection method with an arbitrary cut-off. This parameter takes a
+  floating-point argument which specifies the fraction of maximum value at
+  which the sampling should be cut off. Smaller values lead to distortion
+  nearer the peak of the distribution but are faster to sample. Larger values
+  lead to a better approximation of the distribution function but are slower
+  to sample. The default value is $0.0001$.\\
+
+If drifts are specified with the Maxwell-J\"uttner distribution then the
+distribution is calculated in the rest frame and then Lorentz transformed to
+the specified drifting frame.
+
+\subsubsection{Arbitrary distribution functions}
+\label{sec:arbitrary_dist_fn}
+
+As of version 4.15, \EPOCH also allows the user to request an arbitrary
+non-Maxwellian distribution function to use when sampling the particle
+momentum for a species. If combined with a specified drift then the
+distribution function is calculated first and the drift is applied to the
+resulting particles by Lorentz transform.
+
+This feature does not at present work with the delta\_f loader and is not
+available for particle injectors. It does work correctly with the moving
+window.\\
+
+{\emphtext dist\_fn} - Specifies the functional form of the distribution
+  function, normalised to have a maximum value of 1. The variables
+  ``px'', ``py'' and ``pz'' should be used to parameterise the $x$, $y$ and $z$
+  components of momentum. This may freely vary in space but temporal variation
+  will be ignored since this is only evaluated at the start of the simulation.\\
+
+{\emphtext dist\_fn\_p\{x,y,z\}\_range} - Comma separated pair of numbers to
+  specify the range of momentum for $p_{\{x,y,z\}}$ in SI units. Should be of
+  the form
+  ``$\langle\mbox{lower\_range}\rangle, \langle\mbox{upper\_range}\rangle$''\\
+
+If a range for a momentum direction is not specified then that momentum is
+assumed to be zero. It is up to the user to ensure that the range is large
+enough to correctly capture their desired distribution function. Sampling is by
+a simple rejection sampling and may be much slower than the existing Maxwellian
+sampler. \EPOCH will print a warning if a large number of samples are needed to
+complete the sampling. If this occurs then you might need to reduce the range
+of momentum over which sampling is considered.
+
+If the ``dist\_fn'' key is supplied then any supplied temperature keys are
+ignored.  An example of setting up a truncated power law distribution in
+$p_x$ would be
+\begin{boxverbatim}
+begin:constant
+  dens = 10
+  v0 = 0.05 * c
+  vmax = 0.5 * c
+  p0 = v0 * me * (1.0 + 4.0 * x / x_max)
+  pmax = vmax * me
+  alpha = -2.0
+end:constant
+
+begin:species
+  name = Electron_pl
+  charge = -1
+  mass = 1.0
+  frac = 0.5
+  density = dens
+  # Truncated power law distribution in px
+  dist_fn = exp(-p0 / px) * (px / p0)^alpha
+  dist_fn_px_range = (0, pmax)
+end:species
+\end{boxverbatim}
 
 
 \subsection{\texorpdfstring
@@ -3628,6 +3706,8 @@ The maths parser in {\EPOCH}  has the following constants
 \item nproc\_\{x,y,z\} - The number of processes in the x,y,z directions.
 \item nsteps - The number of timesteps requested.
 \item t\_end - The end time of the simulation.
+\item p\{x,y,z\} - Momentum in the $x, y, z$ directions. Used in specifying
+  arbitrary distribution functions.
 \end{itemize}
 
 It is also possible for an end user to specify custom constants both within
@@ -4111,15 +4191,19 @@ There are also up to three arrays which are available for use.
   direction (3D).
 \end{itemize}
 
-\subsubsection{Loading a non-thermal particle distribution.}
+\subsubsection{Loading a separable non-thermal particle distribution.}
 
-While the autoloader is capable of dealing with most required initial thermal
-distributions, you may want to set up non-thermal initial conditions. The code
-includes a helper function to select a point from an arbitrary distribution
-function which can be used to deal with most non-thermal distributions. To use
-the helper function, you need to define two 1D arrays which are the x and
-y axes for the distribution function. An example of using the helper function
-is given below.
+It is now possible to specify any arbitrary distribution function to use
+for setting up the initial particle momenta, as described in
+\sect{arbitrary_dist_fn}. However, if the distribution function can be
+represented as a set of 1D distribution functions in $p_x,\,p_y$ and $p_z$
+separately, then it may be significantly faster to use the method outlined
+below.
+
+The code includes a helper function to select a point from an arbitrary
+distribution function. To use the helper function, you need to define two 1D
+arrays which are the $x$ and $y$ axes for the distribution function as
+shown in the following example.
 \begin{boxverbatim}
   SUBROUTINE manual_load
 
@@ -5352,6 +5436,20 @@ used in conjunction with the moving window.
 \begin{itemize}
 \item persist\_start\_time
 \item persist\_start\_step
+\end{itemize}
+\item Added loading of relativistic particle species using the
+    Maxwell-J\"uttner distribution. See \sect{maxwell_juttner}. This adds the
+    following flags to the species block
+\begin{itemize}
+\item use\_maxwell\_juttner
+\item fractional\_tail\_cutoff
+\end{itemize}
+\item Added loading of particle species using an arbitrary distribution
+    function for sampling the momentum components. See
+    \sect{arbitrary_dist_fn}. This adds the following flags to the species block
+\begin{itemize}
+\item dist\_fn
+\item dist\_fn\_p\{x,y,z\}\_range
 \end{itemize}
 \end{itemize}
 \bigskip
