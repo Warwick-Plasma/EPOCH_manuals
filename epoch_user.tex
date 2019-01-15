@@ -2510,18 +2510,20 @@ by summing properties of all the particles in each grid cell. The resulting
 quantities are defined on the regular cartesian mesh used for grid variables.
 All entries have a default dumpmask of ``never''.\\
 
-{\emphtext ekbar} - Mean kinetic energy on grid. Can have species dumpmask.\\
-
-{\emphtext ekflux} - Mean kinetic energy flux in each direction on the grid.
-Can have species dumpmask.\\
-
-{\emphtext mass\_density} - Mass density on grid. Can have species dumpmask.\\
-
-{\emphtext charge\_density} - Charge density on grid. Can have species
+{\emphtext ekbar} - Mean kinetic energy on grid in $J$. Can have species
 dumpmask.\\
 
-{\emphtext number\_density} - Number density on grid. Can have species
+{\emphtext ekflux} - Mean kinetic energy flux in each direction on the grid
+in $W/m^2$. Can have species dumpmask.\\
+
+{\emphtext mass\_density} - Mass density on grid in $kg/m^3$. Can have species
 dumpmask.\\
+
+{\emphtext charge\_density} - Charge density on grid in $C/m^3$. Can have
+species dumpmask.\\
+
+{\emphtext number\_density} - Number density on grid in $m^{-3}$. Can have
+species dumpmask.\\
 
 {\emphtext particles\_per\_cell} - Number of particles per cell. Can have
 species dumpmask.  The synonym ``ppc'' may also be used.\\
@@ -2529,14 +2531,14 @@ species dumpmask.  The synonym ``ppc'' may also be used.\\
 {\emphtext average\_weight} - Average of weight of the particles in each cell.
 Can have species dumpmask.\\
 
-{\emphtext temperature} - Isotropic temperature on grid. The synonym ``temp''
-may also be used. Can have species dumpmask.\\
+{\emphtext temperature} - Isotropic temperature on grid in $K$. The synonym
+``temp'' may also be used. Can have species dumpmask.\\
 
 {\emphtext temperature\_\{x,y,z\}} - The temperature in each of the \{x,y,z\}
-directions, respectively. The synonyms ``temp\_\{x,y,z\}'' and ``t\{x,y,z\}''
-may also be used. Can have species dumpmask.\\
+directions, respectively, in $K$. The synonyms ``temp\_\{x,y,z\}'' and
+``t\{x,y,z\}'' may also be used. Can have species dumpmask.\\
 
-{\emphtext poynt\_flux} - Poynting flux in each direction.\\
+{\emphtext poynt\_flux} - Poynting flux in each direction in $W/m^2$.\\
 
 % The cpml_* variables are only really used internally and therefore
 % are currently undocumented
