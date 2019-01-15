@@ -23,14 +23,16 @@ source code.
 This version number is printed to screen when you run the code. The line looks
 something like the following:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.14.0   (commit v4.14.0-0-g6da09889-clean)
+ Welcome to EPOCH2D version 4.15.0   (commit v4.15.0-0-g8dc99add-clean)
 \end{boxverbatim}
-Here, only the number ``4.14'' is important.
+Here, only the number ``4.15'' is important.
 
 Since version 3.1 of the manual, new additions and changes are mentioned
 in the appendix.
 
-\subsection{What is {\EPOCH}?}
+\subsection{\texorpdfstring
+  {What is {\EPOCH}?}
+  {What is {EPOCH}?}}
 
 {\EPOCH} is a plasma physics simulation code which uses the Particle in Cell
 (PIC) method. In this method, collections of physical particles are represented
@@ -43,7 +45,9 @@ pseudoparticle positions. This leads to a scheme which can reproduce the full
 range of classical micro-scale behaviour of a collection of charged
 particles.
 
-\subsubsection{Features of {\EPOCH}}
+\subsubsection{\texorpdfstring
+  {Features of {\EPOCH}}
+  {Features of {EPOCH}}}
 \begin{itemize}
   \item MPI parallelised, explicit, second-order, relativistic PIC code.
   \item Dynamic load balancing option for making optimal use of all processors
@@ -62,7 +66,9 @@ and particle push routines. {\EPOCH} was written to add more modern features
 and to structure the code in such a way that future expansion of the code is
 made as easy as possible.
 
-\subsection{What normalisations are used in {\EPOCH}?}
+\subsection{\texorpdfstring
+  {What normalisations are used in {\EPOCH}?}
+  {What normalisations are used in {EPOCH}?}}
 Since the idea from the start was that {\EPOCH} would be used by a large number
 of different users and that it should be as easy as possible to ``plug in''
 different modules from different people into a given copy of the code, it was
@@ -134,15 +140,18 @@ Further information about this facility can be found in
   experienced users can use it. How do I do that?}
 See \sectit{customising}.
 
-\subsection{I want to develop an addition to {\EPOCH}. How do I do that?}
+\subsection{\texorpdfstring
+  {I want to develop an addition to {\EPOCH}. How do I do that?}
+  {I want to develop an addition to {EPOCH}. How do I do that?}}
 A slightly outdated developers manual exists which should be sufficient to
 cover most aspects of the code functionality. However, the code is written
 in a fairly modular and consistent manner, so reading through that
 is the best source of information. If you get stuck then you can post
 questions on the CCPForge forums.
 
-\subsection{I want to have a full understanding of how {\EPOCH} works. How do I
-  do that?}
+\subsection{\texorpdfstring
+  {I want to have a full understanding of how {\EPOCH} works. How do I do that?}
+  {I want to have a full understanding of how {EPOCH} works. How do I do that?}}
 If you really want to understand {\EPOCH}
 in full, the only way is to read all of
 this manual and then read through the code. Most of it is commented.
@@ -174,7 +183,9 @@ Acknowledgement: ``This work was in part funded by the UK EPSRC grants
 EP/G054950/1, EP/G056803/1, EP/G055165/1 and EP/ M022463/1.''
 
 \newpage
-\section{{\EPOCH} for end users}
+\section{\texorpdfstring
+  {{\EPOCH} for end users}
+  {{EPOCH} for end users}}
 \label{sec:endusers}
 This manual aims to give a complete description of how to set up and run
 {\EPOCH} as an end user. Further details on the design and implementation of
@@ -184,13 +195,15 @@ We begin by giving a brief overview of the {\EPOCH} code-base, how to
 compile and run the code. Note that throughout this user manual, instructions
 are given assuming that you are typing commands at a UNIX terminal.
 
-\subsection{Structure of the {\EPOCH} codes}
+\subsection{\texorpdfstring
+  {Structure of the {\EPOCH} codes}
+  {Structure of the {EPOCH} codes}}
 \label{sec:directory_structure}
 When obtained, the {\EPOCH} codes all have a similar structure. If the tarred
 and gzipped archive (commonly referred to as a tarball) is downloaded and
 unpacked into the user's \verb|$HOME| directory, then the extracted contents
-will consist of a directory named ``\verb|$HOME/epoch-4.14.0|''
-(with ``4.14.0'' substituted by the current version number) and the
+will consist of a directory named ``\verb|$HOME/epoch-4.15.0|''
+(with ``4.15.0'' substituted by the current version number) and the
 subdirectories and files listed below.
 
 Alternatively, if the code is checked out from the GitLab git
@@ -264,7 +277,9 @@ compatible with most other forms of the {\bf make} utility. In theory it is
 possible to compile the code without a {\bf make} utility, but it is much
 easier to compile the code using the supplied makefile.
 
-\subsection{Compiling and running {\EPOCH}}
+\subsection{\texorpdfstring
+  {Compiling and running {\EPOCH}}
+  {Compiling and running {EPOCH}}}
 
 To compile {\EPOCH} in the supplied state, you must first change to the
 correct working directory. As explained in \sect{directory_structure}, the
@@ -286,7 +301,7 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.14.0   (commit v4.14.0-0-g6da09889-clean)
+ Welcome to EPOCH2D version 4.15.0   (commit v4.15.0-0-g8dc99add-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -469,7 +484,9 @@ Just uncomment this line and source code in restart dumps will be permanently
 disabled.
 
 
-\subsection{Running {\EPOCH} and basic control of EPOCH1D}
+\subsection{\texorpdfstring
+  {Running {\EPOCH} and basic control of EPOCH1D}
+  {Running {EPOCH} and basic control of EPOCH1D}}
 When the code is run, the output is
 {\samepage
 \begin{lboxverbatim}{Command line output}
@@ -483,7 +500,7 @@ When the code is run, the output is
   d########P  d##P            ###########P     ##########P  d##P      d##P
  d########P  d##P              d######P          #######P  d##P      d##P
 
- Welcome to EPOCH2D version 4.14.0   (commit v4.14.0-0-g6da09889-clean)
+ Welcome to EPOCH2D version 4.15.0   (commit v4.15.0-0-g8dc99add-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -499,9 +516,14 @@ where the code output is to be placed. This directory must also include the
 file \qtt{input.deck} which controls the code setup, specifies how to set the
 initial conditions and controls the I/O. Writing an input deck for {\EPOCH} is
 fairly time consuming and so the code is supplied with some example input decks
-which include all the necessary sections for the code to run.
+which include all the necessary sections for the code to run. Alternately, the
+code checks for the Data directory in a file named ``USE\_DATA\_DIRECTORY''
+before prompting at the command-line. This allows the code to be run without
+waiting for input at the command-line.
 
-\section{The {\EPOCH} input deck}
+\section{\texorpdfstring
+  {The {\EPOCH} input deck}
+  {The {EPOCH} input deck}}
 \label{sec:input}
 Most of the control of {\EPOCH} is through a text file called \code{input.deck}.
 The input deck file must be in the output directory which is passed to the
@@ -566,7 +588,9 @@ the input deck. The fourteen built in blocks are:
   expressions. These are designed to simplify the initial condition setup.
 \end{itemize}
 
-\subsection{\cemph{control} block}
+\subsection{\texorpdfstring
+  {\inlineemph{control} block}
+  {           {control} block}}
 \label{sec:control_block}
 The \cemph{control} block sets up the basic code properties for the
 domain, the end time of the code, the load balancer and the types of initial
@@ -839,6 +863,47 @@ specified time before beginning to move the particles.\\
   this call, regardless of the value of \inlineemph{dlb\_threshold}.
   The default value is ``T''.\\
 
+{\emphtext use\_pre\_balance} - This logical flag determines whether a load
+  balance will be attempted before the particle load occurs. If this flag is
+  set to ``T'' then the particle auto-loader will be called at setup time, but
+  instead of creating particles it will just populate a particle-per-cell field
+  array. This will then be used to calculate the optimal domain decomposition
+  and all field arrays will be redistributed to use the new layout. Finally,
+  after all of this has been done, the auto-loader will be called again and
+  create just the particles that are present on their optimally load-balanced
+  domains. In contrast, if the flag is set to ``F'' then the domain is just
+  divided evenly amongst processors and the particles are loaded on this domain
+  decomposition. Balancing is then carried out on to redistribute the work load.
+  For heavily imbalanced problems, this can lead to situations in which there is
+  insufficient memory to setup a simulation, despite there being sufficient
+  resources for the final load-balanced conditions. The default value is
+  ``T''.\\
+
+{\emphtext use\_optimal\_layout} - This logical flag determines whether the
+  load balancer attempts to find an optimal processor split before loading
+  the particles. The initial domain split is chosen in such a way as to
+  minimize the total surface area of the resulting domains in 3D, or edge
+  lengths in 2D. For example, if a 2D square domain is run on 16 CPUs then the
+  domain will be divided by 4 in the x-direction and 4 in the y-direction. The
+  other possible splits (1x16, 2x8, 8x2, 16x1) are rejected because they all
+  yield rectangular subdomains whose total edge length is greater than the
+  4x4 edge length. For some problems (eg. a density ramp or thin foil) this is
+  a poor choice and a better load balance would be obtained by a less even
+  split. It is always possible to specify such a split by using
+  \inlineemph{nproc\{x,y,z\}} flags but enabling the
+  \inlineemph{use\_optimal\_layout} flag will automatically determine the best
+  split for you. Future versions of the code will also allow the split to be
+  changed dynamically at run time.  The default value is ``T''.\\
+
+{\emphtext use\_more\_setup\_memory} - This logical flag determines whether the
+  extra memory will be used during the initial setup of particle species.
+  If set to false then
+  only one set of arrays will be used for storing temperature, density and
+  drift during species loading. This can be a significant memory saving but
+  omes at the expense of recalculating grid quantities multiple times.
+  Setting the flag to true enables one set of arrays per species.
+  The default value is ``F''.\\
+
 
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
@@ -906,7 +971,101 @@ This option must be accompanied by a ``stencil'' block.
 See~\sect{stencil_block}\\
 
 
-\subsection{\inlineemph{stencil} block}
+\subsubsection{Strided Current Filtering}
+\label{sec:strided_filtering}
+{\EPOCH} can perform strided multipass digital current filtering as described
+and benchmarked in the review by \citet{Vay2014}. This can be tuned to
+substantially damp high frequencies in the currents and can be used to reduce
+the effect of numerical Cherenkov radiation. Once you turn on current
+filtering by specifying \inlineemph{smooth\_currents=T} you can then set the
+following keys.\\
+
+{\emphtext smooth\_iterations} - Integer number of iterations of the smoothing
+  function to be performed. If not present defaults to one iteration. More
+  iterations will produce smoother results but will be slower.\\
+
+{\emphtext smooth\_compensation} - Logical flag. If this flag is set to true
+  then perform a compensation step (see \citet{Vay2014}) after the smoothing
+  steps are performed. The default value is false.\\
+
+{\emphtext smooth\_strides} - Either a comma separated list of integers or
+  ``auto'' (without quote marks). This specifies the strides (in number of grid
+  cells) to use when performing strided filtering. Specifying ``1, 3'' will
+  smooth each point with the points immediately adjacent and with the points
+  3 cells away on each side of the current cell. Setting this key to
+  ``auto'' uses a ``1, 2, 3, 4'' set of strides as a ``good'' starting point
+  for strided filtering.\\
+
+It should be stressed that there is no set of values that is guaranteed to
+give any given result from filtering while not affecting the physical
+correctness of your simulation. Current filtering should be tuned to match the
+problem that you want to work on and should always be carefully tested to
+ensure that it doesn't produce unphysical results.
+
+
+\subsubsection{Dynamic Load Balancing}
+{\EPOCH} can be configured to balance the workload across processors at
+run-time via the {\emphtext dlb\_threshold} flag.
+``dlb'' stands for Dynamic Load Balancing and, when turned on, it allows the
+code to rearrange the internal domain boundaries to try and balance the
+workload on each processor. This rearrangement is an expensive operation, so
+it is only performed when the maximum load imbalance reaches a given critical
+point. This critical point is given by the parameter ``dlb\_threshold'' which
+is the ratio of the workload on the least loaded processor to the most loaded
+processor. When the calculated load imbalance is less than ``dlb\_threshold''
+the code performs a re-balancing sweep, so if ``dlb\_threshold = 1.0'' is set
+then the code will keep trying to re-balance the workload at almost every
+timestep. At present the workload on each processor is simply calculated from
+the number of particles on each processor, but this will probably change in
+future. If the ``dlb\_threshold'' parameter is not specified then the code
+will only be load balanced at initialisation time.
+
+
+\subsubsection{Automatic halting of a simulation}
+It is sometimes useful to be able to halt an {\EPOCH} simulation midway through
+execution and generate a restart dump. Two methods have been implemented to
+enable this.
+
+The first method is to check for the existence of a ``STOP'' file. Throughout
+execution, {\EPOCH} will check for the existence of a file named either
+``STOP'' or ``STOP\_NODUMP'' in the simulation output directory. The check is
+performed at regular intervals and if such a file is found then the code
+exits immediately. If ``STOP'' is found then a restart dump is written before
+exiting. If ``STOP\_NODUMP'' is found then no I/O is performed.
+
+The interval between checks is controlled by the integer parameter
+``check\_stop\_frequency'' which can be specified in the ``control''
+block of the input deck. If it is less than or equal to zero then
+the check is never performed.
+
+The next method for automatically halting the code is to stop execution after
+a given elapsed walltime.
+If a positive value for ``stop\_at\_walltime'' is specified in the
+control block of an input deck then the code will halt once this
+time is exceeded and write a restart dump. The parameter takes a real
+argument which is the time in seconds since the start of the simulation.
+
+An alternative method of specifying this time is to write it into a separate
+text file. ``stop\_at\_walltime\_file'' is the filename from which to read the
+value for ``stop\_at\_walltime''. Since the walltime will often be
+found by querying the queueing system in a job script, it may be
+more convenient to pipe this value into a text file rather than
+modifying the input deck.
+
+
+\subsubsection{Requesting output dumps at run time}
+\label{sec:dump_request}
+In addition to polling for the existence of a ``STOP'' file, {\EPOCH} also
+periodically checks the output directory for a file named ``DUMP''. If such
+a file is found then {\EPOCH} will immediately create an output dump and
+remove the ``DUMP'' file. By default, the file written will be a restart
+dump but if the ``DUMP'' file contains the name of an output block then this
+will be used instead.
+
+
+\subsection{\texorpdfstring
+  {\inlineemph{stencil} block}
+  {           {stencil} block}}
 \label{sec:stencil_block}
 \scaledcapimage{./images/stencil}{stencil}{Coefficient locations
   for the $B_z$ field computational stencil in 2D.}{0.6}
@@ -942,64 +1101,9 @@ these are calculated using the following  equations:
 {\emphtext dt} - The timestep restriction to use for the field solver\\
 
 
-\subsubsection{Dynamic Load Balancing}
-The first is the {\emphtext dlb\_threshold} flag.
-``dlb'' stands for Dynamic Load Balancing and, when turned on, it allows the
-code to rearrange the internal domain boundaries to try and balance the
-workload on each processor. This rearrangement is an expensive operation, so
-it is only performed when the maximum load imbalance reaches a given critical
-point. This critical point is given by the parameter ``dlb\_threshold'' which
-is the ratio of the workload on the least loaded processor to the most loaded
-processor. When the calculated load imbalance is less than ``dlb\_threshold''
-the code performs a re-balancing sweep, so if ``dlb\_threshold = 1.0'' is set
-then the code will keep trying to re-balance the workload at almost every
-timestep. At present the workload on each processor is simply calculated from
-the number of particles on each processor, but this will probably change in
-future. If the ``dlb\_threshold'' parameter is not specified then the code
-will only be load balanced at initialisation time.
-
-\subsubsection{Automatic halting of a simulation}
-It is sometimes useful to be able to halt an {\EPOCH} simulation midway through
-execution and generate a restart dump. Two methods have been implemented to
-enable this.
-
-The first method is to check for the existence of a ``STOP'' file. Throughout
-execution, {\EPOCH} will check for the existence of a file named either
-``STOP'' or ``STOP\_NODUMP'' in the simulation output directory. The check is
-performed at regular intervals and if such a file is found then the code
-exits immediately. If ``STOP'' is found then a restart dump is written before
-exiting. If ``STOP\_NODUMP'' is found then no I/O is performed.
-
-The interval between checks is controlled by the integer parameter
-``check\_stop\_frequency'' which can be specified in the ``control''
-block of the input deck. If it is less than or equal to zero then
-the check is never performed.
-
-The next method for automatically halting the code is to stop execution after
-a given elapsed walltime.
-If a positive value for ``stop\_at\_walltime'' is specified in the
-control block of an input deck then the code will halt once this
-time is exceeded and write a restart dump. The parameter takes a real
-argument which is the time in seconds since the start of the simulation.
-
-An alternative method of specifying this time is to write it into a separate
-text file. ``stop\_at\_walltime\_file'' is the filename from which to read the
-value for ``stop\_at\_walltime''. Since the walltime will often be
-found by querying the queueing system in a job script, it may be
-more convenient to pipe this value into a text file rather than
-modifying the input deck.
-
-\subsubsection{Requesting output dumps at run time}
-\label{sec:dump_request}
-In addition to polling for the existence of a ``STOP'' file, {\EPOCH} also
-periodically checks the output directory for a file named ``DUMP''. If such
-a file is found then {\EPOCH} will immediately create an output dump and
-remove the ``DUMP'' file. By default, the file written will be a restart
-dump but if the ``DUMP'' file contains the name of an output block then this
-will be used instead.
-
-
-\subsection{\inlineemph{boundaries} block}
+\subsection{\texorpdfstring
+  {\inlineemph{boundaries} block}
+  {           {boundaries} block}}
 \label{sec:boundaries_block}
 The {\emphtext boundaries} block sets the boundary conditions of each boundary
 of the domain. Some types of boundaries allow EM wave sources (lasers) to be
@@ -1162,7 +1266,9 @@ end:boundaries
 \end{boxverbatim}
 
 
-\subsection{\inlineemph{species} block}
+\subsection{\texorpdfstring
+  {\inlineemph{species} block}
+  {           {species} block}}
 \label{sec:species_block}
 The next section of the input deck describes the particle species used in the
 code. An example species block for any {\EPOCH} code is given below.
@@ -1364,7 +1470,7 @@ variables. The data is read in as soon as a line is executed, and so it is
 perfectly possible to load data from a file and then modify the data using
 a mathematical expression.\\
 
-The example block above is for 10,000 values at double precision, i.e. 8-bytes 
+The example block above is for 10,000 values at double precision, i.e. 8-bytes
 each. The density data is the first 80,000 bytes of ``ic.dat''. Bytes 80,000
 to 160,000 are the temp\_x data.
 
@@ -1480,8 +1586,8 @@ end:species
 \end{boxverbatim}
 
 %If ``ionisation\_electron\_species'' is not specified then the electron species
-Ionised states are created automatically and are named according to the ionising species name
-with a number appended. For example
+Ionised states are created automatically and are named according to the
+ionising species name with a number appended. For example
 \begin{boxverbatim}
 begin:species
    name = Helium
@@ -1522,9 +1628,6 @@ using the following control block parameters:\\
 
 \subsubsection{Species Boundaries}
 \label{sec:per_species_bcs}
-\noindent{\emphtext Everything in this subsection needs {\EPOCH} version 4.10
-or above}
-
 
 {\emphtext bc\_x\_min} - Boundary condition to be applied to this species only
 on the lower x boundary. Can be any normal boundary condition apart
@@ -1558,8 +1661,91 @@ boundary. This means that it is possible to use an injector to ``continue'' an
 existing drifting plasma. \inlineemph{NOT COMPATIBLE WITH PERIODIC
 BOUNDARY CONDITIONS!}
 
+\subsubsection{Maxwell-J\"uttner distribution function}
+\label{sec:maxwell_juttner}
 
-\subsection{\inlineemph{laser} block}
+As of version 4.15, \EPOCH allows the user to request a Maxwell-J\"uttner
+distribution rather than a Maxwellian distribution when sampling the particle
+momentum for a species.\\
+
+{\emphtext use\_maxwell\_juttner} - Logical flag determining whether to sample
+  from the Maxwell-J\"uttner distribution when loading the particle species.
+  If ``T'' then Maxwell-J\"uttner is used and if ``F'' Maxwellian is used.
+  The default value is ``F''.\\
+
+{\emphtext fractional\_tail\_cutoff} - The sampling is carried out using a
+  rejection method with an arbitrary cut-off. This parameter takes a
+  floating-point argument which specifies the fraction of maximum value at
+  which the sampling should be cut off. Smaller values lead to distortion
+  nearer the peak of the distribution but are faster to sample. Larger values
+  lead to a better approximation of the distribution function but are slower
+  to sample. The default value is $0.0001$.\\
+
+If drifts are specified with the Maxwell-J\"uttner distribution then the
+distribution is calculated in the rest frame and then Lorentz transformed to
+the specified drifting frame.
+
+\subsubsection{Arbitrary distribution functions}
+\label{sec:arbitrary_dist_fn}
+
+As of version 4.15, \EPOCH also allows the user to request an arbitrary
+non-Maxwellian distribution function to use when sampling the particle
+momentum for a species. If combined with a specified drift then the
+distribution function is calculated first and the drift is applied to the
+resulting particles by Lorentz transform.
+
+This feature does not at present work with the delta\_f loader and is not
+available for particle injectors. It does work correctly with the moving
+window.\\
+
+{\emphtext dist\_fn} - Specifies the functional form of the distribution
+  function, normalised to have a maximum value of 1. The variables
+  ``px'', ``py'' and ``pz'' should be used to parameterise the $x$, $y$ and $z$
+  components of momentum. This may freely vary in space but temporal variation
+  will be ignored since this is only evaluated at the start of the simulation.\\
+
+{\emphtext dist\_fn\_p\{x,y,z\}\_range} - Comma separated pair of numbers to
+  specify the range of momentum for $p_{\{x,y,z\}}$ in SI units. Should be of
+  the form
+  ``$\langle\mbox{lower\_range}\rangle, \langle\mbox{upper\_range}\rangle$''\\
+
+If a range for a momentum direction is not specified then that momentum is
+assumed to be zero. It is up to the user to ensure that the range is large
+enough to correctly capture their desired distribution function. Sampling is by
+a simple rejection sampling and may be much slower than the existing Maxwellian
+sampler. \EPOCH will print a warning if a large number of samples are needed to
+complete the sampling. If this occurs then you might need to reduce the range
+of momentum over which sampling is considered.
+
+If the ``dist\_fn'' key is supplied then any supplied temperature keys are
+ignored.  An example of setting up a truncated power law distribution in
+$p_x$ would be
+\begin{boxverbatim}
+begin:constant
+  dens = 10
+  v0 = 0.05 * c
+  vmax = 0.5 * c
+  p0 = v0 * me * (1.0 + 4.0 * x / x_max)
+  pmax = vmax * me
+  alpha = -2.0
+end:constant
+
+begin:species
+  name = Electron_pl
+  charge = -1
+  mass = 1.0
+  frac = 0.5
+  density = dens
+  # Truncated power law distribution in px
+  dist_fn = exp(-p0 / px) * (px / p0)^alpha
+  dist_fn_px_range = (0, pmax)
+end:species
+\end{boxverbatim}
+
+
+\subsection{\texorpdfstring
+  {\inlineemph{laser} block}
+  {           {laser} block}}
 \label{sec:laser_block}
 Laser blocks attach an EM wave source to a boundary which is set as
 \inlineemph{simple\_laser}.
@@ -1719,7 +1905,9 @@ is an inferior solution since the FDTD scheme has increased error as the
 timestep is reduced from that for EM waves. {\EPOCH}
 includes a high order field solver to attempt to reduce this.
 
-\subsection{\inlineemph{fields} block}
+\subsection{\texorpdfstring
+  {\inlineemph{fields} block}
+  {           {fields} block}}
 \label{sec:fields_block}
 The next type of block in the {\EPOCH} input deck is the fields block. This
 allows you to specify the electric and magnetic fields at any point in the
@@ -1754,7 +1942,9 @@ Any valid maths parser expression can be used to set up the fields, and no
 check is made to ensure that the $\nabla.B = 0$ is satisfied.
 
 
-\subsection{\inlineemph{particles\_from\_file} block}
+\subsection{\texorpdfstring
+  {\inlineemph{particles\_from\_file} block}
+  {           {particles\_from\_file} block}}
 \label{sec:particles_from_file}
 The \cemph{particles\_from\_file block} is similar in function to the
 \cemph{fields} block. It allows the loading of custom particle data from raw
@@ -1817,7 +2007,9 @@ ignored, may be specified multiple times. see \sect{species_block} for more
 details of behaviour.\\
 
 
-\subsection{\inlineemph{window} block}
+\subsection{\texorpdfstring
+  {\inlineemph{window} block}
+  {           {window} block}}
 \label{sec:window_block}
 {\EPOCH} can include an optional block which causes the simulation domain to
 operate as a moving window. At present, it is only possible to have the window
@@ -1891,7 +2083,9 @@ We can't help with this in general.
 work in general.
 \end{itemize}
 
-\subsection{\inlineemph{output} block}
+\subsection{\texorpdfstring
+  {\inlineemph{output} block}
+  {           {output} block}}
 \label{sec:output_block}
 Output in {\EPOCH} is handled using the custom designed SDF file format
 (\inlineemph{Self Describing Format}). A detailed specification of this
@@ -2309,24 +2503,27 @@ codes.\\
 directions. Restart variables.\\
 
 \subsubsection{Derived Variables}
+\label{sec:derived}
 The final set of parameters specify properties which are not variables used
 in the code but are derived from them. The first six variables are derived
 by summing properties of all the particles in each grid cell. The resulting
 quantities are defined on the regular cartesian mesh used for grid variables.
 All entries have a default dumpmask of ``never''.\\
 
-{\emphtext ekbar} - Mean kinetic energy on grid. Can have species dumpmask.\\
-
-{\emphtext ekflux} - Mean kinetic energy flux in each direction on the grid.
-Can have species dumpmask.\\
-
-{\emphtext mass\_density} - Mass density on grid. Can have species dumpmask.\\
-
-{\emphtext charge\_density} - Charge density on grid. Can have species
+{\emphtext ekbar} - Mean kinetic energy on grid in $J$. Can have species
 dumpmask.\\
 
-{\emphtext number\_density} - Number density on grid. Can have species
+{\emphtext ekflux} - Mean kinetic energy flux in each direction on the grid
+in $W/m^2$. Can have species dumpmask.\\
+
+{\emphtext mass\_density} - Mass density on grid in $kg/m^3$. Can have species
 dumpmask.\\
+
+{\emphtext charge\_density} - Charge density on grid in $C/m^3$. Can have
+species dumpmask.\\
+
+{\emphtext number\_density} - Number density on grid in $m^{-3}$. Can have
+species dumpmask.\\
 
 {\emphtext particles\_per\_cell} - Number of particles per cell. Can have
 species dumpmask.  The synonym ``ppc'' may also be used.\\
@@ -2334,12 +2531,14 @@ species dumpmask.  The synonym ``ppc'' may also be used.\\
 {\emphtext average\_weight} - Average of weight of the particles in each cell.
 Can have species dumpmask.\\
 
-{\emphtext temperature} - Isotropic temperature on grid. Can have species
-dumpmask.\\
-%exact way that temperature is calculated in the code is likely to vary in the
-%near future.\\
+{\emphtext temperature} - Isotropic temperature on grid in $K$. The synonym
+``temp'' may also be used. Can have species dumpmask.\\
 
-{\emphtext poynt\_flux} - Poynting flux in each direction.\\
+{\emphtext temperature\_\{x,y,z\}} - The temperature in each of the \{x,y,z\}
+directions, respectively, in $K$. The synonyms ``temp\_\{x,y,z\}'' and
+``t\{x,y,z\}'' may also be used. Can have species dumpmask.\\
+
+{\emphtext poynt\_flux} - Poynting flux in each direction in $W/m^2$.\\
 
 % The cpml_* variables are only really used internally and therefore
 % are currently undocumented
@@ -2641,7 +2840,9 @@ contains ey, step 4 a0002.sdf contains ex, ey and b0000.sdf
 contains ez.
 
 
-\subsection{\inlineemph{output\_global} block}
+\subsection{\texorpdfstring
+  {\inlineemph{output\_global} block}
+  {           {output\_global} block}}
 \label{sec:output_global_block}
 
 With the introduction of multiple output blocks, there are now a few parameters
@@ -2736,7 +2937,9 @@ To force a dump to occur immediately after restart, set
 is ``F''.
 
 
-\subsection{\inlineemph{dist\_fn} block}
+\subsection{\texorpdfstring
+  {\inlineemph{dist\_fn} block}
+  {           {dist\_fn} block}}
 \label{sec:dist_fn_block}
 
 Sometimes it is useful to reconstruct part of the
@@ -2861,7 +3064,9 @@ on the spatial axis, meaning that the result is less smooth than normal
 properties from the code.
 
 
-\subsection{\inlineemph{probe} block}
+\subsection{\texorpdfstring
+  {\inlineemph{probe} block}
+  {           {probe} block}}
 \label{sec:probe_block}
 Sometimes it is useful to consider all the properties of particle which pass
 through a point/line/plane (depending on dimension) in the simulation. To
@@ -2929,7 +3134,9 @@ end:probe
 
 % x1,x2,y1,y2,etc. are considered legacy and no longer documented.
 
-\subsection{\inlineemph{collisions} block}
+\subsection{\texorpdfstring
+  {\inlineemph{collisions} block}
+  {           {collisions} block}}
 \label{sec:collisions_block}
 {\EPOCH} has a particle collision routine based on the model presented
 by \citet{Sentoku}.
@@ -2990,7 +3197,9 @@ end:collisions
   and (spec2,spec3) is set to 0.1
 
 
-\subsection{\inlineemph{qed} block}
+\subsection{\texorpdfstring
+  {\inlineemph{qed} block}
+  {           {qed} block}}
 \label{sec:qed_block}
 
 {\EPOCH} can model QED pair production, synchrotron emission and
@@ -3102,7 +3311,9 @@ a version of the code which you have obtained from a source other than
 CCPForge may include other input deck blocks. These should be described in
 additional documentation provided with the version of the code that you have.
 
-\subsection{\inlineemph{injector} block}
+\subsection{\texorpdfstring
+  {\inlineemph{injector} block}
+  {           {injector} block}}
 \label{sec:injector_block}
 
 {\emphtext
@@ -3229,7 +3440,9 @@ end:injector
 Injectors are a new feature so please be wary of unusual behaviour, and
 contact the {\EPOCH} development team if unexpected results occur}
 
-\subsection{\inlineemph{subset} block}
+\subsection{\texorpdfstring
+  {\inlineemph{subset} block}
+  {           {subset} block}}
 \label{sec:subset_block}
 
 It is possible to restrict the number of particles written to file
@@ -3339,6 +3552,9 @@ begin:output
 end:output
 \end{boxverbatim}
 
+
+\subsubsection{Subsets of fields}
+
 Subset blocks can be applied to per-species variables such as current and
 temperature. Only particles within the given momentum ranges and of the selected
 species are included in the calculations. In addition, subset blocks can now
@@ -3364,7 +3580,31 @@ begin:output
 end:output
 \end{boxverbatim}
 
-\subsection{\inlineemph{constant} block}
+\subsubsection{Persistent subsets}
+Persistent subsets are subsets that capture a set of particles once, given a
+specified set of parameters, and then track those particles permanently.
+Persistent subsets use the same blocks as normal subsets and take the same
+parameters as normal subsets (except the skip parameters which only apply to
+fields). Subsets are marked as persistent by setting either
+
+{\emphtext persist\_start\_time} - Time at which to record the list of
+  particles to be tracked. Throughout the rest of the simulation this recorded
+  list will be used whenever requesting output for this subset.
+  ``persist\_after\_time'' is accepted as an alias. Set to 0 to record from the
+  start of the simulation.\\
+
+{\emphtext persist\_start\_step} - Similar to ``persist\_start\_time'' except
+  this specifies a simulation step number to use instead of time.
+  ``persist\_after\_step'' is accepted as an alias.\\
+
+If the input deck is edited on restart to add a new persistent subset then it
+must be added after existing persistent subsets or problems may occur on
+restart.
+
+
+\subsection{\texorpdfstring
+  {\inlineemph{constant} block}
+  {           {constant} block}}
 \label{sec:constant_block}
 
 The \inlineemph{constant} block type helps to make the input deck more flexible
@@ -3471,6 +3711,8 @@ The maths parser in {\EPOCH}  has the following constants
 \item nproc\_\{x,y,z\} - The number of processes in the x,y,z directions.
 \item nsteps - The number of timesteps requested.
 \item t\_end - The end time of the simulation.
+\item p\{x,y,z\} - Momentum in the $x, y, z$ directions. Used in specifying
+  arbitrary distribution functions.
 \end{itemize}
 
 It is also possible for an end user to specify custom constants both within
@@ -3588,7 +3830,9 @@ changes to the code. An example of using an operator would be:\\
 \indent\inlinecode{length\_x = 10.0 + 12.0}
 
 
-\section{{\EPOCH} use in practice}
+\section{\texorpdfstring
+  {{\EPOCH} use in practice}
+  {{EPOCH} use in practice}}
 \label{sec:usage}
 
 \subsection{Specifying initial conditions for particles using the input deck}
@@ -3678,7 +3922,9 @@ file user\_interaction/ic\_module.f90. Manual loading takes place after
 all the autoloader phase, to allow manual tweaking of autoloader specified
 initial conditions.
 
-\subsubsection{{\EPOCH} internal representation of particles}
+\subsubsection{\texorpdfstring
+  {{\EPOCH} internal representation of particles}
+  {{EPOCH} internal representation of particles}}
 \label{sec:partrep}
 Before we can go about manipulating particle properties in
 \inlinecode{manual\_load}, we first need an overview of how the particles
@@ -3922,7 +4168,9 @@ This can be quite tricky to get right, so in more complicated
 cases it is probably better to use the autoloader than to manually set up the
 number density distribution.
 
-\subsubsection{Grid coordinates used in {\EPOCH}.}
+\subsubsection{\texorpdfstring
+  {Grid coordinates used in {\EPOCH}.}
+  {Grid coordinates used in {EPOCH}.}}
 
 When setting up initial conditions within the {\EPOCH} source (rather than
 using the input deck)
@@ -3948,15 +4196,19 @@ There are also up to three arrays which are available for use.
   direction (3D).
 \end{itemize}
 
-\subsubsection{Loading a non-thermal particle distribution.}
+\subsubsection{Loading a separable non-thermal particle distribution.}
 
-While the autoloader is capable of dealing with most required initial thermal
-distributions, you may want to set up non-thermal initial conditions. The code
-includes a helper function to select a point from an arbitrary distribution
-function which can be used to deal with most non-thermal distributions. To use
-the helper function, you need to define two 1D arrays which are the x and
-y axes for the distribution function. An example of using the helper function
-is given below.
+It is now possible to specify any arbitrary distribution function to use
+for setting up the initial particle momenta, as described in
+\sect{arbitrary_dist_fn}. However, if the distribution function can be
+represented as a set of 1D distribution functions in $p_x,\,p_y$ and $p_z$
+separately, then it may be significantly faster to use the method outlined
+below.
+
+The code includes a helper function to select a point from an arbitrary
+distribution function. To use the helper function, you need to define two 1D
+arrays which are the $x$ and $y$ axes for the distribution function as
+shown in the following example.
 \begin{boxverbatim}
   SUBROUTINE manual_load
 
@@ -4013,7 +4265,9 @@ wish to have a laser on to be of type \inlinecode{simple\_laser} and then
 specify one or more lasers attached to that boundary. Lasers may be specified
 anywhere initial conditions are specified.
 
-\subsection{\inlineemph{laser} blocks in multiple dimensions.}
+\subsection{\texorpdfstring
+  {\inlineemph{laser} blocks in multiple dimensions.}
+  {           {laser} blocks in multiple dimensions.}}
 \label{sec:multilaser}
 
 \scaledcapimage{./images/profile_flat}{flatlaser}{Constant laser profile}{0.36}
@@ -4080,7 +4334,9 @@ the $x$-axis. A simple example of this is given in \sectit{focus_eg}.
 % laser from corner?
 
 
-\subsection{Restarting {\EPOCH} from previous output dumps}
+\subsection{\texorpdfstring
+  {Restarting {\EPOCH} from previous output dumps}
+  {Restarting {EPOCH} from previous output dumps}}
 Another possible way of setting up initial conditions in {\EPOCH} is to load in
 a previous output dump and use it to specify initial conditions for the
 code. The effect of this is to restart the code from the state that it was in
@@ -4292,7 +4548,9 @@ This changes the code to run with a Gaussian density profile rather then a step
 function. Again, this can be extended as far as required.
 %
 
-\subsection{Delta-f method in EPOCH}
+\subsection{\texorpdfstring
+  {Delta-f method in {\EPOCH}}
+  {Delta-f method in {EPOCH}}}
 \label{sec:deltaf}
 
 To help reduce the impact of numerical noise in certain simulations, the
@@ -4361,7 +4619,9 @@ delta-f simulations shows a substantial decrease in noise.
 Further details of the method are provided in a set of slides included in the
 appendix of this document. See \sectit{deltaf_slides}.
 
-\section{Basic examples of using {\EPOCH}}
+\section{\texorpdfstring
+  {Basic examples of using {\EPOCH}}
+  {Basic examples of using {EPOCH}}}
 \label{sec:examples}
 
 In this section we outline a few worked examples of setting up problems
@@ -4695,9 +4955,11 @@ view the results you will have to jump forward to \sectit{idl}.
 \include{idl_visit}
 
 \appendix
-\section{Changes between version 3.1 and 4.0}
+\section{Changes between versions}
 
-\subsection{Changes to the Makefile}
+\subsection{Changes between version 3.1 and 4.0}
+
+\subsubsection{Changes to the Makefile}
 
 Some changes have been made to the Makefile. These are documented in
 \sect{makefile}.\\
@@ -4722,7 +4984,7 @@ Some changes have been made to the Makefile. These are documented in
 \item PARTICLE\_IONISE
 \end{itemize}
 
-\subsection{Major features and new blocks added to the input deck}
+\subsubsection{Major features and new blocks added to the input deck}
 
 \begin{itemize}
 \item CPML boundary conditions - See \sect{cpml}
@@ -4737,7 +4999,7 @@ Some changes have been made to the Makefile. These are documented in
 \end{itemize}
 %dumpmask - single, average_single
 
-\subsection{Additional output block parameters}
+\subsubsection{Additional output block parameters}
 
 The following parameters have also been added to the ``output'' block
 (see \sect{output_directives}):
@@ -4753,7 +5015,7 @@ The following parameters have also been added to the ``output'' block
 \item restartable
 \end{itemize}
 
-\subsection{Other additions to the input deck}
+\subsubsection{Other additions to the input deck}
 
 \begin{itemize}
 \item npart\_per\_cell - See \sect{species_block}
@@ -4767,9 +5029,9 @@ If the deck contains a ``\textbackslash'' character then the rest of the line
 is ignored and the next line becomes a continuation of the current one.
 
 
-\section{Changes between version 4.0 and 4.3}
+\subsection{Changes between version 4.0 and 4.3}
 
-\subsection{Changes to the Makefile}
+\subsubsection{Changes to the Makefile}
 
 Some changes have been made to the Makefile. These are documented in
 \sect{makefile}.\\
@@ -4786,7 +5048,7 @@ Some changes have been made to the Makefile. These are documented in
 \end{itemize}
 
 
-\subsection{Additions to the input deck}
+\subsubsection{Additions to the input deck}
 The following parameters have been added to the ``control'' block of
 the input deck (see \sect{control_block}):
 \begin{itemize}
@@ -4872,7 +5134,8 @@ constants (see \sect{constants}).
 \noindent There has also been a new ``output\_global'' block added to the
 input deck. This is documented in \sect{output_global_block}.
 
-\subsection{Changes in behaviour which are not due to changes in the input deck}
+\subsubsection{Changes in behaviour which are not due to changes in the
+               input deck}
 \begin{itemize}
 \item The species ``drift'' property is now applied to particles whilst the
   moving window model is active. In previous versions of the code, this
@@ -4900,9 +5163,9 @@ input deck. This is documented in \sect{output_global_block}.
 \end{itemize}
 
 
-\section{Changes between version 4.3 and 4.8}
+\subsection{Changes between version 4.3 and 4.8}
 
-\subsection{Changes to the Makefile}
+\subsubsection{Changes to the Makefile}
 
 Some changes have been made to the Makefile. These are documented in
 \sect{makefile}.\\
@@ -4924,7 +5187,7 @@ Some changes have been made to the Makefile. These are documented in
 \end{itemize}
 
 
-\subsection{Additions to the input deck}
+\subsubsection{Additions to the input deck}
 The following parameters have been added to the ``control'' block of
 the input deck (see \sect{control_block}):
 \begin{itemize}
@@ -4955,9 +5218,9 @@ the input deck (see \sect{subset_block}):
 \end{itemize}
 \bigskip
 
-\section{Changes between version 4.8 and 4.9}
+\subsection{Changes between version 4.8 and 4.9}
 
-\subsection{New capabilities}
+\subsubsection{New capabilities}
 Version 4.9 adds significant new capabilities as follows:
 
 \begin{itemize}
@@ -4970,7 +5233,7 @@ Version 4.9 adds significant new capabilities as follows:
 \end{itemize}
 \bigskip
 
-\subsection{Changes to the Makefile}
+\subsubsection{Changes to the Makefile}
 
 Some changes have been made to the Makefile. These are documented in
 \sect{makefile}.\\
@@ -4981,7 +5244,7 @@ Some changes have been made to the Makefile. These are documented in
 \end{itemize}
 \bigskip
 
-\subsection{Additions to the input deck}
+\subsubsection{Additions to the input deck}
 
 The following alterations were made to the input deck:
 \begin{itemize}
@@ -5032,7 +5295,7 @@ the input deck (see \sect{dist_fn_block}):
 \item restrict\_mod\_p
 \end{itemize}
 
-\subsection{Changes not resulting from changes to the deck}
+\subsubsection{Changes not resulting from changes to the deck}
 \begin{itemize}
 \item Lasers can be specified with time-varying frequency profile.
 \item The existing subset blocks can now be applied to field and derived grid
@@ -5051,10 +5314,7 @@ the input deck (see \sect{dist_fn_block}):
 \bigskip
 
 
-\section{Changes between version 4.9 and 4.10}
-
-\subsection{New capabilities}
-Version 4.10 adds the following new capabilities:
+\subsection{Changes between version 4.9 and 4.10}
 
 \begin{itemize}
 \item Time varying particle injectors. See \sect{injector_block}
@@ -5067,9 +5327,9 @@ Version 4.10 adds the following new capabilities:
 \bigskip
 
 
-\section{Changes between version 4.10 and 4.11}
+\subsection{Changes between version 4.10 and 4.11}
 
-\subsection{New capabilities}
+\subsubsection{New capabilities}
 Version 4.11 adds the following new capabilities:
 
 \begin{itemize}
@@ -5083,6 +5343,8 @@ Version 4.11 adds the following new capabilities:
     \sect{makefile}
 \end{itemize}
 
+\subsubsection{Corrections}
+
 The following correction has been made:
 \begin{itemize}
 \item Fractional numbers of particles-per-cell now function as expected when
@@ -5091,10 +5353,7 @@ used in conjunction with the moving window.
 \bigskip
 
 
-\section{Changes between version 4.11 and 4.12}
-
-\subsection{New capabilities}
-Version 4.12 adds the following new capabilities:
+\subsection{Changes between version 4.11 and 4.12}
 
 \begin{itemize}
 \item Added ``average\_weight'' output diagnostic.
@@ -5118,10 +5377,7 @@ Version 4.12 adds the following new capabilities:
 \bigskip
 
 
-\section{Changes between version 4.12 and 4.14}
-
-\subsection{New capabilities}
-Version 4.14 adds the following new capabilities:
+\subsection{Changes between version 4.12 and 4.14}
 
 \begin{itemize}
 \item Added the ``reset\_walltime'' flag to the control block.
@@ -5150,6 +5406,58 @@ Version 4.14 adds the following new capabilities:
     See \sect{output_directives} and \sect{output_global_block}
 \item Added ``walltime\_interval'' parameter to the output block.
     See \sect{multiple_output}
+\end{itemize}
+\bigskip
+
+
+\subsection{Changes between version 4.14 and 4.15}
+
+\begin{itemize}
+\item Added averaging of ``poynt\_flux'' and ``ekflux'' variables.
+\item The initial problem setup can now be load-balanced before any particles
+    are loaded. This enables some heavily imbalanced setups to be run that were
+    not previously possible.
+\begin{itemize}
+\item Added the ``use\_pre\_balance'' flag to the control block.
+    See \sect{control_block}
+\end{itemize}
+\item Allow the load balancer to adjust the processor topology
+\begin{itemize}
+\item Added the ``use\_optimal\_layout'' flag to the control block.
+    See \sect{control_block}
+\end{itemize}
+\item Added control block option ``use\_more\_setup\_memory'' for controlling
+    the way that species are setup. See \sect{control_block}
+\item Added strided multipass digital current filtering
+    (See \sect{strided_filtering}). This adds the following flags to the
+    control block.
+\begin{itemize}
+\item smooth\_iterations
+\item smooth\_compensation
+\item smooth\_strides
+\end{itemize}
+\item Added persistent subsets. See \sect{subset_block}. This adds the
+    following flags to the subset block
+\begin{itemize}
+\item persist\_start\_time
+\item persist\_start\_step
+\end{itemize}
+\item Added loading of relativistic particle species using the
+    Maxwell-J\"uttner distribution. See \sect{maxwell_juttner}. This adds the
+    following flags to the species block
+\begin{itemize}
+\item use\_maxwell\_juttner
+\item fractional\_tail\_cutoff
+\end{itemize}
+\item Added loading of particle species using an arbitrary distribution
+    function for sampling the momentum components. See
+    \sect{arbitrary_dist_fn}. This adds the following flags to the species block
+\begin{itemize}
+\item dist\_fn
+\item dist\_fn\_p\{x,y,z\}\_range
+\end{itemize}
+\item Added ``temperature\_\{x,y,z\}'' derived output variables to the
+    output block. See \sect{derived}.
 \end{itemize}
 \bigskip
 
