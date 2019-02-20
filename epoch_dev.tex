@@ -224,12 +224,30 @@ is explained here
 
 \subsection{The files in \inlinecode{src/physics\_packages}}
 \begin{itemize}
-\item\inlinecode{ionise.F90} - This is a demonstration of how to implement a
-  physics package. It implements a field ionisation routine using a 1 level
-  Saha equation. It is more intended of a demonstration of how a physics
-  package could be implemented than a ``research ready'' ionisation routine.
-  Anyone seriously wanting to study the effects of ionisation should implement
-  their own model.
+\item\inlinecode{TABLES} - Subdirectory containing tables
+for QED emissions. 
+\item\inlinecode{numerics.f90} - Some additional numerics
+routines, primarily for the photons (QED) package.
+\item\inlinecode{ionise.F90} - Physics package dealing with field ionisation. 
+Field ionisation consists of three distinct regimes; multiphoton in which
+ionisation is best described as absorption of multiple photons, tunnelling 
+in which deformation of the atomic Coulomb potential is the dominant factor,
+and barrier suppression ionisation in which the electric field is strong enough
+for an electron to escape classically. It is possible to turn off multiphoton or
+barrier suppression ionisation through the input deck. 
+\item\inlinecode{collisions.F90} - Physics package handling particle collisions
+and collisional ionisation. See 
+\url{http://iopscience.iop.org/article/10.1088/0741-3335/57/11/113001/pdf}
+for details. 
+\item\inlinecode{injectors.F90} - Package dealing with particle injection through
+a boundary. Currently this handles drifting and non-drifting Maxwellian and
+flux-Maxwellian distributions. 
+\item\inlinecode{photons.F90} - Package for some QED effects. 
+EPOCH can model QED pair production, synchrotron emission and radiation 
+reaction as described in Duclous et al 
+\url{http://iopscience.iop.org/article/10.1088/0741-3335/53/1/015009} and 
+Ridgers et al. 
+\url{https://www.sciencedirect.com/science/article/pii/S0021999113008061?via}
 \end{itemize}
 
 \subsection{The files in \inlinecode{src/user\_interaction}}
