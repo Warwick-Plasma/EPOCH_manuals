@@ -1567,21 +1567,21 @@ begin:species
    ionisation_energies = (11.26*ev,24.38*ev,47.89*ev,64.49*ev,392.1*ev,490.0*ev)
    ionisation_electron_species = \
        (electron,electron,electron,fourth,electron,electron)
-   rho = den_gas
+   density = den_gas
 end:species
 
 begin:species
    charge = -1.0
    mass = 1.0
    name = electron
-   rho = 0.0
+   density = 0.0
 end:species
 
 begin:species
    charge = -1.0
    mass = 1.0
    name = fourth
-   rho = 0.0
+   density = 0.0
 end:species
 \end{boxverbatim}
 
@@ -3250,7 +3250,7 @@ deck would look like
 begin:species
    name = electron
    frac = 0.5
-   rho = 7.7e29
+   density = 7.7e29
    identify:electron
 end:species
 \end{boxverbatim}
@@ -4758,7 +4758,7 @@ begin:species
    frac = 0.5
    temp_x = temp
    drift_x = drift_p
-   rho = dens
+   density = dens
 end:species
 
 
@@ -4770,7 +4770,7 @@ begin:species
    frac = 0.5
    temp_x = temp
    drift_x = -drift_p
-   rho = dens
+   density = dens
 end:species
 
 
@@ -4921,9 +4921,9 @@ begin:species
    charge = 1.0
    mass = 1836.2
    frac = 0.5
-   rho = if((r gt ri) and (r lt ro), den_cone, 0.0)
-   rho = if((x gt xi) and (x lt xo) and (r lt ri), den_cone, rho(proton))
-   rho = if(x gt xo, 0.0, rho(proton))
+   density = if((r gt ri) and (r lt ro), den_cone, 0.0)
+   density = if((x gt xi) and (x lt xo) and (r lt ri), den_cone, density(proton))
+   density = if(x gt xo, 0.0, density(proton))
 end:species
 
 begin:species
@@ -4931,7 +4931,7 @@ begin:species
    charge = -1.0
    mass = 1.0
    frac = 0.5
-   rho = rho(proton)
+   density = density(proton)
 end:species
 \end{lboxverbatim}
 
