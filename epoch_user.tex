@@ -23,9 +23,9 @@ source code.
 This version number is printed to screen when you run the code. The line looks
 something like the following:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.14.0   (commit v4.14.0-0-g6da09889-clean)
+ Welcome to EPOCH2D version 4.15.0   (commit v4.15.0-0-g8dc99add-clean)
 \end{boxverbatim}
-Here, only the number ``4.14'' is important.
+Here, only the number ``4.15'' is important.
 
 Since version 3.1 of the manual, new additions and changes are mentioned
 in the appendix.
@@ -202,8 +202,8 @@ are given assuming that you are typing commands at a UNIX terminal.
 When obtained, the {\EPOCH} codes all have a similar structure. If the tarred
 and gzipped archive (commonly referred to as a tarball) is downloaded and
 unpacked into the user's \verb|$HOME| directory, then the extracted contents
-will consist of a directory named ``\verb|$HOME/epoch-4.14.0|''
-(with ``4.14.0'' substituted by the current version number) and the
+will consist of a directory named ``\verb|$HOME/epoch-4.15.0|''
+(with ``4.15.0'' substituted by the current version number) and the
 subdirectories and files listed below.
 
 Alternatively, if the code is checked out from the GitLab git
@@ -301,7 +301,7 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.14.0   (commit v4.14.0-0-g6da09889-clean)
+ Welcome to EPOCH2D version 4.15.0   (commit v4.15.0-0-g8dc99add-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -500,7 +500,7 @@ When the code is run, the output is
   d########P  d##P            ###########P     ##########P  d##P      d##P
  d########P  d##P              d######P          #######P  d##P      d##P
 
- Welcome to EPOCH2D version 4.14.0   (commit v4.14.0-0-g6da09889-clean)
+ Welcome to EPOCH2D version 4.15.0   (commit v4.15.0-0-g8dc99add-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -1567,21 +1567,21 @@ begin:species
    ionisation_energies = (11.26*ev,24.38*ev,47.89*ev,64.49*ev,392.1*ev,490.0*ev)
    ionisation_electron_species = \
        (electron,electron,electron,fourth,electron,electron)
-   rho = den_gas
+   density = den_gas
 end:species
 
 begin:species
    charge = -1.0
    mass = 1.0
    name = electron
-   rho = 0.0
+   density = 0.0
 end:species
 
 begin:species
    charge = -1.0
    mass = 1.0
    name = fourth
-   rho = 0.0
+   density = 0.0
 end:species
 \end{boxverbatim}
 
@@ -2503,24 +2503,27 @@ codes.\\
 directions. Restart variables.\\
 
 \subsubsection{Derived Variables}
+\label{sec:derived}
 The final set of parameters specify properties which are not variables used
 in the code but are derived from them. The first six variables are derived
 by summing properties of all the particles in each grid cell. The resulting
 quantities are defined on the regular cartesian mesh used for grid variables.
 All entries have a default dumpmask of ``never''.\\
 
-{\emphtext ekbar} - Mean kinetic energy on grid. Can have species dumpmask.\\
-
-{\emphtext ekflux} - Mean kinetic energy flux in each direction on the grid.
-Can have species dumpmask.\\
-
-{\emphtext mass\_density} - Mass density on grid. Can have species dumpmask.\\
-
-{\emphtext charge\_density} - Charge density on grid. Can have species
+{\emphtext ekbar} - Mean kinetic energy on grid in $J$. Can have species
 dumpmask.\\
 
-{\emphtext number\_density} - Number density on grid. Can have species
+{\emphtext ekflux} - Mean kinetic energy flux in each direction on the grid
+in $W/m^2$. Can have species dumpmask.\\
+
+{\emphtext mass\_density} - Mass density on grid in $kg/m^3$. Can have species
 dumpmask.\\
+
+{\emphtext charge\_density} - Charge density on grid in $C/m^3$. Can have
+species dumpmask.\\
+
+{\emphtext number\_density} - Number density on grid in $m^{-3}$. Can have
+species dumpmask.\\
 
 {\emphtext particles\_per\_cell} - Number of particles per cell. Can have
 species dumpmask.  The synonym ``ppc'' may also be used.\\
@@ -2528,12 +2531,14 @@ species dumpmask.  The synonym ``ppc'' may also be used.\\
 {\emphtext average\_weight} - Average of weight of the particles in each cell.
 Can have species dumpmask.\\
 
-{\emphtext temperature} - Isotropic temperature on grid. Can have species
-dumpmask.\\
-%exact way that temperature is calculated in the code is likely to vary in the
-%near future.\\
+{\emphtext temperature} - Isotropic temperature on grid in $K$. The synonym
+``temp'' may also be used. Can have species dumpmask.\\
 
-{\emphtext poynt\_flux} - Poynting flux in each direction.\\
+{\emphtext temperature\_\{x,y,z\}} - The temperature in each of the \{x,y,z\}
+directions, respectively, in $K$. The synonyms ``temp\_\{x,y,z\}'' and
+``t\{x,y,z\}'' may also be used. Can have species dumpmask.\\
+
+{\emphtext poynt\_flux} - Poynting flux in each direction in $W/m^2$.\\
 
 % The cpml_* variables are only really used internally and therefore
 % are currently undocumented
@@ -3250,7 +3255,7 @@ deck would look like
 begin:species
    name = electron
    frac = 0.5
-   rho = 7.7e29
+   density = 7.7e29
    identify:electron
 end:species
 \end{boxverbatim}
@@ -4758,7 +4763,7 @@ begin:species
    frac = 0.5
    temp_x = temp
    drift_x = drift_p
-   rho = dens
+   density = dens
 end:species
 
 
@@ -4770,7 +4775,7 @@ begin:species
    frac = 0.5
    temp_x = temp
    drift_x = -drift_p
-   rho = dens
+   density = dens
 end:species
 
 
@@ -4921,9 +4926,9 @@ begin:species
    charge = 1.0
    mass = 1836.2
    frac = 0.5
-   rho = if((r gt ri) and (r lt ro), den_cone, 0.0)
-   rho = if((x gt xi) and (x lt xo) and (r lt ri), den_cone, rho(proton))
-   rho = if(x gt xo, 0.0, rho(proton))
+   density = if((r gt ri) and (r lt ro), den_cone, 0.0)
+   density = if((x gt xi) and (x lt xo) and (r lt ri), den_cone, density(proton))
+   density = if(x gt xo, 0.0, density(proton))
 end:species
 
 begin:species
@@ -4931,7 +4936,7 @@ begin:species
    charge = -1.0
    mass = 1.0
    frac = 0.5
-   rho = rho(proton)
+   density = density(proton)
 end:species
 \end{lboxverbatim}
 
@@ -5546,6 +5551,8 @@ used in conjunction with the moving window.
 \item dist\_fn
 \item dist\_fn\_p\{x,y,z\}\_range
 \end{itemize}
+\item Added ``temperature\_\{x,y,z\}'' derived output variables to the
+    output block. See \sect{derived}.
 \end{itemize}
 \bigskip
 
