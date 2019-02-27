@@ -452,6 +452,10 @@ symbol. The options currently controlled by the preprocessor are:\\
   rather than the Boris push.
   This is slower than the Boris push but gives the correct $E\times B$
   velocity, which can be important for highly relativistic simulations.
+\item DELTAF\_METHOD - Compile the code to use the delta-f method to represent
+  particles rather than standard PIC. Note that this completely changes the
+  code behaviour and should not be enabled for normal use. See \sect{deltaf}.
+\item DELTAF\_DEBUG - Add debug code for the delta-f method.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
@@ -5249,6 +5253,8 @@ Some changes have been made to the Makefile. These are documented in
 \noindent The following compile-time define has been added to the Makefile:
 \begin{itemize}
 \item DELTAF\_METHOD
+\item DELTAF\_DEBUG
+\item USE\_ISATTY
 \end{itemize}
 \bigskip
 
@@ -5414,6 +5420,8 @@ used in conjunction with the moving window.
     See \sect{output_directives} and \sect{output_global_block}
 \item Added ``walltime\_interval'' parameter to the output block.
     See \sect{multiple_output}
+\item Added the Higuera-Cary particle push. This can be enabled using the
+    ``HC\_PUSH'' Makefile flag. See \sect{makefile}.
 \end{itemize}
 \bigskip
 
