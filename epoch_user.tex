@@ -1278,16 +1278,17 @@ begin:species
    charge = -1.0
    mass = 1.0
    frac = 0.5
-   # npart = 2000*100
+   # npart = 2000 * 100
    # tracer = F
-   density = 1.e4
+   number_density = 1.e4
    temp = 1e6
 
    temp_x = 0.0
    temp_y = temp_x(Electron)
-   density_min = 0.1 * den_max
-   density = if(abs(x) lt thick, den_max, 0.0)
-   density = if((x gt -thick) and (abs(y) gt 2e-6), 0.0, density(Carbon))
+   number_density_min = 0.1 * den_max
+   number_density = if(abs(x) lt thick, den_max, 0.0)
+   number_density = if((x gt -thick) and (abs(y) gt 2e-6), \
+                       0.0, number_density(Carbon))
 end:species
 
 begin:species
@@ -1296,7 +1297,7 @@ begin:species
    mass = 1836.0*12
    frac = 0.5
 
-   density = 0.25*density(Electron)
+   number_density = 0.25 * number_density(Electron)
    temp_x = temp_x(Electron)
    temp_y = temp_x(Electron)
 
@@ -1392,30 +1393,32 @@ then used by the autoloader to actually position the particles.
 The elements of the species block used for setting
 initial conditions are:\\
 
-{\emphtext density} - Particle number density in $m^{-3}$.
-As soon as a density= line has been read, the values are
+{\emphtext number\_density} - Particle number density in $m^{-3}$.
+As soon as a number\_density= line has been read, the values are
 calculated for the whole domain and are available for reuse on the right hand
 side of an expression. This is seen in the above example in the first two lines
-for the Electron species, where the density is first set and then corrected.
-If you wish to specify the density in parts per cubic metre then you can
-divide by the ``cc'' constant (see \sect{constants}).
-This parameter is mandatory.\\
+for the Electron species, where the number density is first set and then
+corrected.  If you wish to specify the number density in parts per cubic metre
+then you can divide by the ``cc'' constant (see \sect{constants}).
+This parameter is mandatory. ``density'' is accepted as an alias.\\
 
-{\emphtext density\_min} - Minimum particle number density in $m^{-3}$.
-When the number density in a cell falls below density\_min the
+{\emphtext number\_density\_min} - Minimum particle number density in $m^{-3}$.
+When the number density in a cell falls below number\_density\_min the
 autoloader does not load any pseudoparticles into that cell to minimise the
 number of low weight, unimportant particles. If set to 0 then all cells are
-loaded with particles. This is the default.\\
+loaded with particles. This is the default. ``density\_min'' is accepted
+as an alias.\\
 
-{\emphtext density\_max} - Maximum particle number density in $m^{-3}$.
+{\emphtext number\_density\_max} - Maximum particle number density in $m^{-3}$.
 When the number density in a cell rises above density\_max the
-autoloader clips the density to density\_max allowing easy
+autoloader clips the density to number\_density\_max allowing easy
 implementation of exponential rises to plateaus. If it is a negative value
-then no clipping is performed. This is the default.\\
+then no clipping is performed. This is the default. ``density\_max'' is accepted
+as an alias.\\
 
 {\emphtext mass\_density} - Particle mass density in $kg\,m^{-3}$. The same
-as ``density'' but multiplied by the particle mass. If you wish to use units
-of $g\,cm^{-3}$ then append the appropriate multiplication factor.
+as ``number\_density'' but multiplied by the particle mass. If you wish to use
+units of $g\,cm^{-3}$ then append the appropriate multiplication factor.
 For example: ``\verb|mass_density = 2 * 1e3 / cc|''.\\
 
 {\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
@@ -1449,7 +1452,7 @@ For more information on what is meant by a ``simple binary file'', see
 \begin{lboxverbatim}{external initial conditions}
 begin:species
    name = Electron
-   density = 'Data/ic.dat'
+   number_density = 'Data/ic.dat'
    offset = 80000
    temp_x = 'Data/ic.dat'
 end:species
@@ -1486,7 +1489,7 @@ unformatted files using the offset element, but care must be taken!}\\
 The following entries are used for configuring the Delta-f method
 (see \sect{deltaf}).\\
 
-{\emphtext density\_back, drift\_\{x,y,z\}\_back, temp\_\{x,y,z\}\_back,
+{\emphtext number\_density\_back, drift\_\{x,y,z\}\_back, temp\_\{x,y,z\}\_back,
 \par temp\_\{x,y,z\}\_back\_ev, temp\_back, temp\_back\_ev}
  - These all have the same
 meanings as the parameters listed above that don't include the ``\_back'' text,
@@ -1524,13 +1527,15 @@ The following parameters are added to the ``species'' block:\\
   less than ``demote\_multiplier'' times the local average.  The default value
   is 1.\\
 
-{\emphtext promote\_density} - The particle is only considered for promotion
-  when the local density is less than ``promote\_density''.  The default value
-  is the largest floating point number.\\
+{\emphtext promote\_number\_density} - The particle is only considered for
+  promotion when the local number density is less than
+  ``promote\_number\_density''.  The default value is the largest floating
+  point number.\\
 
-{\emphtext demote\_density}  - The particle is only considered for demotion
-  when the local density is greater than ``demote\_density''.  The default
-  value is 0.\\
+{\emphtext demote\_number\_density} - The particle is only considered for
+  demotion when the local number density is greater than
+  ``demote\_number\_density''.  The default value is 0.\\
+  point number.\\
 
 
 \subsubsection{Ionisation}
@@ -1567,21 +1572,21 @@ begin:species
    ionisation_energies = (11.26*ev,24.38*ev,47.89*ev,64.49*ev,392.1*ev,490.0*ev)
    ionisation_electron_species = \
        (electron,electron,electron,fourth,electron,electron)
-   density = den_gas
+   number_density = den_gas
 end:species
 
 begin:species
    charge = -1.0
    mass = 1.0
    name = electron
-   density = 0.0
+   number_density = 0.0
 end:species
 
 begin:species
    charge = -1.0
    mass = 1.0
    name = fourth
-   density = 0.0
+   number_density = 0.0
 end:species
 \end{boxverbatim}
 
@@ -1735,7 +1740,7 @@ begin:species
   charge = -1
   mass = 1.0
   frac = 0.5
-  density = dens
+  number_density = dens
   # Truncated power law distribution in px
   dist_fn = exp(-p0 / px) * (px / p0)^alpha
   dist_fn_px_range = (0, pmax)
@@ -3255,7 +3260,7 @@ deck would look like
 begin:species
    name = electron
    frac = 0.5
-   density = 7.7e29
+   number_density = 7.7e29
    identify:electron
 end:species
 \end{boxverbatim}
@@ -3393,12 +3398,12 @@ The ``injector'' block accepts the following keys:\\
   injector. Average number of particles injected will be this value or slightly
   higher if very few particles are specified.\\
 
-{\emphtext density} - Number density of the particle source in m$^{-3}$. Can
-  be space varying along the boundary to which the injector is attached and
-  time varying.\\
+{\emphtext number\_density} - Number density of the particle source in
+  m$^{-3}$. Can be space varying along the boundary to which the injector is
+  attached and time varying.\\
 
-{\emphtext density\_min} - Minimum density in m$^{-3}$ below which pseudo
-  particles are not loaded. Use if the density has a profile to avoid
+{\emphtext number\_density\_min} - Minimum density in m$^{-3}$ below which
+  pseudo particles are not loaded. Use if the density has a profile to avoid
   injecting low weight particles in low density regions.\\
 
 {\emphtext temp\_x} - Temperature in x direction (K)\\
@@ -3428,7 +3433,7 @@ begin:injector
 
   boundary = x_min
   species = Electron
-  density = dens
+  number_density = dens
   temp_x = temp
   drift_x = drift_p
   npart_per_cell = 32
@@ -3867,7 +3872,7 @@ A, & \mbox{otherwise}
 \item if(a,b,c) - Conditional function. If a != 0 the function returns b,
   otherwise the function returns c.
 
-\item density(a) - Returns the density for species a.
+\item number\_density(a) - Returns the number density for species a.
 \item temp\_\{x,y,z\}(a) - Returns temperature in the x, y or z direction for
     species a.
 \item temp(a) - Returns the isotropic temperature for species a.
@@ -3971,31 +3976,31 @@ begin:species
    name = s1
    # first set density in the range 0->1
    # cut down density in x direction
-   density = if ((x gt -1) and (x lt 1),1.0,0.2)
+   number_density = if ((x gt -1) and (x lt 1), 1.0, 0.2)
    # cut down density in y direction
-   density = if ((y gt -1) and (y lt 1),density(s1),0.2)
+   number_density = if ((y gt -1) and (y lt 1), number_density(s1), 0.2)
 
    # multiply density by real particle density
-   density = density(s1)*100.0
+   number_density = number_density(s1) * 100.0
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*100.0
+   number_density_min = 0.3 * 100.0
 end:species
 
 begin:species
    # Just copy the density for species s1
-   density = density(s1)
+   number_density = number_density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*100.0
+   number_density_min = 0.3 * 100.0
 end:species
 \end{boxverbatim}
 
@@ -4481,33 +4486,33 @@ begin:species
 
    # first set density in the range 0->1
    # cut down density in x direction
-   density = if ((x gt -1) and (x lt 1),1.0,0.2)
+   number_density = if ((x gt -1) and (x lt 1), 1.0, 0.2)
    # cut down density in y direction
-   density = if ((y gt -1) and (y lt 1),density(s1),0.2)
+   number_density = if ((y gt -1) and (y lt 1), number_density(s1), 0.2)
 
    # multiply density by real particle density
-   density = density(s1)*100.0
+   number_density = number_density(s1) * 100.0
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*100.0
+   number_density_min = 0.3 * 100.0
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   density = density(s1)
+   number_density = number_density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*100.0
+   number_density_min = 0.3 * 100.0
 end:species
 \end{boxverbatim}
 
@@ -4523,33 +4528,33 @@ begin:species
 
    # first set density in the range 0->1
    # cut down density in x direction
-   density = if ((x gt -1) and (x lt 1),1.0,0.2)
+   number_density = if ((x gt -1) and (x lt 1), 1.0, 0.2)
    # cut down density in y direction
-   density = if ((y gt -1) and (y lt 1),density(s1),0.2)
+   number_density = if ((y gt -1) and (y lt 1), number_density(s1), 0.2)
 
    # multiply density by real particle density
-   density = density(s1)*particle_density
+   number_density = number_density(s1) * particle_density
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   density = density(s1)
+   number_density = number_density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 \end{boxverbatim}
 
@@ -4583,21 +4588,21 @@ begin:species
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   density = density(s1)
+   number_density = number_density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 \end{boxverbatim}
 
@@ -4606,8 +4611,8 @@ profiles later. For example:
 \begin{boxverbatim}
 begin:constant
    particle_density = 100.0 # Particle number density
-   profile_x = gauss(x,0.0,1.0)
-   profile_y = gauss(y,0.0,1.0)
+   profile_x = gauss(x, 0.0, 1.0)
+   profile_y = gauss(y, 0.0, 1.0)
 end:constant
 
 begin:species
@@ -4621,21 +4626,21 @@ begin:species
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   density = density(s1)
+   number_density = number_density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 \end{boxverbatim}
 
@@ -4676,9 +4681,10 @@ the temperature in each direction is equal, we have
     \exp\left( \frac{m (\mathbf{v} - \mathbf{v_d})^2}{2 k_B T} \right).
 \end{equation*}
 
-The parameters density\_back, temp(x,y,z)\_back and drift(x,y,z)\_back in each
-species specification in the input deck set $f_0$. density\_back $=0$ is the
-default and is equivalent to not using the delta-f method.
+The parameters number\_density\_back, temp(x,y,z)\_back and drift(x,y,z)\_back
+in each species specification in the input deck set $f_0$.
+number\_density\_back $=0$ is the default and is equivalent to not using the
+delta-f method.
 
 For example, the electron species component of an input deck solved using
 delta-f might be written:
@@ -4691,8 +4697,8 @@ begin:species
    frac = 0.3
    temp = 1e8
    temp_back = 1e8
-   density = 1e20
-   density_back = 1e20
+   number_density = 1e20
+   number_density_back = 1e20
 end:species
 \end{lboxverbatim}
 
@@ -4763,7 +4769,7 @@ begin:species
    frac = 0.5
    temp_x = temp
    drift_x = drift_p
-   density = dens
+   number_density = dens
 end:species
 
 
@@ -4775,7 +4781,7 @@ begin:species
    frac = 0.5
    temp_x = temp
    drift_x = -drift_p
-   density = dens
+   number_density = dens
 end:species
 
 
@@ -4849,8 +4855,9 @@ end:constant
 
 begin:species
    name = Electron
-   density = den_peak*(sin(4.0*pi*x/length_x+pi/4))*(sin(8.0*pi*y/length_y)+1)
-   density_min = 0.1*den_peak
+   number_density = den_peak * sin(4.0 * pi * x / length_x + pi / 4) \
+                    * (sin(8.0 * pi * y / length_y) + 1)
+   number_density_min = 0.1 * den_peak
    charge = -1.0
    mass = 1.0
    frac = 0.5
@@ -4858,7 +4865,7 @@ end:species
 
 begin:species
    name = Proton
-   density = density(Electron)
+   number_density = number_density(Electron)
    charge = 1.0
    mass = 1836.2
    frac = 0.5
@@ -4926,9 +4933,10 @@ begin:species
    charge = 1.0
    mass = 1836.2
    frac = 0.5
-   density = if((r gt ri) and (r lt ro), den_cone, 0.0)
-   density = if((x gt xi) and (x lt xo) and (r lt ri), den_cone, density(proton))
-   density = if(x gt xo, 0.0, density(proton))
+   number_density = if((r gt ri) and (r lt ro), den_cone, 0.0)
+   number_density = if((x gt xi) and (x lt xo) and (r lt ri), \
+                       den_cone, number_density(proton))
+   number_density = if(x gt xo, 0.0, number_density(proton))
 end:species
 
 begin:species
@@ -4936,7 +4944,7 @@ begin:species
    charge = -1.0
    mass = 1.0
    frac = 0.5
-   density = density(proton)
+   number_density = number_density(proton)
 end:species
 \end{lboxverbatim}
 
@@ -5557,7 +5565,25 @@ used in conjunction with the moving window.
 \bigskip
 
 
-\subsection{Changes between version 4.15 and 5.0}
+\subsection{Changes between version 4.15 and 4.16}
+
+\begin{itemize}
+\item Added ``number\_density'' aliases for ``density'' in the species and
+   injector blocks (see \sect{species_block} and \sect{injector_block}).
+   These aliases include:
+\begin{itemize}
+\item number\_density for density
+\item promote\_number\_density for promote\_density
+\item demote\_number\_density for demote\_density
+\item number\_density\_min for density\_min
+\item number\_density\_max for density\_max
+\item number\_density\_back for density\_back
+\end{itemize}
+\end{itemize}
+\bigskip
+
+
+\subsection{Changes between version 4.16 and 5.0}
 
 \begin{itemize}
 \item Added antennae that allow you to specify an external time varying current
