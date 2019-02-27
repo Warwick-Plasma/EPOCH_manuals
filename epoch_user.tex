@@ -452,6 +452,18 @@ symbol. The options currently controlled by the preprocessor are:\\
   rather than the Boris push.
   This is slower than the Boris push but gives the correct $E\times B$
   velocity, which can be important for highly relativistic simulations.
+\item DELTAF\_METHOD - Compile the code to use the delta-f method to represent
+  particles rather than standard PIC. Note that this completely changes the
+  code behaviour and should not be enabled for normal use. See \sect{deltaf}.
+\item DELTAF\_DEBUG - Add debug code for the delta-f method.
+\item NO\_USE\_ISATTY - When printing the initial welcome message, EPOCH makes
+  use of the C-library's isatty function. This requires Fortran2003 features
+  that might not be available on all platforms. The flag allows this
+  functionality to be disabled on platforms that don't support it.
+\item NO\_MPI3 - This compiler flag allows the user to disable MPI-3 features
+  such as the ``MPI\_TYPE\_SIZE\_X'' routine. This allows the code to be
+  compiled against older versions of the MPI library. The flag should only be
+  enabled if the code fails to compile without it.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
@@ -5344,6 +5356,8 @@ Some changes have been made to the Makefile. These are documented in
 \noindent The following compile-time define has been added to the Makefile:
 \begin{itemize}
 \item DELTAF\_METHOD
+\item DELTAF\_DEBUG
+\item USE\_ISATTY
 \end{itemize}
 \bigskip
 
@@ -5509,6 +5523,8 @@ used in conjunction with the moving window.
     See \sect{output_directives} and \sect{output_global_block}
 \item Added ``walltime\_interval'' parameter to the output block.
     See \sect{multiple_output}
+\item Added the Higuera-Cary particle push. This can be enabled using the
+    ``HC\_PUSH'' Makefile flag. See \sect{makefile}.
 \end{itemize}
 \bigskip
 
@@ -5580,6 +5596,9 @@ used in conjunction with the moving window.
 \item number\_density\_back for density\_back
 \end{itemize}
 \end{itemize}
+\item Replaced ``USE\_ISATTY'' Makefile flag with ``NO\_USE\_ISATTY''.
+  See \sect{makefile}.
+\item Added ``NO\_MPI3'' Makefile flag. See \sect{makefile}.
 \bigskip
 
 
