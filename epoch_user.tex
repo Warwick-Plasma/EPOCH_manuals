@@ -611,17 +611,17 @@ conditions to use.
 The control block of a valid input deck for EPOCH2D reads as follows:
 \begin{lboxverbatim}{control block}
 begin:control
-   # global number of gridpoints
+   # Global number of gridpoints
    nx = 512 # in x
    ny = 512 # in y
-   # global number of particles
+   # Global number of particles
    npart = 10 * nx * ny
 
-   # final time of simulation
+   # Final time of simulation
    t_end = 1.0e-12
    # nsteps = -1
 
-   # size of domain
+   # Size of domain
    x_min = -0.1e-6
    x_max = 400.0e-6
    y_min = -400.0e-6
@@ -1306,7 +1306,7 @@ end:species
 begin:species
    name = Carbon
    charge = 4.0
-   mass = 1836.0*12
+   mass = 1836.0 * 12
    frac = 0.5
 
    number_density = 0.25 * number_density(Electron)
@@ -1774,7 +1774,7 @@ begin:laser
    lambda = 1.06 * micron
    pol_angle = 0.0
    phase = 0.0
-   t_profile = gauss(time,40.0e-15,40.0e-15)
+   t_profile = gauss(time, 40.0e-15, 40.0e-15)
    t_start = 0.0
    t_end = 80.0e-15
 end:laser
@@ -1931,8 +1931,8 @@ allows you to specify the electric and magnetic fields at any point in the
 domain. An example block is shown below:
 \begin{lboxverbatim}{fields block}
 begin:fields
-   ex = sin(pi*x/length_x)
-   ey = cos(pi*x/length_x)
+   ex = sin(pi * x / length_x)
+   ey = cos(pi * x / length_x)
    ez = 0
    bx = 1.0
    by = -1.0
@@ -2137,7 +2137,7 @@ begin:output
    # If use_offset_grid is true then the code dumps a grid which
    # displays positions relative to the left hand edge of the window
    use_offset_grid = F
-   # number of timesteps between output dumps
+   # Number of timesteps between output dumps
    dt_snapshot = 1.0e-14
    # Number of dt_snapshot between full dumps
    full_dump_every = 10
@@ -2986,15 +2986,15 @@ begin:dist_fn
    direction1 = dir_x
    direction2 = dir_px
 
-   # range is ignored for spatial coordinates
-   range1 = (1,1)
-   range2 = (-50.0e-20,50.0e-20)
+   # Range is ignored for spatial coordinates
+   range1 = (1, 1)
+   range2 = (-50.0e-20, 50.0e-20)
 
-   # resolution is ignored for spatial coordinates
+   # Resolution is ignored for spatial coordinates
    resolution1 = 1
    resolution2 = 5000
 
-   restrict_py = (-3.0e-20,3.0e-20)
+   restrict_py = (-3.0e-20, 3.0e-20)
 
    include_species:Electron
    include_species:Carbon
@@ -3643,21 +3643,21 @@ deleted and replaced with the new one. This happens without warning.
 \begin{lboxverbatim}{constant block}
 begin:constant
    lambda = 1.06 * micron
-   omega = 2.0*pi*c/lambda
+   omega = 2.0 * pi * c / lambda
    den_crit = critical(omega)
    scale = 3.5 * micron
-   den_max = 5.0*den_crit
+   den_max = 5.0 * den_crit
    thick = 300e-9
    pplength = 6000e-9
    widscale = 5.0e-6
 
-   t_wid = (10.0e-6)/c
+   t_wid = (10.0e-6) / c
    amax = 1.0
    wy = 1e-6
    y = 0.0
 
-   slope = exp(-2.0*(y/wy)^2)
-   blob = gauss(sqrt(x^2+y^2),0.0,1.0e-6)
+   slope = exp(-2.0 * (y/wy)^2)
+   blob = gauss(sqrt(x^2+y^2), 0.0, 1.0e-6)
 end:constant
 \end{lboxverbatim}
 
@@ -4656,10 +4656,10 @@ begin:control
    nx = 400
    npart = 20000
 
-   #final time of simulation
+   # Final time of simulation
    t_end = 1.5e-1
 
-   #size of domain
+   # Size of domain
    x_min = 0
    x_max = 5.0e5
 end:control
@@ -4703,7 +4703,7 @@ end:species
 
 
 begin:output
-   # number of timesteps between output dumps
+   # Number of timesteps between output dumps
    dt_snapshot = 1.5e-3
    # Number of dt_snapshot between full dumps
    full_dump_every = 1
@@ -4727,7 +4727,7 @@ begin:output
    number_density = always + species
    temperature = always + species
 
-   # extended io
+   # Extended io
    distribution_functions = always
 end:output
 \end{lboxverbatim}
@@ -4904,10 +4904,10 @@ begin:control
   nx = 500
   ny = nx
 
-  # final time of simulation
+  # Final time of simulation
   t_end = 100 * femto
 
-  # size of domain
+  # Size of domain
   x_min = -10 * micron
   x_max = -x_min
   y_min = x_min
@@ -4926,17 +4926,16 @@ end:boundaries
 begin:constant
   lambda0 = 1.0 * micron
 
-  #These two set the beam focus
+  # These two set the beam focus
   w_0 = 0.9 * micron #Beam waist size
   x_spot = 15 * micron #Distance from x_min to spot
 
-  #These are the parameters calculated for driving the laser
-  #These should not need to be modified
+  # These are the parameters calculated for driving the laser
+  # These should not need to be modified
   x_R = pi * w_0^2 / lambda0 #Rayleigh range
   RC = x_spot * (1.0 + (x_R/x_spot)^2) #Radius of curvature on x_min
   w_bnd = w_0 * sqrt( 1.0 + (x_spot/x_R)^2) #Spot size at x_min
-  gouy = atan(x_spot/x_R) #Gouy phase shift at x_min
-
+  gouy = atan(x_spot/x_R) # Gouy phase shift at x_min
 end:constant
 
 begin:laser
@@ -4945,11 +4944,11 @@ begin:laser
   lambda = lambda0
 
   phase = 2.0 * pi/ lambda0 * y^2 / (2.0 * RC) - gouy
-  profile = gauss(y,0,w_bnd)
+  profile = gauss(y, 0, w_bnd)
 end:laser
 
 begin:output
-  # number of timesteps between output dumps
+  # Number of timesteps between output dumps
   dt_snapshot = 25 * femto
 
   # Properties on grid
