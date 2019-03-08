@@ -383,21 +383,22 @@ symbol. The options currently controlled by the preprocessor are:\\
   Use this flag to disable per-particle weighting if you need to save on
   memory, but it this option is recommended only for advanced users.
 \item NO\_TRACER\_PARTICLES - This flag will disable the option to specify one
-  or more species as zero-weight particles. Zero-weight particles
+  or more species as zero-current particles. Zero-current particles
   move about as would a normal particle with the same charge and mass, but
   they do not generate any current and are therefore passive
-  elements in the simulation. Zero-weight particles should be included in
+  elements in the simulation. Zero-current particles should be included in
   collisions to ensure they move identically to ordinary particles. The
-  implementation of zero-weight particles requires an additional ``IF'' clause
+  implementation of zero-current particles requires an additional ``IF'' clause
   in the particle push, so it has a slight performance impact. If you do not
   require the feature then setting this flag will give a slight performance
-  improvement. \warn Since the particles effectively have zero weight, they
+  improvement. \warn Since the particles effectively have zero weight in terms
+  of their numerical heating properties, they
   do not always behave in the same way that an ordinary particle with weight
   would behave and this can sometimes lead to unexpected behaviour. If the
   purpose is merely to track a subset of a particle species to use as output
   then a better mechanism to use is ``persistent subsets''
   (see \sect{persistent_subsets}). In version 5.0, this flag will be
-  and replaced with ``ZERO\_WEIGHT\_PARTICLES''.
+  and replaced with ``ZERO\_CURRENT\_PARTICLES''.
 \item NO\_PARTICLE\_PROBES - For laser plasma interaction studies it can
   sometimes
   be useful to be able to record information about particles which cross a
@@ -1380,22 +1381,25 @@ this particle species. The default dumpmask is ``always''.\\
 If set to ``F'' it has the same meaning as ``dumpmask = never''. If set to
 ``T'' it has the same meaning as ``dumpmask = always''.\\
 
-{\emphtext zero\_weight} - Logical flag switching the particle species
-into zero-weight particles. Zero-weight particles are enabled with the correct
-precompiler option, and when set for a given species make that species move
+{\emphtext zero\_current} - Logical flag switching the particle species
+into zero-current particles. Zero-current particles are enabled if the
+if the ``NO\_TRACER\_PARTICLES'' precompiler option has not been used and
+the ``zero\_current'' flag is set to true for a given species.
+When set, the species will move
 correctly for its charge and mass, but contribute no current. This means that
 these particles are passive elements in the simulation. In all other respects
 they are designed to behave identically to ordinary particles, so they do take
 part in collisions by default. This can be prevented using the collision
 matrices in \sectit{collisions_block}.
-\warn Since the particles effectively have zero weight, they
+\warn Since the particles effectively have zero weight in terms of their
+numerical heating properties, they
 do not always behave in the same way that an ordinary particle with weight
 would behave and this can sometimes lead to unexpected behaviour. If the
 purpose is merely to track a subset of a particle species to use as output
 then a better mechanism to use is ``persistent subsets''
 (see \sect{persistent_subsets}). ``tracer'' is currently accepted as an alias
 but this will be removed in version 5.0.
-``zero\_weight = F'' is the default value.\\
+``zero\_current = F'' is the default value.\\
 
 {\emphtext identify} - Used to identify the type of particle. Currently this
 is used primarily by the QED routines. See \sect{qed_block} for details.\\
@@ -4077,7 +4081,7 @@ The current definition is:
     TYPE(primitive_stack) :: dist_fn_range(3)
 
 #ifndef NO_TRACER_PARTICLES
-    LOGICAL :: zero_weight
+    LOGICAL :: zero_current
 #endif
 
     ! ID code which identifies if a species is of a special type
@@ -5531,7 +5535,7 @@ used in conjunction with the moving window.
 \item Replaced ``USE\_ISATTY'' Makefile flag with ``NO\_USE\_ISATTY''.
   See \sect{makefile}.
 \item Added ``NO\_MPI3'' Makefile flag. See \sect{makefile}.
-\item Added a ``zero\_weight'' alias for ``tracer'' in the species blocks.
+\item Added a ``zero\_current'' alias for ``tracer'' in the species blocks.
   See \sect{species_block}. The use of ``tracer'' has now been deprecated and
   will be removed in version 5.0.
   At that time, the compiler flag will also be renamed.
