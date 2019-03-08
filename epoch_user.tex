@@ -391,7 +391,13 @@ symbol. The options currently controlled by the preprocessor are:\\
   implementation of zero-weight particles requires an additional ``IF'' clause
   in the particle push, so it has a slight performance impact. If you do not
   require the feature then setting this flag will give a slight performance
-  improvement.
+  improvement. \warn Since the particles effectively have zero weight, they
+  do not always behave in the same way that an ordinary particle with weight
+  would behave and this can sometimes lead to unexpected behaviour. If the
+  purpose is merely to track a subset of a particle species to use as output
+  then a better mechanism to use is ``persistent subsets''
+  (see \sect{persistent_subsets}). In version 5.0, this flag will be
+  and replaced with ``ZERO\_WEIGHT\_PARTICLES''.
 \item NO\_PARTICLE\_PROBES - For laser plasma interaction studies it can
   sometimes
   be useful to be able to record information about particles which cross a
@@ -1378,10 +1384,18 @@ If set to ``F'' it has the same meaning as ``dumpmask = never''. If set to
 into zero-weight particles. Zero-weight particles are enabled with the correct
 precompiler option, and when set for a given species make that species move
 correctly for its charge and mass, but contribute no current. This means that
-these particles are passive  in the plasma. In all other respects they
-are designed to behave identically to ordinary particles, so they do take part
-in collisions by default. This can be prevented using the collision matrices in
-\sectit{collisions_block}. ``zero\_weight = F'' is the default value.\\
+these particles are passive elements in the simulation. In all other respects
+they are designed to behave identically to ordinary particles, so they do take
+part in collisions by default. This can be prevented using the collision
+matrices in \sectit{collisions_block}.
+\warn Since the particles effectively have zero weight, they
+do not always behave in the same way that an ordinary particle with weight
+would behave and this can sometimes lead to unexpected behaviour. If the
+purpose is merely to track a subset of a particle species to use as output
+then a better mechanism to use is ``persistent subsets''
+(see \sect{persistent_subsets}). ``tracer'' is currently accepted as an alias
+but this will be removed in version 5.0.
+``zero\_weight = F'' is the default value.\\
 
 {\emphtext identify} - Used to identify the type of particle. Currently this
 is used primarily by the QED routines. See \sect{qed_block} for details.\\
@@ -3596,6 +3610,7 @@ end:output
 \end{boxverbatim}
 
 \subsubsection{Persistent subsets}
+\label{sec:persistent_subsets}
 Persistent subsets are subsets that capture a set of particles once, given a
 specified set of parameters, and then track those particles permanently.
 Persistent subsets use the same blocks as normal subsets and take the same
