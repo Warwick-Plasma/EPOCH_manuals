@@ -23,9 +23,9 @@ source code.
 This version number is printed to screen when you run the code. The line looks
 something like the following:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.15.0   (commit v4.15.0-0-g8dc99add-clean)
+ Welcome to EPOCH2D version 4.16.0   (commit v4.16.0-0-g69eb0fa6-clean)
 \end{boxverbatim}
-Here, only the number ``4.15'' is important.
+Here, only the number ``4.16'' is important.
 
 Since version 3.1 of the manual, new additions and changes are mentioned
 in the appendix.
@@ -202,8 +202,8 @@ are given assuming that you are typing commands at a UNIX terminal.
 When obtained, the {\EPOCH} codes all have a similar structure. If the tarred
 and gzipped archive (commonly referred to as a tarball) is downloaded and
 unpacked into the user's \verb|$HOME| directory, then the extracted contents
-will consist of a directory named ``\verb|$HOME/epoch-4.15.0|''
-(with ``4.15.0'' substituted by the current version number) and the
+will consist of a directory named ``\verb|$HOME/epoch-4.16.0|''
+(with ``4.16.0'' substituted by the current version number) and the
 subdirectories and files listed below.
 
 Alternatively, if the code is checked out from the GitLab git
@@ -301,7 +301,7 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.15.0   (commit v4.15.0-0-g8dc99add-clean)
+ Welcome to EPOCH2D version 4.16.0   (commit v4.16.0-0-g69eb0fa6-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -383,16 +383,22 @@ symbol. The options currently controlled by the preprocessor are:\\
   Use this flag to disable per-particle weighting if you need to save on
   memory, but it this option is recommended only for advanced users.
 \item NO\_TRACER\_PARTICLES - This flag will disable the option to specify one
-  or more species as
-  tracer particles. Tracer particles are specified like normal particles, and
+  or more species as zero-current particles. Zero-current particles
   move about as would a normal particle with the same charge and mass, but
-  tracer particles do not generate any current and are therefore passive
-  elements in the simulation. Tracers should be included in collisions to
-  ensure they move identically to non-tracers. The implementation of tracer
-  particles requires an additional ``IF'' clause
+  they do not generate any current and are therefore passive
+  elements in the simulation. Zero-current particles should be included in
+  collisions to ensure they move identically to ordinary particles. The
+  implementation of zero-current particles requires an additional ``IF'' clause
   in the particle push, so it has a slight performance impact. If you do not
   require the feature then setting this flag will give a slight performance
-  improvement.
+  improvement. \warn Since the particles effectively have zero weight in terms
+  of their numerical heating properties, they
+  do not always behave in the same way that an ordinary particle with weight
+  would behave and this can sometimes lead to unexpected behaviour. If the
+  purpose is merely to track a subset of a particle species to use as output
+  then a better mechanism to use is ``persistent subsets''
+  (see \sect{persistent_subsets}). In version 5.0, this flag will be
+  and replaced with ``ZERO\_CURRENT\_PARTICLES''.
 \item NO\_PARTICLE\_PROBES - For laser plasma interaction studies it can
   sometimes
   be useful to be able to record information about particles which cross a
@@ -452,6 +458,18 @@ symbol. The options currently controlled by the preprocessor are:\\
   rather than the Boris push.
   This is slower than the Boris push but gives the correct $E\times B$
   velocity, which can be important for highly relativistic simulations.
+\item DELTAF\_METHOD - Compile the code to use the delta-f method to represent
+  particles rather than standard PIC. Note that this completely changes the
+  code behaviour and should not be enabled for normal use. See \sect{deltaf}.
+\item DELTAF\_DEBUG - Add debug code for the delta-f method.
+\item NO\_USE\_ISATTY - When printing the initial welcome message, EPOCH makes
+  use of the C-library's isatty function. This requires Fortran2003 features
+  that might not be available on all platforms. The flag allows this
+  functionality to be disabled on platforms that don't support it.
+\item NO\_MPI3 - This compiler flag allows the user to disable MPI-3 features
+  such as the ``MPI\_TYPE\_SIZE\_X'' routine. This allows the code to be
+  compiled against older versions of the MPI library. The flag should only be
+  enabled if the code fails to compile without it.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
@@ -500,7 +518,7 @@ When the code is run, the output is
   d########P  d##P            ###########P     ##########P  d##P      d##P
  d########P  d##P              d######P          #######P  d##P      d##P
 
- Welcome to EPOCH2D version 4.15.0   (commit v4.15.0-0-g8dc99add-clean)
+ Welcome to EPOCH2D version 4.16.0   (commit v4.16.0-0-g69eb0fa6-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -599,17 +617,17 @@ conditions to use.
 The control block of a valid input deck for EPOCH2D reads as follows:
 \begin{lboxverbatim}{control block}
 begin:control
-   # global number of gridpoints
+   # Global number of gridpoints
    nx = 512 # in x
    ny = 512 # in y
-   # global number of particles
+   # Global number of particles
    npart = 10 * nx * ny
 
-   # final time of simulation
+   # Final time of simulation
    t_end = 1.0e-12
    # nsteps = -1
 
-   # size of domain
+   # Size of domain
    x_min = -0.1e-6
    x_max = 400.0e-6
    y_min = -400.0e-6
@@ -1278,25 +1296,25 @@ begin:species
    charge = -1.0
    mass = 1.0
    frac = 0.5
-   # npart = 2000*100
-   # tracer = F
-   density = 1.e4
+   # npart = 2000 * 100
+   number_density = 1.e4
    temp = 1e6
 
    temp_x = 0.0
    temp_y = temp_x(Electron)
-   density_min = 0.1 * den_max
-   density = if(abs(x) lt thick, den_max, 0.0)
-   density = if((x gt -thick) and (abs(y) gt 2e-6), 0.0, density(Carbon))
+   number_density_min = 0.1 * den_max
+   number_density = if(abs(x) lt thick, den_max, 0.0)
+   number_density = if((x gt -thick) and (abs(y) gt 2e-6), \
+                       0.0, number_density(Carbon))
 end:species
 
 begin:species
    name = Carbon
    charge = 4.0
-   mass = 1836.0*12
+   mass = 1836.0 * 12
    frac = 0.5
 
-   density = 0.25*density(Electron)
+   number_density = 0.25 * number_density(Electron)
    temp_x = temp_x(Electron)
    temp_y = temp_x(Electron)
 
@@ -1363,14 +1381,25 @@ this particle species. The default dumpmask is ``always''.\\
 If set to ``F'' it has the same meaning as ``dumpmask = never''. If set to
 ``T'' it has the same meaning as ``dumpmask = always''.\\
 
-{\emphtext tracer} - Logical flag switching the particle species
-into tracer particles. Tracer particles are enabled with the correct
-precompiler option, and when set for a given species make that species move
+{\emphtext zero\_current} - Logical flag switching the particle species
+into zero-current particles. Zero-current particles are enabled if the
+if the ``NO\_TRACER\_PARTICLES'' precompiler option has not been used and
+the ``zero\_current'' flag is set to true for a given species.
+When set, the species will move
 correctly for its charge and mass, but contribute no current. This means that
-these particles are passive tracers in the plasma. In all other respects they
-are designed to behave identically to non-tracers, so they do take part in
-collisions by default. This can be prevented using the collision matrices in
-\sectit{collisions_block}. ``tracer = F'' is the default value.\\
+these particles are passive elements in the simulation. In all other respects
+they are designed to behave identically to ordinary particles, so they do take
+part in collisions by default. This can be prevented using the collision
+matrices in \sectit{collisions_block}.
+\warn Since the particles effectively have zero weight in terms of their
+numerical heating properties, they
+do not always behave in the same way that an ordinary particle with weight
+would behave and this can sometimes lead to unexpected behaviour. If the
+purpose is merely to track a subset of a particle species to use as output
+then a better mechanism to use is ``persistent subsets''
+(see \sect{persistent_subsets}). ``tracer'' is currently accepted as an alias
+but this will be removed in version 5.0.
+``zero\_current = F'' is the default value.\\
 
 {\emphtext identify} - Used to identify the type of particle. Currently this
 is used primarily by the QED routines. See \sect{qed_block} for details.\\
@@ -1392,30 +1421,32 @@ then used by the autoloader to actually position the particles.
 The elements of the species block used for setting
 initial conditions are:\\
 
-{\emphtext density} - Particle number density in $m^{-3}$.
-As soon as a density= line has been read, the values are
+{\emphtext number\_density} - Particle number density in $m^{-3}$.
+As soon as a number\_density= line has been read, the values are
 calculated for the whole domain and are available for reuse on the right hand
 side of an expression. This is seen in the above example in the first two lines
-for the Electron species, where the density is first set and then corrected.
-If you wish to specify the density in parts per cubic metre then you can
-divide by the ``cc'' constant (see \sect{constants}).
-This parameter is mandatory.\\
+for the Electron species, where the number density is first set and then
+corrected.  If you wish to specify the number density in parts per cubic metre
+then you can divide by the ``cc'' constant (see \sect{constants}).
+This parameter is mandatory. ``density'' is accepted as an alias.\\
 
-{\emphtext density\_min} - Minimum particle number density in $m^{-3}$.
-When the number density in a cell falls below density\_min the
+{\emphtext number\_density\_min} - Minimum particle number density in $m^{-3}$.
+When the number density in a cell falls below number\_density\_min the
 autoloader does not load any pseudoparticles into that cell to minimise the
 number of low weight, unimportant particles. If set to 0 then all cells are
-loaded with particles. This is the default.\\
+loaded with particles. This is the default. ``density\_min'' is accepted
+as an alias.\\
 
-{\emphtext density\_max} - Maximum particle number density in $m^{-3}$.
+{\emphtext number\_density\_max} - Maximum particle number density in $m^{-3}$.
 When the number density in a cell rises above density\_max the
-autoloader clips the density to density\_max allowing easy
+autoloader clips the density to number\_density\_max allowing easy
 implementation of exponential rises to plateaus. If it is a negative value
-then no clipping is performed. This is the default.\\
+then no clipping is performed. This is the default. ``density\_max'' is accepted
+as an alias.\\
 
 {\emphtext mass\_density} - Particle mass density in $kg\,m^{-3}$. The same
-as ``density'' but multiplied by the particle mass. If you wish to use units
-of $g\,cm^{-3}$ then append the appropriate multiplication factor.
+as ``number\_density'' but multiplied by the particle mass. If you wish to use
+units of $g\,cm^{-3}$ then append the appropriate multiplication factor.
 For example: ``\verb|mass_density = 2 * 1e3 / cc|''.\\
 
 {\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
@@ -1449,7 +1480,7 @@ For more information on what is meant by a ``simple binary file'', see
 \begin{lboxverbatim}{external initial conditions}
 begin:species
    name = Electron
-   density = 'Data/ic.dat'
+   number_density = 'Data/ic.dat'
    offset = 80000
    temp_x = 'Data/ic.dat'
 end:species
@@ -1486,7 +1517,7 @@ unformatted files using the offset element, but care must be taken!}\\
 The following entries are used for configuring the Delta-f method
 (see \sect{deltaf}).\\
 
-{\emphtext density\_back, drift\_\{x,y,z\}\_back, temp\_\{x,y,z\}\_back,
+{\emphtext number\_density\_back, drift\_\{x,y,z\}\_back, temp\_\{x,y,z\}\_back,
 \par temp\_\{x,y,z\}\_back\_ev, temp\_back, temp\_back\_ev}
  - These all have the same
 meanings as the parameters listed above that don't include the ``\_back'' text,
@@ -1524,13 +1555,15 @@ The following parameters are added to the ``species'' block:\\
   less than ``demote\_multiplier'' times the local average.  The default value
   is 1.\\
 
-{\emphtext promote\_density} - The particle is only considered for promotion
-  when the local density is less than ``promote\_density''.  The default value
-  is the largest floating point number.\\
+{\emphtext promote\_number\_density} - The particle is only considered for
+  promotion when the local number density is less than
+  ``promote\_number\_density''.  The default value is the largest floating
+  point number.\\
 
-{\emphtext demote\_density}  - The particle is only considered for demotion
-  when the local density is greater than ``demote\_density''.  The default
-  value is 0.\\
+{\emphtext demote\_number\_density} - The particle is only considered for
+  demotion when the local number density is greater than
+  ``demote\_number\_density''.  The default value is 0.\\
+  point number.\\
 
 
 \subsubsection{Ionisation}
@@ -1567,21 +1600,21 @@ begin:species
    ionisation_energies = (11.26*ev,24.38*ev,47.89*ev,64.49*ev,392.1*ev,490.0*ev)
    ionisation_electron_species = \
        (electron,electron,electron,fourth,electron,electron)
-   rho = den_gas
+   number_density = den_gas
 end:species
 
 begin:species
    charge = -1.0
    mass = 1.0
    name = electron
-   rho = 0.0
+   number_density = 0.0
 end:species
 
 begin:species
    charge = -1.0
    mass = 1.0
    name = fourth
-   rho = 0.0
+   number_density = 0.0
 end:species
 \end{boxverbatim}
 
@@ -1735,7 +1768,7 @@ begin:species
   charge = -1
   mass = 1.0
   frac = 0.5
-  density = dens
+  number_density = dens
   # Truncated power law distribution in px
   dist_fn = exp(-p0 / px) * (px / p0)^alpha
   dist_fn_px_range = (0, pmax)
@@ -1757,7 +1790,7 @@ begin:laser
    lambda = 1.06 * micron
    pol_angle = 0.0
    phase = 0.0
-   t_profile = gauss(time,40.0e-15,40.0e-15)
+   t_profile = gauss(time, 40.0e-15, 40.0e-15)
    t_start = 0.0
    t_end = 80.0e-15
 end:laser
@@ -1914,8 +1947,8 @@ allows you to specify the electric and magnetic fields at any point in the
 domain. An example block is shown below:
 \begin{lboxverbatim}{fields block}
 begin:fields
-   ex = sin(pi*x/length_x)
-   ey = cos(pi*x/length_x)
+   ex = sin(pi * x / length_x)
+   ey = cos(pi * x / length_x)
    ez = 0
    bx = 1.0
    by = -1.0
@@ -2120,7 +2153,7 @@ begin:output
    # If use_offset_grid is true then the code dumps a grid which
    # displays positions relative to the left hand edge of the window
    use_offset_grid = F
-   # number of timesteps between output dumps
+   # Number of timesteps between output dumps
    dt_snapshot = 1.0e-14
    # Number of dt_snapshot between full dumps
    full_dump_every = 10
@@ -2969,15 +3002,15 @@ begin:dist_fn
    direction1 = dir_x
    direction2 = dir_px
 
-   # range is ignored for spatial coordinates
-   range1 = (1,1)
-   range2 = (-50.0e-20,50.0e-20)
+   # Range is ignored for spatial coordinates
+   range1 = (1, 1)
+   range2 = (-50.0e-20, 50.0e-20)
 
-   # resolution is ignored for spatial coordinates
+   # Resolution is ignored for spatial coordinates
    resolution1 = 1
    resolution2 = 5000
 
-   restrict_py = (-3.0e-20,3.0e-20)
+   restrict_py = (-3.0e-20, 3.0e-20)
 
    include_species:Electron
    include_species:Carbon
@@ -3255,7 +3288,7 @@ deck would look like
 begin:species
    name = electron
    frac = 0.5
-   rho = 7.7e29
+   number_density = 7.7e29
    identify:electron
 end:species
 \end{boxverbatim}
@@ -3393,12 +3426,12 @@ The ``injector'' block accepts the following keys:\\
   injector. Average number of particles injected will be this value or slightly
   higher if very few particles are specified.\\
 
-{\emphtext density} - Number density of the particle source in m$^{-3}$. Can
-  be space varying along the boundary to which the injector is attached and
-  time varying.\\
+{\emphtext number\_density} - Number density of the particle source in
+  m$^{-3}$. Can be space varying along the boundary to which the injector is
+  attached and time varying.\\
 
-{\emphtext density\_min} - Minimum density in m$^{-3}$ below which pseudo
-  particles are not loaded. Use if the density has a profile to avoid
+{\emphtext number\_density\_min} - Minimum density in m$^{-3}$ below which
+  pseudo particles are not loaded. Use if the density has a profile to avoid
   injecting low weight particles in low density regions.\\
 
 {\emphtext temp\_x} - Temperature in x direction (K)\\
@@ -3428,7 +3461,7 @@ begin:injector
 
   boundary = x_min
   species = Electron
-  density = dens
+  number_density = dens
   temp_x = temp
   drift_x = drift_p
   npart_per_cell = 32
@@ -3581,6 +3614,7 @@ end:output
 \end{boxverbatim}
 
 \subsubsection{Persistent subsets}
+\label{sec:persistent_subsets}
 Persistent subsets are subsets that capture a set of particles once, given a
 specified set of parameters, and then track those particles permanently.
 Persistent subsets use the same blocks as normal subsets and take the same
@@ -3626,21 +3660,21 @@ deleted and replaced with the new one. This happens without warning.
 \begin{lboxverbatim}{constant block}
 begin:constant
    lambda = 1.06 * micron
-   omega = 2.0*pi*c/lambda
+   omega = 2.0 * pi * c / lambda
    den_crit = critical(omega)
    scale = 3.5 * micron
-   den_max = 5.0*den_crit
+   den_max = 5.0 * den_crit
    thick = 300e-9
    pplength = 6000e-9
    widscale = 5.0e-6
 
-   t_wid = (10.0e-6)/c
+   t_wid = (10.0e-6) / c
    amax = 1.0
    wy = 1e-6
    y = 0.0
 
-   slope = exp(-2.0*(y/wy)^2)
-   blob = gauss(sqrt(x^2+y^2),0.0,1.0e-6)
+   slope = exp(-2.0 * (y/wy)^2)
+   blob = gauss(sqrt(x^2+y^2), 0.0, 1.0e-6)
 end:constant
 \end{lboxverbatim}
 
@@ -3772,7 +3806,7 @@ A, & \mbox{otherwise}
 \item if(a,b,c) - Conditional function. If a != 0 the function returns b,
   otherwise the function returns c.
 
-\item density(a) - Returns the density for species a.
+\item number\_density(a) - Returns the number density for species a.
 \item temp\_\{x,y,z\}(a) - Returns temperature in the x, y or z direction for
     species a.
 \item temp(a) - Returns the isotropic temperature for species a.
@@ -3876,31 +3910,31 @@ begin:species
    name = s1
    # first set density in the range 0->1
    # cut down density in x direction
-   density = if ((x gt -1) and (x lt 1),1.0,0.2)
+   number_density = if ((x gt -1) and (x lt 1), 1.0, 0.2)
    # cut down density in y direction
-   density = if ((y gt -1) and (y lt 1),density(s1),0.2)
+   number_density = if ((y gt -1) and (y lt 1), number_density(s1), 0.2)
 
    # multiply density by real particle density
-   density = density(s1)*100.0
+   number_density = number_density(s1) * 100.0
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*100.0
+   number_density_min = 0.3 * 100.0
 end:species
 
 begin:species
    # Just copy the density for species s1
-   density = density(s1)
+   number_density = number_density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*100.0
+   number_density_min = 0.3 * 100.0
 end:species
 \end{boxverbatim}
 
@@ -3999,6 +4033,9 @@ inter-processor communication of particles. The definition of the type is:
     ! Pointer is safe if the particles in it are all unambiguously linked
     LOGICAL :: safe
 
+    ! Does this partlist hold copies of particles rather than originals
+    LOGICAL :: holds_copies
+
     TYPE(particle_list), POINTER :: next, prev
   END TYPE particle_list
 \end{boxverbatim}
@@ -4034,9 +4071,17 @@ The current definition is:
     INTEGER(i8) :: count
     TYPE(particle_list) :: attached_list
     LOGICAL :: immobile
+    LOGICAL :: fill_ghosts
+
+    ! Parameters for relativistic and arbitrary particle loader
+    INTEGER :: ic_df_type
+    REAL(num) :: fractional_tail_cutoff
+
+    TYPE(primitive_stack) :: dist_fn
+    TYPE(primitive_stack) :: dist_fn_range(3)
 
 #ifndef NO_TRACER_PARTICLES
-    LOGICAL :: tracer
+    LOGICAL :: zero_current
 #endif
 
     ! ID code which identifies if a species is of a special type
@@ -4075,6 +4120,11 @@ The current definition is:
     ! Particle migration
     TYPE(particle_species_migration) :: migrate
 
+    ! Initial conditions
+    TYPE(initial_condition_block) :: initial_conditions
+
+    ! Per-species boundary conditions
+    INTEGER, DIMENSION(2*c_ndims) :: bc_particle
   END TYPE particle_species
 \end{boxverbatim}
 
@@ -4108,8 +4158,8 @@ most important ones.
 \item attached\_list - The list of particles which belong to this species.
 \item immobile - If set to \verb|.TRUE.| then the species is ignored during
   the particle push.
-\item tracer - If set to \verb|.TRUE.| then the current is not updated for this
-  particle species.
+\item zero\_weight - If set to \verb|.TRUE.| then the current is not updated
+  for this particle species.
 \end{itemize}
 
 
@@ -4386,33 +4436,33 @@ begin:species
 
    # first set density in the range 0->1
    # cut down density in x direction
-   density = if ((x gt -1) and (x lt 1),1.0,0.2)
+   number_density = if ((x gt -1) and (x lt 1), 1.0, 0.2)
    # cut down density in y direction
-   density = if ((y gt -1) and (y lt 1),density(s1),0.2)
+   number_density = if ((y gt -1) and (y lt 1), number_density(s1), 0.2)
 
    # multiply density by real particle density
-   density = density(s1)*100.0
+   number_density = number_density(s1) * 100.0
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*100.0
+   number_density_min = 0.3 * 100.0
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   density = density(s1)
+   number_density = number_density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*100.0
+   number_density_min = 0.3 * 100.0
 end:species
 \end{boxverbatim}
 
@@ -4428,33 +4478,33 @@ begin:species
 
    # first set density in the range 0->1
    # cut down density in x direction
-   density = if ((x gt -1) and (x lt 1),1.0,0.2)
+   number_density = if ((x gt -1) and (x lt 1), 1.0, 0.2)
    # cut down density in y direction
-   density = if ((y gt -1) and (y lt 1),density(s1),0.2)
+   number_density = if ((y gt -1) and (y lt 1), number_density(s1), 0.2)
 
    # multiply density by real particle density
-   density = density(s1)*particle_density
+   number_density = number_density(s1) * particle_density
 
    # Set the temperature to be zero
    temp_x = 0.0
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   density = density(s1)
+   number_density = number_density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 \end{boxverbatim}
 
@@ -4488,21 +4538,21 @@ begin:species
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   density = density(s1)
+   number_density = number_density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 \end{boxverbatim}
 
@@ -4511,8 +4561,8 @@ profiles later. For example:
 \begin{boxverbatim}
 begin:constant
    particle_density = 100.0 # Particle number density
-   profile_x = gauss(x,0.0,1.0)
-   profile_y = gauss(y,0.0,1.0)
+   profile_x = gauss(x, 0.0, 1.0)
+   profile_y = gauss(y, 0.0, 1.0)
 end:constant
 
 begin:species
@@ -4526,21 +4576,21 @@ begin:species
    temp_y = temp_x(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 
 begin:species
    name = s2
 
    # Just copy the density for species s1
-   density = density(s1)
+   number_density = number_density(s1)
 
    # Just copy the temperature from species s1
    temp_x = temp_x(s1)
    temp_y = temp_y(s1)
 
    # Set the minimum density for this species
-   density_min = 0.3*particle_density
+   number_density_min = 0.3 * particle_density
 end:species
 \end{boxverbatim}
 
@@ -4581,9 +4631,10 @@ the temperature in each direction is equal, we have
     \exp\left( \frac{m (\mathbf{v} - \mathbf{v_d})^2}{2 k_B T} \right).
 \end{equation*}
 
-The parameters density\_back, temp(x,y,z)\_back and drift(x,y,z)\_back in each
-species specification in the input deck set $f_0$. density\_back $=0$ is the
-default and is equivalent to not using the delta-f method.
+The parameters number\_density\_back, temp(x,y,z)\_back and drift(x,y,z)\_back
+in each species specification in the input deck set $f_0$.
+number\_density\_back $=0$ is the default and is equivalent to not using the
+delta-f method.
 
 For example, the electron species component of an input deck solved using
 delta-f might be written:
@@ -4596,8 +4647,8 @@ begin:species
    frac = 0.3
    temp = 1e8
    temp_back = 1e8
-   density = 1e20
-   density_back = 1e20
+   number_density = 1e20
+   number_density_back = 1e20
 end:species
 \end{lboxverbatim}
 
@@ -4638,10 +4689,10 @@ begin:control
    nx = 400
    npart = 20000
 
-   #final time of simulation
+   # Final time of simulation
    t_end = 1.5e-1
 
-   #size of domain
+   # Size of domain
    x_min = 0
    x_max = 5.0e5
 end:control
@@ -4668,7 +4719,7 @@ begin:species
    frac = 0.5
    temp_x = temp
    drift_x = drift_p
-   rho = dens
+   number_density = dens
 end:species
 
 
@@ -4680,12 +4731,12 @@ begin:species
    frac = 0.5
    temp_x = temp
    drift_x = -drift_p
-   rho = dens
+   number_density = dens
 end:species
 
 
 begin:output
-   # number of timesteps between output dumps
+   # Number of timesteps between output dumps
    dt_snapshot = 1.5e-3
    # Number of dt_snapshot between full dumps
    full_dump_every = 1
@@ -4709,7 +4760,7 @@ begin:output
    number_density = always + species
    temperature = always + species
 
-   # extended io
+   # Extended io
    distribution_functions = always
 end:output
 \end{lboxverbatim}
@@ -4754,8 +4805,9 @@ end:constant
 
 begin:species
    name = Electron
-   density = den_peak*(sin(4.0*pi*x/length_x+pi/4))*(sin(8.0*pi*y/length_y)+1)
-   density_min = 0.1*den_peak
+   number_density = den_peak * sin(4.0 * pi * x / length_x + pi / 4) \
+                    * (sin(8.0 * pi * y / length_y) + 1)
+   number_density_min = 0.1 * den_peak
    charge = -1.0
    mass = 1.0
    frac = 0.5
@@ -4763,7 +4815,7 @@ end:species
 
 begin:species
    name = Proton
-   density = density(Electron)
+   number_density = number_density(Electron)
    charge = 1.0
    mass = 1836.2
    frac = 0.5
@@ -4831,9 +4883,10 @@ begin:species
    charge = 1.0
    mass = 1836.2
    frac = 0.5
-   rho = if((r gt ri) and (r lt ro), den_cone, 0.0)
-   rho = if((x gt xi) and (x lt xo) and (r lt ri), den_cone, rho(proton))
-   rho = if(x gt xo, 0.0, rho(proton))
+   number_density = if((r gt ri) and (r lt ro), den_cone, 0.0)
+   number_density = if((x gt xi) and (x lt xo) and (r lt ri), \
+                       den_cone, number_density(proton))
+   number_density = if(x gt xo, 0.0, number_density(proton))
 end:species
 
 begin:species
@@ -4841,7 +4894,7 @@ begin:species
    charge = -1.0
    mass = 1.0
    frac = 0.5
-   rho = rho(proton)
+   number_density = number_density(proton)
 end:species
 \end{lboxverbatim}
 
@@ -4884,10 +4937,10 @@ begin:control
   nx = 500
   ny = nx
 
-  # final time of simulation
+  # Final time of simulation
   t_end = 100 * femto
 
-  # size of domain
+  # Size of domain
   x_min = -10 * micron
   x_max = -x_min
   y_min = x_min
@@ -4906,17 +4959,16 @@ end:boundaries
 begin:constant
   lambda0 = 1.0 * micron
 
-  #These two set the beam focus
+  # These two set the beam focus
   w_0 = 0.9 * micron #Beam waist size
   x_spot = 15 * micron #Distance from x_min to spot
 
-  #These are the parameters calculated for driving the laser
-  #These should not need to be modified
+  # These are the parameters calculated for driving the laser
+  # These should not need to be modified
   x_R = pi * w_0^2 / lambda0 #Rayleigh range
   RC = x_spot * (1.0 + (x_R/x_spot)^2) #Radius of curvature on x_min
   w_bnd = w_0 * sqrt( 1.0 + (x_spot/x_R)^2) #Spot size at x_min
-  gouy = atan(x_spot/x_R) #Gouy phase shift at x_min
-
+  gouy = atan(x_spot/x_R) # Gouy phase shift at x_min
 end:constant
 
 begin:laser
@@ -4925,11 +4977,11 @@ begin:laser
   lambda = lambda0
 
   phase = 2.0 * pi/ lambda0 * y^2 / (2.0 * RC) - gouy
-  profile = gauss(y,0,w_bnd)
+  profile = gauss(y, 0, w_bnd)
 end:laser
 
 begin:output
-  # number of timesteps between output dumps
+  # Number of timesteps between output dumps
   dt_snapshot = 25 * femto
 
   # Properties on grid
@@ -5241,6 +5293,8 @@ Some changes have been made to the Makefile. These are documented in
 \noindent The following compile-time define has been added to the Makefile:
 \begin{itemize}
 \item DELTAF\_METHOD
+\item DELTAF\_DEBUG
+\item USE\_ISATTY
 \end{itemize}
 \bigskip
 
@@ -5406,6 +5460,8 @@ used in conjunction with the moving window.
     See \sect{output_directives} and \sect{output_global_block}
 \item Added ``walltime\_interval'' parameter to the output block.
     See \sect{multiple_output}
+\item Added the Higuera-Cary particle push. This can be enabled using the
+    ``HC\_PUSH'' Makefile flag. See \sect{makefile}.
 \end{itemize}
 \bigskip
 
@@ -5458,6 +5514,31 @@ used in conjunction with the moving window.
 \end{itemize}
 \item Added ``temperature\_\{x,y,z\}'' derived output variables to the
     output block. See \sect{derived}.
+\end{itemize}
+\bigskip
+
+
+\subsection{Changes between version 4.15 and 4.16}
+
+\begin{itemize}
+\item Added ``number\_density'' aliases for ``density'' in the species and
+   injector blocks (see \sect{species_block} and \sect{injector_block}).
+   These aliases include:
+\begin{itemize}
+\item number\_density for density
+\item promote\_number\_density for promote\_density
+\item demote\_number\_density for demote\_density
+\item number\_density\_min for density\_min
+\item number\_density\_max for density\_max
+\item number\_density\_back for density\_back
+\end{itemize}
+\item Replaced ``USE\_ISATTY'' Makefile flag with ``NO\_USE\_ISATTY''.
+  See \sect{makefile}.
+\item Added ``NO\_MPI3'' Makefile flag. See \sect{makefile}.
+\item Added a ``zero\_current'' alias for ``tracer'' in the species blocks.
+  See \sect{species_block}. The use of ``tracer'' has now been deprecated and
+  will be removed in version 5.0.
+  At that time, the compiler flag will also be renamed.
 \end{itemize}
 \bigskip
 
