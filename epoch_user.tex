@@ -2564,6 +2564,9 @@ species dumpmask.  The synonym ``ppc'' may also be used.\\
 {\emphtext average\_weight} - Average of weight of the particles in each cell.
 Can have species dumpmask.\\
 
+{\emphtext average\_p\{x,y,z\}} - Average momentum of the particles in each
+cell.  Can have species dumpmask.\\
+
 {\emphtext temperature} - Isotropic temperature on grid in $K$. The synonym
 ``temp'' may also be used. Can have species dumpmask.\\
 
@@ -5539,6 +5542,15 @@ used in conjunction with the moving window.
   See \sect{species_block}. The use of ``tracer'' has now been deprecated and
   will be removed in version 5.0.
   At that time, the compiler flag will also be renamed.
+\end{itemize}
+\bigskip
+
+
+\subsection{Changes between version 4.16 and 4.17}
+
+\begin{itemize}
+\item Added ``average\_p\{x,y,z\}'' derived output variables to the
+    output block. See \sect{derived}.
 \end{itemize}
 \bigskip
 
