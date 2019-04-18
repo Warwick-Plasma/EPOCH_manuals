@@ -1218,6 +1218,18 @@ simply removed from the simulation when they reach the boundary.\\
 propagate through the boundary. Particles are transmitted through the boundary
 and removed from the system.\\
 
+{\emphtext continue} - Applies to particles \inlineemph{only}.
+An improved version of the
+thermal boundaries using a particle injector. This copies the species
+properties, acting as though the species continued outside the boundary.
+Note that this does \inlineemph{not} match to the species as it evolves, only
+evaluating the initial conditions as specified. Time or space
+varying initial conditions will be evaluated at the current time and at the
+position of the specified boundary.
+All restrictions on particle injectors (see \ref{sec:injector_block})
+apply. This boundary will always apply the
+\inlineemph{use\_flux\_maxwellian} flag\\
+
 {\emphtext cpml\_laser} - See \sect{cpml}.\\
 
 {\emphtext cpml\_outflow} - See \sect{cpml}.\\
@@ -1282,9 +1294,10 @@ end:boundaries
 Thermal boundary conditions have been added to the ``boundaries'' block.
 These simulate the existence of a ``thermal bath'' of particles in the
 domain adjacent to the boundary. When a particle leaves the simulation it is
-replace with an incoming particle sampled from a Maxwellian of a temperature
+replaced with an incoming particle sampled from a Maxwellian of a temperature
 corresponding to that of the initial conditions. It is requested using the
-keyword ``thermal''.
+keyword ``thermal''. Note that these only resample when a particle leaves, unlike
+the ``continue'' boundary condition (added in {\EPOCH} 4.17).
 For example:
 
 \begin{boxverbatim}
@@ -3446,7 +3459,7 @@ complete.
 The ``injector'' block accepts the following keys:\\
 
 {\emphtext boundary} - specifies which boundary to attach the particle source
-  too. Same specification as \sect{laser_block}, so permitted values are
+  to. Same specification as \sect{laser_block}, so permitted values are
   x\_min, x\_max, y\_min, y\_max, z\_min and z\_max.\\
 
 {\emphtext species} - specifies which species should be injected through the
@@ -3499,10 +3512,8 @@ The ``injector'' block accepts the following keys:\\
   the drift is zero. ``drift\_\{x,y,z\}'' are also accepted as aliases.\\
 
 {\emphtext use\_flux\_maxwellian} - Logical flag to determine whether to use
-  an accelerated flux Maxwellian rather than a drifting Maxwellian. This
-  calculates the flux due to passing a Maxwellian source into an electrostatic
-  accelerator instead of a drifting Maxwellian. If your particle source is a
-  lab accelerator then you may want to set this to true.\\
+  an accelerated flux Maxwellian rather than a drifting Maxwellian. See
+  \ref{sec:fluxing} for details.\\
 
 An example input deck might look as follows:\\
 
@@ -3522,6 +3533,30 @@ end:injector
 {\emphtext
 Injectors are a new feature so please be wary of unusual behaviour, and
 contact the {\EPOCH} development team if unexpected results occur}
+
+\subsubsection{Fluxed Distributions}\label{sec:fluxing}
+
+The basic injector assumes a particle source attached to a boundary
+introducing a specied distribution, a drifting Maxwellian. In many
+cases, this is incorrect, and you actually wish to mimic a region
+filled with the specified distribution, injecting particles as they
+cross from this imaginary region into the simulation domain. In this case
+the injector should use the \inlineemph{use\_flux\_maxwellian} key, which
+samples from the distribution $v f(v-drift)$.\\
+
+For a distribution where the drift is large with respect to the thermal
+speed, the flux correction is negligible, and this flag is not recommended
+as it must use a slower method of sampling.\\
+
+Prior to {\EPOCH} version 4.17, the injectors expected an inwards drifting
+distribution and did not correctly handle a distribution with an
+outwards part. Since version 4.17 injectors can smoothly continue a
+specified Maxwellian with any value of drift and any
+non-relativistic temperature. \\
+
+If your particle source is a lab accelerator or a thermal bath, with a drift
+comparable to the thermal speed, then you should set this flag to true.\\
+
 
 \subsection{\texorpdfstring
   {\inlineemph{subset} block}
