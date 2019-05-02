@@ -468,6 +468,10 @@ symbol. The options currently controlled by the preprocessor are:\\
   such as the ``MPI\_TYPE\_SIZE\_X'' routine. This allows the code to be
   compiled against older versions of the MPI library. The flag should only be
   enabled if the code fails to compile without it.
+\item DECK\_DEBUG - If this flag is enabled then the code will exit if any
+  warnings are encountered during deck parsing. If the flag is not enabled then
+  the same behaviour can be obtained by using the ``deck\_warnings\_fatal''
+  flag in the control block of the input deck. See \sect{control_block}.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
@@ -918,6 +922,12 @@ specified time before beginning to move the particles.\\
   drift during species loading. This can be a significant memory saving but
   omes at the expense of recalculating grid quantities multiple times.
   Setting the flag to true enables one set of arrays per species.
+  The default value is ``F''.\\
+
+{\emphtext deck\_warnings\_fatal} - This logical flag controls the behaviour
+  of the deck parser when a warning is encountered. Usually the code will
+  just print a warning message and continue running. Setting this flag to ``T''
+  will force the code to abort.
   The default value is ``F''.\\
 
 
@@ -2560,6 +2570,9 @@ species dumpmask.  The synonym ``ppc'' may also be used.\\
 
 {\emphtext average\_weight} - Average of weight of the particles in each cell.
 Can have species dumpmask.\\
+
+{\emphtext average\_p\{x,y,z\}} - Average momentum of the particles in each
+cell.  Can have species dumpmask.\\
 
 {\emphtext temperature} - Isotropic temperature on grid in $K$. The synonym
 ``temp'' may also be used. Can have species dumpmask.\\
@@ -5635,6 +5648,18 @@ used in conjunction with the moving window.
 \bigskip
 
 
+\subsection{Changes between version 4.16 and 4.17}
+
+\begin{itemize}
+\item Added ``average\_p\{x,y,z\}'' derived output variables to the
+    output block. See \sect{derived}.
+\item Added ``deck\_warnings\_fatal'' flag to the control block for controlling
+    the way that deck parser warnings are handled. See \sect{control_block}
+\item Added ``DECK\_DEBUG'' Makefile flag. See \sect{makefile}.
+\end{itemize}
+\bigskip
+
+
 \subsection{Changes between version 4.16 and 5.0}
 
 \begin{itemize}
@@ -5649,7 +5674,6 @@ used in conjunction with the moving window.
     for the ``tracer'' flag. See \sect{species_block}.
 \end{itemize}
 \bigskip
-
 
 \section{Simple binary files}
 \label{sec:binaryfile}
