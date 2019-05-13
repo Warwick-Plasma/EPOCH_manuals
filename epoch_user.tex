@@ -1473,6 +1473,10 @@ electronvolts rather than Kelvin.\\
 $kg\ ms^{-1}$ to the distribution function for this species. By default,
 the drift is zero.\\
 
+{\emphtext field\_aligned\_initialisation} - Boolean to indicate that the temperature and drifts set for the $z$ ($x$ and $y$) coordinate(s) is (are) used to initialise the particles' velocity components that are parallel (perpendicular) to the magnetic field at each particle's position.\\
+
+{\emphtext x\_perp\_y\_ignored\_z\_para} - Boolean to indicate that the temperature and drifts set for the $x$ and $z$ coordinates are used to initialise the perpendicular and parallel velocity components of particles respecitively, and the $y$ temperature and drift information is ignored. The parallel velocity component $v_\parallel$ is the component parallel to the magnetic field local to the particle, and the perpendicular velocity component is the square root of the sum of squares of the other two velocity components; $v_\bot = (v_{\bot,1}^2 + v_{\bot,2}^2)^\frac{1}{2}$. Here ${\vec v} = v_\parallel {\vec e}_\parallel + v_{\bot,1} {\vec e}_{\bot,1} + v_{\bot,2} {\vec e}_{\bot,2}$.\\
+
 {\emphtext offset} - File offset. See below for details.\\
 
 % There are also 'split' and 'npart_max' entries. I don't know what they are
