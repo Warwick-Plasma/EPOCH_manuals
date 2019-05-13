@@ -3464,6 +3464,9 @@ The ``injector'' block accepts the following keys:\\
   then the last to appear in the deck has precedence. If neither are given
   then the injector will have a default temperature of zero Kelvin.\\
 
+{\emphtext temp\_\{x,y,z\}\_ev, temp\_ev} - These are the same as the
+  temperature parameters described above except the units are given in
+  electronvolts rather than Kelvin.\\
 
 {\emphtext drift\_\{x,y,z\}} - Specifies a momentum space offset in
   $kg\ ms^{-1}$ to the distribution function for this injector. By default,
@@ -5575,6 +5578,9 @@ used in conjunction with the moving window.
 \item Added ``number\_density\_max'' parameter to the injector block. This has
     similar functionality to the species block parameter of the same name.
     See \sect{injector_block}.
+\item Added ``temp\_\{x,y,z\}\_ev'' and ``temp\_ev'' parameters to the injector
+    block. These have the same functionality as the species block parameters
+    of the same name.  See \sect{injector_block}.
 \end{itemize}
 \bigskip
 
