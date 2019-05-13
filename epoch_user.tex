@@ -3443,9 +3443,19 @@ The ``injector'' block accepts the following keys:\\
   m$^{-3}$. Can be space varying along the boundary to which the injector is
   attached and time varying.\\
 
-{\emphtext number\_density\_min} - Minimum density in m$^{-3}$ below which
-  pseudo particles are not loaded. Use if the density has a profile to avoid
-  injecting low weight particles in low density regions.\\
+{\emphtext number\_density\_min} - Minimum particle number density in m$^{-3}$
+  below which pseudo particles are not loaded. Use if the density has a profile
+  to avoid injecting low weight particles in low density regions.\\
+
+{\emphtext number\_density\_max} - Maximum particle number density in $m^{-3}$.
+  When the number density in a cell rises above density\_max the
+  injector clips the density to number\_density\_max allowing easy
+  implementation of exponential rises to plateaus for time-varying injectors.
+  Note that the number of particles per cell is kept fixed and the number
+  density adjustment is achieved by modifying the particle weight. This flag
+  has no effect for particles with per-species weighting.
+  If the flag has a negative value then no clipping is performed. This is the
+  default.\\
 
 {\emphtext temp\_x} - Temperature in x direction (K)\\
 
@@ -5564,6 +5574,9 @@ used in conjunction with the moving window.
 \item Added ``deck\_warnings\_fatal'' flag to the control block for controlling
     the way that deck parser warnings are handled. See \sect{control_block}
 \item Added ``DECK\_DEBUG'' Makefile flag. See \sect{makefile}.
+\item Added ``number\_density\_max'' parameter to the injector block. This has
+    similar functionality to the species block parameter of the same name.
+    See \sect{injector_block}.
 \end{itemize}
 \bigskip
 
