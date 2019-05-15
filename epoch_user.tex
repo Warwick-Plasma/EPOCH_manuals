@@ -3734,7 +3734,8 @@ The maths parser in {\EPOCH}  has the following constants
 \item cc - A convenience symbol for converting from cubic metres to cubic
   centimetres (ie. $10^{-6}$)
 \item time - Initial simulation time.
-\item x,y,z - Grid coordinates in the x,y,z direction.
+\item x,y,z - Cell-centred grid coordinates in the x,y,z direction.
+\item xb,yb,zb - Node-centred grid coordinates in the x,y,z direction.
 \item ix,iy,iz - Grid index in the x,y,z direction.
 \item nx,ny,nz - Number of grid points in the x,y,z direction.
 \item dx,dy,dz - Grid spacing in the x,y,z direction.
@@ -3747,6 +3748,9 @@ The maths parser in {\EPOCH}  has the following constants
 \item t\_end - The end time of the simulation.
 \item p\{x,y,z\} - Momentum in the $x, y, z$ directions. Used in specifying
   arbitrary distribution functions.
+\item r\_xyz - Radial distance from the origin
+\item r\_\{xy,xz,yz\} - Radial distances from the $z$, $y$ and $x$ axes,
+  respectively
 \end{itemize}
 
 It is also possible for an end user to specify custom constants both within
@@ -3809,7 +3813,8 @@ A, & \mbox{otherwise}
 \item number\_density(a) - Returns the number density for species a.
 \item temp\_\{x,y,z\}(a) - Returns temperature in the x, y or z direction for
     species a.
-\item temp(a) - Returns the isotropic temperature for species a.
+\item temp\_\{x,y,z\}\_ev(a) - Returns temperature in the x, y or z direction
+    measured in electronvolts for species a.
 \item e\{x,y,z\}(x,y,z) - Returns the x, y or z component of the electric
     field at the specified location.
 \item b\{x,y,z\}(x,y,z) - Returns the x, y or z component of the magnetic
