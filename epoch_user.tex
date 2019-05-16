@@ -1473,9 +1473,34 @@ electronvolts rather than Kelvin.\\
 $kg\ ms^{-1}$ to the distribution function for this species. By default,
 the drift is zero.\\
 
-{\emphtext field\_aligned\_initialisation} - Boolean to indicate that the temperature and drifts set for the $z$ ($x$ and $y$) coordinate(s) is (are) used to initialise the particles' velocity components that are parallel (perpendicular) to the magnetic field at each particle's position.\\
+{\emphtext field\_aligned\_initialisation} - Boolean to indicate that the
+px, py, and pz coordinates used in the dist\_fn and 
+dist\_fn\_\{px,py,pz\}\_range fields are hijacked to initialise the 
+particles' momenta in a field aligned coordinate system.
+When turned on, this flag causes pz to be treated as the component of
+momentum parallel to the magnetic field local to the particle.
+px and py are similarly used to initialise the particle momentum 
+components in the other two directions; the rotation from field 
+aligned coordinates to the cartesian coordinates is calculated as discussed
+\href{https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle}{here},
+where ${\vec u \parallel {\hat z} \cdot {\vec B}}$, and 
+$\cos\theta = \frac{{\hat z}\cdot{\vec B}}{\|B\|}$.
+If a gyrotropic initial particle distribution function is desired, using
+x\_perp\_y\_ignored\_z\_para as well will generally load particles faster.
+Defaults to ``F''. \\
 
-{\emphtext x\_perp\_y\_ignored\_z\_para} - Boolean to indicate that the temperature and drifts set for the $x$ and $z$ coordinates are used to initialise the perpendicular and parallel velocity components of particles respecitively, and the $y$ temperature and drift information is ignored. The parallel velocity component $v_\parallel$ is the component parallel to the magnetic field local to the particle, and the perpendicular velocity component is the square root of the sum of squares of the other two velocity components; $v_\bot = (v_{\bot,1}^2 + v_{\bot,2}^2)^\frac{1}{2}$. Here ${\vec v} = v_\parallel {\vec e}_\parallel + v_{\bot,1} {\vec e}_{\bot,1} + v_{\bot,2} {\vec e}_{\bot,2}$.\\
+{\emphtext x\_perp\_y\_ignored\_z\_para} - 
+Boolean. As with field\_aligned\_initialisation except that particle momenta 
+are initialised in gyrotropic distribution functions. px in dist\_fn and 
+dist\_fn\_px\_range is used to initialse the speed of particles perpendicular
+to the magnetic field. Consequently particle momenta are initialised 
+in $(v_\parallel, |v_\bot|)$ space.
+Particles' gyroangles are assigned randomly, resulting in gyrotropic
+distribution functions.
+pz refers to the component of momentum aligned with the magnetic field, as 
+in field\_aligned\_initialisation.
+The dependency of dist\_fn on py is ignored.
+Defaults to ``F''.\\
 
 {\emphtext offset} - File offset. See below for details.\\
 
