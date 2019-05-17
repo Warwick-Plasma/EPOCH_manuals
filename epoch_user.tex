@@ -1308,10 +1308,10 @@ begin:species
    frac = 0.5
    # npart = 2000 * 100
    number_density = 1.e4
-   temp = 1e6
+   temperature = 1e6
 
-   temp_x = 0.0
-   temp_y = temp_x(Electron)
+   temperature_x = 0.0
+   temperature_y = temperature_x(Electron)
    number_density_min = 0.1 * den_max
    number_density = if(abs(x) lt thick, den_max, 0.0)
    number_density = if((x gt -thick) and (abs(y) gt 2e-6), \
@@ -1325,8 +1325,8 @@ begin:species
    frac = 0.5
 
    number_density = 0.25 * number_density(Electron)
-   temp_x = temp_x(Electron)
-   temp_y = temp_x(Electron)
+   temperature_x = temperature_x(Electron)
+   temperature_y = temperature_x(Electron)
 
    dumpmask = full
 end:species
@@ -1459,17 +1459,20 @@ as ``number\_density'' but multiplied by the particle mass. If you wish to use
 units of $g\,cm^{-3}$ then append the appropriate multiplication factor.
 For example: ``\verb|mass_density = 2 * 1e3 / cc|''.\\
 
-{\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
-distribution specified in Kelvin.\\
+{\emphtext temperature\_\{x,y,z\}} - The temperature in each direction for a
+thermal distribution specified in Kelvin. ``temp\_\{x,y,z\}'' can be used as
+aliases.\\
 
-{\emphtext temp} - Sets an isotropic temperature distribution in Kelvin.
-If both temp and a specific temp\_x, temp\_y, temp\_z parameter is specified
-then the last to appear in the deck has precedence. If neither are given
-then the species will have a default temperature of zero Kelvin.\\
+{\emphtext temperature} - Sets an isotropic temperature distribution in Kelvin.
+If both ``temperature'' and a specific ``temperature\_x'', ``temperature\_y''
+or ``temperature\_z'' parameter is specified then the last to appear in the
+deck has precedence. If neither are given then the species will have a
+default temperature of zero Kelvin. ``temp'' is accepted as an alias.\\
 
-{\emphtext temp\_\{x,y,z\}\_ev, temp\_ev} - These are the same as the
-temperature parameters described above except the units are given in
-electronvolts rather than Kelvin.\\
+{\emphtext temperature\_\{x,y,z\}\_ev, temperature\_ev} - These are the same
+as the ``temperature'' parameters described above except the units are given
+in electronvolts rather than Kelvin. ``temp\_\{x,y,z\}\_ev'' and ``temp\_ev''
+are accepted as aliases.\\
 
 {\emphtext drift\_p\{x,y,z\}} - Specifies a momentum space offset in
 $kg\ ms^{-1}$ to the distribution function for this species. By default,
@@ -1491,14 +1494,14 @@ begin:species
    name = Electron
    number_density = 'Data/ic.dat'
    offset = 80000
-   temp_x = 'Data/ic.dat'
+   temperature_x = 'Data/ic.dat'
 end:species
 \end{lboxverbatim}
 
 The sizes of the variables to be filled do not need to be provided: the
-code will continue reading until the given variable is filled. 
+code will continue reading until the given variable is filled.
 Note that ghost or guard cells should not be included in the file as
-they cannot be set this way. 
+they cannot be set this way.
 
 An additional element is also introduced, the offset element. This
 is the offset in bytes from the start of the file to where the data should
@@ -1512,7 +1515,7 @@ a mathematical expression.\\
 
 The example block above is for 10,000 values at double precision, i.e. 8-bytes
 each. The density data is the first 80,000 bytes of ``ic.dat''. Bytes 80,000
-to 160,000 are the temp\_x data.
+to 160,000 are the temperature\_x data.
 
 The file should be a simple binary file consisting of floating point numbers of
 the same precision as \inlinecode{\_num} in the core {\EPOCH} code. For
@@ -1527,8 +1530,8 @@ The following entries are used for configuring the Delta-f method
 (see \sect{deltaf}).\\
 
 {\emphtext number\_density\_back, drift\_p\{x,y,z\}\_back,
- temp\_\{x,y,z\}\_back,
-\par temp\_\{x,y,z\}\_back\_ev, temp\_back, temp\_back\_ev}
+ temperature\_\{x,y,z\}\_back,
+\par temperature\_\{x,y,z\}\_back\_ev, temperature\_back, temperature\_back\_ev}
  - These all have the same
 meanings as the parameters listed above that don't include the ``\_back'' text,
 except that they specify the values to use for the background distribution
@@ -3466,17 +3469,20 @@ The ``injector'' block accepts the following keys:\\
   If the flag has a negative value then no clipping is performed. This is the
   default.\\
 
-{\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
-  distribution specified in Kelvin.\\
+{\emphtext temperature\_\{x,y,z\}} - The temperature in each direction for a
+  thermal distribution specified in Kelvin. ``temp\_\{x,y,z\}'' can be used as
+  aliases.\\
 
-{\emphtext temp} - Sets an isotropic temperature distribution in Kelvin.
-  If both temp and a specific temp\_x, temp\_y, temp\_z parameter is specified
-  then the last to appear in the deck has precedence. If neither are given
-  then the injector will have a default temperature of zero Kelvin.\\
+{\emphtext temperature} - Sets an isotropic temperature distribution in Kelvin.
+  If both ``temperature'' and a specific ``temperature\_x'', ``temperature\_y''
+  or ``temperature\_z'' parameter is specified then the last to appear in the
+  deck has precedence. If neither are given then the injector will have a
+  default temperature of zero Kelvin. ``temp'' is accepted as an alias.\\
 
-{\emphtext temp\_\{x,y,z\}\_ev, temp\_ev} - These are the same as the
-  temperature parameters described above except the units are given in
-  electronvolts rather than Kelvin.\\
+{\emphtext temperature\_\{x,y,z\}\_ev, temperature\_ev} - These are the same
+  as the ``temperature'' parameters described above except the units are given
+  in electronvolts rather than Kelvin. ``temp\_\{x,y,z\}\_ev'' and ``temp\_ev''
+  are accepted as aliases.\\
 
 {\emphtext drift\_p\{x,y,z\}} - Specifies a momentum space offset in
   $kg\ ms^{-1}$ to the distribution function for this injector. By default,
@@ -3496,7 +3502,7 @@ begin:injector
   boundary = x_min
   species = Electron
   number_density = dens
-  temp_x = temp
+  temperature_x = temp
   drift_px = drift_p
   npart_per_cell = 32
 
@@ -3845,10 +3851,11 @@ A, & \mbox{otherwise}
   otherwise the function returns c.
 
 \item number\_density(a) - Returns the number density for species a.
-\item temp\_\{x,y,z\}(a) - Returns temperature in the x, y or z direction for
-    species a.
-\item temp\_\{x,y,z\}\_ev(a) - Returns temperature in the x, y or z direction
-    measured in electronvolts for species a.
+\item temperature\_\{x,y,z\}(a) - Returns temperature in the x, y or z
+    direction for species a. ``temp\_\{x,y,z\}(a)'' are accepted as aliases.
+\item temperature\_\{x,y,z\}\_ev(a) - Returns temperature in the x, y or z
+    direction measured in electronvolts for species a.
+    ``temp\_\{x,y,z\}\_ev(a)'' are accepted as aliases.
 \item e\{x,y,z\}(x,y,z) - Returns the x, y or z component of the electric
     field at the specified location.
 \item b\{x,y,z\}(x,y,z) - Returns the x, y or z component of the magnetic
@@ -3957,8 +3964,8 @@ begin:species
    number_density = number_density(s1) * 100.0
 
    # Set the temperature to be zero
-   temp_x = 0.0
-   temp_y = temp_x(s1)
+   temperature_x = 0.0
+   temperature_y = temperature_x(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * 100.0
@@ -3969,8 +3976,8 @@ begin:species
    number_density = number_density(s1)
 
    # Just copy the temperature from species s1
-   temp_x = temp_x(s1)
-   temp_y = temp_y(s1)
+   temperature_x = temperature_x(s1)
+   temperature_y = temperature_y(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * 100.0
@@ -4483,8 +4490,8 @@ begin:species
    number_density = number_density(s1) * 100.0
 
    # Set the temperature to be zero
-   temp_x = 0.0
-   temp_y = temp_x(s1)
+   temperature_x = 0.0
+   temperature_y = temperature_x(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * 100.0
@@ -4497,8 +4504,8 @@ begin:species
    number_density = number_density(s1)
 
    # Just copy the temperature from species s1
-   temp_x = temp_x(s1)
-   temp_y = temp_y(s1)
+   temperature_x = temperature_x(s1)
+   temperature_y = temperature_y(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * 100.0
@@ -4525,8 +4532,8 @@ begin:species
    number_density = number_density(s1) * particle_density
 
    # Set the temperature to be zero
-   temp_x = 0.0
-   temp_y = temp_x(s1)
+   temperature_x = 0.0
+   temperature_y = temperature_x(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4539,8 +4546,8 @@ begin:species
    number_density = number_density(s1)
 
    # Just copy the temperature from species s1
-   temp_x = temp_x(s1)
-   temp_y = temp_y(s1)
+   temperature_x = temperature_x(s1)
+   temperature_y = temperature_y(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4573,8 +4580,8 @@ begin:species
    density = particle_density * profile_x * profile_y
 
    # Set the temperature to be zero
-   temp_x = 0.0
-   temp_y = temp_x(s1)
+   temperature_x = 0.0
+   temperature_y = temperature_x(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4587,8 +4594,8 @@ begin:species
    number_density = number_density(s1)
 
    # Just copy the temperature from species s1
-   temp_x = temp_x(s1)
-   temp_y = temp_y(s1)
+   temperature_x = temperature_x(s1)
+   temperature_y = temperature_y(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4611,8 +4618,8 @@ begin:species
    density = particle_density * profile_x * profile_y
 
    # Set the temperature to be zero
-   temp_x = 0.0
-   temp_y = temp_x(s1)
+   temperature_x = 0.0
+   temperature_y = temperature_x(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4625,8 +4632,8 @@ begin:species
    number_density = number_density(s1)
 
    # Just copy the temperature from species s1
-   temp_x = temp_x(s1)
-   temp_y = temp_y(s1)
+   temperature_x = temperature_x(s1)
+   temperature_y = temperature_y(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4670,8 +4677,8 @@ the temperature in each direction is equal, we have
     \exp\left( \frac{m (\mathbf{v} - \mathbf{v_d})^2}{2 k_B T} \right).
 \end{equation*}
 
-The parameters number\_density\_back, temp(x,y,z)\_back and drift(x,y,z)\_back
-in each species specification in the input deck set $f_0$.
+The parameters number\_density\_back, temperature(x,y,z)\_back and
+drift(x,y,z)\_back in each species specification in the input deck set $f_0$.
 number\_density\_back $=0$ is the default and is equivalent to not using the
 delta-f method.
 
@@ -4685,7 +4692,7 @@ begin:species
    mass  = 1.0
    frac = 0.3
    temp = 1e8
-   temp_back = 1e8
+   temperature_back = 1e8
    number_density = 1e20
    number_density_back = 1e20
 end:species
@@ -4756,7 +4763,7 @@ begin:species
    charge = -1
    mass = 1.0
    frac = 0.5
-   temp_x = temp
+   temperature_x = temp
    drift_px = drift_p
    number_density = dens
 end:species
@@ -4768,7 +4775,7 @@ begin:species
    charge = -1
    mass = 1.0
    frac = 0.5
-   temp_x = temp
+   temperature_x = temp
    drift_px = -drift_p
    number_density = dens
 end:species
@@ -5616,7 +5623,9 @@ used in conjunction with the moving window.
 \begin{itemize}
 \item ``drift\_p\{x,y,z\}'' and ``drift\_p\{x,y,z\}\_back'' aliases for
     ``drift\_\{x,y,z\}'' and ``drift\_\{x,y,z\}\_back''. See
-    \sect{species_block} and \sect{injector_block}
+    \sect{species_block} and \sect{injector_block}.
+\item ``temperature'' aliases for the various ``temp'' parameters. See
+    \sect{species_block}, \sect{injector_block} and \sect{functions}.
 \end{itemize}
 \end{itemize}
 \bigskip
