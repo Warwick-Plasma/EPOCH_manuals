@@ -625,7 +625,7 @@ begin:control
    nx = 512 # in x
    ny = 512 # in y
    # Global number of particles
-   npart = 10 * nx * ny
+   nparticles = 10 * nx * ny
 
    # Final time of simulation
    t_end = 1.0e-12
@@ -658,11 +658,12 @@ The allowed entries are as follows:\\
 {\emphtext nx, ny, nz} - Number of grid points in the x,y,z direction. This
 parameter is mandatory.\\
 
-{\emphtext npart} - The global number of pseudoparticles in the
+{\emphtext nparticles} - The global number of pseudoparticles in the
 simulation. This parameter does not need to be given if a specific number
-of particles is supplied for each particle species by using the ``npart''
+of particles is supplied for each particle species by using the ``nparticles''
 directive in each \cemph{species} block (see \sect{species_block}). If both are
-given then the value in the \cemph{control} block will be ignored.\\
+given then the value in the \cemph{control} block will be ignored.
+``npart'' is accepted as an alias.\\
 
 {\emphtext nsteps} - The number of iterations of the core solver before the
 code terminates. Negative numbers instruct the code to only terminate at
@@ -1306,7 +1307,7 @@ begin:species
    charge = -1.0
    mass = 1.0
    frac = 0.5
-   # npart = 2000 * 100
+   # nparticles = 2000 * 100
    number_density = 1.e4
    temperature = 1e6
 
@@ -1349,34 +1350,35 @@ charged particles. This is a mandatory parameter.\\
 {\emphtext mass} - This sets the mass of the species in multiples
 of the electron mass. Cannot be negative. This is a mandatory parameter.\\
 
-{\emphtext npart} - This specifies the number of pseudoparticles
+{\emphtext nparticles} - This specifies the number of pseudoparticles
 which should be loaded into the simulation domain for this species block.
 Using this parameter is the most convenient way of loading particles for
 simulations which contain multiple species with different number densities.
-If \inlineemph{npart} is specified in a species block then any value
-given for \inlineemph{npart} in the \inlineemph{control} block is ignored.
-\inlineemph{npart} should not be specified at the same time
-as \inlineemph{frac} within a \inlineemph{species} block.\\
+If \inlineemph{nparticles} is specified in a species block then any value
+given for \inlineemph{nparticles} in the \inlineemph{control} block is ignored.
+\inlineemph{nparticles} should not be specified at the same time
+as \inlineemph{frac} within a \inlineemph{species} block.
+``npart'' is accepted as an alias.\\
 
-{\emphtext frac} - This specifies what fraction of \inlineemph{npart} (the
+{\emphtext frac} - This specifies what fraction of \inlineemph{nparticles} (the
 global number of particles specified in the control block) should be assigned
 to the species.\\
 
-{\emphtext NOTE: frac should not be specified at the same time as npart for a
-given species.}\\
+{\emphtext NOTE: ``frac'' should not be specified at the same time as
+``nparticles'' for a given species.}\\
 
-{\emphtext npart\_per\_cell} - Integer parameter which specifies
+{\emphtext nparticles\_per\_cell} - Integer parameter which specifies
 the number of particles per cell to use for the initial particle loading.
-At a later stage this may be extended to allow ``npart\_per\_cell'' to be
+At a later stage this may be extended to allow ``nparticles\_per\_cell'' to be
 a spatially varying function.
 
-If per-species weighting is used then the value of ``npart\_per\_cell'' will
-be the average number of particles per cell.  If ``npart'' or ``frac'' have
-also been specified for a species, then they will be ignored.
+If per-species weighting is used then the value of ``nparticles\_per\_cell''
+will be the average number of particles per cell.  If ``nparticles'' or
+``frac'' have also been specified for a species, then they will be ignored.
 
-To avoid confusion, there is no globally used ``npart\_per\_species''.  If you
-want to have a single value to change in the input deck then this can be
-achieved using a constant block.\\
+To avoid confusion, there is no globally used ``nparticles\_per\_species''. If
+you want to have a single value to change in the input deck then this can be
+achieved using a constant block. ``npart\_per\_cell'' is accepted as an alias.\\
 
 {\emphtext dumpmask} - Determines which output dumps will include this
 particle species. The dumpmask has the same semantics as those used
@@ -3447,9 +3449,10 @@ The ``injector'' block accepts the following keys:\\
 
 {\emphtext t\_end} - Time at which to end the injector.\\
 
-{\emphtext npart\_per\_cell} - Target pseudo-particle density for the
+{\emphtext nparticles\_per\_cell} - Target pseudo-particle density for the
   injector. Average number of particles injected will be this value or slightly
-  higher if very few particles are specified.\\
+  higher if very few particles are specified. ``npart\_per\_cell'' is accepted
+  as an alias.\\
 
 {\emphtext number\_density} - Number density of the particle source in
   m$^{-3}$. Can be space varying along the boundary to which the injector is
@@ -3504,7 +3507,7 @@ begin:injector
   number_density = dens
   temperature_x = temp
   drift_px = drift_p
-  npart_per_cell = 32
+  nparticles_per_cell = 32
 
 end:injector
 \end{boxverbatim}
@@ -4734,7 +4737,7 @@ files.\\
 \begin{lboxverbatim}{input.deck}
 begin:control
    nx = 400
-   npart = 20000
+   nparticles = 20000
 
    # Final time of simulation
    t_end = 1.5e-1
@@ -4836,7 +4839,7 @@ begin:control
    y_min = x_min
    y_max = x_max
    nsteps = 0
-   npart = 40 * nx * ny
+   nparticles = 40 * nx * ny
 end:control
 
 begin:boundaries
@@ -4893,7 +4896,7 @@ begin:control
    nx = 250
    ny = nx
    nz = nx
-   npart = 2 * nx * ny * nz
+   nparticles = 2 * nx * ny * nz
    x_min = -10 * micron
    x_max = -x_min
    y_min = x_min
@@ -5631,6 +5634,9 @@ used in conjunction with the moving window.
     ``drift\_p\{x,y,z\}\_back'', ``temperature\_\{x,y,z\}\_back'',
     ``temperature\_\{x,y,z\}\_back\_ev'', ``temperature\_back'' and
     ``temperature\_back\_ev''. See \sect{deltaf}.
+\item ``nparticles'' and ``nparticles\_per\_cell'' aliases for ``npart'' and
+    ``npart\_per\_cell''. See \sect{control_block}, \sect{species_block} and
+    \sect{injector_block}.
 \end{itemize}
 \end{itemize}
 \bigskip
