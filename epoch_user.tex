@@ -1529,12 +1529,12 @@ unformatted files using the offset element, but care must be taken!}\\
 The following entries are used for configuring the Delta-f method
 (see \sect{deltaf}).\\
 
-{\emphtext number\_density\_back, drift\_p\{x,y,z\}\_back,
- temperature\_\{x,y,z\}\_back,
-\par temperature\_\{x,y,z\}\_back\_ev, temperature\_back, temperature\_back\_ev}
+{\emphtext number\_density\_background, drift\_p\{x,y,z\}\_background,
+\par temperature\_\{x,y,z\}\_background, temperature\_\{x,y,z\}\_background\_ev,
+\par\vspace{3pt} temperature\_background, temperature\_background\_ev}
  - These all have the same
-meanings as the parameters listed above that don't include the ``\_back'' text,
-except that they specify the values to use for the background distribution
+meanings as the parameters listed above that don't include the ``\_background''
+text, except that they specify the values to use for the background distribution
 function.\\
 
 \subsubsection{Particle migration between species}
@@ -4677,10 +4677,11 @@ the temperature in each direction is equal, we have
     \exp\left( \frac{m (\mathbf{v} - \mathbf{v_d})^2}{2 k_B T} \right).
 \end{equation*}
 
-The parameters number\_density\_back, temperature(x,y,z)\_back and
-drift(x,y,z)\_back in each species specification in the input deck set $f_0$.
-number\_density\_back $=0$ is the default and is equivalent to not using the
-delta-f method.
+The parameters number\_density\_background, temperature(x,y,z)\_background and
+drift(x,y,z)\_background in each species specification in the input deck are
+used to set $f_0$.
+number\_density\_background $=0$ is the default and is equivalent to not using
+the delta-f method.
 
 For example, the electron species component of an input deck solved using
 delta-f might be written:
@@ -4692,9 +4693,9 @@ begin:species
    mass  = 1.0
    frac = 0.3
    temp = 1e8
-   temperature_back = 1e8
+   temperature_background = 1e8
    number_density = 1e20
-   number_density_back = 1e20
+   number_density_background = 1e20
 end:species
 \end{lboxverbatim}
 
@@ -5626,6 +5627,10 @@ used in conjunction with the moving window.
     \sect{species_block} and \sect{injector_block}.
 \item ``temperature'' aliases for the various ``temp'' parameters. See
     \sect{species_block}, \sect{injector_block} and \sect{functions}.
+\item ``background'' aliases for ``number\_density\_back'',
+    ``drift\_p\{x,y,z\}\_back'', ``temperature\_\{x,y,z\}\_back'',
+    ``temperature\_\{x,y,z\}\_back\_ev'', ``temperature\_back'' and
+    ``temperature\_back\_ev''. See \sect{deltaf}.
 \end{itemize}
 \end{itemize}
 \bigskip
