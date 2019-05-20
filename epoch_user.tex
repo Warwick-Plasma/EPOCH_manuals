@@ -1460,13 +1460,12 @@ units of $g\,cm^{-3}$ then append the appropriate multiplication factor.
 For example: ``\verb|mass_density = 2 * 1e3 / cc|''.\\
 
 {\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
-distribution in Kelvin.\\
+distribution specified in Kelvin.\\
 
 {\emphtext temp} - Sets an isotropic temperature distribution in Kelvin.
-If both temp and a specific
-temp\_x, temp\_y, temp\_z parameter is specified then the last to appear in the
-deck has precedence. If neither are given then the species will have a default
-temperature of zero Kelvin.\\
+If both temp and a specific temp\_x, temp\_y, temp\_z parameter is specified
+then the last to appear in the deck has precedence. If neither are given
+then the species will have a default temperature of zero Kelvin.\\
 
 {\emphtext temp\_\{x,y,z\}\_ev, temp\_ev} - These are the same as the
 temperature parameters described above except the units are given in
@@ -3443,23 +3442,35 @@ The ``injector'' block accepts the following keys:\\
   m$^{-3}$. Can be space varying along the boundary to which the injector is
   attached and time varying.\\
 
-{\emphtext number\_density\_min} - Minimum density in m$^{-3}$ below which
-  pseudo particles are not loaded. Use if the density has a profile to avoid
-  injecting low weight particles in low density regions.\\
+{\emphtext number\_density\_min} - Minimum particle number density in m$^{-3}$
+  below which pseudo particles are not loaded. Use if the density has a profile
+  to avoid injecting low weight particles in low density regions.\\
 
-{\emphtext temp\_x} - Temperature in x direction (K)\\
+{\emphtext number\_density\_max} - Maximum particle number density in $m^{-3}$.
+  When the number density in a cell rises above density\_max the
+  injector clips the density to number\_density\_max allowing easy
+  implementation of exponential rises to plateaus for time-varying injectors.
+  Note that the number of particles per cell is kept fixed and the number
+  density adjustment is achieved by modifying the particle weight. This flag
+  has no effect for particles with per-species weighting.
+  If the flag has a negative value then no clipping is performed. This is the
+  default.\\
 
-{\emphtext temp\_y} - Temperature in y direction (K)\\
+{\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
+  distribution specified in Kelvin.\\
 
-{\emphtext temp\_z} - Temperature in z direction (K)\\
+{\emphtext temp} - Sets an isotropic temperature distribution in Kelvin.
+  If both temp and a specific temp\_x, temp\_y, temp\_z parameter is specified
+  then the last to appear in the deck has precedence. If neither are given
+  then the injector will have a default temperature of zero Kelvin.\\
 
-{\emphtext temp} - Temperature in all directions (K)\\
+{\emphtext temp\_\{x,y,z\}\_ev, temp\_ev} - These are the same as the
+  temperature parameters described above except the units are given in
+  electronvolts rather than Kelvin.\\
 
-{\emphtext drift\_x} - Momentum drift in x direction in kg m/s\\
-
-{\emphtext drift\_y} - Momentum drift in x direction in kg m/s\\
-
-{\emphtext drift\_z} - Momentum drift in x direction in kgm/s\\
+{\emphtext drift\_\{x,y,z\}} - Specifies a momentum space offset in
+  $kg\ ms^{-1}$ to the distribution function for this injector. By default,
+  the drift is zero.\\
 
 {\emphtext use\_flux\_maxwellian} - Logical flag to determine whether to use
   an accelerated flux Maxwellian rather than a drifting Maxwellian. This
@@ -5569,6 +5580,12 @@ used in conjunction with the moving window.
 \item Added ``deck\_warnings\_fatal'' flag to the control block for controlling
     the way that deck parser warnings are handled. See \sect{control_block}
 \item Added ``DECK\_DEBUG'' Makefile flag. See \sect{makefile}.
+\item Added ``number\_density\_max'' parameter to the injector block. This has
+    similar functionality to the species block parameter of the same name.
+    See \sect{injector_block}.
+\item Added ``temp\_\{x,y,z\}\_ev'' and ``temp\_ev'' parameters to the injector
+    block. These have the same functionality as the species block parameters
+    of the same name.  See \sect{injector_block}.
 \end{itemize}
 \bigskip
 
