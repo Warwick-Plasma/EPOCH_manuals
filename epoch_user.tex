@@ -1482,7 +1482,7 @@ momentum parallel to the magnetic field local to the particle.
 px and py are similarly used to initialise the particle momentum
 components in the other two directions; the rotation from field
 aligned coordinates to the cartesian coordinates is calculated as discussed in
-\cite{rotmatrix},
+the Wikipedia article \cite{rotmatrix},
 where ${\vec u \parallel {\hat z} \cdot {\vec B}}$, and
 $\cos\theta = {{\hat z}\cdot{\vec B}} / {\|B\|}$.
 If a gyrotropic initial particle distribution function is desired, using
@@ -5702,6 +5702,9 @@ used in conjunction with the moving window.
     ``ZERO\_CURRENT\_PARTICLES''. See \sect{makefile}. Support for the
     ``zero\_current'' species flag is disabled by default. Removed support
     for the ``tracer'' flag. See \sect{species_block}.
+\item Add ``field\_aligned\_initialisation'' and
+    ``x\_perp\_y\_ignored\_z\_para'' flags to the species block for setting
+    up a ring-beam simulation. See \sect{species_block}.
 \end{itemize}
 \bigskip
 
