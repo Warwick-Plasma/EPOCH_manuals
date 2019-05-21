@@ -1472,6 +1472,36 @@ electronvolts rather than Kelvin.\\
 $kg\ ms^{-1}$ to the distribution function for this species. By default,
 the drift is zero.\\
 
+{\emphtext field\_aligned\_initialisation} - Boolean to indicate that the
+px, py, and pz coordinates used in the ``dist\_fn'' and
+``dist\_fn\_\{px,py,pz\}\_range'' fields are hijacked to initialise the
+particles' momenta in a field aligned coordinate system.
+When turned on, this flag causes pz to be treated as the component of
+momentum parallel to the magnetic field local to the particle.
+px and py are similarly used to initialise the particle momentum
+components in the other two directions; the rotation from field
+aligned coordinates to the cartesian coordinates is calculated as discussed in
+the Wikipedia article \cite{rotmatrix},
+where ${\vec u \parallel {\hat z} \cdot {\vec B}}$, and
+$\cos\theta = {{\hat z}\cdot{\vec B}} / {\|B\|}$.
+If a gyrotropic initial particle distribution function is desired, using
+``x\_perp\_y\_ignored\_z\_para'' in conjunction with
+``field\_aligned\_initialisation'' will generally load particles faster.
+Defaults to ``F''. \\
+
+{\emphtext x\_perp\_y\_ignored\_z\_para} -
+Boolean. As with ``field\_aligned\_initialisation'' except that particle momenta
+are initialised in gyrotropic distribution functions. px in ``dist\_fn'' and
+``dist\_fn\_px\_range'' are used to initialise the speed of particles
+perpendicular to the magnetic field. Consequently particle momenta are
+initialised in $(v_\parallel, |v_\bot|)$ space.
+Particles' gyroangles are assigned randomly, resulting in gyrotropic
+distribution functions.
+pz refers to the component of momentum aligned with the magnetic field, as
+in ``field\_aligned\_initialisation''.
+The dependency of ``dist\_fn'' on py is ignored.
+Defaults to ``F''.\\
+
 {\emphtext offset} - File offset. See below for details.\\
 
 % There are also 'split' and 'npart_max' entries. I don't know what they are
@@ -5682,7 +5712,7 @@ used in conjunction with the moving window.
 \bigskip
 
 
-\subsection{Changes between version 4.16 and 5.0}
+\subsection{Changes between version 4.17 and 5.0}
 
 \begin{itemize}
 \item Added antennae that allow you to specify an external time varying current
@@ -5694,6 +5724,9 @@ used in conjunction with the moving window.
     ``ZERO\_CURRENT\_PARTICLES''. See \sect{makefile}. Support for the
     ``zero\_current'' species flag is disabled by default. Removed support
     for the ``tracer'' flag. See \sect{species_block}.
+\item Add ``field\_aligned\_initialisation'' and
+    ``x\_perp\_y\_ignored\_z\_para'' flags to the species block for setting
+    up a ring-beam simulation. See \sect{species_block}.
 \end{itemize}
 \bigskip
 
