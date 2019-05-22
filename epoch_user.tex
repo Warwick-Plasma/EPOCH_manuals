@@ -3080,7 +3080,7 @@ only be dumped at full dumps. The default dumpmask is ``always''.\\
 {\emphtext direction\inlinecode{n}} - This is the phase space to sample
 along axis \inlinecode{n}. This can be any one of:
 dir\_x, dir\_y, dir\_z, dir\_px, dir\_py, dir\_pz, dir\_en, dir\_gamma\_m1,
-dir\_xy\_angle, dir\_yz\_angle, dir\_zx\_angle
+dir\_xy\_angle, dir\_yz\_angle, dir\_zx\_angle, dir\_mod\_p
 with spatial codes only being available in dimensionalities of the code which
 have that direction. Therefore dir\_z does not exist in EPOCH1D or EPOCH2D
 and dir\_y does not exist in EPOCH1D.
@@ -3116,8 +3116,10 @@ all species in the output file.\\
   calculating the distribution function is adjusted by subtracting the Delta-f
   distribution function for the particle species. The default value is ``F''.\\
 
-{\emphtext restrict\_\{x,y,z,px,py,pz\}} - Restrictions are specified in the
-  same way as ranges, but have a subtly different behaviour. Ranges specify
+{\emphtext restrict\_\verb|<|direction\verb|>|} - ``\verb|<|direction\verb|>|''
+  can be any one of ``x, y, z, px, py, pz, en, gamma\_m1, xy\_angle,
+  yz\_angle, zx\_angle, mod\_p''. Restrictions are specified in
+  the same way as ranges, but have a subtly different behaviour. Ranges specify
   the range of a visible axis on the resulting distribution function, whereas
   restrictions allow you to specify minimum and maximum values for each
   spatial and momentum direction and use only particles which fall within this
@@ -5425,6 +5427,17 @@ block of the input deck (see \sect{output_global_block}):
 the input deck (see \sect{subset_block}):
 \begin{itemize}
 \item skip, skip\_{x,y,z}
+\end{itemize}
+\bigskip
+
+\noindent The following parameters have been added to the ``dist\_fn'' block of
+the input deck (see \sect{dist_fn_block}):
+\begin{itemize}
+\item restrict\_en
+\item restrict\_gamma\_m1
+\item restrict\_xy\_angle
+\item restrict\_yz\_angle
+\item restrict\_zx\_angle
 \end{itemize}
 \bigskip
 
