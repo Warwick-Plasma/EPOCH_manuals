@@ -3183,14 +3183,19 @@ end:probe
   {\inlineemph{collisions} block}
   {           {collisions} block}}
 \label{sec:collisions_block}
-{\EPOCH} has a particle collision routine based on the model presented
-by \citet{Sentoku}.
+{\EPOCH} has a particle collision routine with scattering algorithms based on
+the model presented by \citet{Sentoku} or the model presented by
+\citet{Perez}, which in turn was based on the work of \citet{Nanbu}.
 This adds a new output block named ``collisions'' which accepts the
-following three parameters.\\
+following four parameters.\\
 
 {\emphtext use\_collisions} - This is a logical flag which determines whether
   or not to call the collision routine. If omitted, the default is ``T'' if any
   of the frequency factors are non-zero (see below) and ``F'' otherwise.\\
+
+{\emphtext use\_nanbu} - This logical flag determines whether the scattering
+  angle of P\'erez/Nanbu will be used. If ``F'', the Sentoku-Kemp algorithm will
+  be used. The default is ``T''.\\
 
 {\emphtext coulomb\_log} - This may either be set to a real value, specifying
   the Coulomb logarithm to use when scattering the particles or to the special
@@ -3229,6 +3234,7 @@ For example:
 \begin{lboxverbatim}{collisions}
 begin:collisions
    use_collisions = T
+   use_nanbu = T
    coulomb_log = auto
    collide = all
    collide = spec1 spec2 off
@@ -3236,7 +3242,8 @@ begin:collisions
 end:collisions
 \end{lboxverbatim}
 
-  With this block, collisions are turned on and the Coulomb logarithm is
+  With this block, collisions are turned on, the Nanbu-P\'erez scattering
+  algorithm is used and the Coulomb logarithm is
   automatically calculated. All values of the frequency array are set
   to one except (spec1,spec2) is set to minus one (and also (spec2,spec1))
   and (spec2,spec3) is set to 0.1
@@ -5568,6 +5575,11 @@ used in conjunction with the moving window.
   See \sect{species_block}. The use of ``tracer'' has now been deprecated and
   will be removed in version 5.0.
   At that time, the compiler flag will also be renamed.
+\item Added collisions block option ``use\_nanbu'' for enabling the
+   scattering algorithm of Nanbu, with relativistic corrections by
+   P\'erez. Due to known issues in the Sentoku-Kemp
+   method for some test problems, the Nanbu method is now the default.
+   See \sect{collisions_block}.
 \end{itemize}
 \bigskip
 
