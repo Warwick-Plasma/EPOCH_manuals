@@ -1306,7 +1306,7 @@ begin:species
    name = Electron
    charge = -1.0
    mass = 1.0
-   frac = 0.5
+   fraction = 0.5
    # nparticles = 2000 * 100
    number_density = 1.e4
    temperature = 1e6
@@ -1323,7 +1323,7 @@ begin:species
    name = Carbon
    charge = 4.0
    mass = 1836.0 * 12
-   frac = 0.5
+   fraction = 0.5
 
    number_density = 0.25 * number_density(Electron)
    temperature_x = temperature_x(Electron)
@@ -1357,14 +1357,14 @@ simulations which contain multiple species with different number densities.
 If \inlineemph{nparticles} is specified in a species block then any value
 given for \inlineemph{nparticles} in the \inlineemph{control} block is ignored.
 \inlineemph{nparticles} should not be specified at the same time
-as \inlineemph{frac} within a \inlineemph{species} block.
+as \inlineemph{fraction} within a \inlineemph{species} block.
 ``npart'' is accepted as an alias.\\
 
-{\emphtext frac} - This specifies what fraction of \inlineemph{nparticles} (the
-global number of particles specified in the control block) should be assigned
-to the species.\\
+{\emphtext fraction} - This specifies what fraction of \inlineemph{nparticles}
+(the global number of particles specified in the control block) should be
+assigned to the species. ``frac'' is accepted as an alias.\\
 
-{\emphtext NOTE: ``frac'' should not be specified at the same time as
+{\emphtext NOTE: ``fraction'' should not be specified at the same time as
 ``nparticles'' for a given species.}\\
 
 {\emphtext nparticles\_per\_cell} - Integer parameter which specifies
@@ -1374,7 +1374,7 @@ a spatially varying function.
 
 If per-species weighting is used then the value of ``nparticles\_per\_cell''
 will be the average number of particles per cell.  If ``nparticles'' or
-``frac'' have also been specified for a species, then they will be ignored.
+``fraction'' have also been specified for a species, then they will be ignored.
 
 To avoid confusion, there is no globally used ``nparticles\_per\_species''. If
 you want to have a single value to change in the input deck then this can be
@@ -1782,7 +1782,7 @@ begin:species
   name = Electron_pl
   charge = -1
   mass = 1.0
-  frac = 0.5
+  fraction = 0.5
   number_density = dens
   # Truncated power law distribution in px
   dist_fn = exp(-p0 / px) * (px / p0)^alpha
@@ -3314,7 +3314,7 @@ deck would look like
 \begin{boxverbatim}
 begin:species
    name = electron
-   frac = 0.5
+   fraction = 0.5
    number_density = 7.7e29
    identify:electron
 end:species
@@ -4694,7 +4694,7 @@ begin:species
    name = electron
    charge = -1.0
    mass  = 1.0
-   frac = 0.3
+   fraction = 0.3
    temp = 1e8
    temperature_background = 1e8
    number_density = 1e20
@@ -4766,7 +4766,7 @@ begin:species
    name = Right
    charge = -1
    mass = 1.0
-   frac = 0.5
+   fraction = 0.5
    temperature_x = temp
    drift_px = drift_p
    number_density = dens
@@ -4778,7 +4778,7 @@ begin:species
    name = Left
    charge = -1
    mass = 1.0
-   frac = 0.5
+   fraction = 0.5
    temperature_x = temp
    drift_px = -drift_p
    number_density = dens
@@ -4860,7 +4860,7 @@ begin:species
    number_density_min = 0.1 * den_peak
    charge = -1.0
    mass = 1.0
-   frac = 0.5
+   fraction = 0.5
 end:species
 
 begin:species
@@ -4868,7 +4868,7 @@ begin:species
    number_density = number_density(Electron)
    charge = 1.0
    mass = 1836.2
-   frac = 0.5
+   fraction = 0.5
 end:species
 
 begin:output
@@ -4932,7 +4932,7 @@ begin:species
    name = proton
    charge = 1.0
    mass = 1836.2
-   frac = 0.5
+   fraction = 0.5
    number_density = if((r gt ri) and (r lt ro), den_cone, 0.0)
    number_density = if((x gt xi) and (x lt xo) and (r lt ri), \
                        den_cone, number_density(proton))
@@ -4943,7 +4943,7 @@ begin:species
    name = electron
    charge = -1.0
    mass = 1.0
-   frac = 0.5
+   fraction = 0.5
    number_density = number_density(proton)
 end:species
 \end{lboxverbatim}
@@ -5637,6 +5637,8 @@ used in conjunction with the moving window.
 \item ``nparticles'' and ``nparticles\_per\_cell'' aliases for ``npart'' and
     ``npart\_per\_cell''. See \sect{control_block}, \sect{species_block} and
     \sect{injector_block}.
+\item ``fraction'' alias for ``frac'' in the control block.
+    See \sect{species_block}.
 \end{itemize}
 \end{itemize}
 \bigskip
