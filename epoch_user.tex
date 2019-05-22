@@ -2562,8 +2562,9 @@ All entries have a default dumpmask of ``never''.\\
 {\emphtext average\_particle\_energy} - Mean kinetic energy on grid in $J$. Can
 have species dumpmask. ``ekbar'' is accepted as an alias.\\
 
-{\emphtext ekflux} - Mean kinetic energy flux in each direction on the grid
-in $W/m^2$. Can have species dumpmask.\\
+{\emphtext particle\_energy\_flux} - Mean kinetic energy flux in each direction
+on the grid in $W/m^2$. Can have species dumpmask. ``ekflux'' is accepted as an
+alias.\\
 
 {\emphtext mass\_density} - Mass density on grid in $kg/m^3$. Can have species
 dumpmask.\\
@@ -5648,6 +5649,8 @@ used in conjunction with the moving window.
 \item ``gamma\_minus\_one'' alias for ``gamma\_m1'' in the dist\_fn block.
     See \sect{dist_fn_block}.
 \item ``average\_particle\_energy'' alias for ``ekbar'' in the output block.
+    See \sect{derived}.
+\item ``particle\_energy\_flux'' alias for ``ekflux'' in the output block.
     See \sect{derived}.
 \end{itemize}
 \end{itemize}
