@@ -3041,7 +3041,7 @@ only be dumped at full dumps. The default dumpmask is ``always''.\\
 {\emphtext direction\inlinecode{n}} - This is the phase space to sample
 along axis \inlinecode{n}. This can be any one of:
 dir\_x, dir\_y, dir\_z, dir\_px, dir\_py, dir\_pz, dir\_en, dir\_gamma\_m1,
-dir\_xy\_angle, dir\_yz\_angle, dir\_zx\_angle
+dir\_xy\_angle, dir\_yz\_angle, dir\_zx\_angle, dir\_mod\_p
 with spatial codes only being available in dimensionalities of the code which
 have that direction. Therefore dir\_z does not exist in EPOCH1D or EPOCH2D
 and dir\_y does not exist in EPOCH1D.
@@ -3079,7 +3079,7 @@ all species in the output file.\\
 
 {\emphtext restrict\_\verb|<|direction\verb|>|} - ``\verb|<|direction\verb|>|''
   can be any one of ``x, y, z, px, py, pz, en, gamma\_m1, xy\_angle,
-  yz\_angle, zx\_angle''. Restrictions are specified in
+  yz\_angle, zx\_angle, mod\_p''. Restrictions are specified in
   the same way as ranges, but have a subtly different behaviour. Ranges specify
   the range of a visible axis on the resulting distribution function, whereas
   restrictions allow you to specify minimum and maximum values for each
