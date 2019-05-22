@@ -3342,13 +3342,14 @@ Possible identities are:\\
   needed for photon production to work. If multiple species are present then
   generated photons will appear in the first species of this type.\\
 
-{\emphtext bw\_electron} - The electron species for pair production by the
-  Breit-Wheeler process. If a species of this type exists then electrons from
-  the pair production module will be created in this species. If no species of
-  this type is specified then pair electrons will be generated in the first
-  electron species.\\
+{\emphtext breit\_wheeler\_electron} - The electron species for pair production
+  by the Breit-Wheeler process. If a species of this type exists then electrons
+  from the pair production module will be created in this species. If no species
+  of this type is specified then pair electrons will be generated in the first
+  electron species. ``bw\_electron'' is accepted as an alias.\\
 
-{\emphtext bw\_positron} - As above but for positrons.\\
+{\emphtext breit\_wheeler\_positron} - As above but for positrons.
+  ``bw\_proton'' is accepted as an alias.\\
 
 {\emphtext trident\_electron} - The electron species for pair production by
   the Trident process. If a species of this type exists then electrons from
@@ -3361,18 +3362,18 @@ Possible identities are:\\
 {\emphtext proton} - A normal proton species. This is for convenience only and
   is not required by the pair production routines.\\
 
-A species should be identified only once, so a ``bw\_electron'' species does
-not need to also be identified as an ``electron'' species. If the code is
-running with ``produce\_photons=T'' then a photon species must be created by
-the user and identified. If the code is running with ``produce\_pairs=T'' then
-the code must specify at least one electron (or bw\_electron) species and one
-positron (or bw\_positron) species. These species will usually be defined with
-zero particles from the start of the simulation and will accumulate particles
-as the simulation progresses. The code will fail to run if the needed
-species are not specified.
+A species should be identified only once, so a ``breit\_wheeler\_electron''
+species does not need to also be identified as an ``electron'' species. If the
+code is running with ``produce\_photons=T'' then a photon species must be
+created by the user and identified. If the code is running with
+``produce\_pairs=T'' then the code must specify at least one electron (or
+breit\_wheeler\_electron) species and one positron (or breit\_wheeler\_positron)
+species. These species will usually be defined with zero particles from the
+start of the simulation and will accumulate particles as the simulation
+progresses. The code will fail to run if the needed species are not specified.
 
 The basic input deck has now been considered fully but it
- is possible for an end user to add new blocks to the input deck As a result,
+is possible for an end user to add new blocks to the input deck As a result,
 a version of the code which you have obtained from a source other than
 CCPForge may include other input deck blocks. These should be described in
 additional documentation provided with the version of the code that you have.
@@ -5657,6 +5658,8 @@ used in conjunction with the moving window.
     See \sect{derived}.
 \item ``polarisation'' and ``polarisation\_angle'' aliases for ``pol'' and
     ``pol\_angle'' in the laser block.  See \sect{laser_block}.
+\item ``breit\_wheeler\_\{electron,proton\}'' aliases for
+    ``bw\_\{electron,proton\}'' in the qed block. See \sect{qed_block}.
 \end{itemize}
 \end{itemize}
 \bigskip
