@@ -1848,8 +1848,8 @@ conditions deck.\\
   ``micron''. One of \inlineemph{lambda} or \inlineemph{omega} (or
   \inlineemph{frequency}) is a required parameter.\\
 
-{\emphtext pol\_angle} - Polarisation angle for the electric field of the
-  laser in radians. This parameter is optional and has a value of zero by
+{\emphtext polarisation\_angle} - Polarisation angle for the electric field of
+  the laser in radians. This parameter is optional and has a value of zero by
   default. The angle is measured with respect to the right-hand triad of
   propagation direction, electric and magnetic fields. Although the 1D code
   has no $y$ or $z$ spatial axis, the fields still have $y$ and $z$ components.
@@ -1857,16 +1857,16 @@ conditions deck.\\
   $y$-direction and the $B$ field is the $z$-direction. The polarisation angle
   is measured clockwise about the $x$-axis with zero along the $E_y$
   direction. If the laser is on \inlineemph{x\_max} then the angle is
-  anti-clockwise.\\
+  anti-clockwise. ``pol\_angle'' is accepted as an alias.\\
   Similarly, for propagation directions:\\
 \inlineemph{y\_min} - angle about $y$-axis, zero along $z$-axis\\
 \inlineemph{z\_min} - angle about $z$-axis, zero along $x$-axis\\
 \inlineemph{y\_max} - angle anti-clockwise about $y$-axis, zero along $z$-axis\\
 \inlineemph{z\_max} - angle anti-clockwise about $z$-axis, zero along $x$-axis\\
 
-{\emphtext pol} - This is identical to \inlineemph{pol\_angle} with the angle
-  specified in degrees rather than radians. If both are specified then the
-  last one is used.\\
+{\emphtext polarisation} - This is identical to \inlineemph{polarisation\_angle}
+  with the angle specified in degrees rather than radians. If both are specified
+  then the last one is used. ``pol'' is accepted as an alias.\\
 
 {\emphtext phase} - The phase profile of the laser wavefront given in radians.
   Phase may be a function of both space and time. The laser is driven using
@@ -5655,6 +5655,8 @@ used in conjunction with the moving window.
     See \sect{derived}.
 \item ``poynting\_flux'' alias for ``poynt\_flux'' in the output block.
     See \sect{derived}.
+\item ``polarisation'' and ``polarisation\_angle'' aliases for ``pol'' and
+    ``pol\_angle'' in the laser block.  See \sect{laser_block}.
 \end{itemize}
 \end{itemize}
 \bigskip
