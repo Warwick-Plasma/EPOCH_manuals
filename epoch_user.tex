@@ -3058,11 +3058,12 @@ only be dumped at full dumps. The default dumpmask is ``always''.\\
 
 {\emphtext direction\inlinecode{n}} - This is the phase space to sample
 along axis \inlinecode{n}. This can be any one of:
-dir\_x, dir\_y, dir\_z, dir\_px, dir\_py, dir\_pz, dir\_en, dir\_gamma\_m1,
+dir\_x, dir\_y, dir\_z, dir\_px, dir\_py, dir\_pz, dir\_energy, dir\_gamma\_m1,
 dir\_xy\_angle, dir\_yz\_angle, dir\_zx\_angle, dir\_mod\_p
 with spatial codes only being available in dimensionalities of the code which
 have that direction. Therefore dir\_z does not exist in EPOCH1D or EPOCH2D
-and dir\_y does not exist in EPOCH1D.
+and dir\_y does not exist in EPOCH1D. ``dir\_en'' is accepted as an alias for
+``dir\_energy''.
 
 The flags ``dir\_xy\_angle'', ``dir\_yz\_angle'' and
 ``dir\_zx\_angle'' calculate the distribution
@@ -3096,7 +3097,7 @@ all species in the output file.\\
   distribution function for the particle species. The default value is ``F''.\\
 
 {\emphtext restrict\_\verb|<|direction\verb|>|} - ``\verb|<|direction\verb|>|''
-  can be any one of ``x, y, z, px, py, pz, en, gamma\_m1, xy\_angle,
+  can be any one of ``x, y, z, px, py, pz, energy, gamma\_m1, xy\_angle,
   yz\_angle, zx\_angle, mod\_p''. Restrictions are specified in
   the same way as ranges, but have a subtly different behaviour. Ranges specify
   the range of a visible axis on the resulting distribution function, whereas
@@ -5639,6 +5640,8 @@ used in conjunction with the moving window.
     \sect{injector_block}.
 \item ``fraction'' alias for ``frac'' in the control block.
     See \sect{species_block}.
+\item ``energy'' alias for ``en'' in the dist\_fn block.
+    See \sect{dist_fn_block}.
 \end{itemize}
 \end{itemize}
 \bigskip
