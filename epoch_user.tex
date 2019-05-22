@@ -2197,7 +2197,7 @@ begin:output
    bz = always
    jx = always
    jy = always
-   ekbar = always + species
+   average_particle_energy = always + species
    mass_density = never + species
    charge_density = always
    number_density = always + species
@@ -2254,7 +2254,8 @@ Note that variables required for restarting the code are always written to
 restart dumps. This flag is to enable the writing of additional variables
 into such dump files.\\
 
-For grid variables derived from summing over particles (ie. ``ekbar'',
+For grid variables derived from summing over particles
+(ie. ``average\_particle\_energy'',
 ``mass\_density'', ``charge\_density'', ``number\_density'', ``temperature'')
 the following two parameters also apply.\\
 
@@ -2558,8 +2559,8 @@ by summing properties of all the particles in each grid cell. The resulting
 quantities are defined on the regular cartesian mesh used for grid variables.
 All entries have a default dumpmask of ``never''.\\
 
-{\emphtext ekbar} - Mean kinetic energy on grid in $J$. Can have species
-dumpmask.\\
+{\emphtext average\_particle\_energy} - Mean kinetic energy on grid in $J$. Can
+have species dumpmask. ``ekbar'' is accepted as an alias.\\
 
 {\emphtext ekflux} - Mean kinetic energy flux in each direction on the grid
 in $W/m^2$. Can have species dumpmask.\\
@@ -2663,14 +2664,14 @@ begin:output
 
    charge_density = always + average + snapshot
    mass_density = full + average + snapshot
-   ekbar = full + average
+   average_particle_energy = full + average
 end:output
 \end{boxverbatim}
 
 With this configuration, ``charge\_density'' will be written in both normal and
 averaged form at normal, full and restart dumps. ``mass\_density'' will be
 written in both forms at full dumps. Only the average value of
-``ekbar'' will be written at full dumps.
+``average\_particle\_energy'' will be written at full dumps.
 
 Only field and derived variables can be averaged currently in {\EPOCH}.
 Particle properties, distribution functions and particle probes cannot
@@ -4807,7 +4808,7 @@ begin:output
    by = always
    bz = always
    jx = always
-   ekbar = always
+   average_particle_energy = always
    mass_density = never + species
    charge_density = always
    number_density = always + species
@@ -5646,6 +5647,8 @@ used in conjunction with the moving window.
     See \sect{dist_fn_block}.
 \item ``gamma\_minus\_one'' alias for ``gamma\_m1'' in the dist\_fn block.
     See \sect{dist_fn_block}.
+\item ``average\_particle\_energy'' alias for ``ekbar'' in the output block.
+    See \sect{derived}.
 \end{itemize}
 \end{itemize}
 \bigskip
