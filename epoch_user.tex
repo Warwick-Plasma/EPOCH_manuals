@@ -1215,26 +1215,16 @@ simply removed from the simulation when they reach the boundary.\\
   to the field. When specified for particles, the particles are reflected.\\
 
 {\emphtext open} - When applied to fields, EM waves outflowing characteristics
-propagate through the boundary. Particles are transmitted through the boundary
-and removed from the system.\\
+  propagate through the boundary. Particles are transmitted through the boundary
+  and removed from the system.\\
 
-{\emphtext heat\_bath} - Applies to particles \inlineemph{only}.
-An improved version of the
-thermal boundaries using a particle injector. This copies the species
-properties, acting as though the species continued outside the boundary.
-Note that this does \inlineemph{not} match to the species as it evolves, only
-evaluating the initial conditions as specified. Time or space
-varying initial conditions will be evaluated at the current time and at the
-position of the specified boundary.
-All restrictions on particle injectors (see \ref{sec:injector_block})
-apply. This boundary will always apply the
-\inlineemph{use\_flux\_maxwellian} flag\\
+{\emphtext heat\_bath} - Applies to particles only. See \sect{thermal}.\\
 
 {\emphtext cpml\_laser} - See \sect{cpml}.\\
 
 {\emphtext cpml\_outflow} - See \sect{cpml}.\\
 
-{\emphtext thermal} - See \sect{thermal}.\\
+{\emphtext thermal} - Applies to particles only. See \sect{thermal}.\\
 
 {\emphtext NOTE: If simple\_laser, simple\_outflow, cpml\_laser,
 cpml\_outflow or open are specified on one or more boundaries then the code
@@ -1288,22 +1278,37 @@ end:boundaries
 \end{boxverbatim}
 }
 
-\subsubsection{Thermal boundaries}
+\subsubsection{Thermal boundary conditions}
 \label{sec:thermal}
 
-Thermal boundary conditions have been added to the ``boundaries'' block.
-These simulate the existence of a ``thermal bath'' of particles in the
-domain adjacent to the boundary. When a particle leaves the simulation it is
-replaced with an incoming particle sampled from a Maxwellian of a temperature
-corresponding to that of the initial conditions. It is requested using the
-keyword ``thermal''. Note that these only resample when a particle leaves, unlike
-the ``heat\_bath'' boundary condition (added in {\EPOCH} 4.17).
+The ``heat\_bath'' particle boundary condition simulates the existence of a
+``thermal bath'' of particles in the domain adjacent to the boundary.
+This is achieved by setting up particle injectors whose properties match those
+of each species. These injectors will then steadily add particles to the
+simulation as if the plasma continued for an infinite extent beyond the
+simulation boundaries. Note that the injectors do \inlineemph{not} attempt to
+match the species as they evolve. The injector properties are only set to match
+the properties specified at the start of the simulation. However, these
+properties can vary both temporally and spacially. Time or space varying
+initial conditions will be evaluated at the current simulation time and at the
+position of the specified boundary.
+All restrictions on particle injectors apply (see \ref{sec:injector_block}).\\
+
+Historically, thermal boundary conditions in {\EPOCH} were specified using
+the ``thermal'' boundary condition for particles in the ``boundaries'' block.
+These work by replacing each particles that leaves the simulation with an
+identical incoming particle whose momentum has sampled from a Maxwellian of a
+temperature corresponding to that of the initial conditions.
+In most situations, the ``heat\_bath'' boundary condition will give better
+results, but the latter method has been kept for backwards compatibility.\\
+
 For example:
 
 \begin{boxverbatim}
 begin:boundaries
    bc_x_min = laser
-   bc_x_max = thermal
+   bc_x_max_field = open
+   bc_x_max_particle = heat_bath
 end:boundaries
 \end{boxverbatim}
 
