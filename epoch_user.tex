@@ -1218,7 +1218,7 @@ simply removed from the simulation when they reach the boundary.\\
 propagate through the boundary. Particles are transmitted through the boundary
 and removed from the system.\\
 
-{\emphtext continue} - Applies to particles \inlineemph{only}.
+{\emphtext heat\_bath} - Applies to particles \inlineemph{only}.
 An improved version of the
 thermal boundaries using a particle injector. This copies the species
 properties, acting as though the species continued outside the boundary.
@@ -1297,7 +1297,7 @@ domain adjacent to the boundary. When a particle leaves the simulation it is
 replaced with an incoming particle sampled from a Maxwellian of a temperature
 corresponding to that of the initial conditions. It is requested using the
 keyword ``thermal''. Note that these only resample when a particle leaves, unlike
-the ``continue'' boundary condition (added in {\EPOCH} 4.17).
+the ``heat\_bath'' boundary condition (added in {\EPOCH} 4.17).
 For example:
 
 \begin{boxverbatim}
