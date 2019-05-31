@@ -1215,14 +1215,16 @@ simply removed from the simulation when they reach the boundary.\\
   to the field. When specified for particles, the particles are reflected.\\
 
 {\emphtext open} - When applied to fields, EM waves outflowing characteristics
-propagate through the boundary. Particles are transmitted through the boundary
-and removed from the system.\\
+  propagate through the boundary. Particles are transmitted through the boundary
+  and removed from the system.\\
+
+{\emphtext heat\_bath} - Applies to particles only. See \sect{thermal}.\\
 
 {\emphtext cpml\_laser} - See \sect{cpml}.\\
 
 {\emphtext cpml\_outflow} - See \sect{cpml}.\\
 
-{\emphtext thermal} - See \sect{thermal}.\\
+{\emphtext thermal} - Applies to particles only. See \sect{thermal}.\\
 
 {\emphtext NOTE: If simple\_laser, simple\_outflow, cpml\_laser,
 cpml\_outflow or open are specified on one or more boundaries then the code
@@ -1276,21 +1278,37 @@ end:boundaries
 \end{boxverbatim}
 }
 
-\subsubsection{Thermal boundaries}
+\subsubsection{Thermal boundary conditions}
 \label{sec:thermal}
 
-Thermal boundary conditions have been added to the ``boundaries'' block.
-These simulate the existence of a ``thermal bath'' of particles in the
-domain adjacent to the boundary. When a particle leaves the simulation it is
-replace with an incoming particle sampled from a Maxwellian of a temperature
-corresponding to that of the initial conditions. It is requested using the
-keyword ``thermal''.
+The ``heat\_bath'' particle boundary condition simulates the existence of a
+``thermal bath'' of particles in the domain adjacent to the boundary.
+This is achieved by setting up particle injectors whose properties match those
+of each species. These injectors will then steadily add particles to the
+simulation as if the plasma continued for an infinite extent beyond the
+simulation boundaries. Note that the injectors do \inlineemph{not} attempt to
+match the species as they evolve. The injector properties are only set to match
+the properties specified at the start of the simulation. However, these
+properties can vary both temporally and spacially. Time or space varying
+initial conditions will be evaluated at the current simulation time and at the
+position of the specified boundary.
+All restrictions on particle injectors apply (see \ref{sec:injector_block}).\\
+
+Historically, thermal boundary conditions in {\EPOCH} were specified using
+the ``thermal'' boundary condition for particles in the ``boundaries'' block.
+These work by replacing each particles that leaves the simulation with an
+identical incoming particle whose momentum has sampled from a Maxwellian of a
+temperature corresponding to that of the initial conditions.
+In most situations, the ``heat\_bath'' boundary condition will give better
+results, but the latter method has been kept for backwards compatibility.\\
+
 For example:
 
 \begin{boxverbatim}
 begin:boundaries
    bc_x_min = laser
-   bc_x_max = thermal
+   bc_x_max_field = open
+   bc_x_max_particle = heat_bath
 end:boundaries
 \end{boxverbatim}
 
@@ -3446,7 +3464,7 @@ complete.
 The ``injector'' block accepts the following keys:\\
 
 {\emphtext boundary} - specifies which boundary to attach the particle source
-  too. Same specification as \sect{laser_block}, so permitted values are
+  to. Same specification as \sect{laser_block}, so permitted values are
   x\_min, x\_max, y\_min, y\_max, z\_min and z\_max.\\
 
 {\emphtext species} - specifies which species should be injected through the
@@ -3499,10 +3517,12 @@ The ``injector'' block accepts the following keys:\\
   the drift is zero. ``drift\_\{x,y,z\}'' are also accepted as aliases.\\
 
 {\emphtext use\_flux\_maxwellian} - Logical flag to determine whether to use
-  an accelerated flux Maxwellian rather than a drifting Maxwellian. This
-  calculates the flux due to passing a Maxwellian source into an electrostatic
-  accelerator instead of a drifting Maxwellian. If your particle source is a
-  lab accelerator then you may want to set this to true.\\
+  a flux Maxwellian rather than a drifting Maxwellian when sampling particles
+  to inject. By default, the injector will sample from a flux Maxwellian for
+  small values of drift and, for computational efficiency, a drifting
+  Maxwellian when the drift velocity is much larger than the thermal velocity.
+  It is possible to force the code to always use a drifting Maxwellian by
+  setting this flag to ``F''.  The default value is ``T''.\\
 
 An example input deck might look as follows:\\
 
@@ -5661,6 +5681,9 @@ used in conjunction with the moving window.
 \item ``breit\_wheeler\_\{electron,proton\}'' aliases for
     ``bw\_\{electron,proton\}'' in the qed block. See \sect{qed_block}.
 \end{itemize}
+\item Added ``heat\_bath'' particle boundary conditions. These use the particle
+    injectors to create an improved form of thermal boundary conditions.
+    See \sect{boundaries_block}.
 \end{itemize}
 \bigskip
 
