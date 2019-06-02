@@ -3379,9 +3379,9 @@ progresses. The code will fail to run if the needed species are not specified.
 
 {\EPOCH} is capable of simulating bremsstrahlung radiation using a combination
 of the techniques described by \citet{Vyskocil2018} and \citet{Wu2018}. In
-order to run this module, the compiler flag
-``-DBREMSSTRAHLUNG" must be switched on in the Makefile. A corresponding
-``bremsstrahlung'' block for the input deck has been created, and uses a similar
+order to run this module, the compiler flag ``-DBREMSSTRAHLUNG'' must be
+switched on in the Makefile. There should also be a corresponding
+``bremsstrahlung'' block for the input deck which uses a similar
  format to the ``qed'' block.
 
 An example bremsstrahlung block is shown below:
@@ -3402,7 +3402,7 @@ end:bremsstrahlung
   The default is ``F''.\\
 
 {\emphtext start\_time} - Floating point value specifying the time after
-  which bremsstrahlung radiation is modelled. The default is 0.0.\\
+  which bremsstrahlung radiation is modelled. The default is 0.\\
 
 {\emphtext produce\_photons} - Logical flag to allow population of a photon
   species. If ``F'', then only the energy loss of the electrons will be
@@ -3418,7 +3418,7 @@ end:bremsstrahlung
   species. The default is 0.\\
 
 {\emphtext photon\_weight} - Floating point value which applies a multiplier to
-  the reduce weight of produced macro-photons, in order to increase the number
+  the weight of produced macro-photons in order to increase the number
   of overall emissions and obtain better spectra. Must be less than or equal
   to 1 and greater than 0. For example, 0.1 would make emission 10 times more
   likely, but for macro-photons only 10\% the weight of the generating
@@ -3434,7 +3434,7 @@ end:bremsstrahlung
   section enhancement due to heated ionised targets is considered, based on
   theory described by \citet{Wu2018}. It is expected that for high energy
   electrons passing through low density, ionised plasmas with electron
-  temperatures over  $\sim$100 eV ($\sim8\times 10^{5}$ K), the bremsstrahlung
+  temperatures over $\sim$100 eV ($\sim8\times 10^{5}$ K), the bremsstrahlung
   emission rate could increase by a factor of 2-3. This has not been tested
   experimentally, and so the default value is set to ``F''.\\
 
@@ -3443,14 +3443,14 @@ end:bremsstrahlung
   flag, default ``T''.\\
 
 {\emphtext use\_bremsstrahlung\_table\_location} - String specifying the
-  location of the emission look-up tables for bremsstrahlung. Debugging
-  variable, with the default path set to:
+  location of the emission look-up tables for bremsstrahlung.
+  The default path is set to
   \inlinecode{src/physics\_packages/TABLES/br}.\\
 
 Bremsstrahlung, like QED, requires the code to know which species are electrons
 and which are photons, so uses the same identify system (with
 \inlinecode{identify:brem\_photon} for a bremsstrahlung-only photon species).
-Additionally, the atomic numbers of the atom/ion species are also required in
+Additionally, the atomic numbers of the atom/ion species are required in
 the species block. For example, atomic aluminium (charge = 0) could be
 specified as:
 
@@ -3467,11 +3467,11 @@ begin:species
 end:species
 \end{boxverbatim}
 
-If the atomic number is not specified, then it will be assumed that the ion is
+If the atomic number is not specified then it will be assumed that the ion is
 fully ionised and the atomic number would be set to the charge (the nearest
 integer to the ion charge when expressed in units of elementary charge). If
 ionisation is considered, the atomic number must be specified for the first
-ion species, and all children species will retain the same atomic number.
+ion species and all child species will retain the same atomic number.
 
 The direction of emitted macro-photons will always be in the direction of the
 generating macro-electron trajectory. This assumes emission from relativistic
