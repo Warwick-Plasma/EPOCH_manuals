@@ -612,6 +612,11 @@ the input deck. The fourteen built in blocks are:
   expressions. These are designed to simplify the initial condition setup.
 \end{itemize}
 
+Note that it is possible for an end user to add new blocks to the input deck.
+As a result, a version of the code which you have obtained from a source other
+than the GitLab repository may include additional input deck blocks that are
+not documented in this manual.
+
 \subsection{\texorpdfstring
   {\inlineemph{control} block}
   {           {control} block}}
@@ -3479,12 +3484,6 @@ The direction of emitted macro-photons will always be in the direction of the
 generating macro-electron trajectory. This assumes emission from relativistic
 electrons only - this code will not accurately reproduce the angular
 distribution of bremsstrahlung radiation from low energy electrons.
-
-The basic input deck has now been considered fully but it
-is possible for an end user to add new blocks to the input deck As a result,
-a version of the code which you have obtained from a source other than
-CCPForge may include other input deck blocks. These should be described in
-additional documentation provided with the version of the code that you have.
 
 \subsection{\texorpdfstring
   {\inlineemph{injector} block}
