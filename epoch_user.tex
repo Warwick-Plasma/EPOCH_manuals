@@ -5782,6 +5782,25 @@ used in conjunction with the moving window.
 \item ``breit\_wheeler\_\{electron,proton\}'' aliases for
     ``bw\_\{electron,proton\}'' in the qed block. See \sect{qed_block}.
 \end{itemize}
+\item Add model for simulating bremsstrahlung radiation. This is disabled by
+   default and can be enabled by specifying the ``-DBREMSSTRAHLUNG'' flag at
+   compile time. The model is configured using a new ``bremsstrahlung'' block
+   which takes the following parameters:
+\begin{itemize}
+\item enable
+\item start\_time
+\item produce\_photons
+\item photon\_energy\_min
+\item photon\_weight
+\item photon\_dynamics
+\item use\_plasma\_screening
+\item use\_radiation\_reaction
+\item table\_location
+\end{itemize}
+   See \sect{bremsstrahlung_block} for details.
+   It also adds the ``bremsstrahlung\_optical\_depth'' output block parameter
+   and ``atomic\_number'' and ``identify:brem\_photon'' species parameters. See
+   \sect{output_block} and \sect{species_block}.
 \end{itemize}
 \bigskip
 
