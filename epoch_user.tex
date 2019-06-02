@@ -3395,7 +3395,7 @@ An example bremsstrahlung block is shown below:
 
 \begin{lboxverbatim}{bremsstrahlung block}
 begin:bremsstrahlung
-   use_bremsstrahlung = T
+   enable = T
    start_time = 0
    produce_photons = T
    photon_energy_min = 1 * kev
@@ -3405,8 +3405,8 @@ begin:bremsstrahlung
 end:bremsstrahlung
 \end{lboxverbatim}
 
-{\emphtext use\_bremsstrahlung} - Logical flag to turn bremsstrahlung on or off.
-  The default is ``F''.\\
+{\emphtext enable} - Logical flag to turn bremsstrahlung on or off.
+  ``use\_bremsstrahlung'' is accepted as an alias. The default is ``F''.\\
 
 {\emphtext start\_time} - Floating point value specifying the time after
   which bremsstrahlung radiation is modelled. The default is 0.\\
