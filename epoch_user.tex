@@ -1421,7 +1421,8 @@ but this will be removed in version 5.0.
 ``zero\_current = F'' is the default value.\\
 
 {\emphtext identify} - Used to identify the type of particle. Currently this
-is used primarily by the QED routines. See \sect{qed_block} for details.\\
+is used primarily by the QED and bremsstrahlung routines. See \sect{qed_block}
+and \sect{bremsstrahlung} for details.\\
 
 {\emphtext immobile} - Logical flag. If this parameter is set to ``T'' then
 the species will be ignored during the particle push. The default value
@@ -3368,6 +3369,9 @@ Possible identities are:\\
 
 {\emphtext proton} - A normal proton species. This is for convenience only and
   is not required by the pair production routines.\\
+
+{\emphtext brem\_photon} - A bremsstrahlung photon species. This is used by the
+  bremsstrahlung radiation model. See \sect{bremsstrahlung_block} for details.\\
 
 A species should be identified only once, so a ``breit\_wheeler\_electron''
 species does not need to also be identified as an ``electron'' species. If the
