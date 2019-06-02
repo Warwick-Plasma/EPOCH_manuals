@@ -472,6 +472,8 @@ symbol. The options currently controlled by the preprocessor are:\\
   warnings are encountered during deck parsing. If the flag is not enabled then
   the same behaviour can be obtained by using the ``deck\_warnings\_fatal''
   flag in the control block of the input deck. See \sect{control_block}.
+\item BREMSSTRAHLUNG - This flag enables the model for simulating
+  bremsstrahlung radiation. See \sect{bremsstrahlung_block} for details.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
@@ -607,6 +609,11 @@ the input deck. The fourteen built in blocks are:
 \item constant - Contains information about user defined constants and
   expressions. These are designed to simplify the initial condition setup.
 \end{itemize}
+
+Note that it is possible for an end user to add new blocks to the input deck.
+As a result, a version of the code which you have obtained from a source other
+than the GitLab repository may include additional input deck blocks that are
+not documented in this manual.
 
 \subsection{\texorpdfstring
   {\inlineemph{control} block}
@@ -1429,7 +1436,12 @@ then a better mechanism to use is ``persistent subsets''
 ``zero\_current = F'' is the default value.\\
 
 {\emphtext identify} - Used to identify the type of particle. Currently this
-is used primarily by the QED routines. See \sect{qed_block} for details.\\
+is used primarily by the QED and bremsstrahlung routines. See \sect{qed_block}
+and \sect{bremsstrahlung} for details.\\
+
+{\emphtext atomic\_number} - Integer parameter specifying the atomic number of
+a species. This is used by the bremsstrahlung radiation model. See
+\sect{bremsstrahlung_block} for details.\\
 
 {\emphtext immobile} - Logical flag. If this parameter is set to ``T'' then
 the species will be ignored during the particle push. The default value
@@ -2536,6 +2548,11 @@ mass (ie. not rest mass).\\
   Restart variable. This option is only supplied for debugging purposes and
   should not be required by most users.\\
 
+{\emphtext bremsstrahlung\_optical\_depth} - The dumpmask for per-particle
+  optical depth used by the bremsstrahlung radiation model.
+  Restart variable. This option is only supplied for debugging purposes and
+  should not be required by most users.\\
+
 {\emphtext qed\_energy} - The dumpmask for per-particle QED-related particle
   energy.
   Restart variable. This option is only supplied for debugging purposes and
@@ -3407,6 +3424,9 @@ Possible identities are:\\
 {\emphtext proton} - A normal proton species. This is for convenience only and
   is not required by the pair production routines.\\
 
+{\emphtext brem\_photon} - A bremsstrahlung photon species. This is used by the
+  bremsstrahlung radiation model. See \sect{bremsstrahlung_block} for details.\\
+
 A species should be identified only once, so a ``breit\_wheeler\_electron''
 species does not need to also be identified as an ``electron'' species. If the
 code is running with ``produce\_photons=T'' then a photon species must be
@@ -3417,11 +3437,112 @@ species. These species will usually be defined with zero particles from the
 start of the simulation and will accumulate particles as the simulation
 progresses. The code will fail to run if the needed species are not specified.
 
-The basic input deck has now been considered fully but it
-is possible for an end user to add new blocks to the input deck As a result,
-a version of the code which you have obtained from a source other than
-CCPForge may include other input deck blocks. These should be described in
-additional documentation provided with the version of the code that you have.
+\subsection{\texorpdfstring
+  {\inlineemph{bremsstrahlung} block}
+  {           {bremsstrahlung} block}}
+\label{sec:bremsstrahlung_block}
+
+{\EPOCH} is capable of simulating bremsstrahlung radiation using a combination
+of the techniques described by \citet{Vyskocil2018} and \citet{Wu2018}. In
+order to run this module, the compiler flag ``-DBREMSSTRAHLUNG'' must be
+switched on in the Makefile. There should also be a corresponding
+``bremsstrahlung'' block for the input deck which uses a similar
+ format to the ``qed'' block.
+
+An example bremsstrahlung block is shown below:
+
+\begin{lboxverbatim}{bremsstrahlung block}
+begin:bremsstrahlung
+   enable = T
+   start_time = 0
+   produce_photons = T
+   photon_energy_min = 1 * kev
+   photon_weight = 1.0
+   photon_dynamics = F
+   use_plasma_screening = F
+end:bremsstrahlung
+\end{lboxverbatim}
+
+{\emphtext enable} - Logical flag to turn bremsstrahlung on or off.
+  ``use\_bremsstrahlung'' is accepted as an alias. The default is ``F''.\\
+
+{\emphtext start\_time} - Floating point value specifying the time after
+  which bremsstrahlung radiation is modelled. The default is 0.\\
+
+{\emphtext produce\_photons} - Logical flag to allow population of a photon
+  species. If ``F'', then only the energy loss of the electrons will be
+  simulated. The photon species can be specified by including the line
+  \inlinecode{identify:brem\_photon} in the corresponding species block. If the
+  compiler flag ``-DPHOTONS'' is active, QED and bremsstrahlung will both
+  populate the first species with \inlinecode{identify:photon} if no
+  brem\_photon species is specified. The default is ``F''.\\
+
+{\emphtext photon\_energy\_min} - Floating point value specifying the minimum
+  energy of produced photons. Electron energy loss is still calculated for
+  lower energy photon emissions, but these photons are not added to the photon
+  species. The default is 0.\\
+
+{\emphtext photon\_weight} - Floating point value which applies a multiplier to
+  the weight of produced macro-photons in order to increase the number
+  of overall emissions and obtain better spectra. Must be less than or equal
+  to 1 and greater than 0. For example, 0.1 would make emission 10 times more
+  likely, but for macro-photons only 10\% the weight of the generating
+  macro-electrons. The default is 1. Note that only one emission is possible
+  per macro-electron per timestep, so setting this too low will saturate
+  emissions.\\
+
+{\emphtext photon\_dynamics} - Logical flag to specify whether or not to push
+  photons. If ``F'', then the generated photons are immobilised at the point of
+  emission. The default is ``F''.\\
+
+{\emphtext use\_plasma\_screening} - Logical flag to specify whether a cross
+  section enhancement due to heated ionised targets is considered, based on
+  theory described by \citet{Wu2018}. It is expected that for high energy
+  electrons passing through low density, ionised plasmas with electron
+  temperatures over $\sim$100 eV ($\sim8\times 10^{5}$ K), the bremsstrahlung
+  emission rate could increase by a factor of 2-3. This has not been tested
+  experimentally, and so the default value is set to ``F''.\\
+
+{\emphtext use\_radiation\_reaction} - Logical flag to specify whether the
+  electrons experience energy loss when emitting photons or not.
+  ``use\_bremsstrahlung\_recoil'' is accepted as an alias. Debugging
+  flag, default ``T''.\\
+
+{\emphtext table\_location} - String specifying the
+  location of the emission look-up tables for bremsstrahlung.
+  The default path is set to
+  \inlinecode{src/physics\_packages/TABLES/br}.\\
+
+Bremsstrahlung, like QED, requires the code to know which species are electrons
+and which are photons, so uses the same identify system (with
+\inlinecode{identify:brem\_photon} for a bremsstrahlung-only photon species).
+Additionally, the atomic numbers of the atom/ion species are required in
+the species block. For example, atomic aluminium (charge = 0) could be
+specified as:
+
+\begin{boxverbatim}
+begin:species
+   name = Aluminium
+   atomic_number = 13
+   charge = 0
+
+   mass = 49218
+   number_density = 6.022e28
+   fraction = 0.5
+   dump = T
+end:species
+\end{boxverbatim}
+
+If the atomic number is not specified then it will be assumed that the ion is
+fully ionised and the atomic number would be set to the charge (the nearest
+integer to the ion charge when expressed in units of elementary charge). If
+ionisation is considered, the atomic number must be specified for the first
+ion species and all child species will retain the same atomic number.
+
+The direction of emitted macro-photons will always be in the direction of the
+generating macro-electron trajectory. This assumes emission from relativistic
+electrons only - this code will not accurately reproduce the angular
+distribution of bremsstrahlung radiation from low energy electrons.
 
 \subsection{\texorpdfstring
   {\inlineemph{injector} block}
@@ -5806,6 +5927,25 @@ used in conjunction with the moving window.
 \item Added ``heat\_bath'' particle boundary conditions. These use the particle
     injectors to create an improved form of thermal boundary conditions.
     See \sect{boundaries_block}.
+\item Add model for simulating bremsstrahlung radiation. This is disabled by
+   default and can be enabled by specifying the ``-DBREMSSTRAHLUNG'' flag at
+   compile time. The model is configured using a new ``bremsstrahlung'' block
+   which takes the following parameters:
+\begin{itemize}
+\item enable
+\item start\_time
+\item produce\_photons
+\item photon\_energy\_min
+\item photon\_weight
+\item photon\_dynamics
+\item use\_plasma\_screening
+\item use\_radiation\_reaction
+\item table\_location
+\end{itemize}
+   See \sect{bremsstrahlung_block} for details.
+   It also adds the ``bremsstrahlung\_optical\_depth'' output block parameter
+   and ``atomic\_number'' and ``identify:brem\_photon'' species parameters. See
+   \sect{output_block} and \sect{species_block}.
 \end{itemize}
 \bigskip
 
