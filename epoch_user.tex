@@ -1450,6 +1450,12 @@ a species. This is used by the bremsstrahlung radiation model. See
 the species will be ignored during the particle push. The default value
 is ``F''.\\
 
+{\emphtext background\_species} - Logical flag. If set to ``T'' the species will
+be treated as a non evolving continuum background. No particles are loaded. Any
+particle-like specifications will be ignored. Background species are currently
+only used by the bremsstrahlung radiation model. See \sect{bremsstrahlung_block}
+for details. Default value is ``F''.``background'' is accepted as an alias.\\
+
 The species blocks are also used for specifying initial conditions for
 the particle species. The initial conditions in {\EPOCH} can be specified in
 various ways, but the easiest way is to specify the initial conditions in the
