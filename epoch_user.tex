@@ -1437,7 +1437,7 @@ then a better mechanism to use is ``persistent subsets''
 
 {\emphtext identify} - Used to identify the type of particle. Currently this
 is used primarily by the QED and bremsstrahlung routines. See \sect{qed_block}
-and \sect{bremsstrahlung} for details.\\
+and \sect{bremsstrahlung_block} for details.\\
 
 {\emphtext atomic\_number} - Integer parameter specifying the atomic number of
 a species. This is used by the bremsstrahlung radiation model. See
@@ -1446,6 +1446,12 @@ a species. This is used by the bremsstrahlung radiation model. See
 {\emphtext immobile} - Logical flag. If this parameter is set to ``T'' then
 the species will be ignored during the particle push. The default value
 is ``F''.\\
+
+{\emphtext background\_species} - Logical flag. If set to ``T'' the species will
+be treated as a non evolving continuum background. No particles are loaded. Any
+particle-like specifications will be ignored. Background species are currently
+only used by the bremsstrahlung radiation model. See \sect{bremsstrahlung_block}
+for details. Default value is ``F''.``background'' is accepted as an alias.\\
 
 The species blocks are also used for specifying initial conditions for
 the particle species. The initial conditions in {\EPOCH} can be specified in
@@ -2800,6 +2806,9 @@ into a single file.
 The ``restartable'' field specifies that the output block should
 generate output dumps containing all the information necessary
 to restart a simulation.
+
+The ``full'' and ``restart'' dumpmask flags do not make much sense in the new
+style of output block and these have been deprecated.
 
 The following parameters are supported by the new style of output block in
 addition to those for the traditional style:
@@ -5944,7 +5953,8 @@ used in conjunction with the moving window.
 \end{itemize}
    See \sect{bremsstrahlung_block} for details.
    It also adds the ``bremsstrahlung\_optical\_depth'' output block parameter
-   and ``atomic\_number'' and ``identify:brem\_photon'' species parameters. See
+   and ``atomic\_number'', ``background\_species'' and
+   ``identify:brem\_photon'' species parameters. See
    \sect{output_block} and \sect{species_block}.
 \end{itemize}
 \bigskip
