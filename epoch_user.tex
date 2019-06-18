@@ -776,7 +776,7 @@ specified time before beginning to move the particles.\\
   set to ``T'' then the domain split amongst processors will be identical
   along with the seeds for the random number generators. Note that the flag
   will be ignored if the number of processors does not match that used in the
-  original run. The default value is ``F''.\\
+  original run. The default value is ``T''.\\
 
 {\emphtext allow\_cpu\_reduce} - Logical flag which allows the number of CPUs
   used to be reduced from the number specified. In some situations it may not
@@ -5814,10 +5814,12 @@ used in conjunction with the moving window.
 \item Added ``heat\_bath'' particle boundary conditions. These use the particle
     injectors to create an improved form of thermal boundary conditions.
     See \sect{boundaries_block}.
+\item Changed the default value for the ``use\_exact\_restart'' flag to ``T''.
+    See \sect{control_block}.
 \item Add model for simulating bremsstrahlung radiation. This is disabled by
-   default and can be enabled by specifying the ``-DBREMSSTRAHLUNG'' flag at
-   compile time. The model is configured using a new ``bremsstrahlung'' block
-   which takes the following parameters:
+    default and can be enabled by specifying the ``-DBREMSSTRAHLUNG'' flag at
+    compile time. The model is configured using a new ``bremsstrahlung'' block
+    which takes the following parameters:
 \begin{itemize}
 \item enable
 \item start\_time
@@ -5829,11 +5831,11 @@ used in conjunction with the moving window.
 \item use\_radiation\_reaction
 \item table\_location
 \end{itemize}
-   See \sect{bremsstrahlung_block} for details.
-   It also adds the ``bremsstrahlung\_optical\_depth'' output block parameter
-   and ``atomic\_number'', ``background\_species'' and
-   ``identify:brem\_photon'' species parameters. See
-   \sect{output_block} and \sect{species_block}.
+    See \sect{bremsstrahlung_block} for details.
+    It also adds the ``bremsstrahlung\_optical\_depth'' output block parameter
+    and ``atomic\_number'', ``background\_species'' and
+    ``identify:brem\_photon'' species parameters. See
+    \sect{output_block} and \sect{species_block}.
 \end{itemize}
 \bigskip
 
