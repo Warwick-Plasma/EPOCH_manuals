@@ -23,9 +23,9 @@ source code.
 This version number is printed to screen when you run the code. The line looks
 something like the following:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.16.0   (commit v4.16.0-0-g69eb0fa6-clean)
+ Welcome to EPOCH2D version 4.17.0   (commit v4.17.0-0-g1f6d56a22-clean)
 \end{boxverbatim}
-Here, only the number ``4.16'' is important.
+Here, only the number ``4.17'' is important.
 
 Since version 3.1 of the manual, new additions and changes are mentioned
 in the appendix.
@@ -202,8 +202,8 @@ are given assuming that you are typing commands at a UNIX terminal.
 When obtained, the {\EPOCH} codes all have a similar structure. If the tarred
 and gzipped archive (commonly referred to as a tarball) is downloaded and
 unpacked into the user's \verb|$HOME| directory, then the extracted contents
-will consist of a directory named ``\verb|$HOME/epoch-4.16.0|''
-(with ``4.16.0'' substituted by the current version number) and the
+will consist of a directory named ``\verb|$HOME/epoch-4.17.0|''
+(with ``4.17.0'' substituted by the current version number) and the
 subdirectories and files listed below.
 
 Alternatively, if the code is checked out from the GitLab git
@@ -301,7 +301,7 @@ or whatever the correct binary is for the dimensionality of the code that you
 have. You should be given a screen which begins with the {\EPOCH} logo, and then
 reads:
 \begin{boxverbatim}
- Welcome to EPOCH2D version 4.16.0   (commit v4.16.0-0-g69eb0fa6-clean)
+ Welcome to EPOCH2D version 4.17.0   (commit v4.17.0-0-g1f6d56a22-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -470,6 +470,12 @@ symbol. The options currently controlled by the preprocessor are:\\
   such as the ``MPI\_TYPE\_SIZE\_X'' routine. This allows the code to be
   compiled against older versions of the MPI library. The flag should only be
   enabled if the code fails to compile without it.
+\item DECK\_DEBUG - If this flag is enabled then the code will exit if any
+  warnings are encountered during deck parsing. If the flag is not enabled then
+  the same behaviour can be obtained by using the ``deck\_warnings\_fatal''
+  flag in the control block of the input deck. See \sect{control_block}.
+\item BREMSSTRAHLUNG - This flag enables the model for simulating
+  bremsstrahlung radiation. See \sect{bremsstrahlung_block} for details.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
@@ -518,7 +524,7 @@ When the code is run, the output is
   d########P  d##P            ###########P     ##########P  d##P      d##P
  d########P  d##P              d######P          #######P  d##P      d##P
 
- Welcome to EPOCH2D version 4.16.0   (commit v4.16.0-0-g69eb0fa6-clean)
+ Welcome to EPOCH2D version 4.17.0   (commit v4.17.0-0-g1f6d56a22-clean)
 
  *************************************************************
  The code was compiled with no compile time options
@@ -606,6 +612,11 @@ the input deck. The fourteen built in blocks are:
   expressions. These are designed to simplify the initial condition setup.
 \end{itemize}
 
+Note that it is possible for an end user to add new blocks to the input deck.
+As a result, a version of the code which you have obtained from a source other
+than the GitLab repository may include additional input deck blocks that are
+not documented in this manual.
+
 \subsection{\texorpdfstring
   {\inlineemph{control} block}
   {           {control} block}}
@@ -621,7 +632,7 @@ begin:control
    nx = 512 # in x
    ny = 512 # in y
    # Global number of particles
-   npart = 10 * nx * ny
+   nparticles = 10 * nx * ny
 
    # Final time of simulation
    t_end = 1.0e-12
@@ -654,11 +665,12 @@ The allowed entries are as follows:\\
 {\emphtext nx, ny, nz} - Number of grid points in the x,y,z direction. This
 parameter is mandatory.\\
 
-{\emphtext npart} - The global number of pseudoparticles in the
+{\emphtext nparticles} - The global number of pseudoparticles in the
 simulation. This parameter does not need to be given if a specific number
-of particles is supplied for each particle species by using the ``npart''
+of particles is supplied for each particle species by using the ``nparticles''
 directive in each \cemph{species} block (see \sect{species_block}). If both are
-given then the value in the \cemph{control} block will be ignored.\\
+given then the value in the \cemph{control} block will be ignored.
+``npart'' is accepted as an alias.\\
 
 {\emphtext nsteps} - The number of iterations of the core solver before the
 code terminates. Negative numbers instruct the code to only terminate at
@@ -764,7 +776,7 @@ specified time before beginning to move the particles.\\
   set to ``T'' then the domain split amongst processors will be identical
   along with the seeds for the random number generators. Note that the flag
   will be ignored if the number of processors does not match that used in the
-  original run. The default value is ``F''.\\
+  original run. The default value is ``T''.\\
 
 {\emphtext allow\_cpu\_reduce} - Logical flag which allows the number of CPUs
   used to be reduced from the number specified. In some situations it may not
@@ -922,6 +934,12 @@ specified time before beginning to move the particles.\\
   Setting the flag to true enables one set of arrays per species.
   The default value is ``F''.\\
 
+{\emphtext deck\_warnings\_fatal} - This logical flag controls the behaviour
+  of the deck parser when a warning is encountered. Usually the code will
+  just print a warning message and continue running. Setting this flag to ``T''
+  will force the code to abort.
+  The default value is ``F''.\\
+
 
 \subsubsection{Maxwell Solvers}
 \label{sec:maxwell_solvers}
@@ -959,7 +977,7 @@ While it is not technically required to use a \inlineemph{dt\_multiplier}
 smaller than unity, the value proposed by \citet{Lehe2013} is
 ``\inlineemph{dt\_multiplier}=0.96''. \\
 
-{\emphtext maxwell\_solver = pukhov} - This setting will enable en extended
+{\emphtext maxwell\_solver = pukhov} - This setting will enable an extended
 stencil proposed by \citet{Pukhov1999} under the name of NDFX.
 It is available in EPOCH2D and EPOCH3D. In EPOCH1D, setting
 ``\inlineemph{maxwell\_solver} = pukhov'' will make the code fall back silently
@@ -1204,14 +1222,16 @@ simply removed from the simulation when they reach the boundary.\\
   to the field. When specified for particles, the particles are reflected.\\
 
 {\emphtext open} - When applied to fields, EM waves outflowing characteristics
-propagate through the boundary. Particles are transmitted through the boundary
-and removed from the system.\\
+  propagate through the boundary. Particles are transmitted through the boundary
+  and removed from the system.\\
+
+{\emphtext heat\_bath} - Applies to particles only. See \sect{thermal}.\\
 
 {\emphtext cpml\_laser} - See \sect{cpml}.\\
 
 {\emphtext cpml\_outflow} - See \sect{cpml}.\\
 
-{\emphtext thermal} - See \sect{thermal}.\\
+{\emphtext thermal} - Applies to particles only. See \sect{thermal}.\\
 
 {\emphtext NOTE: If simple\_laser, simple\_outflow, cpml\_laser,
 cpml\_outflow or open are specified on one or more boundaries then the code
@@ -1265,21 +1285,37 @@ end:boundaries
 \end{boxverbatim}
 }
 
-\subsubsection{Thermal boundaries}
+\subsubsection{Thermal boundary conditions}
 \label{sec:thermal}
 
-Thermal boundary conditions have been added to the ``boundaries'' block.
-These simulate the existence of a ``thermal bath'' of particles in the
-domain adjacent to the boundary. When a particle leaves the simulation it is
-replace with an incoming particle sampled from a Maxwellian of a temperature
-corresponding to that of the initial conditions. It is requested using the
-keyword ``thermal''.
+The ``heat\_bath'' particle boundary condition simulates the existence of a
+``thermal bath'' of particles in the domain adjacent to the boundary.
+This is achieved by setting up particle injectors whose properties match those
+of each species. These injectors will then steadily add particles to the
+simulation as if the plasma continued for an infinite extent beyond the
+simulation boundaries. Note that the injectors do \inlineemph{not} attempt to
+match the species as they evolve. The injector properties are only set to match
+the properties specified at the start of the simulation. However, these
+properties can vary both temporally and spacially. Time or space varying
+initial conditions will be evaluated at the current simulation time and at the
+position of the specified boundary.
+All restrictions on particle injectors apply (see \ref{sec:injector_block}).\\
+
+Historically, thermal boundary conditions in {\EPOCH} were specified using
+the ``thermal'' boundary condition for particles in the ``boundaries'' block.
+These work by replacing each particles that leaves the simulation with an
+identical incoming particle whose momentum has sampled from a Maxwellian of a
+temperature corresponding to that of the initial conditions.
+In most situations, the ``heat\_bath'' boundary condition will give better
+results, but the latter method has been kept for backwards compatibility.\\
+
 For example:
 
 \begin{boxverbatim}
 begin:boundaries
    bc_x_min = laser
-   bc_x_max = thermal
+   bc_x_max_field = open
+   bc_x_max_particle = heat_bath
 end:boundaries
 \end{boxverbatim}
 
@@ -1295,13 +1331,13 @@ begin:species
    name = Electron
    charge = -1.0
    mass = 1.0
-   frac = 0.5
-   # npart = 2000 * 100
+   fraction = 0.5
+   # nparticles = 2000 * 100
    number_density = 1.e4
-   temp = 1e6
+   temperature = 1e6
 
-   temp_x = 0.0
-   temp_y = temp_x(Electron)
+   temperature_x = 0.0
+   temperature_y = temperature_x(Electron)
    number_density_min = 0.1 * den_max
    number_density = if(abs(x) lt thick, den_max, 0.0)
    number_density = if((x gt -thick) and (abs(y) gt 2e-6), \
@@ -1312,11 +1348,11 @@ begin:species
    name = Carbon
    charge = 4.0
    mass = 1836.0 * 12
-   frac = 0.5
+   fraction = 0.5
 
    number_density = 0.25 * number_density(Electron)
-   temp_x = temp_x(Electron)
-   temp_y = temp_x(Electron)
+   temperature_x = temperature_x(Electron)
+   temperature_y = temperature_x(Electron)
 
    dumpmask = full
 end:species
@@ -1339,34 +1375,35 @@ charged particles. This is a mandatory parameter.\\
 {\emphtext mass} - This sets the mass of the species in multiples
 of the electron mass. Cannot be negative. This is a mandatory parameter.\\
 
-{\emphtext npart} - This specifies the number of pseudoparticles
+{\emphtext nparticles} - This specifies the number of pseudoparticles
 which should be loaded into the simulation domain for this species block.
 Using this parameter is the most convenient way of loading particles for
 simulations which contain multiple species with different number densities.
-If \inlineemph{npart} is specified in a species block then any value
-given for \inlineemph{npart} in the \inlineemph{control} block is ignored.
-\inlineemph{npart} should not be specified at the same time
-as \inlineemph{frac} within a \inlineemph{species} block.\\
+If \inlineemph{nparticles} is specified in a species block then any value
+given for \inlineemph{nparticles} in the \inlineemph{control} block is ignored.
+\inlineemph{nparticles} should not be specified at the same time
+as \inlineemph{fraction} within a \inlineemph{species} block.
+``npart'' is accepted as an alias.\\
 
-{\emphtext frac} - This specifies what fraction of \inlineemph{npart} (the
-global number of particles specified in the control block) should be assigned
-to the species.\\
+{\emphtext fraction} - This specifies what fraction of \inlineemph{nparticles}
+(the global number of particles specified in the control block) should be
+assigned to the species. ``frac'' is accepted as an alias.\\
 
-{\emphtext NOTE: frac should not be specified at the same time as npart for a
-given species.}\\
+{\emphtext NOTE: ``fraction'' should not be specified at the same time as
+``nparticles'' for a given species.}\\
 
-{\emphtext npart\_per\_cell} - Integer parameter which specifies
+{\emphtext nparticles\_per\_cell} - Integer parameter which specifies
 the number of particles per cell to use for the initial particle loading.
-At a later stage this may be extended to allow ``npart\_per\_cell'' to be
+At a later stage this may be extended to allow ``nparticles\_per\_cell'' to be
 a spatially varying function.
 
-If per-species weighting is used then the value of ``npart\_per\_cell'' will
-be the average number of particles per cell.  If ``npart'' or ``frac'' have
-also been specified for a species, then they will be ignored.
+If per-species weighting is used then the value of ``nparticles\_per\_cell''
+will be the average number of particles per cell.  If ``nparticles'' or
+``fraction'' have also been specified for a species, then they will be ignored.
 
-To avoid confusion, there is no globally used ``npart\_per\_species''.  If you
-want to have a single value to change in the input deck then this can be
-achieved using a constant block.\\
+To avoid confusion, there is no globally used ``nparticles\_per\_species''. If
+you want to have a single value to change in the input deck then this can be
+achieved using a constant block. ``npart\_per\_cell'' is accepted as an alias.\\
 
 {\emphtext dumpmask} - Determines which output dumps will include this
 particle species. The dumpmask has the same semantics as those used
@@ -1402,11 +1439,22 @@ but this will be removed in version 5.0.
 ``zero\_current = F'' is the default value.\\
 
 {\emphtext identify} - Used to identify the type of particle. Currently this
-is used primarily by the QED routines. See \sect{qed_block} for details.\\
+is used primarily by the QED and bremsstrahlung routines. See \sect{qed_block}
+and \sect{bremsstrahlung_block} for details.\\
+
+{\emphtext atomic\_number} - Integer parameter specifying the atomic number of
+a species. This is used by the bremsstrahlung radiation model. See
+\sect{bremsstrahlung_block} for details.\\
 
 {\emphtext immobile} - Logical flag. If this parameter is set to ``T'' then
 the species will be ignored during the particle push. The default value
 is ``F''.\\
+
+{\emphtext background\_species} - Logical flag. If set to ``T'' the species will
+be treated as a non evolving continuum background. No particles are loaded. Any
+particle-like specifications will be ignored. Background species are currently
+only used by the bremsstrahlung radiation model. See \sect{bremsstrahlung_block}
+for details. Default value is ``F''.``background'' is accepted as an alias.\\
 
 The species blocks are also used for specifying initial conditions for
 the particle species. The initial conditions in {\EPOCH} can be specified in
@@ -1449,22 +1497,24 @@ as ``number\_density'' but multiplied by the particle mass. If you wish to use
 units of $g\,cm^{-3}$ then append the appropriate multiplication factor.
 For example: ``\verb|mass_density = 2 * 1e3 / cc|''.\\
 
-{\emphtext temp\_\{x,y,z\}} - The temperature in each direction for a thermal
-distribution in Kelvin.\\
+{\emphtext temperature\_\{x,y,z\}} - The temperature in each direction for a
+thermal distribution specified in Kelvin. ``temp\_\{x,y,z\}'' can be used as
+aliases.\\
 
-{\emphtext temp} - Sets an isotropic temperature distribution in Kelvin.
-If both temp and a specific
-temp\_x, temp\_y, temp\_z parameter is specified then the last to appear in the
-deck has precedence. If neither are given then the species will have a default
-temperature of zero Kelvin.\\
+{\emphtext temperature} - Sets an isotropic temperature distribution in Kelvin.
+If both ``temperature'' and a specific ``temperature\_x'', ``temperature\_y''
+or ``temperature\_z'' parameter is specified then the last to appear in the
+deck has precedence. If neither are given then the species will have a
+default temperature of zero Kelvin. ``temp'' is accepted as an alias.\\
 
-{\emphtext temp\_\{x,y,z\}\_ev, temp\_ev} - These are the same as the
-temperature parameters described above except the units are given in
-electronvolts rather than Kelvin.\\
+{\emphtext temperature\_\{x,y,z\}\_ev, temperature\_ev} - These are the same
+as the ``temperature'' parameters described above except the units are given
+in electronvolts rather than Kelvin. ``temp\_\{x,y,z\}\_ev'' and ``temp\_ev''
+are accepted as aliases.\\
 
-{\emphtext drift\_\{x,y,z\}} - Specifies a momentum space offset in
+{\emphtext drift\_p\{x,y,z\}} - Specifies a momentum space offset in
 $kg\ ms^{-1}$ to the distribution function for this species. By default,
-the drift is zero.\\
+the drift is zero. ``drift\_\{x,y,z\}'' are also accepted as aliases.\\
 
 {\emphtext offset} - File offset. See below for details.\\
 
@@ -1482,14 +1532,14 @@ begin:species
    name = Electron
    number_density = 'Data/ic.dat'
    offset = 80000
-   temp_x = 'Data/ic.dat'
+   temperature_x = 'Data/ic.dat'
 end:species
 \end{lboxverbatim}
 
 The sizes of the variables to be filled do not need to be provided: the
-code will continue reading until the given variable is filled. 
+code will continue reading until the given variable is filled.
 Note that ghost or guard cells should not be included in the file as
-they cannot be set this way. 
+they cannot be set this way.
 
 An additional element is also introduced, the offset element. This
 is the offset in bytes from the start of the file to where the data should
@@ -1503,7 +1553,7 @@ a mathematical expression.\\
 
 The example block above is for 10,000 values at double precision, i.e. 8-bytes
 each. The density data is the first 80,000 bytes of ``ic.dat''. Bytes 80,000
-to 160,000 are the temp\_x data.
+to 160,000 are the temperature\_x data.
 
 The file should be a simple binary file consisting of floating point numbers of
 the same precision as \inlinecode{\_num} in the core {\EPOCH} code. For
@@ -1517,11 +1567,12 @@ unformatted files using the offset element, but care must be taken!}\\
 The following entries are used for configuring the Delta-f method
 (see \sect{deltaf}).\\
 
-{\emphtext number\_density\_back, drift\_\{x,y,z\}\_back, temp\_\{x,y,z\}\_back,
-\par temp\_\{x,y,z\}\_back\_ev, temp\_back, temp\_back\_ev}
+{\emphtext number\_density\_background, drift\_p\{x,y,z\}\_background,
+\par temperature\_\{x,y,z\}\_background, temperature\_\{x,y,z\}\_background\_ev,
+\par\vspace{3pt} temperature\_background, temperature\_background\_ev}
  - These all have the same
-meanings as the parameters listed above that don't include the ``\_back'' text,
-except that they specify the values to use for the background distribution
+meanings as the parameters listed above that don't include the ``\_background''
+text, except that they specify the values to use for the background distribution
 function.\\
 
 \subsubsection{Particle migration between species}
@@ -1767,7 +1818,7 @@ begin:species
   name = Electron_pl
   charge = -1
   mass = 1.0
-  frac = 0.5
+  fraction = 0.5
   number_density = dens
   # Truncated power law distribution in px
   dist_fn = exp(-p0 / px) * (px / p0)^alpha
@@ -1833,8 +1884,8 @@ conditions deck.\\
   ``micron''. One of \inlineemph{lambda} or \inlineemph{omega} (or
   \inlineemph{frequency}) is a required parameter.\\
 
-{\emphtext pol\_angle} - Polarisation angle for the electric field of the
-  laser in radians. This parameter is optional and has a value of zero by
+{\emphtext polarisation\_angle} - Polarisation angle for the electric field of
+  the laser in radians. This parameter is optional and has a value of zero by
   default. The angle is measured with respect to the right-hand triad of
   propagation direction, electric and magnetic fields. Although the 1D code
   has no $y$ or $z$ spatial axis, the fields still have $y$ and $z$ components.
@@ -1842,16 +1893,16 @@ conditions deck.\\
   $y$-direction and the $B$ field is the $z$-direction. The polarisation angle
   is measured clockwise about the $x$-axis with zero along the $E_y$
   direction. If the laser is on \inlineemph{x\_max} then the angle is
-  anti-clockwise.\\
+  anti-clockwise. ``pol\_angle'' is accepted as an alias.\\
   Similarly, for propagation directions:\\
 \inlineemph{y\_min} - angle about $y$-axis, zero along $z$-axis\\
 \inlineemph{z\_min} - angle about $z$-axis, zero along $x$-axis\\
 \inlineemph{y\_max} - angle anti-clockwise about $y$-axis, zero along $z$-axis\\
 \inlineemph{z\_max} - angle anti-clockwise about $z$-axis, zero along $x$-axis\\
 
-{\emphtext pol} - This is identical to \inlineemph{pol\_angle} with the angle
-  specified in degrees rather than radians. If both are specified then the
-  last one is used.\\
+{\emphtext polarisation} - This is identical to \inlineemph{polarisation\_angle}
+  with the angle specified in degrees rather than radians. If both are specified
+  then the last one is used. ``pol'' is accepted as an alias.\\
 
 {\emphtext phase} - The phase profile of the laser wavefront given in radians.
   Phase may be a function of both space and time. The laser is driven using
@@ -2182,7 +2233,7 @@ begin:output
    bz = always
    jx = always
    jy = always
-   ekbar = always + species
+   average_particle_energy = always + species
    mass_density = never + species
    charge_density = always
    number_density = always + species
@@ -2239,7 +2290,8 @@ Note that variables required for restarting the code are always written to
 restart dumps. This flag is to enable the writing of additional variables
 into such dump files.\\
 
-For grid variables derived from summing over particles (ie. ``ekbar'',
+For grid variables derived from summing over particles
+(ie. ``average\_particle\_energy'',
 ``mass\_density'', ``charge\_density'', ``number\_density'', ``temperature'')
 the following two parameters also apply.\\
 
@@ -2475,6 +2527,11 @@ mass (ie. not rest mass).\\
   Restart variable. This option is only supplied for debugging purposes and
   should not be required by most users.\\
 
+{\emphtext bremsstrahlung\_optical\_depth} - The dumpmask for per-particle
+  optical depth used by the bremsstrahlung radiation model.
+  Restart variable. This option is only supplied for debugging purposes and
+  should not be required by most users.\\
+
 {\emphtext qed\_energy} - The dumpmask for per-particle QED-related particle
   energy.
   Restart variable. This option is only supplied for debugging purposes and
@@ -2543,11 +2600,12 @@ by summing properties of all the particles in each grid cell. The resulting
 quantities are defined on the regular cartesian mesh used for grid variables.
 All entries have a default dumpmask of ``never''.\\
 
-{\emphtext ekbar} - Mean kinetic energy on grid in $J$. Can have species
-dumpmask.\\
+{\emphtext average\_particle\_energy} - Mean kinetic energy on grid in $J$. Can
+have species dumpmask. ``ekbar'' is accepted as an alias.\\
 
-{\emphtext ekflux} - Mean kinetic energy flux in each direction on the grid
-in $W/m^2$. Can have species dumpmask.\\
+{\emphtext particle\_energy\_flux} - Mean kinetic energy flux in each direction
+on the grid in $W/m^2$. Can have species dumpmask. ``ekflux'' is accepted as an
+alias.\\
 
 {\emphtext mass\_density} - Mass density on grid in $kg/m^3$. Can have species
 dumpmask.\\
@@ -2564,6 +2622,9 @@ species dumpmask.  The synonym ``ppc'' may also be used.\\
 {\emphtext average\_weight} - Average of weight of the particles in each cell.
 Can have species dumpmask.\\
 
+{\emphtext average\_p\{x,y,z\}} - Average momentum of the particles in each
+cell.  Can have species dumpmask.\\
+
 {\emphtext temperature} - Isotropic temperature on grid in $K$. The synonym
 ``temp'' may also be used. Can have species dumpmask.\\
 
@@ -2571,7 +2632,8 @@ Can have species dumpmask.\\
 directions, respectively, in $K$. The synonyms ``temp\_\{x,y,z\}'' and
 ``t\{x,y,z\}'' may also be used. Can have species dumpmask.\\
 
-{\emphtext poynt\_flux} - Poynting flux in each direction in $W/m^2$.\\
+{\emphtext poynting\_flux} - Poynting flux in each direction in $W/m^2$.
+``poynt\_flux'' is accepted as an alias.\\
 
 % The cpml_* variables are only really used internally and therefore
 % are currently undocumented
@@ -2645,14 +2707,14 @@ begin:output
 
    charge_density = always + average + snapshot
    mass_density = full + average + snapshot
-   ekbar = full + average
+   average_particle_energy = full + average
 end:output
 \end{boxverbatim}
 
 With this configuration, ``charge\_density'' will be written in both normal and
 averaged form at normal, full and restart dumps. ``mass\_density'' will be
 written in both forms at full dumps. Only the average value of
-``ekbar'' will be written at full dumps.
+``average\_particle\_energy'' will be written at full dumps.
 
 Only field and derived variables can be averaged currently in {\EPOCH}.
 Particle properties, distribution functions and particle probes cannot
@@ -2717,6 +2779,9 @@ into a single file.
 The ``restartable'' field specifies that the output block should
 generate output dumps containing all the information necessary
 to restart a simulation.
+
+The ``full'' and ``restart'' dumpmask flags do not make much sense in the new
+style of output block and these have been deprecated.
 
 The following parameters are supported by the new style of output block in
 addition to those for the traditional style:
@@ -3040,11 +3105,14 @@ only be dumped at full dumps. The default dumpmask is ``always''.\\
 
 {\emphtext direction\inlinecode{n}} - This is the phase space to sample
 along axis \inlinecode{n}. This can be any one of:
-dir\_x, dir\_y, dir\_z, dir\_px, dir\_py, dir\_pz, dir\_en, dir\_gamma\_m1,
-dir\_xy\_angle, dir\_yz\_angle, dir\_zx\_angle
+dir\_x, dir\_y, dir\_z, dir\_px, dir\_py, dir\_pz, dir\_energy,
+dir\_gamma\_minus\_one, dir\_xy\_angle, dir\_yz\_angle, dir\_zx\_angle,
+dir\_mod\_p
 with spatial codes only being available in dimensionalities of the code which
 have that direction. Therefore dir\_z does not exist in EPOCH1D or EPOCH2D
-and dir\_y does not exist in EPOCH1D.
+and dir\_y does not exist in EPOCH1D. ``dir\_en'' and ``dir\_gamma\_m1''
+are accepted as an aliases for ``dir\_energy'' and ``dir\_gamma\_minus\_one''
+respectively.
 
 The flags ``dir\_xy\_angle'', ``dir\_yz\_angle'' and
 ``dir\_zx\_angle'' calculate the distribution
@@ -3077,8 +3145,10 @@ all species in the output file.\\
   calculating the distribution function is adjusted by subtracting the Delta-f
   distribution function for the particle species. The default value is ``F''.\\
 
-{\emphtext restrict\_\{x,y,z,px,py,pz\}} - Restrictions are specified in the
-  same way as ranges, but have a subtly different behaviour. Ranges specify
+{\emphtext restrict\_\verb|<|direction\verb|>|} - ``\verb|<|direction\verb|>|''
+  can be any one of ``x, y, z, px, py, pz, energy, gamma\_minus\_one, xy\_angle,
+  yz\_angle, zx\_angle, mod\_p''. Restrictions are specified in
+  the same way as ranges, but have a subtly different behaviour. Ranges specify
   the range of a visible axis on the resulting distribution function, whereas
   restrictions allow you to specify minimum and maximum values for each
   spatial and momentum direction and use only particles which fall within this
@@ -3171,14 +3241,19 @@ end:probe
   {\inlineemph{collisions} block}
   {           {collisions} block}}
 \label{sec:collisions_block}
-{\EPOCH} has a particle collision routine based on the model presented
-by \citet{Sentoku}.
+{\EPOCH} has a particle collision routine with scattering algorithms based on
+the model presented by \citet{Sentoku} or the model presented by
+\citet{Perez}, which in turn was based on the work of \citet{Nanbu}.
 This adds a new output block named ``collisions'' which accepts the
-following three parameters.\\
+following four parameters.\\
 
 {\emphtext use\_collisions} - This is a logical flag which determines whether
   or not to call the collision routine. If omitted, the default is ``T'' if any
   of the frequency factors are non-zero (see below) and ``F'' otherwise.\\
+
+{\emphtext use\_nanbu} - This logical flag determines whether the scattering
+  angle of P\'erez/Nanbu will be used. If ``F'', the Sentoku-Kemp algorithm will
+  be used. The default is ``T''.\\
 
 {\emphtext coulomb\_log} - This may either be set to a real value, specifying
   the Coulomb logarithm to use when scattering the particles or to the special
@@ -3217,6 +3292,7 @@ For example:
 \begin{lboxverbatim}{collisions}
 begin:collisions
    use_collisions = T
+   use_nanbu = T
    coulomb_log = auto
    collide = all
    collide = spec1 spec2 off
@@ -3224,7 +3300,8 @@ begin:collisions
 end:collisions
 \end{lboxverbatim}
 
-  With this block, collisions are turned on and the Coulomb logarithm is
+  With this block, collisions are turned on, the Nanbu-P\'erez scattering
+  algorithm is used and the Coulomb logarithm is
   automatically calculated. All values of the frequency array are set
   to one except (spec1,spec2) is set to minus one (and also (spec2,spec1))
   and (spec2,spec3) is set to 0.1
@@ -3287,7 +3364,7 @@ deck would look like
 \begin{boxverbatim}
 begin:species
    name = electron
-   frac = 0.5
+   fraction = 0.5
    number_density = 7.7e29
    identify:electron
 end:species
@@ -3309,13 +3386,14 @@ Possible identities are:\\
   needed for photon production to work. If multiple species are present then
   generated photons will appear in the first species of this type.\\
 
-{\emphtext bw\_electron} - The electron species for pair production by the
-  Breit-Wheeler process. If a species of this type exists then electrons from
-  the pair production module will be created in this species. If no species of
-  this type is specified then pair electrons will be generated in the first
-  electron species.\\
+{\emphtext breit\_wheeler\_electron} - The electron species for pair production
+  by the Breit-Wheeler process. If a species of this type exists then electrons
+  from the pair production module will be created in this species. If no species
+  of this type is specified then pair electrons will be generated in the first
+  electron species. ``bw\_electron'' is accepted as an alias.\\
 
-{\emphtext bw\_positron} - As above but for positrons.\\
+{\emphtext breit\_wheeler\_positron} - As above but for positrons.
+  ``bw\_proton'' is accepted as an alias.\\
 
 {\emphtext trident\_electron} - The electron species for pair production by
   the Trident process. If a species of this type exists then electrons from
@@ -3328,21 +3406,125 @@ Possible identities are:\\
 {\emphtext proton} - A normal proton species. This is for convenience only and
   is not required by the pair production routines.\\
 
-A species should be identified only once, so a ``bw\_electron'' species does
-not need to also be identified as an ``electron'' species. If the code is
-running with ``produce\_photons=T'' then a photon species must be created by
-the user and identified. If the code is running with ``produce\_pairs=T'' then
-the code must specify at least one electron (or bw\_electron) species and one
-positron (or bw\_positron) species. These species will usually be defined with
-zero particles from the start of the simulation and will accumulate particles
-as the simulation progresses. The code will fail to run if the needed
-species are not specified.
+{\emphtext brem\_photon} - A bremsstrahlung photon species. This is used by the
+  bremsstrahlung radiation model. See \sect{bremsstrahlung_block} for details.\\
 
-The basic input deck has now been considered fully but it
- is possible for an end user to add new blocks to the input deck As a result,
-a version of the code which you have obtained from a source other than
-CCPForge may include other input deck blocks. These should be described in
-additional documentation provided with the version of the code that you have.
+A species should be identified only once, so a ``breit\_wheeler\_electron''
+species does not need to also be identified as an ``electron'' species. If the
+code is running with ``produce\_photons=T'' then a photon species must be
+created by the user and identified. If the code is running with
+``produce\_pairs=T'' then the code must specify at least one electron (or
+breit\_wheeler\_electron) species and one positron (or breit\_wheeler\_positron)
+species. These species will usually be defined with zero particles from the
+start of the simulation and will accumulate particles as the simulation
+progresses. The code will fail to run if the needed species are not specified.
+
+\subsection{\texorpdfstring
+  {\inlineemph{bremsstrahlung} block}
+  {           {bremsstrahlung} block}}
+\label{sec:bremsstrahlung_block}
+
+{\EPOCH} is capable of simulating bremsstrahlung radiation using a combination
+of the techniques described by \citet{Vyskocil2018} and \citet{Wu2018}. In
+order to run this module, the compiler flag ``-DBREMSSTRAHLUNG'' must be
+switched on in the Makefile. There should also be a corresponding
+``bremsstrahlung'' block for the input deck which uses a similar
+ format to the ``qed'' block.
+
+An example bremsstrahlung block is shown below:
+
+\begin{lboxverbatim}{bremsstrahlung block}
+begin:bremsstrahlung
+   enable = T
+   start_time = 0
+   produce_photons = T
+   photon_energy_min = 1 * kev
+   photon_weight = 1.0
+   photon_dynamics = F
+   use_plasma_screening = F
+end:bremsstrahlung
+\end{lboxverbatim}
+
+{\emphtext enable} - Logical flag to turn bremsstrahlung on or off.
+  ``use\_bremsstrahlung'' is accepted as an alias. The default is ``F''.\\
+
+{\emphtext start\_time} - Floating point value specifying the time after
+  which bremsstrahlung radiation is modelled. The default is 0.\\
+
+{\emphtext produce\_photons} - Logical flag to allow population of a photon
+  species. If ``F'', then only the energy loss of the electrons will be
+  simulated. The photon species can be specified by including the line
+  \inlinecode{identify:brem\_photon} in the corresponding species block. If the
+  compiler flag ``-DPHOTONS'' is active, QED and bremsstrahlung will both
+  populate the first species with \inlinecode{identify:photon} if no
+  brem\_photon species is specified. The default is ``F''.\\
+
+{\emphtext photon\_energy\_min} - Floating point value specifying the minimum
+  energy of produced photons. Electron energy loss is still calculated for
+  lower energy photon emissions, but these photons are not added to the photon
+  species. The default is 0.\\
+
+{\emphtext photon\_weight} - Floating point value which applies a multiplier to
+  the weight of produced macro-photons in order to increase the number
+  of overall emissions and obtain better spectra. Must be less than or equal
+  to 1 and greater than 0. For example, 0.1 would make emission 10 times more
+  likely, but for macro-photons only 10\% the weight of the generating
+  macro-electrons. The default is 1. Note that only one emission is possible
+  per macro-electron per timestep, so setting this too low will saturate
+  emissions.\\
+
+{\emphtext photon\_dynamics} - Logical flag to specify whether or not to push
+  photons. If ``F'', then the generated photons are immobilised at the point of
+  emission. The default is ``F''.\\
+
+{\emphtext use\_plasma\_screening} - Logical flag to specify whether a cross
+  section enhancement due to heated ionised targets is considered, based on
+  theory described by \citet{Wu2018}. It is expected that for high energy
+  electrons passing through low density, ionised plasmas with electron
+  temperatures over $\sim$100 eV ($\sim8\times 10^{5}$ K), the bremsstrahlung
+  emission rate could increase by a factor of 2-3. This has not been tested
+  experimentally, and so the default value is set to ``F''.\\
+
+{\emphtext use\_radiation\_reaction} - Logical flag to specify whether the
+  electrons experience energy loss when emitting photons or not.
+  ``use\_bremsstrahlung\_recoil'' is accepted as an alias. Debugging
+  flag, default ``T''.\\
+
+{\emphtext table\_location} - String specifying the
+  location of the emission look-up tables for bremsstrahlung.
+  The default path is set to
+  \inlinecode{src/physics\_packages/TABLES/br}.\\
+
+Bremsstrahlung, like QED, requires the code to know which species are electrons
+and which are photons, so uses the same identify system (with
+\inlinecode{identify:brem\_photon} for a bremsstrahlung-only photon species).
+Additionally, the atomic numbers of the atom/ion species are required in
+the species block. For example, atomic aluminium (charge = 0) could be
+specified as:
+
+\begin{boxverbatim}
+begin:species
+   name = Aluminium
+   atomic_number = 13
+   charge = 0
+
+   mass = 49218
+   number_density = 6.022e28
+   fraction = 0.5
+   dump = T
+end:species
+\end{boxverbatim}
+
+If the atomic number is not specified then it will be assumed that the ion is
+fully ionised and the atomic number would be set to the charge (the nearest
+integer to the ion charge when expressed in units of elementary charge). If
+ionisation is considered, the atomic number must be specified for the first
+ion species and all child species will retain the same atomic number.
+
+The direction of emitted macro-photons will always be in the direction of the
+generating macro-electron trajectory. This assumes emission from relativistic
+electrons only - this code will not accurately reproduce the angular
+distribution of bremsstrahlung radiation from low energy electrons.
 
 \subsection{\texorpdfstring
   {\inlineemph{injector} block}
@@ -3412,7 +3594,7 @@ complete.
 The ``injector'' block accepts the following keys:\\
 
 {\emphtext boundary} - specifies which boundary to attach the particle source
-  too. Same specification as \sect{laser_block}, so permitted values are
+  to. Same specification as \sect{laser_block}, so permitted values are
   x\_min, x\_max, y\_min, y\_max, z\_min and z\_max.\\
 
 {\emphtext species} - specifies which species should be injected through the
@@ -3422,37 +3604,55 @@ The ``injector'' block accepts the following keys:\\
 
 {\emphtext t\_end} - Time at which to end the injector.\\
 
-{\emphtext npart\_per\_cell} - Target pseudo-particle density for the
+{\emphtext nparticles\_per\_cell} - Target pseudo-particle density for the
   injector. Average number of particles injected will be this value or slightly
-  higher if very few particles are specified.\\
+  higher if very few particles are specified. ``npart\_per\_cell'' is accepted
+  as an alias.\\
 
 {\emphtext number\_density} - Number density of the particle source in
   m$^{-3}$. Can be space varying along the boundary to which the injector is
   attached and time varying.\\
 
-{\emphtext number\_density\_min} - Minimum density in m$^{-3}$ below which
-  pseudo particles are not loaded. Use if the density has a profile to avoid
-  injecting low weight particles in low density regions.\\
+{\emphtext number\_density\_min} - Minimum particle number density in m$^{-3}$
+  below which pseudo particles are not loaded. Use if the density has a profile
+  to avoid injecting low weight particles in low density regions.\\
 
-{\emphtext temp\_x} - Temperature in x direction (K)\\
+{\emphtext number\_density\_max} - Maximum particle number density in $m^{-3}$.
+  When the number density in a cell rises above density\_max the
+  injector clips the density to number\_density\_max allowing easy
+  implementation of exponential rises to plateaus for time-varying injectors.
+  Note that the number of particles per cell is kept fixed and the number
+  density adjustment is achieved by modifying the particle weight. This flag
+  has no effect for particles with per-species weighting.
+  If the flag has a negative value then no clipping is performed. This is the
+  default.\\
 
-{\emphtext temp\_y} - Temperature in y direction (K)\\
+{\emphtext temperature\_\{x,y,z\}} - The temperature in each direction for a
+  thermal distribution specified in Kelvin. ``temp\_\{x,y,z\}'' can be used as
+  aliases.\\
 
-{\emphtext temp\_z} - Temperature in z direction (K)\\
+{\emphtext temperature} - Sets an isotropic temperature distribution in Kelvin.
+  If both ``temperature'' and a specific ``temperature\_x'', ``temperature\_y''
+  or ``temperature\_z'' parameter is specified then the last to appear in the
+  deck has precedence. If neither are given then the injector will have a
+  default temperature of zero Kelvin. ``temp'' is accepted as an alias.\\
 
-{\emphtext temp} - Temperature in all directions (K)\\
+{\emphtext temperature\_\{x,y,z\}\_ev, temperature\_ev} - These are the same
+  as the ``temperature'' parameters described above except the units are given
+  in electronvolts rather than Kelvin. ``temp\_\{x,y,z\}\_ev'' and ``temp\_ev''
+  are accepted as aliases.\\
 
-{\emphtext drift\_x} - Momentum drift in x direction in kg m/s\\
-
-{\emphtext drift\_y} - Momentum drift in x direction in kg m/s\\
-
-{\emphtext drift\_z} - Momentum drift in x direction in kgm/s\\
+{\emphtext drift\_p\{x,y,z\}} - Specifies a momentum space offset in
+  $kg\ ms^{-1}$ to the distribution function for this injector. By default,
+  the drift is zero. ``drift\_\{x,y,z\}'' are also accepted as aliases.\\
 
 {\emphtext use\_flux\_maxwellian} - Logical flag to determine whether to use
-  an accelerated flux Maxwellian rather than a drifting Maxwellian. This
-  calculates the flux due to passing a Maxwellian source into an electrostatic
-  accelerator instead of a drifting Maxwellian. If your particle source is a
-  lab accelerator then you may want to set this to true.\\
+  a flux Maxwellian rather than a drifting Maxwellian when sampling particles
+  to inject. By default, the injector will sample from a flux Maxwellian for
+  small values of drift and, for computational efficiency, a drifting
+  Maxwellian when the drift velocity is much larger than the thermal velocity.
+  It is possible to force the code to always use a drifting Maxwellian by
+  setting this flag to ``F''.  The default value is ``T''.\\
 
 An example input deck might look as follows:\\
 
@@ -3462,9 +3662,9 @@ begin:injector
   boundary = x_min
   species = Electron
   number_density = dens
-  temp_x = temp
-  drift_x = drift_p
-  npart_per_cell = 32
+  temperature_x = temp
+  drift_px = drift_p
+  nparticles_per_cell = 32
 
 end:injector
 \end{boxverbatim}
@@ -3734,7 +3934,8 @@ The maths parser in {\EPOCH}  has the following constants
 \item cc - A convenience symbol for converting from cubic metres to cubic
   centimetres (ie. $10^{-6}$)
 \item time - Initial simulation time.
-\item x,y,z - Grid coordinates in the x,y,z direction.
+\item x,y,z - Cell-centred grid coordinates in the x,y,z direction.
+\item xb,yb,zb - Node-centred grid coordinates in the x,y,z direction.
 \item ix,iy,iz - Grid index in the x,y,z direction.
 \item nx,ny,nz - Number of grid points in the x,y,z direction.
 \item dx,dy,dz - Grid spacing in the x,y,z direction.
@@ -3747,6 +3948,9 @@ The maths parser in {\EPOCH}  has the following constants
 \item t\_end - The end time of the simulation.
 \item p\{x,y,z\} - Momentum in the $x, y, z$ directions. Used in specifying
   arbitrary distribution functions.
+\item r\_xyz - Radial distance from the origin
+\item r\_\{xy,xz,yz\} - Radial distances from the $z$, $y$ and $x$ axes,
+  respectively
 \end{itemize}
 
 It is also possible for an end user to specify custom constants both within
@@ -3807,9 +4011,11 @@ A, & \mbox{otherwise}
   otherwise the function returns c.
 
 \item number\_density(a) - Returns the number density for species a.
-\item temp\_\{x,y,z\}(a) - Returns temperature in the x, y or z direction for
-    species a.
-\item temp(a) - Returns the isotropic temperature for species a.
+\item temperature\_\{x,y,z\}(a) - Returns temperature in the x, y or z
+    direction for species a. ``temp\_\{x,y,z\}(a)'' are accepted as aliases.
+\item temperature\_\{x,y,z\}\_ev(a) - Returns temperature in the x, y or z
+    direction measured in electronvolts for species a.
+    ``temp\_\{x,y,z\}\_ev(a)'' are accepted as aliases.
 \item e\{x,y,z\}(x,y,z) - Returns the x, y or z component of the electric
     field at the specified location.
 \item b\{x,y,z\}(x,y,z) - Returns the x, y or z component of the magnetic
@@ -3918,8 +4124,8 @@ begin:species
    number_density = number_density(s1) * 100.0
 
    # Set the temperature to be zero
-   temp_x = 0.0
-   temp_y = temp_x(s1)
+   temperature_x = 0.0
+   temperature_y = temperature_x(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * 100.0
@@ -3930,8 +4136,8 @@ begin:species
    number_density = number_density(s1)
 
    # Just copy the temperature from species s1
-   temp_x = temp_x(s1)
-   temp_y = temp_y(s1)
+   temperature_x = temperature_x(s1)
+   temperature_y = temperature_y(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * 100.0
@@ -4444,8 +4650,8 @@ begin:species
    number_density = number_density(s1) * 100.0
 
    # Set the temperature to be zero
-   temp_x = 0.0
-   temp_y = temp_x(s1)
+   temperature_x = 0.0
+   temperature_y = temperature_x(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * 100.0
@@ -4458,8 +4664,8 @@ begin:species
    number_density = number_density(s1)
 
    # Just copy the temperature from species s1
-   temp_x = temp_x(s1)
-   temp_y = temp_y(s1)
+   temperature_x = temperature_x(s1)
+   temperature_y = temperature_y(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * 100.0
@@ -4486,8 +4692,8 @@ begin:species
    number_density = number_density(s1) * particle_density
 
    # Set the temperature to be zero
-   temp_x = 0.0
-   temp_y = temp_x(s1)
+   temperature_x = 0.0
+   temperature_y = temperature_x(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4500,8 +4706,8 @@ begin:species
    number_density = number_density(s1)
 
    # Just copy the temperature from species s1
-   temp_x = temp_x(s1)
-   temp_y = temp_y(s1)
+   temperature_x = temperature_x(s1)
+   temperature_y = temperature_y(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4534,8 +4740,8 @@ begin:species
    density = particle_density * profile_x * profile_y
 
    # Set the temperature to be zero
-   temp_x = 0.0
-   temp_y = temp_x(s1)
+   temperature_x = 0.0
+   temperature_y = temperature_x(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4548,8 +4754,8 @@ begin:species
    number_density = number_density(s1)
 
    # Just copy the temperature from species s1
-   temp_x = temp_x(s1)
-   temp_y = temp_y(s1)
+   temperature_x = temperature_x(s1)
+   temperature_y = temperature_y(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4572,8 +4778,8 @@ begin:species
    density = particle_density * profile_x * profile_y
 
    # Set the temperature to be zero
-   temp_x = 0.0
-   temp_y = temp_x(s1)
+   temperature_x = 0.0
+   temperature_y = temperature_x(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4586,8 +4792,8 @@ begin:species
    number_density = number_density(s1)
 
    # Just copy the temperature from species s1
-   temp_x = temp_x(s1)
-   temp_y = temp_y(s1)
+   temperature_x = temperature_x(s1)
+   temperature_y = temperature_y(s1)
 
    # Set the minimum density for this species
    number_density_min = 0.3 * particle_density
@@ -4631,10 +4837,11 @@ the temperature in each direction is equal, we have
     \exp\left( \frac{m (\mathbf{v} - \mathbf{v_d})^2}{2 k_B T} \right).
 \end{equation*}
 
-The parameters number\_density\_back, temp(x,y,z)\_back and drift(x,y,z)\_back
-in each species specification in the input deck set $f_0$.
-number\_density\_back $=0$ is the default and is equivalent to not using the
-delta-f method.
+The parameters number\_density\_background, temperature(x,y,z)\_background and
+drift(x,y,z)\_background in each species specification in the input deck are
+used to set $f_0$.
+number\_density\_background $=0$ is the default and is equivalent to not using
+the delta-f method.
 
 For example, the electron species component of an input deck solved using
 delta-f might be written:
@@ -4644,11 +4851,11 @@ begin:species
    name = electron
    charge = -1.0
    mass  = 1.0
-   frac = 0.3
+   fraction = 0.3
    temp = 1e8
-   temp_back = 1e8
+   temperature_background = 1e8
    number_density = 1e20
-   number_density_back = 1e20
+   number_density_background = 1e20
 end:species
 \end{lboxverbatim}
 
@@ -4687,7 +4894,7 @@ files.\\
 \begin{lboxverbatim}{input.deck}
 begin:control
    nx = 400
-   npart = 20000
+   nparticles = 20000
 
    # Final time of simulation
    t_end = 1.5e-1
@@ -4716,9 +4923,9 @@ begin:species
    name = Right
    charge = -1
    mass = 1.0
-   frac = 0.5
-   temp_x = temp
-   drift_x = drift_p
+   fraction = 0.5
+   temperature_x = temp
+   drift_px = drift_p
    number_density = dens
 end:species
 
@@ -4728,9 +4935,9 @@ begin:species
    name = Left
    charge = -1
    mass = 1.0
-   frac = 0.5
-   temp_x = temp
-   drift_x = -drift_p
+   fraction = 0.5
+   temperature_x = temp
+   drift_px = -drift_p
    number_density = dens
 end:species
 
@@ -4754,7 +4961,7 @@ begin:output
    by = always
    bz = always
    jx = always
-   ekbar = always
+   average_particle_energy = always
    mass_density = never + species
    charge_density = always
    number_density = always + species
@@ -4789,7 +4996,7 @@ begin:control
    y_min = x_min
    y_max = x_max
    nsteps = 0
-   npart = 40 * nx * ny
+   nparticles = 40 * nx * ny
 end:control
 
 begin:boundaries
@@ -4810,7 +5017,7 @@ begin:species
    number_density_min = 0.1 * den_peak
    charge = -1.0
    mass = 1.0
-   frac = 0.5
+   fraction = 0.5
 end:species
 
 begin:species
@@ -4818,7 +5025,7 @@ begin:species
    number_density = number_density(Electron)
    charge = 1.0
    mass = 1836.2
-   frac = 0.5
+   fraction = 0.5
 end:species
 
 begin:output
@@ -4846,7 +5053,7 @@ begin:control
    nx = 250
    ny = nx
    nz = nx
-   npart = 2 * nx * ny * nz
+   nparticles = 2 * nx * ny * nz
    x_min = -10 * micron
    x_max = -x_min
    y_min = x_min
@@ -4882,7 +5089,7 @@ begin:species
    name = proton
    charge = 1.0
    mass = 1836.2
-   frac = 0.5
+   fraction = 0.5
    number_density = if((r gt ri) and (r lt ro), den_cone, 0.0)
    number_density = if((x gt xi) and (x lt xo) and (r lt ri), \
                        den_cone, number_density(proton))
@@ -4893,7 +5100,7 @@ begin:species
    name = electron
    charge = -1.0
    mass = 1.0
-   frac = 0.5
+   fraction = 0.5
    number_density = number_density(proton)
 end:species
 \end{lboxverbatim}
@@ -5270,6 +5477,17 @@ the input deck (see \sect{subset_block}):
 \end{itemize}
 \bigskip
 
+\noindent The following parameters have been added to the ``dist\_fn'' block of
+the input deck (see \sect{dist_fn_block}):
+\begin{itemize}
+\item restrict\_en
+\item restrict\_gamma\_m1
+\item restrict\_xy\_angle
+\item restrict\_yz\_angle
+\item restrict\_zx\_angle
+\end{itemize}
+\bigskip
+
 \subsection{Changes between version 4.8 and 4.9}
 
 \subsubsection{New capabilities}
@@ -5539,6 +5757,85 @@ used in conjunction with the moving window.
   See \sect{species_block}. The use of ``tracer'' has now been deprecated and
   will be removed in version 5.0.
   At that time, the compiler flag will also be renamed.
+\item Added collisions block option ``use\_nanbu'' for enabling the
+   scattering algorithm of Nanbu, with relativistic corrections by
+   P\'erez. Due to known issues in the Sentoku-Kemp
+   method for some test problems, the Nanbu method is now the default.
+   See \sect{collisions_block}.
+\end{itemize}
+\bigskip
+
+
+\subsection{Changes between version 4.16 and 4.17}
+
+\begin{itemize}
+\item Added ``average\_p\{x,y,z\}'' derived output variables to the
+    output block. See \sect{derived}.
+\item Added ``deck\_warnings\_fatal'' flag to the control block for controlling
+    the way that deck parser warnings are handled. See \sect{control_block}
+\item Added ``DECK\_DEBUG'' Makefile flag. See \sect{makefile}.
+\item Added ``number\_density\_max'' parameter to the injector block. This has
+    similar functionality to the species block parameter of the same name.
+    See \sect{injector_block}.
+\item Added ``temp\_\{x,y,z\}\_ev'' and ``temp\_ev'' parameters to the injector
+    block. These have the same functionality as the species block parameters
+    of the same name.  See \sect{injector_block}.
+\item Added multiple aliases for input deck parameters:
+\begin{itemize}
+\item ``drift\_p\{x,y,z\}'' and ``drift\_p\{x,y,z\}\_back'' aliases for
+    ``drift\_\{x,y,z\}'' and ``drift\_\{x,y,z\}\_back''. See
+    \sect{species_block} and \sect{injector_block}.
+\item ``temperature'' aliases for the various ``temp'' parameters. See
+    \sect{species_block}, \sect{injector_block} and \sect{functions}.
+\item ``background'' aliases for ``number\_density\_back'',
+    ``drift\_p\{x,y,z\}\_back'', ``temperature\_\{x,y,z\}\_back'',
+    ``temperature\_\{x,y,z\}\_back\_ev'', ``temperature\_back'' and
+    ``temperature\_back\_ev''. See \sect{deltaf}.
+\item ``nparticles'' and ``nparticles\_per\_cell'' aliases for ``npart'' and
+    ``npart\_per\_cell''. See \sect{control_block}, \sect{species_block} and
+    \sect{injector_block}.
+\item ``fraction'' alias for ``frac'' in the control block.
+    See \sect{species_block}.
+\item ``energy'' alias for ``en'' in the dist\_fn block.
+    See \sect{dist_fn_block}.
+\item ``gamma\_minus\_one'' alias for ``gamma\_m1'' in the dist\_fn block.
+    See \sect{dist_fn_block}.
+\item ``average\_particle\_energy'' alias for ``ekbar'' in the output block.
+    See \sect{derived}.
+\item ``particle\_energy\_flux'' alias for ``ekflux'' in the output block.
+    See \sect{derived}.
+\item ``poynting\_flux'' alias for ``poynt\_flux'' in the output block.
+    See \sect{derived}.
+\item ``polarisation'' and ``polarisation\_angle'' aliases for ``pol'' and
+    ``pol\_angle'' in the laser block.  See \sect{laser_block}.
+\item ``breit\_wheeler\_\{electron,proton\}'' aliases for
+    ``bw\_\{electron,proton\}'' in the qed block. See \sect{qed_block}.
+\end{itemize}
+\item Added ``heat\_bath'' particle boundary conditions. These use the particle
+    injectors to create an improved form of thermal boundary conditions.
+    See \sect{boundaries_block}.
+\item Changed the default value for the ``use\_exact\_restart'' flag to ``T''.
+    See \sect{control_block}.
+\item Add model for simulating bremsstrahlung radiation. This is disabled by
+    default and can be enabled by specifying the ``-DBREMSSTRAHLUNG'' flag at
+    compile time. The model is configured using a new ``bremsstrahlung'' block
+    which takes the following parameters:
+\begin{itemize}
+\item enable
+\item start\_time
+\item produce\_photons
+\item photon\_energy\_min
+\item photon\_weight
+\item photon\_dynamics
+\item use\_plasma\_screening
+\item use\_radiation\_reaction
+\item table\_location
+\end{itemize}
+    See \sect{bremsstrahlung_block} for details.
+    It also adds the ``bremsstrahlung\_optical\_depth'' output block parameter
+    and ``atomic\_number'', ``background\_species'' and
+    ``identify:brem\_photon'' species parameters. See
+    \sect{output_block} and \sect{species_block}.
 \end{itemize}
 \bigskip
 
@@ -5618,7 +5915,7 @@ recommended to write each separate array to its own file.
 
 %\addcontentsline{toc}{section}{References}
 \bibliography{epoch_refs}{}
-\bibliographystyle{IEEEtranN}
+\bibliographystyle{IEEEtranSN}
 
 \end{document}
 
