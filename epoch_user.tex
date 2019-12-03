@@ -1186,15 +1186,14 @@ accepted as a synonyms.\\
 
 {\emphtext cpml\_sigma\_max} - A tunable CPML parameter (see \sect{cpml}).\\
 
-There are ten boundary types in {\EPOCH} and each boundary of the domain can
+There are mutiple boundary types in {\EPOCH} and each boundary of the domain can
 have one and only one of these boundaries attached to it. These boundary types
 are:\\
 
 {\emphtext periodic} - A simple periodic boundary condition. Fields and/or
 particles reaching one edge of the domain are wrapped round to the opposite
-boundary. If either boundary condition is set to periodic
-then the boundary condition on the matching boundary at the other side of
-the box is also assumed periodic.\\
+boundary. Periodic boundaries must be specified on both the min and max
+boundary.\\
 
 {\emphtext simple\_laser} - A characteristic based boundary condition to which
 one or more EM wave sources can be attached. EM waves impinging on a
@@ -1232,6 +1231,8 @@ simply removed from the simulation when they reach the boundary.\\
 {\emphtext cpml\_outflow} - See \sect{cpml}.\\
 
 {\emphtext thermal} - Applies to particles only. See \sect{thermal}.\\
+
+{\emphtext zero\_current} - See \sect{zerocurr}.\\
 
 {\emphtext NOTE: If simple\_laser, simple\_outflow, cpml\_laser,
 cpml\_outflow or open are specified on one or more boundaries then the code
@@ -1317,6 +1318,38 @@ begin:boundaries
    bc_x_max_field = open
    bc_x_max_particle = heat_bath
 end:boundaries
+\end{boxverbatim}
+
+\subsubsection{Zero current boundaries}
+\label{sec:zerocurr}
+
+\emph{These boundaries can be applied to x\_min and/or x\_max to
+exactly one species.} These boundaries add a particle injector
+to the relevant boundary with a density, temperature and drift
+matching the species to which they are applied. The net current
+on the boundary from all other species is calculated and the
+injector inwards drift is adjusted to cancel this, to create a
+zero-current boundary. The adjustment is made with a moving average
+on the inverse plasma frequency timescale.
+
+These boundaries are intended to provide a roughly thermal bath
+outside the domain, but with some small variations of inwards drift.
+This can handle, for example, a weak bump-on-tail instability
+where the bulk plasma shifts slightly to provide a return current.
+These should always be applied to the lightest species, usually
+electrons, as these respond fastest and give the most physical
+result. Because the current is calculated from actual macro-particles
+sufficient particles per cell are required for a smooth result.
+For example:
+
+\begin{boxverbatim}
+begin:species
+   name = Electron
+   ...
+   drift_x = -1.0e-24
+   bc_x_min = open
+   bc_x_max = zero_current
+end:species
 \end{boxverbatim}
 
 
