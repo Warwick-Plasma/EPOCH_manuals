@@ -414,6 +414,8 @@ symbol. The options currently controlled by the preprocessor are:\\
   function (0th order b-spline yielding a second order weighting).
 \item PARTICLE\_SHAPE\_BSPLINE3 - This flag changes the particle representation
   to that of a 3rd order b-spline shape function (5th order weighting).
+\item WT\_INTERPOLATION - When this option is enabled, the time-step dependent
+  force interpolation scheme (WT scheme from \citet{Lu2020}) is used.
 \item PARTICLE\_ID - When this option is enabled, all particles are assigned
   a unique identification number when writing particle data to file. This
   number can then be used to track the progress of a particle during the
