@@ -727,7 +727,7 @@ is to use a second order scheme.\\
 
 {\emphtext maxwell\_solver} - Choose a Maxwell solver scheme with an extended
 stencil. This option is only active if \inlineemph{field\_order} is set to 2.
-Possible options are ``yee'', ``lehe\_\{x,y,z\}'', ``pukhov'', ``cowan''
+Possible options are ``yee'', ``lehe\_\{x,y,z\}'', ``pukhov'',``cowan'', ``m4''
 and ``custom''.
 Note that
 not all options are available in 1d and 2d. The default is ``yee'' which is the
@@ -1001,6 +1001,10 @@ When Cowan's scheme is reduced to 2D it is the same as Pokhov's scheme with
 $\inlineemph{dt\_multiplier}<1.0$.
 The resulting dispersion relation is best along the axis with the smallest grid
 spacing.\\
+
+{\emphtext maxwell\_solver = m4} - This setting will enable an extended stencil
+proposed by \citet{Lu2020}. As the wavenumber approches zero, the second order
+terms of the Taylor expansion of the resulting numerical phase speed vanish.\\
 
 {\emphtext maxwell\_solver = custom} - This setting will enable full user
 control over the extended stencil coefficients. This allows for the
