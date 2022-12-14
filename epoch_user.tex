@@ -407,6 +407,11 @@ symbol. The options currently controlled by the preprocessor are:\\
   copies of particles until the next output dump, it is a heavyweight
   diagnostic. If you don't require the diagnostic you can set this flag to
   disable it.
+\item PROBE\_TIME - When this option is enabled, particle probes will also
+  output the time each particle passes the probe. The specific time is
+  interpolated to match the time where the macro-particle position lies on
+  the probe surface. This option does nothing if the NO\_PARTICLE\_PROBES 
+  option is also selected.
 \item PARTICLE\_SHAPE\_TOPHAT - By default, the code uses a first order
   b-spline (triangle) shape function to represent particles giving
   third order particle weighting.
@@ -476,6 +481,9 @@ symbol. The options currently controlled by the preprocessor are:\\
   flag in the control block of the input deck. See \sect{control_block}.
 \item BREMSSTRAHLUNG - This flag enables the model for simulating
   bremsstrahlung radiation. See \sect{bremsstrahlung_block} for details.
+\item PROBE\_TIME - This flag assigns a new particle variable for tracking the
+  time particles pass probes. Switching this on will automatically output 
+  time\_at\_probe for particles involved in a probe output dump.
 \end{itemize}
 
 If a user requests an option which the code has not been compiled to support
@@ -1620,78 +1628,91 @@ The following parameters are added to the ``species'' block:\\
 \subsubsection{Ionisation}
 \label{sec:ionisation}
 
-{\EPOCH} now includes field ionisation which can be activated by defining
-ionisation energies and an electron for the ionising species. This is done
-via the species block using the following parameters:\\
+{\EPOCH} now includes both field and collisional ionisation, which can be 
+activated by switching on keys in different blocks. Previous versions of
+{\EPOCH} forced the user to specify ionisation energies for each ion charge
+state, but since {\EPOCH} 4.19, these are set automatically using look-up tables.
 
-{\emphtext ionisation\_energies} - This is an array of ionisation energies
-  (in Joules) starting from the outermost shell. It expects to be given all
-  energies down to the fully ionised ion; if the user wishes to exclude some
-  inner shell ionisation for some reason they need to give this a very large
-  number. Note that the ionisation model assumes that the outermost electron
-  ionises first always, and that the orbitals are filled assuming ground
-  state. When this parameter is specified it turns on ionisation modelling.
-  If you wish to specify the values in Electron-Volts, add the ``ev''
-  multiplication factor (see \sect{constants}).\\
+Field and collisional ionisation must be switched on in the control block and 
+collision block respectively, and species which are to be ionised must be 
+specified in their species block. A basic example of using both ionisation 
+mechanisms is given below, where non-relevant lines have been omitted.
 
-{\emphtext ionisation\_electron\_species} - Name of the electron species. This
+\begin{lboxverbatim}{Ionisation keys}
+begin:control
+   use_multi_photon = T
+   use_bsi = F
+   field_ionisation = T
+end:control
+
+begin:collisions
+   use_collisional_ionisation = T 
+   ci_n_step = 3
+end:collisions
+
+begin:species
+  name = Carbon
+  charge = 0
+  atomic_no = 6
+  ionise = T
+  ionise_limit = 3
+  unique_electron_species = T
+end:species   
+
+begin:species
+  name = Carbon4
+  charge = 4
+  atomic_no = 6
+  ionise = T
+  ionisation_electron_species = (Electron4, Electron)
+end:species
+\end{lboxverbatim}
+
+{\emphtext field\_ionisation} - Switches on field ionisation.\\
+  
+{\emphtext use\_collisional\_ionisation} - Switches on ionisation by collisional
+  electron impact.\\
+  
+{\emphtext ci\_n\_step} - Only performs the collisional ionisation calculation
+  once every $n$ steps, where $n$ is set by this parameter. This is done 
+  to speed up the code, and the default is 1 (every step). When
+  this is greater than 1, the assumed time-step for the collisional ionisation
+  calculation is $n*dt$. Note that an ion may only be ionised once per calculation,
+  so if $n$ is too high, the number of ions will be underestimated.\\
+
+{\emphtext atomic\_no} - Atomic number of the element. When combined with the
+  charge, the code can deduce the element and charge-state of the ion, and 
+  may use the appropriate ionisation energy and shell binding energies.\\
+  
+{\emphtext ionise} - Allows ionisation of this species, and generates additional
+  particle species for each ion charge state.\\
+
+{\emphtext ionise\_limit} - This limits the number of additional particle species to
+  be generated. In this example, ion macro-particles in the Carbon species can only
+  be ionised 3 times - ionisation of Carbon3 will not be considered.\\
+
+{\emphtext ionisation\_electron\_species} - Name of the electron species to 
+  populate with ejected electrons. This
   can be specified as an array in the event that the user wishes some levels
   to have a different electron species which can be handy for monitoring
   ionisation at specific levels. ``electron'' and ``electron\_species'' are
-  accepted as synonyms. Either one species for \emph{all} levels, or one species
-  for \emph{each} species should be specified. \\
+  accepted as synonyms. Either one species for \emph{all} ionisation levels, or one species
+  for \emph{each} level should be specified. In the Carbon4 example, the user may have
+  written \emph{ionisation\_electron\_species = Electron} to use the Electron species 
+  for all ejected electrons. \\
+  
+{\emphtext unique\_electron\_species} - If ``T'', this generates a
+  unique electron species to populate with ejected electrons from each
+  ion charge state. The user must use this, or \emph{ionisation\_electron\_species}.\\
 
-For example, ionising carbon species might appear in the input deck as:
-
-\begin{boxverbatim}
-begin:species
-   charge = 0.0
-   mass = 1837.2
-   name = carbon
-   ionisation_energies = (11.26*ev,24.38*ev,47.89*ev,64.49*ev,392.1*ev,490.0*ev)
-   ionisation_electron_species = \
-       (electron,electron,electron,fourth,electron,electron)
-   number_density = den_gas
-end:species
-
-begin:species
-   charge = -1.0
-   mass = 1.0
-   name = electron
-   number_density = 0.0
-end:species
-
-begin:species
-   charge = -1.0
-   mass = 1.0
-   name = fourth
-   number_density = 0.0
-end:species
-\end{boxverbatim}
-
-%If ``ionisation\_electron\_species'' is not specified then the electron species
 Ionised states are created automatically and are named according to the
-ionising species name with a number appended. For example
-\begin{boxverbatim}
-begin:species
-   name = Helium
-   ionisation_energies = (24.6*ev,54.4*ev)
-   dump = F
-end:species
-\end{boxverbatim}
-With this species block, the species named ``Helium1'' and ``Helium2''
-are automatically created. These species will also inherit the ``dump''
-parameter from their parent species, so in this example they will both have
-``dump = F'' set. This behaviour can be overridden by explicitly
+ionising species name with a number appended. For example, with the Carbon
+species block, the species named ``Carbon1'', ``Carbon2'' and ``Carbon3''
+are automatically created. Note that for pre-ionised species like the Carbon4 block,
+species would be named ``Carbon41'', ``Carbon42''. These species will also 
+inherit the ``dump''
+parameter from their parent species. This behaviour can be overridden by explicitly
 adding a species block of the same name with a differing dumpmask.
-eg.
-\begin{boxverbatim}
-begin:species
-   name = Helium1
-   dump = T
-end:species
-\end{boxverbatim}
-
 
 Field ionisation consists of three distinct regimes; multiphoton in which
 ionisation is best described as absorption of multiple photons, tunnelling
@@ -2635,6 +2656,11 @@ directions, respectively, in $K$. The synonyms ``temp\_\{x,y,z\}'' and
 {\emphtext poynting\_flux} - Poynting flux in each direction in $W/m^2$.
 ``poynt\_flux'' is accepted as an alias.\\
 
+{\emphtext coulomb\_logarithm} - An estimate for the averaged Coulomb logarithm
+in each cell between the first listed species, and all other species.
+If the ``species'' dumpmask is given, then this calculation is repeated
+for the remaining particle species.\\
+
 % The cpml_* variables are only really used internally and therefore
 % are currently undocumented
 
@@ -3178,7 +3204,12 @@ in the input deck. These record copies of all particles which cross a
 point/line/plane in a given direction which meet minimum and maximum kinetic
 energy criteria and output the particle properties into the normal output
 files. Particle probes record the positions, momenta and weight of all
-particles passing through the plane. To use particle probes, the code must
+particles passing through the plane. If the code is compiled with 
+\inlinecode{-DPARTICLE\_ID} or \inlinecode{-DPARTICLE\_ID4}, 
+the code also outputs the ID of passing particles. 
+If the code is compiled with \inlinecode{-DPROBE\_TIME}, the time at which the
+particle touches the probe surface is also output. 
+To use particle probes, the code must
 not have been
 compiled with the \inlinecode{-DNO\_PARTICLE\_PROBES} compiler option. This is
 a fairly heavyweight diagnostic since each particle position must be tested
@@ -3244,8 +3275,12 @@ end:probe
 {\EPOCH} has a particle collision routine with scattering algorithms based on
 the model presented by \citet{Sentoku} or the model presented by
 \citet{Perez}, which in turn was based on the work of \citet{Nanbu}.
-This adds a new output block named ``collisions'' which accepts the
-following four parameters.\\
+This adds a new output block named ``collisions'', and since version 4.19, there are two 
+possible collision modes: binary and background.
+Binary collisions pair particles together, and apply scatter to both particles.
+In the background mode, particle species are split into fast-background pairs, where
+only particles in the fast species are scattered. Originally, {\EPOCH} could only
+run in the full binary-collisions mode, which accepts the following keys:\\
 
 {\emphtext use\_collisions} - This is a logical flag which determines whether
   or not to call the collision routine. If omitted, the default is ``T'' if any
@@ -3275,7 +3310,9 @@ following four parameters.\\
   If the syntax ``species1 species2 $<$value$>$'' is used, then the
   (species1,species2) element of the matrix is set to the factor
   ``$<$value$>$''.  This may either be a real number, or the special value
-  ``on'' or ``off''. The ``collide'' parameter may be used multiple times.\\
+  ``on'' or ``off''. The ``collide'' parameter may be used multiple times.
+  Value may also be set to ``background'' to specify a fast-background pair 
+  see below).\\
   The default value is ``all'' (ie. all elements of the matrix are set to
   one).\\
 
@@ -3283,11 +3320,12 @@ following four parameters.\\
   then the collisional ionisation model is enabled. This process is independent
   of \inlineemph{field\_ionisation} (\sect{ionisation}). However, in order to
   set up \inlineemph{collisional\_ionisation}
-  you must also specify ionisation energies and electrons in a
-  \inlineemph{species} block (see \sect{ionisation}). The default value
+  you must also specify certain variables in the species blocks (see \sect{ionisation}). The default value
   is ``F''.\\
 
-For example:
+{\emphtext coll\_n\_step} - Number of time-steps, $n$, between collision calculations. This key speeds up the collisions routine by reducing the number of collision calculations performed. On steps which apply collisions, the calculation is performed using a time-step of $n dt$, where $dt$ is the simulation time-step. The default is 1 (calculate collisions every step).\\
+
+An example deck using full binary collisions could be set up as follows:
 
 \begin{lboxverbatim}{collisions}
 begin:collisions
@@ -3304,8 +3342,57 @@ end:collisions
   algorithm is used and the Coulomb logarithm is
   automatically calculated. All values of the frequency array are set
   to one except (spec1,spec2) is set to minus one (and also (spec2,spec1))
-  and (spec2,spec3) is set to 0.1
+  and (spec2,spec3) is set to 0.1.\\
+  
+  The background collisions mode offers a speed-up compared to the binary
+  method when applicable. This mode assumes the particles in one species are
+  considerably faster than the particles in a background species, so the 
+  relative velocity between fast and background particles is roughly the 
+  fast particle speed. 
+  This eliminates the need to pair particles together in a local cell, as in
+  the binary collision case. However, background particles will not
+  experience scatter in this mode. This mode was originally intended for 
+  electron-ion collisions, where both species had temperatures on the order 
+  of keV. An example of fast-background collisions is given below
+  
+\begin{lboxverbatim}{background collisions}
+begin:collisions
+   use_collisions = T
+   coulomb_log = 5
+   collide = none
+   collide = Electron Ion1 background
+   collide = Electron Ion2 background
+   collide = Electron Electron on
+   
+   use_cold_correction = F
+   rel_cutoff = 0.01
+   back_update_dt = 5.0e-15 
+end:collisions
+\end{lboxverbatim}
 
+The above example deactivates all collisions, then sets up two fast-background pairs,
+with the Electron providing the fast species in both pairs, and Ion1 and Ion2 taking
+the background roles. Full binary collisions are used for Electron-Electron collisions,
+as these do not satisfy the fast-background assumptions. Additional speed-up keys are
+used which only apply to background collisions. These are: \\
+
+{\emphtext use\_cold\_correction} - The Nanbu-P\'{e}rez collisions model has a low
+temperature correction factor, given in equation (20) of P\'{e}rez \textit{et al} \cite{Perez}. 
+In some cases, this only affects particles with energy
+on the order of eV, and may be ignored. If ``F'', this calculation is skipped. The
+default is ``T'', to perform the full calculation.\\
+
+{\emphtext rel\_cutoff} - Collisions are calculated in the centre-of-mass frame
+between colliding fast and background particles. In practice, only the fast
+particle momentum is transformed. This key takes a number between 0 and 1, and
+if the fractional momentum change between frames is lower than this number, the
+frame transform is skipped. The default is 0, so frame transforms are always considered.\\
+
+{\emphtext back\_update\_dt} - If the background species number density varies
+slowly, we do not need to re-calculate each step. This key specifies the 
+time-step of recalculation for the background number density, and also the 
+Coulomb logarithm if \inlineemph{coulomb\_log} is set to auto. The default is 0,
+so background variables are re-calculated each step.\\
 
 \subsection{\texorpdfstring
   {\inlineemph{qed} block}
@@ -3429,7 +3516,9 @@ of the techniques described by \citet{Vyskocil2018} and \citet{Wu2018}. In
 order to run this module, the compiler flag ``-DBREMSSTRAHLUNG'' must be
 switched on in the Makefile. There should also be a corresponding
 ``bremsstrahlung'' block for the input deck which uses a similar
- format to the ``qed'' block.
+format to the ``qed'' block. Bremsstrahlung cross sections may be calculated
+for both electrons and positrons. Photons may also undergo pair production
+according to the Bethe-Heitler model.
 
 An example bremsstrahlung block is shown below:
 
@@ -3442,6 +3531,9 @@ begin:bremsstrahlung
    photon_weight = 1.0
    photon_dynamics = F
    use_plasma_screening = F
+   use_brem_scatter = T
+   use_bethe_heitler = F
+   use_positron_brem = F
 end:bremsstrahlung
 \end{lboxverbatim}
 
@@ -3494,6 +3586,18 @@ end:bremsstrahlung
   location of the emission look-up tables for bremsstrahlung.
   The default path is set to
   \inlinecode{src/physics\_packages/TABLES/br}.\\
+  
+{\emphtext use\_brem\_scatter} - Samples photon ejection angle from a 
+  differential cross section. Default is ``F'', where photons are emitted in the
+  direction of the incident particle (ultra-relativistic approximation).\\
+  
+{\emphtext use\_bethe\_heitler} - Allows photons to undergo Bethe-Heitler pair
+  production. Default is ``F''. This requires both electron and positron species
+  to be defined.\\
+  
+{\emphtext use\_positron\_brem} - Samples bremsstrahlung radiation from positrons. 
+  Default is ``F''. If ``T'', electrons and positrons share the same 
+  parameter values set in the bremsstrahlung block.\\  
 
 Bremsstrahlung, like QED, requires the code to know which species are electrons
 and which are photons, so uses the same identify system (with
@@ -3521,10 +3625,17 @@ integer to the ion charge when expressed in units of elementary charge). If
 ionisation is considered, the atomic number must be specified for the first
 ion species and all child species will retain the same atomic number.
 
-The direction of emitted macro-photons will always be in the direction of the
-generating macro-electron trajectory. This assumes emission from relativistic
-electrons only - this code will not accurately reproduce the angular
-distribution of bremsstrahlung radiation from low energy electrons.
+If Bethe-Heitler pair production is considered, the user may identify specific
+species to populate with Bethe-Heitler electrons and positrons using the identity
+aliases: \\
+
+{\emphtext identify:bethe\_heitler\_electron} - bh\_electron is also accepted \\
+
+{\emphtext identify:bethe\_heitler\_positron} - bh\_positron is also accepted \\
+
+If these species are unspecified, {\EPOCH} will populate the first electron and 
+positron species present in the code. Additional identity aliases are provided in 
+Section \ref{sec:qed_block}.
 
 \subsection{\texorpdfstring
   {\inlineemph{injector} block}
@@ -3537,7 +3648,10 @@ Everything in this Subsection requires {\EPOCH} Version 4.10 or later.}
 The \inlineemph{injector} block specifies a particle source to be introduced
 through a simulation boundary. Each injector block specifies a source of a
 single species of particle defined by a density, centre of mass drift momentum,
-temperature and number of simulation particles per cell. The current version
+temperature and number of simulation particles per cell. 
+Injectors may also be set-up to inject particles with properties and at times 
+read from files created by the user.
+The current version
 of the injectors is incompatible with the \inlineemph{PER\_SPECIES\_WEIGHT}
 compiler flag, and attempting to use an injector with a version of {\EPOCH}
 compiled with this flag will fail.
@@ -3560,6 +3674,11 @@ care must be taken when introducing relativistic beams since the current due
 to a highly relativistic beam will not be the current due to the centre of mass
 velocity since {\EPOCH} does not use the Maxwell-J\"{u}ttner distribution for
 loading particles.
+
+The user may over-ride this behaviour and inject particles with specific
+momenta, positions, weights and ID values, at specific simulation times. These
+particle parameters are read from files, and syntax for these is provided in 
+Section \ref{sec:file_injectors}.
 
 \subsubsection{Boundary Conditions}
 
@@ -3672,6 +3791,83 @@ end:injector
 {\emphtext
 Injectors are a new feature so please be wary of unusual behaviour, and
 contact the {\EPOCH} development team if unexpected results occur}
+
+\subsubsection{Inject particles from file} \label{sec:file_injectors}
+
+The plasma injectors may be over-written to allow the user to inject macro-particles
+with specific momenta, positions and weight, at given simulation times on given boundaries.
+Files containing injected particle properties must be formatted in a particular way.
+Each variable type (position, momentum, weight, time) must be stored in a separate file.
+Each line of a given file corresponds to a variable value for one particle, and particles must
+be arranged in chronological order.\\
+
+For example, a user wants to inject 3 particles of weights 10, 20 and 30, at times 1.0e-15 s,
+2.0e-15 s and 3.0e-15 s respectively, into a 1D simulation through the x\_min boundary.
+The file containing injection time data would contain:
+
+\begin{lboxverbatim}{inject\_t.txt}
+1.0e-15
+2.0e-15
+3.0e-15
+\end{lboxverbatim}
+
+and the weight data file would contain:
+
+\begin{lboxverbatim}{inject\_w.txt}
+10
+20
+30
+\end{lboxverbatim}
+
+The user could create similar files to describe the $px$, $py$ and $pz$
+momentum components of each injected particle, where the first value in 
+each file would be assigned to the 1.0e-15 macro-particle. In higher
+dimensions, injection position on the boundary must also be specified.
+Particle ID may be given if \inlinecode{-DPARTICLE\_ID} or \inlinecode{-DPARTICLE\_ID4}
+are specified.\\
+
+The user may have multiple file-injectors running simultaneously, by
+defining multiple file-injector blocks. An example block is provided below 
+for a 2D simulation. In this example, all files are present in the same
+directory as the input deck.
+
+\begin{lboxverbatim}{File injectors}
+begin:injector
+
+  boundary = x_min
+  species = Electron
+  inject_from_file = T 
+  
+  y_data = "inject_y.txt"
+  px_data = "inject_px.txt"
+  py_data = "inject_py.txt"
+  w_data = "inject_w.txt"
+  t_data = "inject_t.txt"
+
+end:injector
+\end{lboxverbatim}
+
+{\emphtext inject\_from\_file} - If ``T'', the code will ignore the flux-Maxwellian keys,
+  and will instead inject particles based on the \{...\}\_data keys.\\
+  
+{\emphtext \{x, y, z\}\_data} - Files containing the positions of injected particles.
+  These are not used in 1D simulations, but must be used in 2D and 3D. In this example,
+  no $x$ file is given, as all particles are injected through \inlinecode{x\_min}.\\
+  
+{\emphtext \{px, py, pz\}\_data} - Files containing the momenta of injected particles.
+  These are optional parameters - if a momentum component file is missing, this 
+  component will be set to zero for all injected particles.\\
+  
+{\emphtext w\_data} - The file containing the weights of all injected particles. This 
+  data is mandatory.\\
+ 
+{\emphtext t\_data} - The file containing the times each particle passes the boundary.
+  Injected particles will be positioned outside the simulation window, such that
+  they pass the boundary at the time specified in this file. This data is mandatory.\\
+  
+{\emphtext id\_data} - The file containing the ID values assigned to each injected
+  particle. This is optional, and may only be used if the code is compiled with 
+  either \inlinecode{-DPARTICLE\_ID} or \inlinecode{-DPARTICLE\_ID4}.\\
 
 \subsection{\texorpdfstring
   {\inlineemph{subset} block}
